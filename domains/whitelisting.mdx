@@ -1,0 +1,163 @@
+---
+title: 'Domain-Level Whitelisting'
+description: 'Automatically whitelist all visitors to specific domains for streamlined content display'
+---
+
+Domain-level whitelisting allows you to automatically whitelist all visitors to a specific domain, ensuring they see your full content without requiring URL parameters or other conditions.
+
+## Understanding Domain-Level Whitelisting
+
+When you enable domain-level whitelisting, **all visitors** to that specific domain are automatically whitelisted for their entire session. This means they will see content in **Whitelisted Containers** by default, without needing query parameters or other whitelisting conditions.
+
+### How It Works
+- **Automatic whitelisting** - No URL parameters needed
+- **Domain-specific** - Only applies to the configured domain
+- **Session-wide** - Applies to all pages within that domain
+- **Immediate effect** - Takes effect as soon as visitors land on the domain
+
+## Setting Up Domain-Level Whitelisting
+
+### Step 1: Access Domain Settings
+1. Go to **Domains** in your ElasticFunnels.io dashboard
+2. Find the domain you want to configure
+3. Click **"Edit"** on that domain
+
+### Step 2: Enable Whitelisting
+1. In the domain settings, look for **"Whitelist all visitors"** option
+2. **Toggle it ON** to enable automatic whitelisting
+3. **Save** your domain configuration
+
+### Step 3: Verify Configuration
+- **Enabled**: All visitors to this domain will see full content
+- **Disabled**: Visitors will see compliant content (unless whitelisted by other methods)
+
+## When to Use Domain-Level Whitelisting
+
+### Separate Domains Strategy
+**Best use case**: When you have separate domains for different purposes:
+- **Compliant domain** (e.g., `example-compliant.com`) - For ad platform review
+- **Full content domain** (e.g., `example-full.com`) - For actual traffic
+
+### Traffic Segmentation
+Use domain-level whitelisting when you want to:
+- **Direct real traffic** to a specific domain
+- **Separate compliance review** from actual customer traffic
+- **Simplify visitor experience** - no need for complex URL parameters
+- **Ensure consistent experience** across all pages on that domain
+
+### Campaign-Specific Domains
+Perfect for:
+- **VIP campaigns** with dedicated domains
+- **Affiliate-specific domains** for different partners
+- **Geographic targeting** with country-specific domains
+- **Product-specific domains** for different offers
+
+## Integration with Other Whitelisting Methods
+
+### Priority Order
+When multiple whitelisting methods are configured:
+1. **Domain-level whitelisting** (highest priority)
+2. **Query parameter whitelisting**
+3. **Page event whitelisting**
+4. **Default non-whitelisted state**
+
+### Combined Strategies
+You can combine domain-level whitelisting with:
+- **Query parameter conditions** for additional logic
+- **Page event whitelisting** for specific pages
+- **Visitor segmentation** based on other criteria
+
+## Best Practices
+
+### Domain Organization
+- **Use descriptive domain names** - Make it clear which domain serves which purpose
+- **Keep domains organized** - Document which domains are whitelisted
+- **Test thoroughly** - Verify whitelisting works as expected before going live
+- **Monitor performance** - Track how each domain performs
+
+### Traffic Management
+- **Route traffic appropriately** - Send real visitors to whitelisted domains
+- **Use non-whitelisted domains** for compliance review
+- **Consider SEO impact** - Ensure proper domain strategy for search engines
+- **Plan for scale** - Consider how domain strategy will work as you grow
+
+### Security Considerations
+- **Protect whitelisted domains** - Don't share whitelisted domain URLs publicly
+- **Monitor access** - Keep track of who has access to whitelisted domains
+- **Regular audits** - Review domain settings periodically
+- **Backup strategy** - Have fallback domains if needed
+
+## Troubleshooting
+
+### Common Issues
+- **Whitelisting not working** - Check that the toggle is enabled and saved
+- **Wrong content showing** - Verify domain spelling and configuration
+- **Mixed content** - Ensure all pages on the domain have proper containers
+- **Session issues** - Test in incognito mode to verify fresh session behavior
+
+### Testing Your Setup
+1. **Visit the domain directly** - Should show full content immediately
+2. **Check different pages** - Verify whitelisting applies site-wide
+3. **Test in incognito** - Ensure it works for new visitors
+4. **Verify containers** - Make sure Whitelisted Containers are displaying
+5. **Test other domains** - Ensure non-whitelisted domains show compliant content
+
+### Debugging Steps
+1. **Check domain settings** - Verify the toggle is enabled
+2. **Clear browser cache** - Remove any cached content
+3. **Test with different browsers** - Ensure cross-browser compatibility
+4. **Check page containers** - Verify Whitelisted/Non Whitelisted containers exist
+5. **Review page events** - Ensure no conflicting whitelisting rules
+
+## Advanced Configuration
+
+### Multiple Domain Strategy
+**Example setup**:
+- `yoursite.com` - Non-whitelisted (for compliance)
+- `yoursite-vip.com` - Whitelisted (for real traffic)
+- `yoursite-affiliate.com` - Whitelisted (for affiliate traffic)
+
+### Domain-Specific Funnels
+You can create different funnels for different domains:
+- **Compliant funnel** - For non-whitelisted domains
+- **Full funnel** - For whitelisted domains
+- **Hybrid approach** - Same funnel with different content containers
+
+### Analytics and Tracking
+- **Track domain performance** separately in analytics
+- **Monitor conversion rates** for each domain
+- **Compare performance** between whitelisted and non-whitelisted domains
+- **Optimize based on data** from each domain
+
+## Migration from Parameter-Based Whitelisting
+
+### Transitioning Strategy
+1. **Set up new whitelisted domain** alongside existing setup
+2. **Test thoroughly** with small traffic sample
+3. **Gradually redirect traffic** to new domain
+4. **Monitor performance** during transition
+5. **Fully migrate** once confident in new setup
+
+### Benefits of Domain-Level Whitelisting
+- **Simpler URLs** - No need for complex parameters
+- **Better user experience** - Cleaner, more professional URLs
+- **Easier management** - Single toggle instead of complex page events
+- **Consistent behavior** - All pages on domain behave the same way
+
+## Compliance Considerations
+
+### Platform Policies
+- **Use responsibly** - Only for legitimate compliance purposes
+- **Keep compliant domains functional** - Don't make them obviously fake
+- **Follow platform guidelines** - Ensure compliance with ad platform terms
+- **Regular policy reviews** - Stay updated with platform policy changes
+
+### Documentation
+- **Document your strategy** - Keep records of which domains serve which purpose
+- **Team training** - Ensure your team understands the domain setup
+- **Change management** - Document any changes to domain configuration
+- **Backup procedures** - Have contingency plans for domain issues
+
+<Note>
+Domain-level whitelisting is a powerful feature that simplifies visitor management. Use it strategically to create clean, professional experiences while maintaining compliance with advertising platforms.
+</Note> 
