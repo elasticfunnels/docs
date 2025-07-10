@@ -1,0 +1,154 @@
+---
+title: 'Page Variants'
+description: 'Create and manage multiple versions of your pages for split testing and optimization'
+---
+
+Page variants allow you to create multiple versions of the same page for split testing, optimization, or different marketing campaigns.
+
+## Creating Page Variants
+
+### Add a New Variant
+1. Go to **Pages** → Select your page
+2. Click **"Add Variant"** or **"Create Variant"**
+3. The system automatically creates a new variant with the next number (V1, V2, V3, etc.)
+4. Edit the new variant with your desired changes
+
+### Variant Naming System
+Elastic Funnels uses a **numerical system** instead of letters:
+- **V1** - First variant (original)
+- **V2** - Second variant  
+- **V3** - Third variant
+- And so on...
+
+**Why numbers instead of letters?**
+- **Clearer progression** - Easy to understand the sequence
+- **No confusion** - No ambiguity about which comes first
+- **Unlimited variants** - Can create as many as needed (V1, V2, V3...V100)
+
+## Managing Variants
+
+### Set Active Variant
+1. **Select the variant** you want to make active
+2. **Click "Set as Active"** or toggle the active status
+3. **The URL updates** automatically to show the active version
+4. **Version parameter** is added to the URL (e.g., `?v=2`)
+
+### Version URL Structure
+- **V1 (Default)**: `https://yoursite.com/page`
+- **V2**: `https://yoursite.com/page?v=2`
+- **V3**: `https://yoursite.com/page?v=3`
+
+### Variant Status
+Each variant has a status:
+- **Active** - Currently serving to visitors
+- **Draft** - Work in progress, not live
+- **Paused** - Temporarily disabled
+- **Archived** - Saved for reference but not active
+
+## Split Testing with Variants
+
+### Page-Level Split Testing
+Use variants for A/B testing different page versions:
+
+1. **Create multiple variants** with different content
+2. **Set up split test** in Page Events or Funnel level
+3. **Configure traffic distribution** (50/50, 70/30, etc.)
+4. **Monitor performance** metrics for each variant
+
+### Funnel-Level Integration
+Variants work seamlessly with funnel split testing:
+- **Split test node** can direct traffic to different variants
+- **Purchase tracking** attributes conversions to specific variants
+- **Analytics** show performance data for each variant
+
+## Best Practices
+
+### Variant Organization
+- **Clear naming** - Use descriptive names beyond just V1, V2, V3
+- **Version notes** - Document what changed in each variant
+- **Purpose tracking** - Record why each variant was created
+- **Performance baseline** - Always keep your original as a control
+
+### Testing Strategy
+- **Test one element** at a time for clear results
+- **Significant changes** - Make meaningful differences between variants
+- **Statistical significance** - Run tests long enough for reliable data
+- **Document results** - Keep notes on what worked and what didn't
+
+### Content Management
+- **Consistent structure** - Keep similar layouts when possible
+- **Asset management** - Organize images and videos for each variant
+- **Mobile optimization** - Ensure all variants work on mobile devices
+- **Loading speed** - Optimize each variant for fast loading
+
+## Advanced Variant Usage
+
+### Campaign-Specific Variants
+Create variants for different marketing campaigns:
+- **Traffic source optimization** - Different versions for different sources
+- **Seasonal campaigns** - Holiday or event-specific versions
+- **Geographic targeting** - Location-specific content
+- **Device optimization** - Mobile vs desktop optimized versions
+
+### Personalization
+Use variants for personalized experiences:
+- **Affiliate-specific** - Different versions for different affiliates
+- **User segment** - Different content for different user types
+- **Purchase history** - Different offers based on past purchases
+- **Behavior-based** - Different content based on user actions
+
+## Technical Implementation
+
+### URL Parameters
+Variants use the `v=` parameter:
+- **Default behavior** - V1 loads without parameter
+- **Explicit versions** - V2+ require `v=2`, `v=3`, etc.
+- **SEO considerations** - Use canonical tags for duplicate content
+- **Analytics tracking** - Ensure proper tracking for each variant
+
+### Page Events Integration
+Variants work with Page Events:
+- **Query parameter conditions** - Can check for version parameter
+- **Dynamic content** - Can load different content based on variant
+- **Conditional logic** - Different actions for different variants
+
+### Funnel Integration
+Variants integrate with funnel flows:
+- **Split test routing** - Direct traffic to specific variants
+- **Purchase attribution** - Track which variant drove the conversion
+- **Upsell sequences** - Different upsells based on variant performance
+
+## Analytics and Reporting
+
+### Performance Metrics
+Track key metrics for each variant:
+- **Conversion rate** - Percentage of visitors who convert
+- **Revenue per visitor** - Average revenue generated
+- **Bounce rate** - Percentage who leave immediately
+- **Time on page** - How long visitors stay
+- **Click-through rate** - Engagement with call-to-action buttons
+
+### Comparison Tools
+- **Side-by-side comparison** - Compare variant performance
+- **Statistical significance** - Determine if differences are meaningful
+- **Confidence intervals** - Understand the reliability of results
+- **Performance trends** - Track improvement over time
+
+## Troubleshooting
+
+### Common Issues
+- **Variants not loading** - Check URL parameters and routing
+- **Split tests not working** - Verify funnel or page event configuration
+- **Analytics not tracking** - Ensure proper tracking setup for variants
+- **Content not updating** - Clear cache and check variant status
+
+### Testing Your Variants
+1. **Direct URL access** - Test each variant URL directly
+2. **Split test functionality** - Verify random distribution works
+3. **Mobile testing** - Check all variants on mobile devices
+4. **Cross-browser testing** - Ensure compatibility across browsers
+5. **Performance testing** - Check loading speed for each variant
+
+<Note>
+Page variants are powerful for optimization, but avoid creating too many variants simultaneously. Focus on testing meaningful differences that could impact your conversion rates.
+</Note> 

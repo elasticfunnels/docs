@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Funnel & Page Builder Documentation",
   "colors": {
-    "primary": "#c03f24",
-    "light": "#c03f24",
-    "dark": "#c03f24"
+    "primary": "#1d4ed8",
+    "light": "#1d4ed8",
+    "dark": "#1d4ed8"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -22,34 +22,61 @@
             ]
           },
           {
-            "group": "Essentials",
+            "group": "Funnels & Page Events",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "API Documentation",
-            "pages": [
-              "api-reference/introduction"
+              "funnels/create-funnel",
+              "funnels/rearrange-nodes",
+              "funnels/split-testing",
+              "funnels/exit-popups",
+              "funnels/dynamic-content",
+              "funnels/page-events",
+              "funnels/query-parameters",
+              "funnels/sequence-nodes"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Pages",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "pages/create-landing-page",
+              "pages/page-variants",
+              "pages/visitor-based-content"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "integrations/meta-ads",
+              "integrations/google-ads",
+              "integrations/google-analytics",
+              "integrations/buygoods",
+              "integrations/clickbank",
+              "integrations/clickbank-vendor",
+              "integrations/affiliate-tracking"
+            ]
+          },
+          {
+            "group": "Forms & Data",
+            "pages": [
+              "forms/lead-capture",
+              "forms/thank-you-pages",
+              "forms/export-data"
+            ]
+          },
+          {
+            "group": "Products & Sales",
+            "pages": [
+              "products/buy-links",
+              "products/upsells",
+              "products/custom-attributes",
+              "products/advanced-purchase-links"
+            ]
+          },
+          {
+            "group": "Domains & Customization",
+            "pages": [
+              "domains/custom-domains",
+              "domains/customization",
+              "domains/whitelisting"
             ]
           }
         ]
@@ -58,19 +85,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Email Support",
+          "href": "mailto:support@elasticfunnels.io",
+          "icon": "envelope"
         }
       ]
     }

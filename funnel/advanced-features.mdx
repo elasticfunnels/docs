@@ -1,0 +1,62 @@
+---
+title: 'Advanced Features & Testing'
+description: 'Master split testing, exit popups, and dynamic content for enhanced funnel performance'
+---
+
+# Advanced Features & Testing
+
+Unlock powerful features to optimize your funnels and maximize conversions.
+
+## How do I add a split-test node for my headline or video?
+
+**Description:** Learn how to test different versions (e.g., headlines or video content) within a single funnel step.
+
+### AI Setup
+1. You first need to add a "split test container" component where you want your split test content to show up
+2. Then you go to the page events builder for that page
+3. Click "Add Node"
+4. Type a prompt like, "I want to split test video 1 and video 2 for people from the United States"
+5. Add a "Split Test Component" node if needed, ensuring you've selected a Split Test Container
+
+### Manual Setup
+1. **Create the headline (or element) as a component:**
+   - Right-click an element in the page builder and select "Create a new component," or build one from scratch
+2. **Add a "Split Test Container" on the page and name it for reference**
+3. **Go to the page events builder:**
+   - Click "Add Node" and select "Split Test Component"
+   - Select the container for the split test
+   - Set the traffic percentage for each variant and choose the components to show
+4. **Ensure connections:**
+   - Connect the split test component node to the "entry node" or "script rule" node if not already connected
+
+## How do I build an exit popup that triggers on exit intent?
+
+**Description:** An exit popup appears when a user's mouse moves toward leaving the page, giving you a final opportunity to engage them.
+
+### AI Setup
+1. Go to the page events builder for the desired page
+2. Click "Add Node"
+3. Type a prompt, such as "Show [popup name] popup when a user tries to leave"
+
+### Manual Setup
+1. Go to "Pages" → "Advanced" → "Popups"
+2. Click "Create Popup" and give it a name
+3. Select a base template if needed
+4. Return to the page events builder for the page
+5. Click "Add Node" and select the "Exit Intent" node
+6. Add a "Popup" node and connect it to the "Exit Intent" node
+
+## How do I incorporate dynamic content blocks that change based on user behavior?
+
+**Description:** Dynamic content automatically updates elements for scenarios like showing special pricing to certain affiliates or location-based offers.
+
+### AI Setup
+1. Go to the page events builder
+2. Click "Add Node"
+3. Type a prompt like, "Change content 'packages' for affiliate ID 100 with 'packages cheaper'"
+4. Add a "Dynamic Container" node to ensure content replacement
+
+### Manual Setup
+1. **Wrap Components:** In the page builder, wrap the desired element (e.g., packages) in a "Dynamic Container" block. Name the block for easy reference
+2. **Define Conditions:** In the page events builder, click "Add Node" and select "Script Rule." Specify conditions (e.g., affiliate ID, location)
+3. **Set Up the Dynamic Container:** Add a "Dynamic Container" node and specify the content to replace when conditions are met 

@@ -1,0 +1,220 @@
+---
+title: 'Query Parameter Conditions'
+description: 'Use URL parameters to control visitor behavior and content display'
+---
+
+Query Parameter Conditions allow you to create dynamic experiences based on URL parameters. This is essential for affiliate tracking, visitor-based content display, and personalized visitor experiences.
+
+## Understanding Query Parameters
+
+Query parameters are the part of a URL that comes after the `?` symbol:
+- **Base URL**: `https://yoursite.com/page`
+- **With parameters**: `https://yoursite.com/page?vtID=k&source=facebook`
+
+In this example:
+- `vtID` is a parameter with value `k`
+- `source` is a parameter with value `facebook`
+
+## Query Parameter Condition Node
+
+The Query Parameter Condition node checks if URL parameters exist or have specific values.
+
+### Basic Setup
+1. Go to **Page Events** for your page
+2. Click **"Add Node"** 
+3. Select **"Query Parameter Condition"**
+4. Configure the parameter name and condition
+5. Connect to appropriate action nodes
+
+### Available Operators
+- **Equals** - Parameter exactly matches a value
+- **Not Equals** - Parameter doesn't match a value
+- **Contains** - Parameter contains a substring
+- **Is Empty** - Parameter exists but has no value
+- **Is Not Empty** - Parameter exists and has a value
+- **Greater Than** - Parameter value is greater than specified number
+- **Less Than** - Parameter value is less than specified number
+
+## Common Use Cases
+
+### Content Whitelisting
+Use parameters to control access to full content:
+
+**Example**: `https://yoursite.com/page?vtID=k`
+
+**Configuration**:
+1. Go to **Page Events** for the specific page you want to configure
+2. From the **"On Page Loaded"** node, drag a new **"Query Parameter Condition"** node
+3. Configure: Parameter `vtID`, Operator `Equals`, Value `k`
+4. From the **"Query Parameter Condition"** node, drag a **"Whitelist Visitor"** node
+
+**Result**: Visitors with the correct parameter see full content
+
+### Affiliate Tracking
+Track different affiliate sources:
+
+**Example**: `https://yoursite.com/page?affID=100`
+
+**Configuration**:
+- Parameter: `affID`
+- Operator: `Equals`
+- Value: `100`
+- Action: `Dynamic Container` (show affiliate-specific content)
+
+### Campaign Tracking
+Show different content based on campaign:
+
+**Example**: `https://yoursite.com/page?campaign=summer2024`
+
+**Configuration**:
+- Parameter: `campaign`
+- Operator: `Equals`
+- Value: `summer2024`
+- Action: `Dynamic Container` (show summer promotion)
+
+### Geographic Targeting
+Redirect based on location parameter:
+
+**Example**: `https://yoursite.com/page?country=US`
+
+**Configuration**:
+- Parameter: `country`
+- Operator: `Equals`
+- Value: `US`
+- Action: `Load Page` (US-specific page)
+
+## Advanced Parameter Logic
+
+### Multiple Conditions
+You can check multiple parameters in sequence:
+
+1. **First condition**: Check if `vtID` is not empty
+2. **Second condition**: Check if `source` equals `facebook`
+3. **Action**: Show Facebook-specific whitelisted content
+
+### Conditional Branching
+Use different actions based on parameter values:
+
+**Setup**:
+- Parameter: `traffic_source`
+- **If equals "google"** → Show Google-optimized content
+- **If equals "facebook"** → Show Facebook-optimized content
+- **If empty** → Show default content
+
+### Parameter Validation
+Ensure parameters meet specific criteria:
+
+**Example**: Only whitelist if affiliate ID is valid
+- Parameter: `affID`
+- Operator: `Greater Than`
+- Value: `0`
+- Action: `Whitelist Visitor`
+
+## Integration with Other Features
+
+### Whitelisting System
+Query parameters are the primary method for visitor whitelisting:
+
+**Common patterns**:
+- `vtID=k` for general whitelisting
+- `access=premium` for premium content
+- `preview=true` for preview mode
+
+### Split Testing
+Use parameters to control which visitors see which tests:
+
+**Example**: `https://yoursite.com/page?test=variant_a`
+- Show specific split test variant based on parameter
+- Useful for controlled testing or affiliate-specific variants
+
+### Dynamic Content
+Parameters can trigger dynamic content changes:
+
+**Example**: `https://yoursite.com/page?price=discounted`
+- Show special pricing based on parameter
+- Useful for limited-time offers or special promotions
+
+## Best Practices
+
+### Parameter Naming
+- **Use clear names** - `vtID`, `affID`, `campaign` are descriptive
+- **Be consistent** - Use the same parameter names across all pages
+- **Avoid conflicts** - Don't use parameter names that conflict with system parameters
+
+### Security Considerations
+- **Don't rely on parameters alone** for security
+- **Validate parameter values** to prevent injection attacks
+- **Use HTTPS** when passing sensitive information
+- **Consider parameter encryption** for highly sensitive data
+
+### URL Management
+- **Keep URLs clean** - Use only necessary parameters
+- **Document parameter usage** - Maintain a list of all parameters and their purposes
+- **Test parameter combinations** - Ensure multiple parameters work together
+
+## Common Parameter Patterns
+
+### Affiliate Tracking
+Standard parameters for affiliate management:
+- `affID` or `aff` - Affiliate identifier
+- `subID` - Sub-affiliate or campaign identifier
+- `source` - Traffic source (google, facebook, etc.)
+- `medium` - Traffic medium (cpc, social, email, etc.)
+
+### Content Control
+Parameters for content management:
+- `vtID` - Visitor type identifier for whitelisting
+- `access` - Access level (free, premium, vip)
+- `preview` - Preview mode for testing
+- `version` - Content version or variant
+
+### Campaign Tracking
+Parameters for campaign management:
+- `campaign` - Campaign name or identifier
+- `utm_source` - UTM source tracking
+- `utm_medium` - UTM medium tracking
+- `utm_campaign` - UTM campaign tracking
+
+## Troubleshooting
+
+### Common Issues
+- **Parameter not recognized** - Check spelling and case sensitivity
+- **Condition not triggering** - Verify operator and value match exactly
+- **Multiple parameters conflicting** - Check the order of conditions
+- **URL encoding issues** - Ensure special characters are properly encoded
+
+### Testing Parameters
+1. **Manual testing** - Add parameters to URLs and test functionality
+2. **Browser tools** - Use developer tools to inspect parameter values
+3. **Incognito mode** - Test without cached data
+4. **Different browsers** - Ensure cross-browser compatibility
+
+### Debugging Tips
+- **Check parameter spelling** - Parameters are case-sensitive
+- **Verify operator logic** - Ensure you're using the correct operator
+- **Test empty states** - Check what happens when parameters are missing
+- **Monitor page events** - Use debugging tools to track node execution
+
+## Advanced Implementation
+
+### Dynamic Parameter Generation
+Generate parameters dynamically:
+- **JavaScript generation** - Create parameters based on user behavior
+- **Server-side generation** - Add parameters based on server logic
+- **Third-party integration** - Parameters from external systems
+
+### Parameter Persistence
+Maintain parameters across page navigation:
+- **Session storage** - Store parameters for the session
+- **Local storage** - Store parameters persistently
+- **URL rewriting** - Automatically add parameters to all links
+
+### API Integration
+Use parameters for API calls:
+- **Pass parameters to external APIs** - Forward tracking data
+- **Receive parameters from APIs** - Get data from external systems
+- **Webhook integration** - Send parameter data to webhooks
+
+<Note>
+Query parameters are powerful but should be used thoughtfully. Too many parameters can make URLs unwieldy and harder to manage. Focus on the parameters that provide the most value for your specific use case.
+</Note> 

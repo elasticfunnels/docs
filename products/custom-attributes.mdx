@@ -1,0 +1,99 @@
+---
+title: 'Custom Product Attributes'
+description: 'Add custom information like bonuses, URLs, and metadata to your products'
+---
+
+Custom attributes let you include additional information (e.g., bonus URLs) on product pages.
+
+## Create Custom Attributes
+
+### Step 1: Add Attributes to Product
+1. In "Products," select or create the product
+2. Scroll to "Custom Attributes" and add a new key-value pair (e.g., "bonus_url" → "https://yourbonuslink")
+3. Save your changes
+
+### Step 2: Use in Page Builder
+1. Add a "Product Item" component to your page
+2. In the properties tab, configure fields such as Product Type and Classification (e.g., Bonus)
+3. To display attributes, add text or links using `{product.attributes.[attribute_name]}`, e.g., `{product.attributes.bonus_url}`
+
+## Common Attribute Types
+
+### Bonus Content
+- **bonus_url**: Link to bonus materials
+- **bonus_description**: Description of bonus content
+- **bonus_value**: Monetary value of bonuses
+
+### Product Details
+- **warranty_period**: Product warranty information
+- **shipping_weight**: For shipping calculations
+- **dimensions**: Product size specifications
+- **color_options**: Available color variants
+
+### Marketing Data
+- **launch_date**: When product was released
+- **bestseller_rank**: Ranking information
+- **testimonial_count**: Number of reviews/testimonials
+- **guarantee_terms**: Money-back guarantee details
+
+## Display Attributes on Pages
+
+### Text Display
+```
+Bonus Value: {product.attributes.bonus_value}
+```
+
+### Link Display
+```html
+<a href="{product.attributes.bonus_url}">Download Your Bonus</a>
+```
+
+### Conditional Display
+Show attributes only if they exist:
+```
+{if product.attributes.warranty_period}
+  Warranty: {product.attributes.warranty_period}
+{endif}
+```
+
+## Advanced Use Cases
+
+### Dynamic Pricing
+- Store different price points for different audiences
+- Show member vs. non-member pricing
+- Regional pricing variations
+
+### Affiliate-Specific Content
+- Custom bonuses per affiliate
+- Affiliate-specific landing page content
+- Tracking codes and parameters
+
+### Seasonal Promotions
+- Holiday-specific offers
+- Limited-time bonus content
+- Seasonal product variations
+
+## Best Practices
+
+### Naming Conventions
+- Use descriptive, consistent attribute names
+- Avoid spaces (use underscores: `bonus_url` not `bonus url`)
+- Keep names lowercase for consistency
+
+### Data Management
+- Regularly audit and clean up unused attributes
+- Document what each attribute is used for
+- Maintain consistency across similar products
+
+### Performance Considerations
+- Don't create excessive attributes for single products
+- Use attributes efficiently to avoid page slowdowns
+- Cache frequently accessed attribute data
+
+## Troubleshooting
+
+### Common Issues
+- **Attribute not displaying**: Check spelling and syntax
+- **Broken links**: Verify URLs in attribute values
+- **Missing data**: Ensure attributes are saved to the product
+- **Formatting problems**: Check for special characters in attribute values 

@@ -1,0 +1,304 @@
+---
+title: 'Funnel & Page Builder FAQ and Advanced Features'
+description: 'Comprehensive guide to building, tracking, and managing funnels with advanced features and troubleshooting'
+---
+
+# Funnel & Page Builder FAQ and Advanced Features
+
+Welcome! This document combines frequently asked questions (FAQ) with additional reference material about short-code redirection, funnel flow processing, and more. It's aimed at helping you successfully build, track, and manage funnels or landing pages, while providing optional technical notes for deeper customization.
+
+## Getting Started with Funnels
+
+### How do I create a new funnel from scratch?
+
+**Description:** Learn how to start a fresh funnel, assign domains, and organize your funnel steps.
+
+**Instructions:**
+1. From your main dashboard, click on "Funnels"
+2. Click the "Create New Funnel" button
+3. Enter a funnel name
+4. Assign one or more domains (optional: set as default for a domain)
+5. Proceed to the builder interface
+6. Click "Add Node" to add your first funnel step (e.g., a page or a redirect)
+7. Connect your nodes to define the journey
+8. Click "Save" to store your changes
+
+### How do I create a new landing page from scratch using the page builder?
+
+**Description:** A dedicated landing page helps you showcase your product or service effectively to visitors.
+
+**Instructions:**
+1. Select "Pages" in your dashboard
+2. Click "Create Page," then name it
+3. Choose a domain if you want the page to be available only on that domain (otherwise, it's available on all project domains)
+4. Pick a "Page Type": visual builder or code editor (for more customization, requires programming knowledge)
+5. In the visual builder, drag and drop elements (text, images, forms, etc.) to design your layout
+6. Save your page and preview it
+7. You can publish it immediately or keep it as a draft
+
+### How do I rearrange or auto‑layout nodes in my funnel builder?
+
+**Description:** Rearranging nodes keeps your funnel organized and visually clear.
+
+**Instructions:**
+1. Click and drag any node to manually reposition it
+2. Look for a "Rearrange" button and click it to reposition all nodes automatically
+3. Adjust as needed, then click "Save"
+4. Reload the funnel to ensure changes stick
+
+## Advanced Features & Testing
+
+### How do I add a split-test node for my headline or video?
+
+**Description:** Learn how to test different versions (e.g., headlines or video content) within a single funnel step.
+
+**AI Setup:**
+1. You first need to add a "split test container" component where you want your split test content to show up
+2. Then you go to the page events builder for that page
+3. Click "Add Node"
+4. Type a prompt like, "I want to split test video 1 and video 2 for people from the United States"
+5. Add a "Split Test Component" node if needed, ensuring you've selected a Split Test Container
+
+**Manual Setup:**
+1. Create the headline (or element) as a component:
+   - Right-click an element in the page builder and select "Create a new component," or build one from scratch
+2. Add a "Split Test Container" on the page and name it for reference
+3. Go to the page events builder:
+   - Click "Add Node" and select "Split Test Component"
+   - Select the container for the split test
+   - Set the traffic percentage for each variant and choose the components to show
+4. Ensure connections:
+   - Connect the split test component node to the "entry node" or "script rule" node if not already connected
+
+### How do I build an exit popup that triggers on exit intent?
+
+**Description:** An exit popup appears when a user's mouse moves toward leaving the page, giving you a final opportunity to engage them.
+
+**AI Setup:**
+1. Go to the page events builder for the desired page
+2. Click "Add Node"
+3. Type a prompt, such as "Show [popup name] popup when a user tries to leave"
+
+**Manual Setup:**
+1. Go to "Pages" → "Advanced" → "Popups"
+2. Click "Create Popup" and give it a name
+3. Select a base template if needed
+4. Return to the page events builder for the page
+5. Click "Add Node" and select the "Exit Intent" node
+6. Add a "Popup" node and connect it to the "Exit Intent" node
+
+### How do I incorporate dynamic content blocks that change based on user behavior?
+
+**Description:** Dynamic content automatically updates elements for scenarios like showing special pricing to certain affiliates or location-based offers.
+
+**AI Setup:**
+1. Go to the page events builder
+2. Click "Add Node"
+3. Type a prompt like, "Change content 'packages' for affiliate ID 100 with 'packages cheaper'"
+4. Add a "Dynamic Container" node to ensure content replacement
+
+**Manual Setup:**
+1. **Wrap Components:** In the page builder, wrap the desired element (e.g., packages) in a "Dynamic Container" block. Name the block for easy reference
+2. **Define Conditions:** In the page events builder, click "Add Node" and select "Script Rule." Specify conditions (e.g., affiliate ID, location)
+3. **Set Up the Dynamic Container:** Add a "Dynamic Container" node and specify the content to replace when conditions are met
+
+## Integrations & Marketing
+
+### How do I connect Meta Ads to my funnel?
+
+**Description:** Integrating Meta Ads (Facebook) lets you track ad performance and conversions within your funnel.
+
+**Instructions:**
+1. Go to "Settings" or "Integrations"
+2. Click "New Integration" and follow the redirect to Facebook
+3. Once back, select the ad account ID associated with this project
+
+### How do I connect Google Ads to my funnel?
+
+**Description:** Integrating Google Ads helps you track clicks and conversions directly from your funnel pages.
+
+**Instructions:**
+1. Go to "Settings" or "Integrations"
+2. Click "New Integration" and follow the prompts for Google
+3. Select the ad account ID associated with this project
+
+### How do I connect Google Analytics to my funnel?
+
+**Description:** Google Analytics provides insight into user behavior, traffic sources, and conversions.
+
+**Instructions:**
+1. Go to "Settings" or "Integrations"
+2. Click "Activate" and provide your Measurement ID
+
+### How do I connect Buygoods as an affiliate to my funnel?
+
+**Description:** Buygoods integration for affiliates enables automatic tracking and postback across your funnel.
+
+**Instructions:**
+1. Go to "Settings" or "Integrations"
+2. Click "Activate" and copy the conversion and refund URLs
+3. Go to Buygoods Backoffice and add the URLs
+
+<Note>This integration is used as an affiliate. To integrate as a vendor, use the merchants section.</Note>
+
+### How do I connect Clickbank as an affiliate to my funnel?
+
+**Description:** Clickbank integration for affiliates automatically tracks conversions and postbacks.
+
+**Instructions:**
+1. Go to "Settings" or "Integrations"
+2. Click "Activate" and provide the API key (see How to Create ClickBank API Keys)
+
+<Note>This integration is used as an affiliate. To integrate as a vendor, use the merchants section.</Note>
+
+## Forms & Data Collection
+
+### How do I integrate a lead capture form into my funnel?
+
+**Description:** Capture leads by creating a custom collection for storing user data, then embedding it into your page.
+
+**Instructions:**
+
+**Create a Collection Form:**
+1. Go to "Pages" → "Advanced" → "Collections"
+2. Click "Create Collection"
+3. Enter a name, define what happens on a new entry, and decide if you want to allow public export (e.g., for suppressions)
+
+**Configure Fields:**
+1. Add fields (Text Field, Email Field, etc.)
+2. Set attributes like required, searchable, private, and encrypt (for suppressions)
+
+**Add the Form to a Page:**
+1. Go to the page builder and click the "+" button at the top left to add a new component
+2. Search for your collection by name, then drag and drop the form
+
+**Configure Form Submission:**
+1. Select the "Form" element in the "Layers" tab at the bottom left
+2. In the properties tab, configure the success message or choose what to do after submission (show a modal, redirect, or display a message)
+3. If opting to show a modal, create it first by adding a modal component
+
+### How do I create a custom "thank you" page after a form submission?
+
+**Description:** A custom "thank you" page can confirm submission success and guide users to next steps.
+
+**Instructions:**
+
+**Create and Stylize a "Thank You" Page:**
+1. Create a new page named "Thank You"
+2. Design and stylize it as you wish
+
+**Set Up the Collection Form:**
+1. Create a collection and add it to the page where you collect data
+2. Find the form in the layers list
+
+**Configure Redirection:**
+1. In the form settings, choose "Redirect to URL" upon successful submission
+2. Enter your "Thank You" page URL
+3. Save
+
+Submitting the form should now redirect users to the thank-you page.
+
+### How do I export collection entries to CSV?
+
+**Description:** Exporting collection entries allows for data analysis or sharing outside the platform.
+
+**Instructions:**
+1. Go to "Collections" in your dashboard
+2. Find the collection you need in the list
+3. Click the "Export" button
+4. A modal appears where you can:
+   - Enter your email address
+   - Choose "New entries only" if applicable
+   - Select the fields to export (e.g., Name, Email, Date Added)
+5. Click "Export"
+6. You'll receive an email once the export is complete
+
+## Products & Sales
+
+### How do I add a buy link for my products?
+
+**Description:** Buy links let customers purchase products directly from your page.
+
+**Instructions:**
+
+**Add a Product:**
+1. Go to "Products" → "Add Product"
+2. Fill out all necessary information and define a product code
+3. Include cost of goods if you want reporting
+
+**Embedding the Buy Link:**
+1. Create a link tag and insert `[BUY=product_code]` or `[UPSELL=product_code]`
+2. You can pass more data, e.g., `[BUY=product_code cbfid=1234 extra=abcd]`
+
+**Merchant Information:**
+1. If you have a different code on Buygoods, Clickbank, or Digistore24, go to the "Merchant Information" tab
+2. Associate the correct product ID from that platform
+
+### How do I set up a redirect to an upsell page after a purchase?
+
+**Description:** Redirecting users to an upsell page after purchase allows you to present additional offers or upgrades.
+
+**Instructions:**
+1. In your funnel builder, locate the page node where the purchase will occur
+2. Add a "Purchase" node to the page node
+3. After adding it, use a "Page" node to select an upsell page or a "Redirect to URL" node to enter the upsell URL
+4. Connect the "Purchase" node to the next step
+5. Save your funnel and perform a test purchase to ensure redirection works as expected
+
+### How do I add custom attributes (like bonuses) to my product pages?
+
+**Description:** Custom attributes let you include additional information (e.g., bonus URLs) on product pages.
+
+**Instructions:**
+
+**Create Custom Attributes:**
+1. In "Products," select or create the product
+2. Scroll to "Custom Attributes" and add a new key-value pair (e.g., "bonus_url" → "https://yourbonuslink")
+3. Save your changes
+
+**Use in Page Builder:**
+1. Add a "Product Item" component to your page
+2. In the properties tab, configure fields such as Product Type and Classification (e.g., Bonus)
+3. To display attributes, add text or links using `{product.attributes.[attribute_name]}`, e.g., `{product.attributes.bonus_url}`
+
+### How do I capture affiliate or referral data?
+
+**Description:** Automatically capturing affiliate data helps you track marketing performance across different platforms.
+
+**Instructions:**
+- Affiliate data is automatically tracked for affiliates from Buygoods, Clickbank, and Digistore24 once you've defined a merchant
+- View stats on your dashboard for each affiliate individually
+
+## Domain & Customization
+
+### How do I assign a custom domain to my funnel and enable SSL?
+
+**Description:** Using a custom domain provides a branded URL and increases user trust through SSL encryption.
+
+**Instructions:**
+1. Go to the "Domains" section in your dashboard
+2. Click "Add Domain" and switch to "Custom Domain"
+3. Enter your domain (e.g., example.com)
+4. If you need SSL now, check "I want SSL for this domain"
+5. If not, request SSL later from the domains list by clicking the options button and selecting "Request SSL" once the domain is validated
+6. Associate the domain with a merchant to automatically update buy links (e.g., Buygoods, Clickbank, Digistore24)
+7. Optionally, add reCAPTCHA site and private key for collection forms
+8. Update your DNS with the required A record and TXT record for validation. Both must be added
+9. You'll receive an email once validated. If you encounter issues, email support
+
+### How do I adjust the look and feel (fonts, colors, etc.) of my funnel pages?
+
+**Description:** Branding your pages consistently with the right colors and fonts strengthens your online presence.
+
+**Instructions:**
+
+**Colors (Theme Styles):**
+1. In the page builder, click the "Theme Styles" button (palette icon) on the left toolbar
+2. Adjust settings like Primary, Secondary, Accent, Background, etc.
+3. Choose from theme styles or enter a hex code directly
+4. Save changes to apply
+
+**Fonts:**
+1. Click the "Fonts" button on the toolbar (marked with "T")
+2. Install new fonts if needed
+3. Set the font on specific elements through the style tab 

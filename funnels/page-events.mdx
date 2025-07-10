@@ -1,0 +1,188 @@
+---
+title: 'Page Events'
+description: 'Advanced page event system for controlling visitor behavior and content flow'
+---
+
+Page Events allow you to create complex logic flows that control what happens when visitors interact with your pages. Think of it as a visual programming system for your funnel.
+
+## Understanding Page Events
+
+Page Events use a **node-based system** where you connect different actions and conditions to create custom visitor experiences.
+
+### Node Execution Flow
+Page Events follow a specific execution order:
+- **Left to right** - Nodes execute in left-to-right order
+- **Top to bottom** - When multiple nodes connect from one source, they execute top to bottom
+- **Sequential processing** - Each node completes before moving to the next
+
+### Entry Points
+Every page event flow starts from an entry point:
+- **Page Load** - Triggers when the page first loads
+- **Form Submit** - Triggers when a form is submitted
+- **Button Click** - Triggers when specific buttons are clicked
+- **Exit Intent** - Triggers when user tries to leave the page
+
+## Core Node Types
+
+### Condition Nodes
+Control flow based on visitor data or behavior:
+
+**Query Parameter Condition**
+- Check if URL parameters exist or have specific values
+- Example: `vtID` equals `k` for whitelisting
+- Supports operators: equals, not equals, contains, is empty, is not empty
+
+**Script Rule** 
+- Advanced JavaScript-based conditions
+- Check visitor location, device, referrer, etc.
+- Custom logic for complex scenarios
+
+**Split Test Component**
+- Randomly assign visitors to different variants
+- Set traffic percentages for each variant
+- Connect to different content or actions
+
+### Action Nodes
+Perform specific actions based on conditions:
+
+**Whitelist Visitor**
+- Mark visitor as whitelisted for session
+- Allows access to Whitelisted containers
+- Persists across page navigation
+
+**Mark Visitor as Not Whitelisted**
+- Remove whitelist status
+- Force visitor to see compliant content
+- Useful for testing or conditional access
+
+**Load Page**
+- Load a different page into the same URL
+- Maintain URL while changing content
+- Alternative to redirect for compliance
+
+**Redirect to URL**
+- Send visitor to a different URL
+- External or internal redirects
+- Useful for affiliate links or external tools
+
+**Dynamic Container**
+- Change content within containers
+- Personalize based on visitor data
+- A/B test specific elements
+
+### Utility Nodes
+Helper nodes for complex flows:
+
+**Sequence**
+- Acts like a "for each" loop in programming
+- Executes connected nodes one by one
+- Useful for organizing complex flows
+- Ensures proper execution order
+
+**Router**
+- Creates junction points in your flow
+- Generates unique URLs for testing
+- Useful for complex split testing scenarios
+
+## Advanced Page Event Patterns
+
+### Whitelisting Flow
+Common pattern for visitor-based content display:
+
+1. **Page Load** → **Query Parameter Condition** (`vtID` is not empty)
+2. **Yes** → **Whitelist Visitor**
+3. **No** → Continue with compliant content
+
+### Split Testing with Conditions
+Test different content for whitelisted users:
+
+1. **Page Load** → **Query Parameter Condition** (`vtID` is not empty)  
+2. **Yes** → **Sequence** → **Whitelist Visitor** + **Split Test Component**
+3. **Split Test** → Load different page variants
+
+### Dynamic Content Personalization
+Show different content based on visitor data:
+
+1. **Page Load** → **Script Rule** (check affiliate ID)
+2. **Affiliate ID = 100** → **Dynamic Container** (show special pricing)
+3. **Other** → **Dynamic Container** (show regular pricing)
+
+## Best Practices
+
+### Flow Organization
+- **Keep flows simple** - Complex flows are harder to debug
+- **Use descriptive names** for nodes and connections
+- **Group related logic** with Sequence nodes
+- **Test each branch** of your logic
+
+### Performance Considerations
+- **Minimize node chains** - Long chains can slow page loading
+- **Use efficient conditions** - Simple parameter checks are faster than complex scripts
+- **Consider caching** - Some conditions can be cached for performance
+
+### Debugging Tips
+- **Test in incognito mode** - Avoid cached states
+- **Use browser developer tools** - Check for JavaScript errors
+- **Test all conditions** - Verify both true and false paths
+- **Check parameter spelling** - Case-sensitive parameter names
+
+## Common Use Cases
+
+### Affiliate Management
+- Show different content based on affiliate ID
+- Redirect to affiliate-specific pages
+- Track affiliate performance
+
+### Geographic Targeting
+- Show different offers based on visitor location
+- Redirect to region-specific pages
+- Comply with local regulations
+
+### Device Optimization
+- Show mobile-optimized content on mobile devices
+- Redirect to app store links on mobile
+- Optimize for different screen sizes
+
+### Traffic Source Optimization
+- Show different content based on referrer
+- Optimize for different traffic sources
+- Track campaign performance
+
+## Integration with Other Features
+
+### Funnel Integration
+Page Events work seamlessly with funnel flows:
+- **Purchase nodes** trigger after successful page events
+- **Upsell flows** can use page event data
+- **Conversion tracking** includes page event data
+
+### Analytics Integration
+Page Events provide rich data for analytics:
+- **Node execution tracking** - See which paths visitors take
+- **Conversion attribution** - Track which events lead to conversions
+- **Performance metrics** - Monitor page event execution times
+
+### Form Integration
+Page Events can respond to form submissions:
+- **Pre-submission validation** - Check form data before submission
+- **Post-submission actions** - Redirect or show content after submission
+- **Conditional form processing** - Different actions based on form data
+
+## Troubleshooting
+
+### Common Issues
+- **Events not firing** - Check node connections and entry points
+- **Conditions not working** - Verify parameter names and values
+- **Page not loading** - Check for infinite loops in your flow
+- **Content not updating** - Verify container names and dynamic content setup
+
+### Testing Strategies
+1. **Start simple** - Test basic flows before adding complexity
+2. **Use browser tools** - Check console for errors
+3. **Test all paths** - Verify both success and failure conditions
+4. **Clear session data** - Reset visitor state between tests
+5. **Use preview mode** - Test without affecting live traffic
+
+<Note>
+Page Events are powerful but require careful planning. Start with simple flows and gradually add complexity as you become more comfortable with the system.
+</Note> 

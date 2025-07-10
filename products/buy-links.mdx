@@ -1,0 +1,79 @@
+---
+title: 'Buy Links'
+description: 'Add purchase links to enable direct product sales from your pages'
+---
+
+Buy links let customers purchase products directly from your page.
+
+## Add a Product
+
+### Step 1: Create Product
+1. Go to "Products" → "Add Product"
+2. Fill out all necessary information and define a product code
+3. Include cost of goods if you want reporting
+
+### Step 2: Embedding the Buy Link
+1. Create a link tag and insert `[BUY=product_code]` or `[UPSELL=product_code]`
+2. You can pass more data, e.g., `[BUY=product_code cbfid=1234 extra=abcd]`
+
+### Step 3: Merchant Information
+1. If you have a different code on Buygoods, Clickbank, or Digistore24, go to the "Merchant Information" tab
+2. Associate the correct product ID from that platform
+
+## Buy Link Formats
+
+### Basic Buy Link
+```
+[BUY=your_product_code]
+```
+
+### Upsell Link
+```
+[UPSELL=your_product_code]
+```
+
+### Advanced Parameters
+```
+[BUY=product_code cbfid=affiliate_id extra=campaign_data]
+```
+
+## Parameter Options
+
+### Standard Parameters
+- **cbfid**: ClickBank affiliate ID
+- **extra**: Additional tracking data
+- **quantity**: Pre-set purchase quantity
+- **discount**: Apply discount codes
+
+### Platform-Specific
+- **ClickBank**: cbfid, tid (tracking ID)
+- **Buygoods**: bgfid (Buygoods affiliate ID)
+- **Digistore24**: ds24aid (affiliate ID)
+
+## Product Setup Best Practices
+
+### Required Information
+- Clear product name and description
+- Accurate pricing information
+- Product code (keep it simple and memorable)
+- High-quality product images
+
+### Optional but Recommended
+- Cost of goods sold (for profit tracking)
+- Product categories and tags
+- Shipping information
+- Return/refund policy
+
+## Troubleshooting Buy Links
+
+### Common Issues
+- **Link not working**: Verify product code spelling
+- **Wrong price showing**: Check merchant platform settings
+- **Affiliate tracking missing**: Ensure proper parameter format
+- **Payment processing errors**: Verify merchant account status
+
+### Testing Your Links
+- Test purchase flow from start to finish
+- Verify affiliate tracking is working
+- Check that confirmation emails are sent
+- Ensure proper redirect after purchase 

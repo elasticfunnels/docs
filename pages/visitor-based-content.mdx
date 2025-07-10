@@ -1,0 +1,141 @@
+---
+title: 'Visitor-Based Content Display'
+description: 'Show different content to different visitors based on their whitelisting status'
+---
+
+Visitor-based content display allows you to show different content to different visitors - typically compliant content to ad platform reviewers and actual content to real customers.
+
+## Understanding Content Containers
+
+Elastic Funnels uses two types of containers for visitor-based content display:
+
+### Whitelisted Container
+- Contains the **actual content** you want real visitors to see
+- Shows **full content** (VSL, sales pages, etc.)
+- Hidden from ad platform compliance teams
+- Only visible to whitelisted visitors
+
+### Non Whitelisted Container  
+- Contains **compliant content** for ad platform review
+- Shows **safe content** (TSL, basic landing pages)
+- Always visible to non-whitelisted visitors
+- What compliance teams and ad platforms see
+
+## Content Display Methods
+
+### 1. Container-Based Display (Recommended)
+Use Whitelisted and Non Whitelisted containers on the same page:
+
+**Benefits:**
+- Both versions exist on the same URL
+- Easy to understand and manage
+- Clear separation of compliant vs uncompliant content
+- No confusion about redirect destinations
+
+**Setup:**
+1. Add a "Whitelisted Container" to your page
+2. Add your actual content (VSL, sales copy, etc.) inside this container
+3. Add a "Non Whitelisted Container" to your page  
+4. Add compliant content (TSL, basic info) inside this container
+5. Configure whitelisting rules in Page Events (see detailed steps below)
+
+### 2. Page Loading Method
+Load entirely different pages based on visitor status:
+
+**When to use:**
+- Completely different page layouts needed
+- Complex content differences
+- Multiple page variants
+
+**Setup:**
+1. Create separate compliant and uncompliant pages
+2. Use "Load Page" node in Page Events
+3. Connect to query parameter conditions
+
+### 3. Redirect Method
+Redirect users to different URLs based on their status:
+
+**When to use:**
+- External landing pages
+- Different domains for different content
+- Integration with existing systems
+
+## Whitelisting Visitors
+
+### Domain-Level Whitelisting
+Automatically whitelist all visitors to a specific domain:
+
+1. Go to **Domains** → **Edit Domain**
+2. Enable **"Whitelist all visitors"**
+3. All visitors to this domain will automatically see full content
+
+**Use case:** When you have a separate domain for real traffic vs compliance review
+
+### Query Parameter Whitelisting  
+Whitelist visitors based on URL parameters:
+
+1. Go to **Page Events** for the specific page you want to configure
+2. From the **"On Page Loaded"** node, drag a new **"Query Parameter Condition"** node
+3. Configure the parameter you want to check (e.g., `vtID` equals `k`)
+4. From the **"Query Parameter Condition"** node, drag a **"Whitelist Visitor"** node (or **"Mark Visitor as Not Whitelisted"** if needed)
+5. Visitors with the correct parameter will be whitelisted for their entire session
+
+**Example URL:** `https://yoursite.com/page?vtID=k`
+
+### Session-Based Whitelisting
+Once a visitor is whitelisted, they remain whitelisted for their entire session:
+
+- **Persistent:** Whitelisting survives page navigation
+- **Session-wide:** Applies to all pages in the funnel
+- **Automatic:** No need to re-whitelist on each page
+
+## Advanced Whitelisting Scenarios
+
+### Conditional Whitelisting
+Use **"Mark visitor as not whitelisted"** if you need to:
+- Remove whitelist status under certain conditions
+- Require the parameter on every page visit
+- Reset whitelisting for testing
+
+### Multiple Whitelisting Methods
+You can combine different whitelisting methods:
+- Domain-level + Query parameters
+- Different parameters for different content
+- Conditional logic based on traffic source
+
+## Best Practices
+
+### Content Strategy
+- **Keep compliant content functional** - don't make it obviously fake
+- **Maintain similar layout** between versions when possible
+- **Test both versions** regularly to ensure they work
+- **Consider loading speed** - avoid bloated containers
+
+### Implementation Tips
+- **Use descriptive container names** for easy identification
+- **Test whitelisting logic** thoroughly before going live
+- **Monitor both versions** for performance and compliance
+- **Document your whitelisting rules** for team members
+
+### Compliance Considerations
+- **Follow platform policies** - this is for legitimate compliance, not deception
+- **Keep compliant content relevant** to your actual offering
+- **Don't use visitor-based content to hide prohibited content** from platforms
+- **Review platform terms** regularly as they change
+
+## Troubleshooting
+
+### Common Issues
+- **Whitelisting not working:** Check query parameter spelling and case sensitivity
+- **Content not switching:** Verify container names and page events connections
+- **Session issues:** Clear browser cache and cookies for testing
+
+### Testing Your Setup
+1. Visit your page without whitelisting - should see compliant content
+2. Add the whitelisting parameter - should see full content  
+3. Navigate to other pages - should remain whitelisted
+4. Test in incognito mode to verify session behavior
+
+<Warning>
+Visitor-based content display should only be used for legitimate compliance purposes. Using it to deceive ad platforms or hide prohibited content violates platform terms of service and can result in account suspension.
+</Warning> 

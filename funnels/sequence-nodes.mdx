@@ -1,0 +1,264 @@
+---
+title: 'Sequence Nodes'
+description: 'Organize complex page event flows with sequence nodes for better control and execution order'
+---
+
+Sequence nodes help you organize complex page event flows by ensuring actions execute in the correct order. Think of them as "for each" loops that process connected nodes one by one.
+
+## Understanding Sequence Nodes
+
+A sequence node acts as an **organizational container** that executes all connected nodes in a specific order before proceeding to the next step in your flow.
+
+### How Sequences Work
+- **Sequential execution** - Processes each connected node completely before moving to the next
+- **Top to bottom** - Executes nodes from top to bottom when multiple nodes are connected
+- **Completion control** - Waits for all nodes to complete before continuing the flow
+- **Flow organization** - Helps structure complex logic into manageable chunks
+
+### Why Use Sequences?
+- **Ensure execution order** - Critical when some actions depend on others
+- **Organize complex flows** - Group related actions together
+- **Improve debugging** - Easier to track where issues occur
+- **Better visual organization** - Makes page event flows cleaner and more readable
+
+## Basic Sequence Usage
+
+### Creating a Sequence
+1. Go to **Page Events** for your page
+2. Click **"Add Node"**
+3. Select **"Sequence"**
+4. Connect the nodes you want to execute in sequence
+5. Connect the sequence to your main flow
+
+### Simple Example
+**Without Sequence** (execution order not guaranteed):
+```
+Query Parameter Condition → Whitelist Visitor
+                          → Split Test Component
+                          → Dynamic Content
+```
+
+**With Sequence** (guaranteed order):
+```
+Query Parameter Condition → Sequence → Whitelist Visitor
+                                    → Split Test Component  
+                                    → Dynamic Content
+```
+
+## Advanced Sequence Patterns
+
+### Multi-Step Whitelisting
+Ensure visitors are properly whitelisted before showing content:
+
+**Flow**:
+1. **Query Parameter Condition** (`vtID` is not empty)
+2. **Sequence** contains:
+   - Whitelist Visitor
+   - Log Visitor Data
+   - Split Test Component
+3. **Continue** to next flow step
+
+### Conditional Actions
+Perform multiple actions based on a single condition:
+
+**Flow**:
+1. **Script Rule** (check affiliate ID = 100)
+2. **Sequence** contains:
+   - Dynamic Container (show special pricing)
+   - Log Affiliate Visit
+   - Set Custom Tracking
+3. **Continue** to purchase flow
+
+### Data Processing
+Process visitor data in a specific order:
+
+**Flow**:
+1. **Page Load**
+2. **Sequence** contains:
+   - Capture Visitor Info
+   - Validate Data
+   - Store in Database
+   - Send to Analytics
+3. **Continue** to page display
+
+## Best Practices
+
+### When to Use Sequences
+- **Multiple dependent actions** - When action B depends on action A completing
+- **Data processing** - When you need to process information in steps
+- **Complex conditions** - When you have multiple actions after a condition
+- **Clean organization** - When your flow is getting complex and hard to follow
+
+### When NOT to Use Sequences
+- **Single actions** - Don't use sequences for just one node
+- **Independent actions** - When actions don't depend on each other
+- **Simple flows** - When your flow is already clear and simple
+- **Performance critical** - When you need maximum speed (sequences add slight overhead)
+
+### Organization Tips
+- **Group related actions** - Put logically related nodes in the same sequence
+- **Use descriptive names** - Name your sequences clearly (e.g., "Affiliate Processing")
+- **Keep sequences focused** - Don't put too many unrelated actions in one sequence
+- **Document complex flows** - Add comments explaining what each sequence does
+
+## Integration with Other Features
+
+### Whitelisting Workflows
+Sequences are perfect for complex whitelisting scenarios:
+
+**Example**: Affiliate-specific whitelisting
+```
+Query Parameter Condition (affID exists) → Sequence:
+                                           - Validate Affiliate ID
+                                           - Whitelist Visitor
+                                           - Log Affiliate Visit
+                                           - Set Tracking Variables
+```
+
+### Split Testing
+Use sequences to set up conditions before split testing:
+
+**Example**: Conditional split testing
+```
+Query Parameter Condition (vtID = k) → Sequence:
+                                       - Whitelist Visitor
+                                       - Set Test Variables
+                                       - Split Test Component
+```
+
+### Dynamic Content
+Prepare data before showing dynamic content:
+
+**Example**: Personalized content
+```
+Script Rule (check user type) → Sequence:
+                                 - Load User Data
+                                 - Determine Content Type
+                                 - Dynamic Container
+                                 - Track Personalization
+```
+
+## Common Sequence Patterns
+
+### Authentication Flow
+```
+Page Load → Sequence:
+            - Check Authentication
+            - Validate Session
+            - Load User Preferences
+            - Set User Interface
+```
+
+### Affiliate Processing
+```
+Query Parameter Condition → Sequence:
+                            - Validate Affiliate ID
+                            - Set Tracking Variables
+                            - Log Affiliate Visit
+                            - Apply Affiliate Settings
+```
+
+### Purchase Preparation
+```
+Form Submit → Sequence:
+              - Validate Form Data
+              - Calculate Pricing
+              - Set Payment Variables
+              - Prepare Checkout
+```
+
+### Error Handling
+```
+Script Rule (error detected) → Sequence:
+                               - Log Error Details
+                               - Set Error Message
+                               - Redirect to Error Page
+                               - Send Error Notification
+```
+
+## Troubleshooting
+
+### Common Issues
+- **Sequence not executing** - Check that nodes are properly connected to the sequence
+- **Wrong execution order** - Verify the vertical order of nodes connected to the sequence
+- **Sequence hanging** - Check if any connected nodes are causing infinite loops
+- **Performance issues** - Consider if you have too many nodes in a single sequence
+
+### Debugging Sequences
+1. **Test individual nodes** - Make sure each node in the sequence works independently
+2. **Check execution order** - Verify nodes execute in the expected order
+3. **Monitor completion** - Ensure all nodes complete before the sequence continues
+4. **Use browser tools** - Check console for any JavaScript errors
+5. **Test with different data** - Verify the sequence works with various inputs
+
+### Performance Considerations
+- **Minimize unnecessary sequences** - Don't use sequences unless needed
+- **Optimize node order** - Put faster nodes first when possible
+- **Avoid blocking operations** - Don't put long-running operations in sequences
+- **Consider parallel execution** - Some actions might be better executed in parallel
+
+## Advanced Usage
+
+### Nested Sequences
+You can connect sequences to other sequences for complex workflows:
+
+```
+Main Sequence → Sub-sequence 1 → Action A
+                                → Action B
+              → Sub-sequence 2 → Action C
+                                → Action D
+```
+
+### Conditional Sequences
+Use different sequences based on conditions:
+
+```
+Query Parameter Condition → Sequence A (for affiliates)
+                          → Sequence B (for direct traffic)
+```
+
+### Loop-like Behavior
+While not true loops, sequences can simulate iterative processing:
+
+```
+Sequence → Process Data Chunk 1
+        → Process Data Chunk 2
+        → Process Data Chunk 3
+        → Final Processing
+```
+
+## Real-World Examples
+
+### E-commerce Flow
+```
+Add to Cart → Sequence:
+              - Validate Product Availability
+              - Calculate Shipping
+              - Apply Discounts
+              - Update Cart Total
+              - Prepare Checkout
+```
+
+### Lead Generation
+```
+Form Submit → Sequence:
+              - Validate Email Address
+              - Check for Duplicates
+              - Add to Email List
+              - Send Welcome Email
+              - Redirect to Thank You Page
+```
+
+### Content Personalization
+```
+Page Load → Sequence:
+            - Detect User Location
+            - Load User Preferences
+            - Apply Personalization Rules
+            - Display Personalized Content
+            - Track Personalization Event
+```
+
+<Note>
+Sequences are powerful organizational tools, but they should be used judiciously. Overuse can make your flows unnecessarily complex. Focus on using sequences where execution order truly matters or where you need to group related actions for clarity.
+</Note> 

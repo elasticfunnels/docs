@@ -1,0 +1,64 @@
+---
+title: 'Forms & Data Collection'
+description: 'Set up lead capture forms, thank you pages, and manage your collected data'
+---
+
+# Forms & Data Collection
+
+Build effective lead capture systems and manage your customer data efficiently.
+
+## How do I integrate a lead capture form into my funnel?
+
+**Description:** Capture leads by creating a custom collection for storing user data, then embedding it into your page.
+
+### Create a Collection Form
+1. Go to "Pages" → "Advanced" → "Collections"
+2. Click "Create Collection"
+3. Enter a name, define what happens on a new entry, and decide if you want to allow public export (e.g., for suppressions)
+
+### Configure Fields
+1. Add fields (Text Field, Email Field, etc.)
+2. Set attributes like required, searchable, private, and encrypt (for suppressions)
+
+### Add the Form to a Page
+1. Go to the page builder and click the "+" button at the top left to add a new component
+2. Search for your collection by name, then drag and drop the form
+
+### Configure Form Submission
+1. Select the "Form" element in the "Layers" tab at the bottom left
+2. In the properties tab, configure the success message or choose what to do after submission (show a modal, redirect, or display a message)
+3. If opting to show a modal, create it first by adding a modal component
+
+## How do I create a custom "thank you" page after a form submission?
+
+**Description:** A custom "thank you" page can confirm submission success and guide users to next steps.
+
+### Create and Stylize a "Thank You" Page
+1. Create a new page named "Thank You"
+2. Design and stylize it as you wish
+
+### Set Up the Collection Form
+1. Create a collection and add it to the page where you collect data
+2. Find the form in the layers list
+
+### Configure Redirection
+1. In the form settings, choose "Redirect to URL" upon successful submission
+2. Enter your "Thank You" page URL
+3. Save
+
+Submitting the form should now redirect users to the thank-you page.
+
+## How do I export collection entries to CSV?
+
+**Description:** Exporting collection entries allows for data analysis or sharing outside the platform.
+
+**Instructions:**
+1. Go to "Collections" in your dashboard
+2. Find the collection you need in the list
+3. Click the "Export" button
+4. A modal appears where you can:
+   - Enter your email address
+   - Choose "New entries only" if applicable
+   - Select the fields to export (e.g., Name, Email, Date Added)
+5. Click "Export"
+6. You'll receive an email once the export is complete 

@@ -1,0 +1,196 @@
+---
+title: 'Advanced Purchase Links'
+description: 'Enhanced purchase link system with automatic generation and product dropdown integration'
+---
+
+The advanced purchase link system simplifies the process of adding buy buttons and links to your pages with automatic link generation and product dropdown integration.
+
+## Enhanced Link Insertion
+
+### Automatic Product Dropdown
+Instead of manually typing product codes, you can now select products from a dropdown:
+
+1. **Select a link element** in your page builder
+2. **Click "Insert Product Purchase Link"** in the properties panel
+3. **Choose from dropdown** - All defined products appear in the list
+4. **Automatic link generation** - The system automatically creates the correct buy link
+5. **Instant preview** - See the link format immediately
+
+### Benefits of Dropdown Selection
+- **No manual typing** - Eliminates typos in product codes
+- **Visual product selection** - See product names and details
+- **Automatic formatting** - Correct link syntax generated automatically
+- **Consistent codes** - Ensures all links use the same product identifiers
+- **Quick updates** - Change products without remembering codes
+
+## Link Types and Formats
+
+### Standard Purchase Links
+**Generated format**: `[BUY=product_code]`
+- Used for main product purchases
+- Integrates with your configured payment gateway
+- Automatically includes funnel settings (like CBFID)
+
+### Upsell Links
+**Generated format**: `[UPSELL=product_code]`
+- Used for upsell and cross-sell offers
+- Maintains purchase context from previous transaction
+- Optimized for post-purchase flows
+
+### Decline Links
+**Generated format**: `[DECLINE]`
+- Used for "No thanks" or decline buttons
+- Automatically generated for upsell pages
+- Tracks declination rates for optimization
+
+## Product Integration
+
+### Product Definition Requirements
+Before using the dropdown system, ensure you have:
+1. **Products defined** in the Products section
+2. **Product codes assigned** - Each product needs a unique code
+3. **Pricing configured** - Set up your pricing structure
+4. **Merchant integration** - Connected to your payment processor
+
+### Product Organization
+**Best practices for product management**:
+- **Descriptive names** - Use clear, recognizable product names
+- **Consistent codes** - Use logical naming conventions for codes
+- **Category grouping** - Organize products by type or campaign
+- **Regular updates** - Keep product list current and clean
+
+## Advanced Link Features
+
+### Automatic Parameter Addition
+The system automatically adds relevant parameters:
+- **CBFID integration** - Automatically includes ClickBank pitch flow ID
+- **Affiliate tracking** - Adds affiliate parameters when applicable
+- **Campaign data** - Includes campaign tracking information
+- **Custom attributes** - Adds product-specific parameters
+
+### Dynamic Link Generation
+Links adapt based on context:
+- **Funnel settings** - Uses the funnel's configured payment gateway
+- **Domain settings** - Applies domain-specific merchant settings
+- **Visitor data** - Includes relevant visitor tracking information
+- **Split test variants** - Adjusts based on active split tests
+
+## Implementation Examples
+
+### Basic Product Page
+```html
+<!-- Before: Manual typing -->
+<a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
+
+<!-- After: Dropdown selection -->
+Select link → Insert Product Purchase Link → Choose "3 Bottle Supplement Pack"
+Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
+```
+
+### Upsell Page
+```html
+<!-- Upsell offer -->
+<a href="[UPSELL=supplement_6_bottles]">Upgrade to 6 Bottles</a>
+
+<!-- Decline option -->
+<a href="[DECLINE]">No Thanks</a>
+```
+
+### Multiple Product Options
+```html
+<!-- Different variants on same page -->
+<a href="[BUY=supplement_1_bottle]">1 Bottle - $49</a>
+<a href="[BUY=supplement_3_bottles]">3 Bottles - $127</a>
+<a href="[BUY=supplement_6_bottles]">6 Bottles - $197</a>
+```
+
+## Integration with Existing Systems
+
+### ClickBank Integration
+- **Automatic CBFID inclusion** - No need to manually add pitch flow IDs
+- **Product variant support** - Works with multiple product options
+- **Affiliate tracking** - Maintains affiliate attribution through purchase flow
+
+### Other Payment Gateways
+- **Merchant-specific formatting** - Adapts to your configured gateway
+- **Parameter optimization** - Includes gateway-specific requirements
+- **Fallback handling** - Graceful degradation if integration issues occur
+
+## Best Practices
+
+### Link Organization
+- **Use descriptive anchor text** - Clear call-to-action text
+- **Consistent styling** - Maintain visual consistency across all buy buttons
+- **Strategic placement** - Position links where they make sense in the flow
+- **Mobile optimization** - Ensure links work well on all devices
+
+### Product Management
+- **Regular audits** - Review and clean up unused products
+- **Version control** - Keep track of product changes and pricing updates
+- **Test thoroughly** - Verify all links work correctly after updates
+- **Documentation** - Maintain records of product codes and their purposes
+
+### Performance Optimization
+- **Minimize redirects** - Use direct links when possible
+- **Fast loading** - Optimize for quick page and checkout loading
+- **Error handling** - Provide clear error messages for failed purchases
+- **Analytics tracking** - Monitor link performance and conversion rates
+
+## Troubleshooting
+
+### Common Issues
+- **Product not appearing in dropdown** - Check that product is properly defined
+- **Link not working** - Verify product code and merchant configuration
+- **Wrong pricing displayed** - Check product pricing configuration
+- **Affiliate tracking missing** - Ensure affiliate parameters are properly configured
+
+### Testing Your Links
+1. **Preview mode** - Test links in preview before publishing
+2. **Test purchases** - Use test mode to verify complete purchase flow
+3. **Cross-browser testing** - Ensure links work in all major browsers
+4. **Mobile testing** - Verify mobile purchase experience
+5. **Analytics verification** - Confirm tracking is working correctly
+
+### Debugging Steps
+1. **Check product configuration** - Verify all product details are correct
+2. **Verify merchant settings** - Ensure payment gateway is properly configured
+3. **Test link generation** - Use the dropdown to regenerate links
+4. **Monitor console** - Check for JavaScript errors in browser console
+5. **Review analytics** - Look for patterns in failed purchases
+
+## Migration from Manual Links
+
+### Updating Existing Links
+1. **Identify manual links** - Find all manually typed purchase links
+2. **Use dropdown replacement** - Replace with dropdown-generated links
+3. **Test thoroughly** - Verify all links still work after replacement
+4. **Update documentation** - Record changes for future reference
+
+### Benefits of Migration
+- **Reduced errors** - Eliminate typos in product codes
+- **Easier maintenance** - Update products in one place
+- **Better tracking** - Improved analytics and conversion tracking
+- **Future-proof** - Easier to adapt to new features and integrations
+
+## Advanced Customization
+
+### Custom Link Parameters
+You can still add custom parameters to generated links:
+```html
+<!-- Generated base link -->
+[BUY=product_code]
+
+<!-- With custom parameters -->
+[BUY=product_code extra=campaign_data source=email]
+```
+
+### Dynamic Link Modification
+Use Page Events to modify links dynamically:
+- **Conditional parameters** - Add parameters based on visitor data
+- **A/B testing** - Test different link variations
+- **Personalization** - Customize links based on user preferences
+- **Campaign tracking** - Add campaign-specific parameters
+
+<Note>
+The advanced purchase link system is designed to make your workflow more efficient while reducing errors. Take advantage of the dropdown selection feature to streamline your product page creation process.
+</Note> 

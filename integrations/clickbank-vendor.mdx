@@ -1,0 +1,180 @@
+---
+title: 'ClickBank Vendor Integration'
+description: 'Set up ClickBank as a vendor to sell your products through ClickBank marketplace'
+---
+
+This guide covers setting up ClickBank as a vendor to sell your products through the ClickBank marketplace, including pitch flow configuration and merchant setup.
+
+<Note>This is for vendors selling through ClickBank. If you're an affiliate promoting ClickBank products, see the [ClickBank Affiliate Integration](/integrations/clickbank) instead.</Note>
+
+## Prerequisites
+
+- Active ClickBank vendor account
+- Approved products in ClickBank marketplace
+- Admin access to your ClickBank account
+- Understanding of ClickBank pitch flow system
+
+## Step 1: Create ClickBank Merchant
+
+### Add Merchant Configuration
+1. Go to **Merchants** → **Add Merchant**
+2. Select **Gateway**: ClickBank
+3. Enter your **Account ID** (your ClickBank account nickname)
+4. Create an **Encryption Key** (see below for details)
+5. Save the merchant configuration
+
+### Understanding Encryption Keys
+The encryption key is **not** an API key - it's a security key you create:
+
+- **Purpose**: Encrypts data sent between ClickBank and Elastic Funnels
+- **Security**: Prevents man-in-the-middle attacks on postback data
+- **User-defined**: You create this key (can be any string)
+- **Synchronization**: Must be identical in both ClickBank and Elastic Funnels
+
+**Example**: `MySecretKey2024!` (use your own unique key)
+
+### Postback URL Configuration
+Once saved, the merchant will provide:
+- **Postback URL**: Copy this for ClickBank configuration
+- **Verification**: Use ClickBank's verify button to test the connection
+
+## Step 2: Configure Domain-Merchant Assignment
+
+### Assign Merchant to Domain
+1. Go to **Domains** → **Edit Domain**
+2. Select your ClickBank merchant from the dropdown
+3. Save the domain configuration
+
+This ensures all funnels on this domain use ClickBank for payments.
+
+## Step 3: Set Up ClickBank Pitch Flow
+
+### Create Pitch Flow in ClickBank
+1. Log into your ClickBank account
+2. Go to **Pitch Flows** section
+3. Click **Create New Pitch Flow**
+4. Add all product variants you plan to split test:
+   - Different price points (3 bottles, 6 bottles, 12 bottles)
+   - Different bonus packages
+   - Different upsell combinations
+5. Save and note the **Pitch Flow ID** (CBFID)
+
+### Best Practices for Pitch Flow Setup
+- **Include all variants**: Add every product combination you might test
+- **Avoid re-approval delays**: Having all variants pre-approved saves time
+- **Organize logically**: Group related products together
+- **Document variants**: Keep track of which IDs correspond to which products
+
+## Step 4: Configure Funnel Integration
+
+### Set Funnel Pitch Flow ID
+1. Go to **Funnels** → **Edit Funnel**
+2. In the funnel settings, you'll see:
+   - **ClickBank Pitch Flow ID**: Enter your CBFID
+   - **ClickBank Template Code**: Enter if using custom templates
+3. Save the funnel configuration
+
+### Default Funnel Setup
+- **Make funnel default**: Check this option if you want this funnel to handle all traffic to the domain without the `f=` parameter
+- **URL access**: Visitors can access via `domain.com` or `domain.com?f=funnel_id`
+
+## Step 5: Configure Postback in ClickBank
+
+### Add Postback URLs
+1. In your ClickBank account, go to **Account Settings**
+2. Navigate to **Postback** section
+3. Add the postback URL from your merchant configuration
+4. Configure for:
+   - **Sale notifications**: Instant notification of purchases
+   - **Refund notifications**: Automatic refund processing
+   - **Conversion tracking**: Attribution and analytics
+
+### Test Postback Connection
+1. Use ClickBank's **Verify** button
+2. This tests the connection between ClickBank and Elastic Funnels
+3. Should show successful verification with your encryption key
+
+## Advanced Configuration
+
+### Multiple Product Testing
+When split testing different products:
+1. **Add all products** to the same pitch flow in ClickBank
+2. **Use page events** to show different purchase buttons
+3. **Pass product IDs** in the purchase links
+4. **Track performance** of each variant
+
+### Custom Purchase Links
+Purchase links automatically use the funnel's CBFID:
+- **Standard format**: `[BUY=product_code]`
+- **With parameters**: `[BUY=product_code extra=campaign_data]`
+- **No manual CBFID**: System automatically adds the funnel's pitch flow ID
+
+### Upsell Configuration
+1. **Create upsell nodes** in your funnel
+2. **Connect to purchase nodes** for the main product
+3. **Use funnel-level split testing** or page events for upsell variants
+4. **Configure decline flows** for users who don't purchase upsells
+
+## Split Testing Strategies
+
+### Funnel-Level Split Testing
+Test different upsell sequences:
+1. **Connect split test node** between purchase and upsell
+2. **Create different upsell paths** for each variant
+3. **Track performance** of each upsell sequence
+
+### Page-Level Split Testing
+Test different product presentations:
+1. **Use page events** to show different content
+2. **Connect to query parameter conditions** for traffic segmentation
+3. **Show different purchase buttons** based on test variant
+
+### Product Variant Testing
+Test different price points:
+1. **Include all variants** in ClickBank pitch flow
+2. **Use dynamic content** to show different prices
+3. **Track conversion rates** for each price point
+
+## Troubleshooting
+
+### Common Issues
+
+**Postback not working:**
+- Verify encryption key matches in both systems
+- Check postback URL is correctly entered in ClickBank
+- Ensure merchant is properly assigned to domain
+
+**Purchase links not working:**
+- Verify funnel has correct CBFID
+- Check that merchant is assigned to the domain
+- Ensure products exist in ClickBank pitch flow
+
+**Split testing not working:**
+- Verify all product variants are in the pitch flow
+- Check that page events are properly connected
+- Ensure domain-merchant assignment is correct
+
+### Testing Your Setup
+1. **Use ClickBank's test mode** for initial testing
+2. **Verify postback reception** in Elastic Funnels
+3. **Test purchase flow** end-to-end
+4. **Check conversion tracking** in both systems
+
+## Security Best Practices
+
+- **Keep encryption keys secure** - don't share them
+- **Use strong, unique keys** - avoid simple passwords
+- **Regularly rotate keys** - update periodically for security
+- **Monitor postback logs** - watch for unusual activity
+- **Test with small amounts** - verify everything works before full launch
+
+## Support and Documentation
+
+- **ClickBank documentation**: Refer to ClickBank's vendor guides
+- **Encryption key help**: Contact support if postback verification fails
+- **Funnel configuration**: Use the built-in help system for node setup
+- **Performance tracking**: Monitor both ClickBank and Elastic Funnels analytics
+
+<Warning>
+Ensure all your ClickBank pitch flow products are compliant with ClickBank's marketplace policies. Non-compliant products can result in account suspension.
+</Warning> 

@@ -1,0 +1,50 @@
+---
+title: 'Products & Sales'
+description: 'Configure buy links, upsells, product attributes, and sales processes'
+---
+
+# Products & Sales
+
+Set up your products, configure purchase flows, and optimize your sales processes.
+
+## How do I add a buy link for my products?
+
+**Description:** Buy links let customers purchase products directly from your page.
+
+### Add a Product
+1. Go to "Products" → "Add Product"
+2. Fill out all necessary information and define a product code
+3. Include cost of goods if you want reporting
+
+### Embedding the Buy Link
+1. Create a link tag and insert `[BUY=product_code]` or `[UPSELL=product_code]`
+2. You can pass more data, e.g., `[BUY=product_code cbfid=1234 extra=abcd]`
+
+### Merchant Information
+1. If you have a different code on Buygoods, Clickbank, or Digistore24, go to the "Merchant Information" tab
+2. Associate the correct product ID from that platform
+
+## How do I set up a redirect to an upsell page after a purchase?
+
+**Description:** Redirecting users to an upsell page after purchase allows you to present additional offers or upgrades.
+
+**Instructions:**
+1. In your funnel builder, locate the page node where the purchase will occur
+2. Add a "Purchase" node to the page node
+3. After adding it, use a "Page" node to select an upsell page or a "Redirect to URL" node to enter the upsell URL
+4. Connect the "Purchase" node to the next step
+5. Save your funnel and perform a test purchase to ensure redirection works as expected
+
+## How do I add custom attributes (like bonuses) to my product pages?
+
+**Description:** Custom attributes let you include additional information (e.g., bonus URLs) on product pages.
+
+### Create Custom Attributes
+1. In "Products," select or create the product
+2. Scroll to "Custom Attributes" and add a new key-value pair (e.g., "bonus_url" → "https://yourbonuslink")
+3. Save your changes
+
+### Use in Page Builder
+1. Add a "Product Item" component to your page
+2. In the properties tab, configure fields such as Product Type and Classification (e.g., Bonus)
+3. To display attributes, add text or links using `{product.attributes.[attribute_name]}`, e.g., `{product.attributes.bonus_url}` 
