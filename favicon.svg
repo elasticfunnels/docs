@@ -1,19 +1,11 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.06145 23.1079C5.26816 22.3769 -3.39077 20.6274 1.4173 5.06384C9.6344 6.09939 16.9728 14.0644 9.06145 23.1079Z" fill="url(#paint0_linear_17557_2021)"/>
-<path d="M8.91928 23.0939C5.27642 21.2223 0.78371 4.20891 17.0071 0C20.7569 7.19341 19.6212 16.5452 8.91928 23.0939Z" fill="url(#paint1_linear_17557_2021)"/>
-<path d="M8.91388 23.0788C8.73534 19.8817 10.1585 9.08525 23.5699 13.1107C23.1812 20.1229 18.984 26.4182 8.91388 23.0788Z" fill="url(#paint2_linear_17557_2021)"/>
-<defs>
-<linearGradient id="paint0_linear_17557_2021" x1="3.77557" y1="5.91571" x2="5.23185" y2="21.5589" gradientUnits="userSpaceOnUse">
-<stop stop-color="#18E299"/>
-<stop offset="1" stop-color="#15803D"/>
-</linearGradient>
-<linearGradient id="paint1_linear_17557_2021" x1="12.1711" y1="-0.718425" x2="10.1897" y2="22.9832" gradientUnits="userSpaceOnUse">
-<stop stop-color="#16A34A"/>
-<stop offset="1" stop-color="#4ADE80"/>
-</linearGradient>
-<linearGradient id="paint2_linear_17557_2021" x1="23.1327" y1="15.353" x2="9.33841" y2="18.5196" gradientUnits="userSpaceOnUse">
-<stop stop-color="#4ADE80"/>
-<stop offset="1" stop-color="#0D9373"/>
-</linearGradient>
-</defs>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #c2f52f;
+      }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="640" height="640" rx="78.79" ry="78.79"/>
+  <path class="cls-1" d="M149.22,138.19c-17.18,0-33.7,7.8-43.77,21.72-12.68,17.54-13.74,39.76-3.16,58.08l3.07,5.32,13.34,23.1H19.74l8.56,14.83c16.68,28.9,47.52,46.7,80.89,46.7h45.49l46.55,80.63h-78.66l8.57,14.84c16.69,28.9,47.52,46.7,80.88,46.7h25.18l38.38,67.62c9.59,16.6,26.76,26.51,45.93,26.51s36.34-9.91,45.93-26.51l50.36-86.72h-205.32c-19.62,0-38.24-7.83-51.96-21.22h192.85c47.29,0,90.99-25.23,114.64-66.18l32.84-56.89H109.25c-19.62,0-38.24-7.83-51.95-21.22h377.83c46.65,0,90.13-25.1,113.46-65.51l35.69-61.81H149.22Z"/>
 </svg>
