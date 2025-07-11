@@ -1,0 +1,279 @@
+---
+title: "Debug Window"
+description: "Advanced debugging tools for ElasticFunnels pages - monitor events, interactions, components, and performance"
+icon: "bug"
+---
+
+# Debug Window
+
+The Debug Window is a powerful development tool for ElasticFunnels that provides real-time monitoring and debugging capabilities for your pages. It helps developers and marketers understand how their funnels, events, and interactions are performing.
+
+<Note>
+The Debug Window is loaded asynchronously and activated by pressing **Ctrl+Shift+F12** on your ElasticFunnels page.
+</Note>
+
+## Features
+
+### 🔍 **Real-time Monitoring**
+- Live page event tracking
+- Component interaction monitoring
+- Performance metrics and memory usage
+- Mobile-specific debugging tools
+
+### 🎯 **Interactive Debugging**
+- Manual event triggering
+- Component highlighting and navigation
+- Direct links to builder interfaces
+- Console log capture and filtering
+
+### 📊 **Comprehensive Analytics**
+- Funnel event visualization
+- Performance metrics tracking
+- Mobile debug information
+- Memory usage monitoring
+
+## Getting Started
+
+### Activating the Debug Window
+
+1. **Open your ElasticFunnels page** in a web browser
+2. **Press Ctrl+Shift+F12** to activate the debug window
+3. **The debug window will slide in** from the left side of the screen
+
+The debug window automatically starts monitoring your page and capturing relevant debugging information.
+
+## Debug Window Tabs
+
+### Overview Tab
+
+The Overview tab provides a quick snapshot of your page's current state:
+
+#### System Information
+- **Device**: Current device type detection
+- **Screen**: Browser window dimensions
+- **Viewport**: Available content area
+- **User Agent**: Browser information
+- **Page Load**: Load time performance
+- **Memory**: JavaScript heap usage
+
+#### App State
+- **FID**: Funnel ID
+- **Page ID**: Current page identifier
+- **Brand ID**: Associated brand
+- **Page Events**: Number of configured events
+- **Interactions**: Number of tracked interactions
+- **SIDs**: Session identifiers
+
+### Events Tab
+
+Monitor and control your page's funnel events:
+
+#### Funnel Visualization
+- **Event hierarchy**: Visual representation of your funnel structure
+- **Event details**: Step IDs, data, and next events
+- **Event flow**: How events connect and trigger
+
+#### Manual Triggers
+- **Trigger any event**: Test events without user interaction
+- **Page view events**: Manually trigger page view events
+- **Event validation**: Verify event configuration
+
+<CodeGroup>
+```javascript Example: Triggering an Event
+// The debug window provides buttons to trigger events
+// You can also trigger events programmatically:
+debugWindow.triggerEvent('add_to_cart', 2);
+debugWindow.triggerPageView();
+```
+</CodeGroup>
+
+### Interactions Tab
+
+Track user interactions and form submissions:
+
+- **Interaction list**: All tracked interactions on the page
+- **Component details**: CCID, device type, and data
+- **Focus functionality**: Highlight and scroll to interaction elements
+- **Real-time updates**: See interactions as they happen
+
+### Components Tab
+
+Manage and debug page components:
+
+#### Component Analysis
+- **Component list**: All components with CIDs
+- **Element details**: Tag names, classes, IDs
+- **Position data**: X/Y coordinates and dimensions
+- **Visual debugging**: Highlight components on the page
+
+#### Component Actions
+- **Focus components**: Highlight and scroll to specific components
+- **Builder links**: Direct links to component builders
+- **Batch highlighting**: Highlight all components simultaneously
+
+<CodeGroup>
+```javascript Example: Component Debugging
+// Focus on a specific component
+debugWindow.focusComponent('hero-section-123');
+
+// Highlight all components
+debugWindow.highlightAllComponents();
+
+// Clear all highlights
+debugWindow.clearHighlights();
+```
+</CodeGroup>
+
+### Builders Tab
+
+Quick access to ElasticFunnels builder interfaces:
+
+- **Page Builder**: Direct link to edit the current page
+- **Events Builder**: Configure page events and funnels
+- **Component Builder**: Edit specific components
+- **Page Information**: Brand ID, Page ID, and FID details
+
+### Console Tab
+
+Capture and monitor JavaScript console output:
+
+- **Log capture**: Automatically captures console.log, console.warn, and console.error
+- **Log filtering**: View logs by type (info, warning, error)
+- **Test logging**: Generate test logs for debugging
+- **Export capability**: Export logs for analysis
+
+### Performance Tab
+
+Monitor page performance metrics:
+
+- **Load times**: Page load, DOM ready, and first paint times
+- **Memory usage**: JavaScript heap size and limits
+- **Parallax performance**: Frame drops and scroll events (if applicable)
+- **Real-time updates**: Live performance monitoring
+
+### Mobile Tab
+
+Mobile-specific debugging information:
+
+- **Touch support**: Touch capability detection
+- **Device orientation**: Screen orientation and angle
+- **Pixel ratio**: Device pixel density
+- **Connection status**: Online/offline and connection type
+- **Battery API**: Battery status availability
+- **Mobile exit intent**: Exit intent handler status
+
+## Usage Examples
+
+### Debugging Page Events
+
+1. **Open the Events tab** to see your funnel structure
+2. **Review the event hierarchy** to understand the flow
+3. **Use manual triggers** to test events without user interaction
+4. **Check the console** for any error messages
+
+### Testing Component Interactions
+
+1. **Navigate to the Components tab**
+2. **Click "Highlight All"** to see all tracked components
+3. **Click "Focus" on specific components** to examine them
+4. **Use the builder links** to edit components directly
+
+### Performance Monitoring
+
+1. **Open the Performance tab** for real-time metrics
+2. **Monitor memory usage** during page interactions
+3. **Check load times** for optimization opportunities
+4. **Export data** for detailed analysis
+
+## Advanced Features
+
+### Data Export
+
+The debug window can export comprehensive debugging data:
+
+```javascript
+// Export debugging data
+debugWindow.exportData();
+```
+
+This creates a JSON file containing:
+- Page configuration
+- Event data
+- Interaction logs
+- Performance metrics
+- Console logs
+- Mobile debugging information
+
+### Custom Event Triggering
+
+For advanced debugging, you can trigger specific events:
+
+```javascript
+// Trigger a specific event with step ID
+debugWindow.triggerEvent('conversion_event', 3);
+
+// Trigger page view event
+debugWindow.triggerPageView();
+```
+
+### Real-time Monitoring
+
+The debug window automatically updates every second with:
+- Current device information
+- Screen dimensions
+- Page state changes
+- Performance metrics
+
+## Best Practices
+
+### Development Workflow
+
+1. **Always test events** using the manual triggers before going live
+2. **Use component highlighting** to verify tracking setup
+3. **Monitor console logs** for JavaScript errors
+4. **Export debug data** for troubleshooting complex issues
+
+### Performance Optimization
+
+1. **Monitor memory usage** during extended page sessions
+2. **Check load times** regularly
+3. **Use mobile debugging** for mobile-specific issues
+4. **Export performance data** for analysis
+
+### Debugging Troubleshooting
+
+1. **Check the Overview tab** for basic page information
+2. **Verify event configuration** in the Events tab
+3. **Ensure components are tracked** in the Components tab
+4. **Review console logs** for error messages
+
+## Troubleshooting
+
+### Debug Window Not Appearing
+
+- **Check keyboard shortcut**: Ensure you're pressing **Ctrl+Shift+F12**
+- **Verify page load**: Make sure the page has fully loaded
+- **Check console**: Look for any JavaScript errors
+
+### Events Not Triggering
+
+- **Verify event configuration**: Check the Events tab for proper setup
+- **Test manual triggers**: Use the debug window to trigger events manually
+- **Check console logs**: Look for error messages related to event processing
+
+### Components Not Highlighting
+
+- **Refresh components**: Click the "Refresh" button in the Components tab
+- **Check CID attributes**: Ensure components have proper `data-cid` attributes
+- **Clear and re-highlight**: Use the clear and highlight buttons
+
+<Warning>
+The Debug Window is a development tool does not impact page performance as it only loads when you trigger the hotkey.
+</Warning>
+
+## Related Documentation
+
+- [Page Events](/funnels/page-events) - Learn about configuring page events
+- [Component Tracking](/essentials/component-tracking) - Understanding component IDs
+- [Performance Optimization](/essentials/performance) - Optimizing page performance
+- [Mobile Debugging](/essentials/mobile-debugging) - Mobile-specific debugging techniques 

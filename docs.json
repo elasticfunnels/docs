@@ -20,6 +20,12 @@
             ]
           },
           {
+            "group": "Essentials",
+            "pages": [
+              "essentials/brand-actions"
+            ]
+          },
+          {
             "group": "Funnels & Page Events",
             "pages": [
               "funnels/create-funnel",
@@ -75,6 +81,13 @@
               "domains/custom-domains",
               "domains/customization",
               "domains/whitelisting"
+            ]
+          },
+          {
+            "group": "Development & Debugging",
+            "pages": [
+              "debugging/overview",
+              "debugging/debug-window"
             ]
           }
         ]
