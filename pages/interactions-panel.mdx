@@ -1,0 +1,532 @@
+---
+title: "Interactions Panel"
+description: "Add interactive behaviors to your page elements with clicks, hovers, animations, and custom JavaScript"
+---
+
+The Interactions Panel allows you to add interactive behaviors to any element on your page. Create click handlers, hover effects, animations, form submissions, and execute custom JavaScript code to enhance user engagement and functionality.
+
+<Note>
+Access the Interactions Panel by selecting an element and pressing **Ctrl+I**, or through the right sidebar when an element is selected.
+</Note>
+
+## Quick Start
+
+### Basic Usage Flow
+
+1. **Select an Element**: Click on any element in your page editor
+2. **Open Interactions Panel**: Press **Ctrl+I** or find it in the right sidebar
+3. **Add a Trigger**: Click "Add [Device] Trigger" and choose when the interaction should happen
+4. **Choose an Action**: Select what should happen when the trigger fires
+5. **Configure Settings**: Customize the behavior with specific parameters
+6. **Test**: Preview your page to see the interaction in action
+
+### Common Example: Execute JavaScript on Click
+
+```javascript
+// Example: Simple alert on button click
+alert('Button clicked!');
+
+// Example: Change element content
+document.getElementById('my-text').innerHTML = 'Content changed!';
+
+// Example: Show/hide elements
+document.getElementById('hidden-section').style.display = 'block';
+```
+
+### Getting Element IDs for Targeting
+
+When you need to target specific elements (for show/hide actions, JavaScript code, etc.), you can easily copy their element IDs:
+
+1. **Select the target element** in the page builder
+2. **Hover over "Component Settings"** text in the right sidebar  
+3. **Click the copy link** that appears on hover to copy the element ID
+4. **Paste the ID** into your interaction configuration
+
+This is especially useful for:
+- Show/Hide Element actions
+- Toggle Visibility actions  
+- Custom JavaScript that targets specific elements
+- Focus on Element actions
+
+## Device-Specific Behavior
+
+### Device Detection System
+
+The system automatically detects the current device based on screen width:
+
+#### **Mobile Portrait** 
+- **Screen Width**: ≤ 575px
+- **Device ID**: `mobilePortrait`
+- **Typical Devices**: Mobile phones in portrait mode
+
+#### **Tablet**
+- **Screen Width**: 576px - 992px  
+- **Device ID**: `tablet`
+- **Typical Devices**: Tablets, mobile phones in landscape, small laptops
+
+#### **Desktop** 
+- **Screen Width**: > 992px
+- **Device ID**: `desktop`
+- **Typical Devices**: Desktop computers, large laptops
+
+### Cascading Rules System
+
+The interactions system uses a **cascading inheritance model** where interactions flow down from larger to smaller devices:
+
+**Desktop interactions execute on**: Desktop, Tablet, Mobile Portrait (unless overridden)  
+**Tablet interactions execute on**: Tablet, Mobile Portrait (unless overridden)  
+**Mobile Portrait interactions execute on**: Mobile Portrait only
+
+This ensures your interactions work across all devices while allowing device-specific customization.
+
+### Override and Disable System
+
+When viewing tablet or mobile in the panel, you'll see desktop interactions that will execute unless specifically overridden:
+
+#### **Override Button**
+- Creates a device-specific version of the interaction
+- Allows you to customize behavior for that device
+- The override takes precedence over the cascaded interaction
+
+#### **Disable Button**  
+- Prevents the desktop interaction from executing on this device
+- Useful when an interaction doesn't make sense on smaller screens
+- Creates a "disabled" action that blocks the cascaded interaction
+
+### Dynamic Device Changes
+
+The system automatically handles device changes:
+
+- **Responsive Design**: When users resize their browser or rotate their device
+- **Automatic Re-evaluation**: Interactions are re-evaluated for the new device size
+- **No Page Reload**: Device changes are handled seamlessly without page refresh
+- **Duplicate Prevention**: The system prevents duplicate event listeners during device transitions
+
+<Warning>
+Desktop interactions will execute on all devices unless specifically overridden or disabled. This cascading behavior ensures your interactions work across all screen sizes while giving you complete control over device-specific behavior.
+</Warning>
+
+## Available Triggers
+
+### Mouse & Touch Interactions
+
+#### **On Click**
+- **Description**: Triggers when the element is clicked or tapped
+- **Use Cases**: Button actions, navigation, form submissions
+- **Best For**: Primary user interactions
+
+#### **On Hover** 
+- **Description**: Triggers when mouse hovers over the element
+- **Use Cases**: Tooltips, preview content, hover effects
+- **Note**: May not work on touch devices
+
+#### **On Mouse Enter**
+- **Description**: Triggers when mouse cursor enters the element area
+- **Use Cases**: Show additional information, highlight effects
+- **Difference from hover**: More precise control over enter/leave events
+
+#### **On Mouse Leave**
+- **Description**: Triggers when mouse cursor leaves the element area
+- **Use Cases**: Hide tooltips, reset animations, cleanup actions
+
+### Focus & Form Interactions
+
+#### **On Focus**
+- **Description**: Triggers when the element gains focus
+- **Best For**: Input fields, buttons, interactive elements
+- **Use Cases**: Show help text, highlight sections, form validation
+
+#### **On Blur**
+- **Description**: Triggers when the element loses focus
+- **Best For**: Input fields, form elements
+- **Use Cases**: Validate input, hide help text, save data
+
+#### **On Form Submit**
+- **Description**: Triggers when a form is submitted
+- **Available On**: Form elements only
+- **Use Cases**: Custom validation, tracking, additional processing
+
+#### **On Form Success**
+- **Description**: Triggers when form submission is successful
+- **Available On**: Form elements only
+- **Use Cases**: Show success messages, redirect, track conversions
+
+#### **On Form Error**
+- **Description**: Triggers when form submission fails
+- **Available On**: Form elements only
+- **Use Cases**: Show error messages, retry logic, error tracking
+
+### Other Triggers
+
+#### **On Scroll**
+- **Description**: Triggers when the element is scrolled
+- **Use Cases**: Lazy loading, scroll animations, progress indicators
+
+#### **On Load**
+- **Description**: Triggers when the element finishes loading
+- **Best For**: Images, iframes, media elements
+- **Use Cases**: Show content after loading, initialize components
+
+## Available Actions
+
+### Modal Controls
+
+#### **Show Modal**
+- **Description**: Display a modal dialog
+- **Configuration**: Select which modal to show
+- **Use Cases**: Product details, contact forms, confirmations
+
+#### **Hide Modal**
+- **Description**: Close a modal dialog
+- **Configuration**: Select which modal to hide
+- **Use Cases**: Close buttons, overlay clicks, form completion
+
+### Element Visibility
+
+#### **Show Element**
+- **Description**: Make a hidden element visible
+- **Configuration**: CSS selector of target element
+- **Use Cases**: Reveal hidden content, show form fields
+
+#### **Hide Element**
+- **Description**: Hide a visible element
+- **Configuration**: CSS selector of target element
+- **Use Cases**: Collapse sections, hide form fields
+
+#### **Toggle Visibility**
+- **Description**: Switch between hidden and visible states
+- **Configuration**: CSS selector of target element
+- **Use Cases**: Expandable sections, show/hide toggles
+
+### Tracking & Analytics
+
+#### **Track Split Test Goal**
+- **Description**: Record a conversion goal for split testing
+- **Configuration**: Goal value (e.g., "purchase", "signup")
+- **Use Cases**: Track conversions, measure variant performance
+
+#### **Track Event**
+- **Description**: Send tracking events to analytics platforms
+- **Configuration**: Event name selection
+- **Platforms**: Google Analytics, Meta Ads, Google Ads
+- **Common Events**: Lead, AddToCart, Purchase, Contact, Subscribe
+
+#### **Custom Meta Event**
+- **Description**: Send custom events to Meta (Facebook) Ads
+- **Configuration**: Event name and value
+- **Use Cases**: Custom conversion tracking, audience building
+
+#### **Custom GA Event**
+- **Description**: Send custom events to Google Analytics
+- **Configuration**: Event name and value
+- **Use Cases**: Custom tracking, behavior analysis
+
+### JavaScript Execution
+
+#### **Execute JavaScript**
+- **Description**: Run custom JavaScript code using the browser's JavaScript engine
+- **Configuration**: Code editor with syntax highlighting
+- **Execution**: Code is executed using `eval()` with access to the global scope
+- **Error Handling**: JavaScript errors are caught and logged to the browser console
+- **Use Cases**: Custom functionality, API calls, complex interactions, DOM manipulation
+
+**Example Use Cases:**
+```javascript
+// Show/hide elements
+document.getElementById('section').style.display = 'block';
+
+// Change content
+document.querySelector('.title').textContent = 'New Title';
+
+// API calls
+fetch('/api/data').then(response => response.json()).then(data => {
+    console.log(data);
+    document.getElementById('results').innerHTML = data.message;
+});
+
+// Form manipulation and validation
+const emailField = document.getElementById('email');
+emailField.value = 'user@example.com';
+emailField.focus();
+
+// Check if elements exist before manipulating them
+if (document.getElementById('my-element')) {
+    document.getElementById('my-element').style.display = 'block';
+}
+
+// Wait for elements to load if needed
+setTimeout(() => {
+    document.getElementById('delayed-element').innerHTML = 'Updated!';
+}, 1000);
+```
+
+**Security and Performance Notes:**
+- Code executes with full access to the page and global JavaScript scope
+- All JavaScript errors are caught and logged for debugging
+- Code execution is immediate when the trigger fires
+- Consider performance impact for complex operations
+
+### Element Focus
+
+#### **Focus on Element**
+- **Description**: Set focus to a specific element
+- **Configuration**: CSS selector of target element
+- **Use Cases**: Improve accessibility, guide user attention
+
+### Animations
+
+#### **Slide Animations**
+- **Slide Up**: Element slides upward
+- **Slide Down**: Element slides downward  
+- **Slide Left**: Element slides to the left
+- **Slide Right**: Element slides to the right
+- **Configuration**: Duration, distance, easing function
+
+#### **Fade Animations**
+- **Fade In**: Element fades into view
+- **Fade Out**: Element fades out of view
+- **Configuration**: Duration, easing function
+
+#### **Scale Animations**
+- **Scale Up**: Element grows larger
+- **Scale Down**: Element shrinks smaller
+- **Configuration**: Duration, scale factor, easing function
+
+#### **Rotation Animations**
+- **Rotate Clockwise**: Element rotates clockwise
+- **Rotate Counter**: Element rotates counter-clockwise
+- **Configuration**: Duration, rotation degrees, easing function
+
+#### **Special Effects**
+- **Bounce In**: Element bounces into view
+- **Shake**: Element shakes horizontally
+- **Pulse**: Element pulses in size
+- **Flip**: Element flips around
+- **Configuration**: Duration, easing function
+
+### Animation Settings
+
+All animations can be customized with:
+
+- **Duration**: Animation length in milliseconds (default: 300ms)
+- **Easing**: Animation timing function
+  - ease, ease-in, ease-out, ease-in-out
+  - linear, cubic-bezier curves
+- **Target Element**: Animate a different element (optional)
+
+## Configuration Options
+
+### Action-Specific Settings
+
+#### Modal Actions
+- **Modal Selection**: Choose from available modals on your page
+- **Auto-close**: Configure automatic closing behavior
+
+#### Event Tracking
+- **Event Name**: Select from common events or enter custom names
+- **Goal Value**: Optional conversion value for split testing
+- **Platform Targeting**: Events automatically sent to connected platforms
+
+#### Custom JavaScript
+- **Code Editor**: Full-featured editor with syntax highlighting
+- **Error Handling**: Console integration for debugging
+- **Scope**: Access to page elements and global variables
+
+#### Element Targeting
+- **CSS Selectors**: Use ID (#element), class (.class), or complex selectors
+- **Copy Element IDs**: Hover over "Component Settings" in the right sidebar to copy any element's ID
+- **Validation**: Real-time validation of selector syntax
+- **Multiple Elements**: Target multiple elements with class selectors
+
+#### Animation Controls
+- **Duration**: Fine-tune animation timing
+- **Easing Functions**: Choose from predefined or custom curves
+- **Chaining**: Combine multiple animations for complex effects
+
+
+## Best Practices
+
+### Performance Optimization
+
+1. **Minimize JavaScript**: Keep custom code lightweight and efficient
+2. **Use Animations Sparingly**: Too many animations can impact performance  
+3. **Test on Mobile**: Ensure interactions work well on touch devices
+4. **Optimize Selectors**: Use efficient CSS selectors for targeting elements
+5. **Consider Event Frequency**: Avoid high-frequency events like scroll for heavy operations
+
+### User Experience Guidelines
+
+1. **Provide Visual Feedback**: Users should know when interactions occur
+2. **Maintain Accessibility**: Ensure interactions work with keyboard navigation
+3. **Consider Touch Devices**: Hover effects don't work on mobile
+4. **Test Across Devices**: Verify interactions work on all target devices
+
+### Development Workflow
+
+1. **Start with Desktop**: Create your primary interactions on desktop first
+2. **Test Mobile Early**: Check how interactions behave on smaller screens
+3. **Use Override System**: Create device-specific versions when needed
+4. **Preview Frequently**: Test interactions in preview mode regularly
+
+### Common Patterns
+
+#### Button Click Handlers
+```javascript
+// Track button clicks
+gtag('event', 'click', {
+    event_category: 'button',
+    event_label: 'cta-button'
+});
+
+// Show confirmation
+alert('Thank you for your interest!');
+```
+
+#### Form Enhancement
+```javascript
+// Auto-fill form fields
+document.getElementById('country').value = 'United States';
+
+// Validate before submission
+const email = document.getElementById('email').value;
+if (!email.includes('@')) {
+    alert('Please enter a valid email address');
+    return false;
+}
+```
+
+#### Dynamic Content
+```javascript
+// Update content based on user action
+document.querySelector('.dynamic-text').innerHTML = 'Content updated!';
+
+// Show/hide sections
+document.getElementById('advanced-options').style.display = 'block';
+```
+
+## Device-Specific Examples
+
+### Desktop-Only Interactions
+- **Hover Effects**: Use "On Hover" triggers for rich tooltips and preview content
+- **Complex Animations**: Multi-step animations that work better on larger screens
+- **Advanced JavaScript**: Complex form validation or API interactions
+
+### Mobile-Specific Interactions  
+- **Touch-Friendly Actions**: Larger click targets and simplified interactions
+- **Simplified Animations**: Lighter animations for better mobile performance
+- **Mobile-Specific Content**: Show mobile-optimized content or navigation
+
+### Responsive Strategies
+- **Start with Desktop**: Create your main interactions on desktop first
+- **Test Mobile Early**: Preview how desktop interactions work on mobile
+- **Override When Needed**: Create mobile-specific versions for better UX
+- **Disable Hover Effects**: Disable hover interactions that don't work on touch devices
+
+## Troubleshooting
+
+### Common Issues
+
+#### Interactions Not Triggering
+- **Wrong Element Selected**: Make sure you selected the correct element before adding the interaction
+- **Device Mismatch**: Check if the interaction is set for the device you're testing on
+- **Element Missing**: Verify the target element exists and has a unique ID
+- **JavaScript Errors**: Check browser console for error messages
+
+#### JavaScript Code Issues
+- **Syntax Errors**: Check your JavaScript code syntax in the browser console first
+- **Missing Elements**: Make sure elements you're targeting in your code actually exist
+- **Timing Issues**: Some elements may not be available when your code runs
+
+#### Device-Specific Issues
+- **Desktop vs Mobile**: Desktop interactions run on all devices unless you override them
+- **Touch vs Mouse**: Hover effects don't work on touch devices
+- **Screen Size**: Device detection is based on screen width (575px and 992px breakpoints)
+
+#### Show/Hide Element Issues
+- **Invalid Selectors**: Make sure your CSS selectors are correct (e.g., `#element-id`, `.class-name`)
+- **Element Not Found**: Verify the target element exists on the page
+- **ID Spelling**: Check that element IDs are spelled correctly and match exactly
+- **Need Element ID?**: Hover over "Component Settings" in the right sidebar to copy any element's ID
+
+### Debugging Tips
+
+#### **Testing Your Interactions**
+1. **Preview Mode**: Always test interactions in live preview mode
+2. **Browser Console**: Check for error messages if interactions aren't working
+3. **Device Testing**: Use browser dev tools to simulate different screen sizes
+4. **Step-by-Step Testing**: Test each interaction individually before combining multiple
+
+#### **Common Debugging Steps**
+1. **Verify Element Selection**: Make sure you selected the correct element in the editor
+2. **Check Device Settings**: Confirm the interaction is set for the right device
+3. **Test JavaScript Code**: For custom JavaScript, test your code in the browser console first
+4. **Validate Selectors**: For show/hide actions, ensure your CSS selectors are correct
+5. **Check Element IDs**: Make sure target elements have unique IDs
+
+#### **Quick Fixes**
+- **Interaction not working**: Check browser console for error messages
+- **Wrong device behavior**: Verify device settings in the interactions panel
+- **JavaScript errors**: Test your code syntax in browser console
+- **Element not found**: Double-check element IDs and CSS selectors
+
+## Advanced Use Cases
+
+### API Integration
+```javascript
+// Fetch data from external API
+fetch('https://api.example.com/data')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('results').innerHTML = data.message;
+    });
+```
+
+### Form Validation
+```javascript
+// Custom form validation
+function validateForm() {
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    
+    if (!email || !phone) {
+        alert('Please fill in all required fields');
+        return false;
+    }
+    
+    return true;
+}
+```
+
+### Dynamic Content Updates
+```javascript
+// Update content based on user selection
+const selection = document.getElementById('product-select').value;
+document.getElementById('price-display').textContent = '$' + getPriceForProduct(selection);
+```
+
+## Security Considerations
+
+### Safe JavaScript Practices
+
+1. **Validate Input**: Always validate user input before processing
+2. **Sanitize Data**: Clean data before displaying in HTML
+3. **Limit Scope**: Don't expose sensitive information in client-side code
+4. **Test Thoroughly**: Verify interactions work as expected without security risks
+
+### Content Security Policy
+
+- **Script Sources**: Ensure custom JavaScript complies with CSP
+- **External APIs**: Only connect to trusted external services
+- **User Data**: Handle user data responsibly and securely
+
+<Warning>
+Custom JavaScript executes in the user's browser with access to page content. Always test thoroughly and follow security best practices when implementing custom interactions.
+</Warning>
+
+## Related Documentation
+
+- [Split Testing](/funnels/split-testing) - Using interactions for A/B testing
+- [Form Handling](/forms/lead-capture) - Advanced form interactions
+- [Analytics Integration](/integrations/google-analytics) - Event tracking setup
+- [Debug Window](/debugging/debug-window) - Testing and debugging interactions
+- [Page Events](/funnels/page-events) - Funnel-level event tracking 

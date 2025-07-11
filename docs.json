@@ -43,7 +43,8 @@
             "pages": [
               "pages/create-landing-page",
               "pages/page-variants",
-              "pages/visitor-based-content"
+              "pages/visitor-based-content",
+              "pages/interactions-panel"
             ]
           },
           {
