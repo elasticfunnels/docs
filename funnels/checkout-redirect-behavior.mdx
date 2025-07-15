@@ -1,0 +1,246 @@
+---
+title: "Checkout Redirect Behavior"
+description: "Understanding default checkout redirects and domain-funnel assignment for purchase flows"
+---
+
+When customers purchase from pages that aren't properly assigned to a funnel, the system automatically redirects them to a default thank you page instead of following your intended funnel flow. Understanding and configuring this behavior is crucial for maintaining your sales funnel continuity.
+
+## Default Redirect Behavior
+
+### When Default Redirects Occur
+
+The system redirects customers to a generic thank you page (`/thank-you`) in these situations:
+
+1. **Page Not in Expected Funnel**: The customer purchases from a VSL page, homepage, or landing page that isn't part of any active funnel
+2. **No Active Funnel on Domain**: There's no funnel assigned to the current domain the customer is purchasing from
+3. **Missing Funnel Parameter**: The customer accessed the page without the `?f=funnel_id` parameter and no default funnel is set
+
+### Why This Happens
+
+This default behavior serves as a **fallback mechanism** to ensure:
+- Customers always receive purchase confirmation
+- The checkout process completes successfully
+- No customers are left without a post-purchase experience
+- Business continuity even when funnel configuration is incomplete
+
+<Warning>
+While the default redirect ensures checkout completion, it bypasses your intended upsell sequences, tracking, and custom post-purchase flows. Proper domain-funnel assignment is essential for optimal conversion rates.
+</Warning>
+
+## Domain-Funnel Assignment
+
+### Understanding Domain Assignment
+
+Every funnel can be assigned to one or more domains to control which funnel handles purchases from that domain.
+
+**Key Concepts:**
+- **Domain Assignment**: Links a specific domain to a funnel
+- **Default Funnel**: The funnel that handles all traffic on a domain without explicit funnel parameters
+- **Funnel Parameter**: The `?f=funnel_id` URL parameter that explicitly specifies which funnel to use
+
+### How to Assign Domains to Funnels
+
+#### Step 1: Access Funnel Settings
+1. Go to **Funnels** in your dashboard
+2. Select the funnel you want to configure
+3. Click **Settings** or **Edit Funnel**
+
+#### Step 2: Configure Domain Assignment
+1. In the funnel settings, find the **Domain Assignment** section
+2. Click **Add Domain** 
+3. Enter your domain (e.g., `yoursite.com`)
+4. Choose assignment type:
+   - **Explicit Only**: Requires `?f=funnel_id` parameter
+   - **Default for Domain**: Handles all traffic without parameters
+
+#### Step 3: Set as Default (Optional)
+1. Check **"Make Default"** if you want this funnel to handle all traffic on this domain
+2. This eliminates the need for the `?f=` parameter for most visitors
+3. Save your configuration
+
+### Multiple Domain Configuration
+
+You can assign multiple domains to the same funnel:
+
+**Example Setup:**
+- Main domain: `yoursite.com` (set as default)
+- Backup domain: `backup-domain.com` (set as default)
+- Testing domain: `test.yoursite.com` (explicit only)
+
+## The Funnel Parameter System
+
+### Understanding `?f=funnel_id`
+
+The funnel parameter (`?f=`) explicitly tells the system which funnel to use:
+
+**Examples:**
+- `https://yoursite.com/page?f=main-funnel` - Uses "main-funnel"
+- `https://yoursite.com/page?f=upsell-sequence` - Uses "upsell-sequence"
+- `https://yoursite.com/page` - Uses default funnel (if set) or triggers default redirect
+
+### When to Use Funnel Parameters
+
+#### **Required Scenarios:**
+- **Multiple funnels per domain**: When you have different products/campaigns
+- **Testing new funnels**: Before making them default
+- **Affiliate-specific funnels**: Different flows for different traffic sources
+- **Campaign-specific flows**: Unique sequences for different marketing campaigns
+
+#### **Optional Scenarios:**
+- **Single funnel per domain**: Set as default to avoid parameter requirement
+- **Simple product flows**: When you only have one purchase path
+- **General traffic**: Most visitors can use the default funnel
+
+### Best Practices for Parameter Usage
+
+**For Traffic Sources:**
+```
+Facebook Ads: https://yoursite.com/page?f=facebook-funnel&source=fb
+Google Ads: https://yoursite.com/page?f=google-funnel&source=google
+Affiliate Links: https://yoursite.com/page?f=affiliate-funnel&aff=partner123
+```
+
+**For Product Lines:**
+```
+Product A: https://yoursite.com/page?f=product-a-funnel
+Product B: https://yoursite.com/page?f=product-b-funnel
+Premium: https://yoursite.com/page?f=premium-funnel
+```
+
+## Configuration Examples
+
+### Example 1: Single Product Website
+**Scenario**: One main product with one sales funnel
+
+**Setup:**
+1. Create one funnel: "main-sales-funnel"
+2. Assign your domain: `yoursite.com`
+3. **Set as default**: ✅ Checked
+4. **Result**: All purchases automatically use the correct funnel
+
+### Example 2: Multi-Product Website
+**Scenario**: Multiple products with different upsell sequences
+
+**Setup:**
+1. Create multiple funnels:
+   - "weight-loss-funnel" 
+   - "muscle-gain-funnel"
+   - "supplements-funnel"
+2. Assign all to domain: `fitnesssite.com`
+3. **Set default**: Choose your main product funnel
+4. **Use parameters** for other products:
+   - Weight loss: `?f=weight-loss-funnel`
+   - Muscle gain: `?f=muscle-gain-funnel`
+   - Supplements: `?f=supplements-funnel`
+
+### Example 3: Multiple Domains
+**Scenario**: Different brands on different domains
+
+**Setup:**
+1. **Brand A Funnel**: 
+   - Domain: `brand-a.com` (default)
+   - Handles all Brand A traffic
+2. **Brand B Funnel**:
+   - Domain: `brand-b.com` (default)  
+   - Handles all Brand B traffic
+3. **Testing Funnel**:
+   - Domain: `test.brand-a.com` (explicit only)
+   - Requires `?f=test-funnel` parameter
+
+## Troubleshooting Common Issues
+
+### Issue: Customers Going to Default Thank You Page
+
+**Symptoms:**
+- Customers complete purchase but see generic thank you page
+- Missing expected upsells or post-purchase flow
+- No funnel tracking data for purchases
+
+**Solutions:**
+1. **Check domain assignment**: Ensure your domain is assigned to a funnel
+2. **Verify default setting**: Make sure a default funnel is set if not using parameters
+3. **Test with parameters**: Try accessing with `?f=your-funnel-id`
+4. **Review purchase links**: Ensure buy buttons are on funnel-assigned pages
+
+### Issue: Wrong Funnel Executing
+
+**Symptoms:**
+- Customers enter wrong upsell sequence
+- Incorrect post-purchase flow
+- Wrong tracking attribution
+
+**Solutions:**
+1. **Check parameter conflicts**: Multiple funnel parameters can cause conflicts
+2. **Review default funnel**: Default might be overriding intended funnel
+3. **Verify URL structure**: Ensure funnel parameters are correctly formatted
+4. **Test explicit parameters**: Use specific `?f=` parameters to override defaults
+
+### Issue: Funnel Parameter Not Working
+
+**Symptoms:**
+- Funnel parameter ignored
+- Always defaults to same funnel
+- Parameter appears in URL but doesn't change behavior
+
+**Solutions:**
+1. **Verify funnel ID**: Check that the funnel ID in parameter matches exactly
+2. **Check funnel status**: Ensure the target funnel is active and published
+3. **Review domain configuration**: Confirm funnel is assigned to the current domain
+4. **Clear cache**: Browser or CDN caching might serve old configuration
+
+## Testing Your Configuration
+
+### Step 1: Test Default Behavior
+1. Visit your page without any parameters: `https://yoursite.com/page`
+2. Complete a test purchase
+3. Verify you enter the correct funnel flow
+
+### Step 2: Test Explicit Parameters
+1. Visit with funnel parameter: `https://yoursite.com/page?f=your-funnel-id`
+2. Complete a test purchase
+3. Confirm the specified funnel executes
+
+### Step 3: Test Edge Cases
+1. **Invalid funnel ID**: `?f=nonexistent-funnel` (should fall back to default)
+2. **Empty parameter**: `?f=` (should use default funnel)
+3. **Multiple parameters**: `?f=funnel1&f=funnel2` (should use first valid one)
+
+### Verification Checklist
+- [ ] Domain is assigned to intended funnel
+- [ ] Default funnel is set (if desired)
+- [ ] Test purchases complete successfully
+- [ ] Correct upsell sequences execute
+- [ ] Analytics track properly
+- [ ] All purchase links work correctly
+
+## Best Practices
+
+### Domain Management
+1. **Set clear defaults**: Every active domain should have a default funnel
+2. **Document assignments**: Keep track of which domains use which funnels
+3. **Regular testing**: Test purchase flows on all domains monthly
+4. **Monitor analytics**: Watch for unexpected redirect patterns
+
+### Funnel Parameter Strategy
+1. **Use descriptive IDs**: Make funnel IDs clear and memorable
+2. **Document parameter usage**: Track which campaigns use which parameters
+3. **Test all combinations**: Verify every parameter/domain combination works
+4. **Monitor performance**: Compare conversion rates across different funnels
+
+### Maintenance & Updates
+1. **Regular audits**: Review domain-funnel assignments quarterly
+2. **Test after changes**: Always test purchase flows after configuration changes
+3. **Monitor customer feedback**: Watch for complaints about unexpected experiences
+4. **Update documentation**: Keep team informed of configuration changes
+
+<Note>
+Proper domain-funnel assignment is crucial for maximizing your conversion rates and providing seamless customer experiences. Take time to configure this correctly before launching any marketing campaigns.
+</Note>
+
+## Related Documentation
+
+- [Create Funnel](/funnels/create-funnel) - Basic funnel creation and setup
+- [Query Parameters](/funnels/query-parameters) - Advanced parameter usage and conditions
+- [Split Testing](/funnels/split-testing) - Testing different funnel flows
+- [Thank You Pages](/forms/thank-you-pages) - Customizing post-purchase experiences
+- [Buy Links](/products/buy-links) - Setting up purchase buttons and links 

@@ -29,6 +29,7 @@
             "group": "Funnels & Page Events",
             "pages": [
               "funnels/create-funnel",
+              "funnels/checkout-redirect-behavior",
               "funnels/rearrange-nodes",
               "funnels/split-testing",
               "funnels/exit-popups",
