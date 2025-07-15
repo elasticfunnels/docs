@@ -13,7 +13,7 @@ The system redirects customers to a generic thank you page (`/thank-you`) in the
 
 1. **Page Not in Expected Funnel**: The customer purchases from a VSL page, homepage, or landing page that isn't part of any active funnel
 2. **No Active Funnel on Domain**: There's no funnel assigned to the current domain the customer is purchasing from
-3. **Missing Funnel Parameter**: The customer accessed the page without the `?f=funnel_id` parameter and no default funnel is set
+3. **Missing Funnel Parameter**: The customer accessed the page without the `?f=funnel_code` parameter and no default funnel is set
 
 ### Why This Happens
 
@@ -36,27 +36,33 @@ Every funnel can be assigned to one or more domains to control which funnel hand
 **Key Concepts:**
 - **Domain Assignment**: Links a specific domain to a funnel
 - **Default Funnel**: The funnel that handles all traffic on a domain without explicit funnel parameters
-- **Funnel Parameter**: The `?f=funnel_id` URL parameter that explicitly specifies which funnel to use
+- **Funnel Parameter**: The `?f=funnel_code` URL parameter that explicitly specifies which funnel to use
 
 ### How to Assign Domains to Funnels
 
-#### Step 1: Access Funnel Settings
+#### Method 1: Through Funnel Settings (Recommended)
 1. Go to **Funnels** in your dashboard
-2. Select the funnel you want to configure
-3. Click **Settings** or **Edit Funnel**
-
-#### Step 2: Configure Domain Assignment
-1. In the funnel settings, find the **Domain Assignment** section
-2. Click **Add Domain** 
-3. Enter your domain (e.g., `yoursite.com`)
-4. Choose assignment type:
-   - **Explicit Only**: Requires `?f=funnel_id` parameter
+2. Find and select the funnel you want to configure
+3. Click **Edit Funnel**
+4. In the funnel editor, go to the **Domains** section
+5. Click **Add Domain**
+6. Enter your domain (e.g., `yoursite.com`)
+7. Choose assignment type:
+   - **Explicit Only**: Requires `?f=funnel_code` parameter
    - **Default for Domain**: Handles all traffic without parameters
+8. Check **"Make Default"** if you want this funnel to handle all traffic on this domain
+9. Save your configuration
 
-#### Step 3: Set as Default (Optional)
-1. Check **"Make Default"** if you want this funnel to handle all traffic on this domain
-2. This eliminates the need for the `?f=` parameter for most visitors
-3. Save your configuration
+#### Method 2: Through Settings (Alternative)
+1. Go to **Settings** → **Domains** section
+2. Click **Add Domain** or find an existing domain
+3. Configure domain settings and assign to funnels
+4. Set default funnel assignments as needed
+
+#### Important Notes
+- **A funnel can be on multiple domains**: You can assign the same funnel to several domains
+- **Multiple default assignments**: A funnel can be set as default on multiple domains
+- **Flexible access**: Some domains can require the `?f=funnel_code` parameter while others have the funnel as default
 
 ### Multiple Domain Configuration
 
@@ -69,7 +75,7 @@ You can assign multiple domains to the same funnel:
 
 ## The Funnel Parameter System
 
-### Understanding `?f=funnel_id`
+### Understanding `?f=funnel_code`
 
 The funnel parameter (`?f=`) explicitly tells the system which funnel to use:
 
@@ -90,6 +96,16 @@ The funnel parameter (`?f=`) explicitly tells the system which funnel to use:
 - **Single funnel per domain**: Set as default to avoid parameter requirement
 - **Simple product flows**: When you only have one purchase path
 - **General traffic**: Most visitors can use the default funnel
+
+### Getting Funnel Links
+
+To get a properly formatted funnel link with the correct parameter:
+
+1. Go to **Funnels** in your dashboard
+2. Find the funnel you want in the list
+3. Click **"Generate Tracking Link"** for that funnel
+4. This will provide you with the complete URL including the proper `?f=funnel_code` parameter
+5. Use this link for your marketing campaigns, affiliate links, or anywhere you need to ensure visitors enter the specific funnel
 
 ### Best Practices for Parameter Usage
 
@@ -159,8 +175,9 @@ Premium: https://yoursite.com/page?f=premium-funnel
 **Solutions:**
 1. **Check domain assignment**: Ensure your domain is assigned to a funnel
 2. **Verify default setting**: Make sure a default funnel is set if not using parameters
-3. **Test with parameters**: Try accessing with `?f=your-funnel-id`
+3. **Test with parameters**: Try accessing with `?f=your-funnel-code`
 4. **Review purchase links**: Ensure buy buttons are on funnel-assigned pages
+5. **Use generated links**: Get proper funnel links via "Generate Tracking Link" in the funnel list
 
 ### Issue: Wrong Funnel Executing
 
@@ -174,6 +191,7 @@ Premium: https://yoursite.com/page?f=premium-funnel
 2. **Review default funnel**: Default might be overriding intended funnel
 3. **Verify URL structure**: Ensure funnel parameters are correctly formatted
 4. **Test explicit parameters**: Use specific `?f=` parameters to override defaults
+5. **Use generated links**: Generate proper tracking links to ensure correct funnel codes
 
 ### Issue: Funnel Parameter Not Working
 
@@ -183,10 +201,11 @@ Premium: https://yoursite.com/page?f=premium-funnel
 - Parameter appears in URL but doesn't change behavior
 
 **Solutions:**
-1. **Verify funnel ID**: Check that the funnel ID in parameter matches exactly
+1. **Verify funnel code**: Check that the funnel code in parameter matches exactly
 2. **Check funnel status**: Ensure the target funnel is active and published
 3. **Review domain configuration**: Confirm funnel is assigned to the current domain
 4. **Clear cache**: Browser or CDN caching might serve old configuration
+5. **Use generated links**: Get the correct funnel code via "Generate Tracking Link"
 
 ## Testing Your Configuration
 
@@ -196,12 +215,12 @@ Premium: https://yoursite.com/page?f=premium-funnel
 3. Verify you enter the correct funnel flow
 
 ### Step 2: Test Explicit Parameters
-1. Visit with funnel parameter: `https://yoursite.com/page?f=your-funnel-id`
+1. Visit with funnel parameter: `https://yoursite.com/page?f=your-funnel-code`
 2. Complete a test purchase
 3. Confirm the specified funnel executes
 
 ### Step 3: Test Edge Cases
-1. **Invalid funnel ID**: `?f=nonexistent-funnel` (should fall back to default)
+1. **Invalid funnel code**: `?f=nonexistent-funnel` (should fall back to default)
 2. **Empty parameter**: `?f=` (should use default funnel)
 3. **Multiple parameters**: `?f=funnel1&f=funnel2` (should use first valid one)
 
@@ -222,10 +241,11 @@ Premium: https://yoursite.com/page?f=premium-funnel
 4. **Monitor analytics**: Watch for unexpected redirect patterns
 
 ### Funnel Parameter Strategy
-1. **Use descriptive IDs**: Make funnel IDs clear and memorable
+1. **Use descriptive codes**: Make funnel codes clear and memorable
 2. **Document parameter usage**: Track which campaigns use which parameters
 3. **Test all combinations**: Verify every parameter/domain combination works
 4. **Monitor performance**: Compare conversion rates across different funnels
+5. **Use generated links**: Always use "Generate Tracking Link" to get correct funnel codes
 
 ### Maintenance & Updates
 1. **Regular audits**: Review domain-funnel assignments quarterly
