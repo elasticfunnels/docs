@@ -26,15 +26,20 @@
             ]
           },
           {
-            "group": "Funnels & Page Events",
+            "group": "Funnels",
             "pages": [
               "funnels/create-funnel",
               "funnels/checkout-redirect-behavior",
-              "funnels/rearrange-nodes",
+              "funnels/funnel-split-testing"
+            ]
+          },
+          {
+            "group": "Page Events",
+            "pages": [
+              "funnels/page-events",
+              "funnels/dynamic-content",
               "funnels/split-testing",
               "funnels/exit-popups",
-              "funnels/dynamic-content",
-              "funnels/page-events",
               "funnels/query-parameters",
               "funnels/sequence-nodes"
             ]
@@ -49,6 +54,15 @@
             ]
           },
           {
+            "group": "Merchants",
+            "pages": [
+              "guides/how-to-set-up-a-new-merchant",
+              "merchants/clickbank",
+              "merchants/buygoods",
+              "merchants/digistore24"
+            ]
+          },
+          {
             "group": "Integrations",
             "pages": [
               "integrations/meta-ads",
@@ -56,7 +70,6 @@
               "integrations/google-analytics",
               "integrations/buygoods",
               "integrations/clickbank",
-              "integrations/clickbank-vendor",
               "integrations/affiliate-tracking"
             ]
           },

@@ -1,0 +1,111 @@
+---
+title: "How to set up a new merchant"
+description: "Create a merchant, assign it to a domain, map product IDs, and connect funnels"
+---
+
+This guide walks you through publishing an offer with a new merchant end-to-end. The flow is the same for all supported merchants (Buygoods, ClickBank, Digistore24). Platform-specific extras are linked where needed.
+
+<Warning>
+A domain can have only one merchant assigned at a time. Changing a domain's merchant affects all auto-generated buy links on that domain.
+</Warning>
+
+## Step 1: Create the merchant
+
+1. Go to **Settings** → **Merchants**
+2. Click **Add Merchant**
+3. Select a **Gateway** (e.g., Buygoods, ClickBank, Digistore24)
+4. Enter your **Account ID** (as required by the gateway)
+5. Optional toggles:
+   - **Sync Affiliates Locally**: Keep affiliate data mirrored in your account
+   - **Use Direct Links**: Use gateway-provided direct links when supported
+6. Click **Save**
+
+<Note>
+For ClickBank merchants, you must also create a Pitch Flow in ClickBank. See [ClickBank Merchant Setup](/merchants/clickbank#step-3-set-up-clickbank-pitch-flow).
+</Note>
+
+## Step 2: Assign the merchant to a domain
+
+1. Go to **Settings** → **Domains**
+2. Edit the target domain
+3. Choose your new merchant in **Merchant**
+4. Save
+
+This assignment makes the domain use that merchant for checkout and postbacks.
+
+## Step 3: Map products to the merchant
+
+1. Go to **Settings** → **Products**
+2. Open a product and go to the **Merchant information** tab
+3. Enter the platform-specific Product ID (e.g., Buygoods product ID, ClickBank product ID)
+4. Click **Save**
+
+<Note>
+Product mapping is one-merchant-per-product. Repeat for each product you plan to sell with this merchant.
+</Note>
+
+## Step 4: Connect or create your funnel
+
+You have two options:
+
+- Assign an existing funnel to the domain and (optionally) set it as the default funnel.
+- Or create a new funnel for this domain.
+
+See:
+- [Create Funnel](/funnels/create-funnel)
+- [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior)
+
+If you have multiple funnels on the same domain, copy the funnel link from the funnel list. This adds the `?f={funnel_code}` parameter to ensure the correct funnel runs.
+
+## Step 5: Use adaptive purchase links
+
+Use editor tags so links adapt automatically to the current domain's merchant and your product mapping:
+
+- `[BUY=product_code]`
+- `[UPSELL=product_code]`
+- `[DOWNSELL=product_code]`
+
+These automatically resolve to the correct gateway links for the assigned merchant on the active domain.
+
+<Warning>
+Hardcoded external checkout URLs (e.g., pasted Buygoods/ClickBank links) will not be adapted. Use the tags above instead. See [Buy Links](/products/buy-links) and [Advanced Purchase Links](/products/advanced-purchase-links).
+</Warning>
+
+## Testing and debugging
+
+1. Test buy links on the assigned domain and confirm the correct checkout gateway opens
+2. Complete a test purchase and verify the intended funnel flow executes
+3. Open the **Debug Window** with `Ctrl + Shift + F12` to inspect domain, funnel, and merchant resolution
+4. Verify postbacks and analytics update as expected
+
+### Postback setup and validation
+
+Use the **Setup** modal from the **Merchants** list for gateway-specific postback instructions and your unique URL. After you configure the postback in the merchant platform (Buygoods, ClickBank, Digistore24) and trigger a test event, the modal automatically updates to show validation status when the webhook is received.
+
+Recommended ways to trigger validation:
+
+- Use the merchant's built-in "Send Test" feature (where available)
+- Or perform a low-value test purchase
+
+### Quick checklist
+
+- [ ] Merchant created in **Settings** → **Merchants**
+- [ ] Domain assigned to the merchant in **Settings** → **Domains**
+- [ ] Each product mapped in the product's **Merchant information** tab
+- [ ] Funnel associated with the domain; default set if desired
+- [ ] Links use `[BUY]`, `[UPSELL]`, or `[DOWNSELL]` tags (not hardcoded URLs)
+- [ ] Test purchase completes and the correct flow runs
+
+<Note>
+If you add new pages for a specific funnel or merchant, make sure they are added to the funnel flow. Otherwise, they might not trigger the customer flow.
+</Note>
+
+## Related documentation
+
+- [ClickBank Merchant Setup](/merchants/clickbank)
+- [Buy Links](/products/buy-links)
+- [Advanced Purchase Links](/products/advanced-purchase-links)
+- [Create Funnel](/funnels/create-funnel)
+- [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior)
+
+

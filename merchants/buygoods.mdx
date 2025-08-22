@@ -1,0 +1,46 @@
+---
+title: 'Buygoods'
+description: 'Set up Buygoods as a merchant, assign to a domain, and map products'
+---
+
+This guide explains how to set up Buygoods as a merchant. The overall flow matches the generic merchant setup; use this page for Buygoods-specific notes.
+
+## Step 1: Create Buygoods Merchant
+
+1. Go to **Settings** → **Merchants** → **Add Merchant**
+2. Select **Gateway**: Buygoods
+3. Enter your **Account ID** as provided by Buygoods
+4. Save
+
+## Step 2: Assign Merchant to Domain
+
+1. Go to **Settings** → **Domains** → **Edit Domain**
+2. Select your Buygoods merchant
+3. Save
+
+## Step 3: Map Products
+
+1. Go to **Settings** → **Products** → **Edit**
+2. Open the **Merchant information** tab
+3. Enter the **Buygoods Product ID** for this product
+4. Save
+
+## Links and Funnels
+
+Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded Buygoods checkout URLs.
+
+- See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant)
+- See [Buy Links](/products/buy-links)
+- See [Advanced Purchase Links](/products/advanced-purchase-links)
+
+## Postbacks
+
+Use the **Setup** modal in the **Merchants** list for up-to-date postback instructions and your unique URL. After you configure the URLs in Buygoods and send a test (or run a test purchase), the modal will automatically mark the connection as validated once the webhook is received.
+
+## Troubleshooting
+
+- Wrong gateway on checkout: Verify the domain is assigned to Buygoods
+- Link not working: Ensure product mapping has the correct Buygoods Product ID
+- Missing affiliate data: Confirm affiliate sync settings and use adaptive tags
+
+

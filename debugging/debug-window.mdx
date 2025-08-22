@@ -4,47 +4,42 @@ description: "Advanced debugging tools for ElasticFunnels pages - monitor events
 icon: "bug"
 ---
 
-# Debug Window
-
 The Debug Window is a powerful development tool for ElasticFunnels that provides real-time monitoring and debugging capabilities for your pages. It helps developers and marketers understand how their funnels, events, and interactions are performing.
 
 <Note>
-The Debug Window is loaded asynchronously and activated by pressing **Ctrl+Shift+F12** on your ElasticFunnels page.
+The Debug Window loads asynchronously. Open it with **Ctrl + Shift + F12** on any ElasticFunnels page, or click **Debugger** in the top bar on any builder or code editor page.
 </Note>
 
 ## Features
 
 ### 🔍 **Real-time Monitoring**
-- Live page event tracking
-- Component interaction monitoring
-- Performance metrics and memory usage
-- Mobile-specific debugging tools
+- Live page and backend event tracking
+- Component discovery and interaction monitoring
+- Device, viewport, and app state updates every second
 
 ### 🎯 **Interactive Debugging**
-- Manual event triggering
 - Component highlighting and navigation
 - Direct links to builder interfaces
 - Console log capture and filtering
 
-### 📊 **Comprehensive Analytics**
+### 📊 **Comprehensive Insights**
 - Funnel event visualization
-- Performance metrics tracking
-- Mobile debug information
-- Memory usage monitoring
+- Page builder and events builder shortcuts
+- Export page events and debug payloads
 
 ## Getting Started
 
 ### Activating the Debug Window
 
 1. **Open your ElasticFunnels page** in a web browser
-2. **Press Ctrl+Shift+F12** to activate the debug window
-3. **The debug window will slide in** from the left side of the screen
+2. **Press Ctrl + Shift + F12** to activate the debug window
+3. **The debug window slides up** from the bottom of the screen
 
 The debug window automatically starts monitoring your page and capturing relevant debugging information.
 
 ## Debug Window Tabs
 
-### Overview Tab
+### Overview
 
 The Overview tab provides a quick snapshot of your page's current state:
 
@@ -53,8 +48,6 @@ The Overview tab provides a quick snapshot of your page's current state:
 - **Screen**: Browser window dimensions
 - **Viewport**: Available content area
 - **User Agent**: Browser information
-- **Page Load**: Load time performance
-- **Memory**: JavaScript heap usage
 
 #### App State
 - **FID**: Funnel ID
@@ -64,30 +57,42 @@ The Overview tab provides a quick snapshot of your page's current state:
 - **Interactions**: Number of tracked interactions
 - **SIDs**: Session identifiers
 
-### Events Tab
+### Events
 
-Monitor and control your page's funnel events:
+Monitor your page's funnel events:
 
 #### Funnel Visualization
 - **Event hierarchy**: Visual representation of your funnel structure
 - **Event details**: Step IDs, data, and next events
 - **Event flow**: How events connect and trigger
 
-#### Manual Triggers
-- **Trigger any event**: Test events without user interaction
-- **Page view events**: Manually trigger page view events
-- **Event validation**: Verify event configuration
 
-<CodeGroup>
-```javascript Example: Triggering an Event
-// The debug window provides buttons to trigger events
-// You can also trigger events programmatically:
-debugWindow.triggerEvent('add_to_cart', 2);
-debugWindow.triggerPageView();
-```
-</CodeGroup>
 
-### Interactions Tab
+### Page Events
+
+Inspect backend-evaluated page events (populated by the server during the request):
+
+- **Refresh**: Re-read the current page's backend events
+- **Clear**: Clear the frontend cache of events for this page
+- **Export**: Download a JSON file with the full backend debug payload
+- **Status**: See whether debug is enabled, total events, event types, last event time, and the current debug key
+
+Each event shows its type, relative time, status, and a details section. Expand “Full Context” to view the entire event payload.
+
+### Funnel
+
+Understand how the current page maps to your funnel:
+
+- **Brand ID / FID / FNID**: Quick references for funnel resolution
+- **Funnel Builder**: Open the funnel builder
+- **Open Node**: Deep link to the node if a node code is available
+- **Show Step**: Fallback deep link based on step information
+
+<Warning>
+If the page is not part of the current funnel, you'll see a banner explaining this. In that case, the funnel flow will not trigger from this page. See [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior#default-redirect-behavior).
+</Warning>
+
+### Interactions
 
 Track user interactions and form submissions:
 
@@ -96,7 +101,12 @@ Track user interactions and form submissions:
 - **Focus functionality**: Highlight and scroll to interaction elements
 - **Real-time updates**: See interactions as they happen
 
-### Components Tab
+```javascript
+// Focus a specific interaction element by CCID
+debugWindow.focusOnElement('ccid-123');
+```
+
+### Components
 
 Manage and debug page components:
 
@@ -124,7 +134,7 @@ debugWindow.clearHighlights();
 ```
 </CodeGroup>
 
-### Builders Tab
+### Builders
 
 Quick access to ElasticFunnels builder interfaces:
 
@@ -133,7 +143,7 @@ Quick access to ElasticFunnels builder interfaces:
 - **Component Builder**: Edit specific components
 - **Page Information**: Brand ID, Page ID, and FID details
 
-### Console Tab
+### Console
 
 Capture and monitor JavaScript console output:
 
@@ -142,25 +152,11 @@ Capture and monitor JavaScript console output:
 - **Test logging**: Generate test logs for debugging
 - **Export capability**: Export logs for analysis
 
-### Performance Tab
+## Window Controls
 
-Monitor page performance metrics:
-
-- **Load times**: Page load, DOM ready, and first paint times
-- **Memory usage**: JavaScript heap size and limits
-- **Parallax performance**: Frame drops and scroll events (if applicable)
-- **Real-time updates**: Live performance monitoring
-
-### Mobile Tab
-
-Mobile-specific debugging information:
-
-- **Touch support**: Touch capability detection
-- **Device orientation**: Screen orientation and angle
-- **Pixel ratio**: Device pixel density
-- **Connection status**: Online/offline and connection type
-- **Battery API**: Battery status availability
-- **Mobile exit intent**: Exit intent handler status
+- **Resize**: Drag the handle at the top edge of the panel to adjust height
+- **Persist size**: The panel remembers its height between sessions
+- **Open/Close**: Use the close button in the header, or press the hotkey again
 
 ## Usage Examples
 
@@ -168,8 +164,7 @@ Mobile-specific debugging information:
 
 1. **Open the Events tab** to see your funnel structure
 2. **Review the event hierarchy** to understand the flow
-3. **Use manual triggers** to test events without user interaction
-4. **Check the console** for any error messages
+3. **Check the console** for any error messages
 
 ### Testing Component Interactions
 
@@ -178,12 +173,12 @@ Mobile-specific debugging information:
 3. **Click "Focus" on specific components** to examine them
 4. **Use the builder links** to edit components directly
 
-### Performance Monitoring
+### Exporting Debug Data
 
-1. **Open the Performance tab** for real-time metrics
-2. **Monitor memory usage** during page interactions
-3. **Check load times** for optimization opportunities
-4. **Export data** for detailed analysis
+Two export options are available:
+
+- **Header → Export**: Downloads a JSON with device info, page events, interactions, and captured console logs
+- **Page Events → Export**: Downloads the backend-evaluated page events and their full contexts
 
 ## Advanced Features
 
@@ -200,29 +195,7 @@ This creates a JSON file containing:
 - Page configuration
 - Event data
 - Interaction logs
-- Performance metrics
 - Console logs
-- Mobile debugging information
-
-### Custom Event Triggering
-
-For advanced debugging, you can trigger specific events:
-
-```javascript
-// Trigger a specific event with step ID
-debugWindow.triggerEvent('conversion_event', 3);
-
-// Trigger page view event
-debugWindow.triggerPageView();
-```
-
-### Real-time Monitoring
-
-The debug window automatically updates every second with:
-- Current device information
-- Screen dimensions
-- Page state changes
-- Performance metrics
 
 ## Best Practices
 
@@ -232,13 +205,6 @@ The debug window automatically updates every second with:
 2. **Use component highlighting** to verify tracking setup
 3. **Monitor console logs** for JavaScript errors
 4. **Export debug data** for troubleshooting complex issues
-
-### Performance Optimization
-
-1. **Monitor memory usage** during extended page sessions
-2. **Check load times** regularly
-3. **Use mobile debugging** for mobile-specific issues
-4. **Export performance data** for analysis
 
 ### Debugging Troubleshooting
 
@@ -255,25 +221,25 @@ The debug window automatically updates every second with:
 - **Verify page load**: Make sure the page has fully loaded
 - **Check console**: Look for any JavaScript errors
 
-### Events Not Triggering
-
-- **Verify event configuration**: Check the Events tab for proper setup
-- **Test manual triggers**: Use the debug window to trigger events manually
-- **Check console logs**: Look for error messages related to event processing
-
 ### Components Not Highlighting
 
 - **Refresh components**: Click the "Refresh" button in the Components tab
 - **Check CID attributes**: Ensure components have proper `data-cid` attributes
 - **Clear and re-highlight**: Use the clear and highlight buttons
 
+### Funnel Links Not Appearing
+
+- **Missing brand or funnel**: Ensure `Brand ID` and `FID` are present in the Overview tab
+- **No node code available**: Only “Open Node” is shown when a node code is detected; otherwise, “Show Step” is used
+- **Page not in funnel**: Follow the banner link and review [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior#default-redirect-behavior)
+
 <Warning>
-The Debug Window is a development tool does not impact page performance as it only loads when you trigger the hotkey.
+The Debug Window only loads when you trigger the hotkey and does not affect page performance for visitors.
 </Warning>
 
 ## Related Documentation
 
-- [Page Events](/funnels/page-events) - Learn about configuring page events
+- [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior#default-redirect-behavior) - Understand default redirects and funnel assignment
+- [Page Events](/funnels/page-events) - Configure page-level events
+- [Create Funnel](/funnels/create-funnel) - Build and connect funnels
 - [Component Tracking](/essentials/component-tracking) - Understanding component IDs
-- [Performance Optimization](/essentials/performance) - Optimizing page performance
-- [Mobile Debugging](/essentials/mobile-debugging) - Mobile-specific debugging techniques 

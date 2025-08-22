@@ -1,0 +1,44 @@
+---
+title: 'Funnel Split Testing'
+description: 'Split test entire pages or branches in your funnel'
+---
+
+Funnel-level split testing lets you test different pages or branches of your funnel. It works like component split testing, but instead of selecting a component inside a page, you select a target page or another node in the funnel.
+
+## Setup
+
+### Step 1: Add a Split Test to your funnel
+1. Open your funnel in the builder
+2. Click "Add Node" where you want to branch traffic
+3. Select "Split Test" as the node type
+
+### Step 2: Create your variants
+1. For each variant, choose a target:
+   - **Page**: Send visitors to a specific page node
+   - **Node**: Send visitors to any existing node (e.g., an alternate VSL path)
+2. Set traffic percentages (must total 100%)
+3. Name variants clearly (e.g., "VSL A", "VSL B")
+
+### Step 3: Connect and save
+1. Connect the split test node to each target page/node
+2. Ensure downstream nodes (purchase, upsells, declines) are connected
+3. Click "Save" and reload to confirm layout
+
+## Best Practices
+
+- Keep one variable per test (page vs. branch) for clean attribution
+- Run tests long enough to reach statistical significance
+- Use clear variant names and document the hypothesis
+- Monitor performance and disable losing variants promptly
+
+<Note>
+If you only need to test content inside a single page (like headlines or videos), use **component split testing** instead: [Split Testing](/funnels/split-testing).
+</Note>
+
+## Troubleshooting
+
+- Variants not receiving traffic: verify percentages total 100% and connections are valid
+- Wrong page loading: check that each variant points to the intended page/node
+- Missing upsell flow: ensure variant targets connect to the correct purchase/upsell nodes
+
+
