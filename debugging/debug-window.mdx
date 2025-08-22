@@ -7,7 +7,7 @@ icon: "bug"
 The Debug Window is a powerful development tool for ElasticFunnels that provides real-time monitoring and debugging capabilities for your pages. It helps developers and marketers understand how their funnels, events, and interactions are performing.
 
 <Note>
-The Debug Window loads asynchronously. Open it with **Ctrl + Shift + F12** on any ElasticFunnels page, or click **Debugger** in the top bar on any builder or code editor page.
+The Debug Window loads asynchronously. Open it with **Ctrl + Shift + F12** (Windows/Linux) or **Command + Shift + F12** (Mac) on any ElasticFunnels page, or click **Debugger** in the top bar on any builder or code editor page.
 </Note>
 
 ## Features
@@ -32,7 +32,7 @@ The Debug Window loads asynchronously. Open it with **Ctrl + Shift + F12** on an
 ### Activating the Debug Window
 
 1. **Open your ElasticFunnels page** in a web browser
-2. **Press Ctrl + Shift + F12** to activate the debug window
+2. **Press Ctrl + Shift + F12** (Windows/Linux) or **Command + Shift + F12** (Mac) to activate the debug window
 3. **The debug window slides up** from the bottom of the screen
 
 The debug window automatically starts monitoring your page and capturing relevant debugging information.
@@ -217,7 +217,7 @@ This creates a JSON file containing:
 
 ### Debug Window Not Appearing
 
-- **Check keyboard shortcut**: Ensure you're pressing **Ctrl+Shift+F12**
+- **Check keyboard shortcut**: Ensure you're pressing **Ctrl+Shift+F12** (Windows/Linux) or **Command+Shift+F12** (Mac)
 - **Verify page load**: Make sure the page has fully loaded
 - **Check console**: Look for any JavaScript errors
 
@@ -232,6 +232,21 @@ This creates a JSON file containing:
 - **Missing brand or funnel**: Ensure `Brand ID` and `FID` are present in the Overview tab
 - **No node code available**: Only “Open Node” is shown when a node code is detected; otherwise, “Show Step” is used
 - **Page not in funnel**: Follow the banner link and review [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior#default-redirect-behavior)
+
+### Debug Window Opens on Wrong Domain
+
+If you opened the Debug Window from the Page Builder and it appears on a different domain than the one you need:
+
+<Note>
+When you preview a page or open the Debugger, it opens on the first applicable domain. If your page isn’t assigned exclusively to a specific domain, it may open on the `*.elasticfunnels.io` subdomain. This is expected behavior. To preview on another domain, manually change the page URL’s domain and reopen the Debug Window there.
+</Note>
+
+1. In the already opened Debug Window, go to the **Overview** tab and copy the **Debug Key**
+2. Navigate to the actual domain you want to debug
+3. Press **Ctrl + Shift + F12** (Windows/Linux) or **Command + Shift + F12** (Mac) to open the Debug Window on that domain
+4. Paste the **Debug Key** when prompted to attach the session to this domain
+
+You can find the Debug Key in the **Overview** tab of the Debug Window.
 
 <Warning>
 The Debug Window only loads when you trigger the hotkey and does not affect page performance for visitors.
