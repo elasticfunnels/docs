@@ -1,0 +1,418 @@
+---
+title: "Video Metrics"
+description: "Track video engagement and performance metrics across different video players and platforms"
+---
+
+<Warning>
+**Player Compatibility Notice**: Video tracking accuracy depends on your video player implementation. Some players may not properly track all metrics or may have limited support.
+
+**Known Limitations**:
+- **vTurb V2**: Only partially supported - some metrics may not track accurately
+- **Custom players**: Must implement standard video events and have `video` tag name.
+
+**Recommendation**: Test your specific player setup to verify which metrics are accurately tracked before relying on the data for optimization decisions.
+</Warning>
+
+---
+
+## TLDR
+
+**Quick Summary**: Video metrics help you understand how users interact with video content in your funnels. These metrics work with various video players and provide insights into engagement, completion rates, and viewing behavior.
+
+**Most Important**: Video Play Rate, Video Completion Rate, and Average Watch Time are your core video performance indicators.
+
+**Bottom Line**: Higher video engagement typically leads to better conversion rates. Monitor these metrics to optimize your video content and placement.
+
+**Player Compatibility**: These metrics work with most modern video players including HTML5, Vimeo, YouTube, Wistia, and custom players that support standard video events.
+
+---
+
+## Core Video Engagement Metrics
+
+### Video Play Rate
+
+**What it is**: The percentage of visitors who start playing your video
+
+**How it's calculated**: (Video Play Sessions ÷ Total Sessions) × 100
+
+**Example**: 500 video plays from 1,000 sessions = 50% play rate
+
+**Why it matters**:
+- Shows how compelling your video thumbnail and placement are
+- Indicates initial user interest in your content
+- Helps optimize video positioning and preview images
+
+**Good benchmarks**:
+- 30-50%: Good performance
+- 50-70%: Excellent performance
+- 70%+: Outstanding performance
+
+**Player requirements**: Requires video player to fire 'play' events
+
+---
+
+### Video Completion Rate
+
+**What it is**: The percentage of video viewers who watch the entire video
+
+**How it's calculated**: (Video Completion Sessions ÷ Video Play Sessions) × 100
+
+**Example**: 200 completions from 500 plays = 40% completion rate
+
+**Why it matters**:
+- Measures content quality and engagement
+- Indicates if video length is appropriate
+- Shows effectiveness of your video content
+
+**Good benchmarks**:
+- 20-40%: Typical performance
+- 40-60%: Good performance
+- 60%+: Excellent performance
+
+**Player requirements**: Requires video player to fire 'ended' or completion events
+
+---
+
+### Average Video Watch Time
+
+**What it is**: The average amount of time users spend watching your video
+
+**How it's calculated**: Total Video Watch Time ÷ Video Sessions
+
+**Example**: 5,000 seconds total watch time from 100 sessions = 50 seconds average
+
+**Why it matters**:
+- Shows actual engagement level with your content
+- Helps identify optimal video length
+- Indicates where viewers typically drop off
+
+**Optimization tips**:
+- Hook viewers in the first 10 seconds
+- Keep key messages early in the video
+- Test different video lengths
+- Add captions for better accessibility
+
+**Player requirements**: Requires video player to track time watched accurately
+
+---
+
+## Advanced Video Metrics
+
+### Video Unmute Rate
+
+**What it is**: The percentage of video viewers who unmute the video (for autoplay videos)
+
+**How it's calculated**: (Video Unmute Sessions ÷ Video Play Sessions) × 100
+
+**Why it matters**:
+- Critical for autoplay video strategies
+- Shows active engagement vs passive viewing
+- Helps optimize audio content and captions
+
+**Good benchmarks**:
+- 10-20%: Typical for autoplay videos
+- 20-30%: Good performance
+- 30%+: Excellent performance
+
+**Player requirements**: Requires video player to track mute/unmute events
+
+---
+
+### Video CTA Show Rate
+
+**What it is**: The percentage of video sessions where a call-to-action is displayed
+
+**How it's calculated**: (Video CTA Shows ÷ Video Sessions) × 100
+
+**Why it matters**:
+- Measures CTA visibility and timing
+- Helps optimize when CTAs appear
+- Shows potential conversion opportunities
+
+**Optimization strategies**:
+- Show CTAs at optimal engagement points
+- Test different CTA timing
+- A/B test CTA designs and messaging
+
+**Player requirements**: Requires custom implementation to track CTA displays
+
+---
+
+### Total Video Watch Time
+
+**What it is**: The cumulative time all users spend watching your video content
+
+**Use for**:
+- Understanding overall content consumption
+- Calculating average watch times
+- Measuring total engagement volume
+
+**Why it's valuable**:
+- Shows aggregate content value
+- Helps justify video production costs
+- Indicates content popularity trends
+
+---
+
+## Video Session Metrics
+
+### Video Sessions
+
+**What it is**: Total number of sessions where video content was accessed
+
+**Different from**: Video plays (some sessions may not result in plays)
+
+**Use for**:
+- Understanding video exposure
+- Calculating play rates
+- Measuring video page traffic
+
+---
+
+### Video Play Sessions
+
+**What it is**: Number of sessions where users actually started playing the video
+
+**Why track separately**: Distinguishes between video exposure and actual engagement
+
+**Use for**:
+- Calculating completion rates
+- Understanding true video engagement
+- Optimizing video placement and thumbnails
+
+---
+
+### Video Completion Sessions
+
+**What it is**: Number of sessions where users watched the video to completion
+
+**Critical for**:
+- Measuring content effectiveness
+- Understanding user commitment
+- Optimizing video length and content
+
+---
+
+## Player-Specific Considerations
+
+### HTML5 Video Players
+
+**Supported events**: play, pause, ended, timeupdate, volumechange
+**Tracking accuracy**: High - direct event access
+**Setup requirements**: Standard HTML5 video element with event listeners
+
+### YouTube Embedded Videos
+
+**Supported events**: onStateChange, onPlaybackQualityChange
+**Tracking accuracy**: Good - via YouTube API
+**Setup requirements**: YouTube IFrame API integration
+**Limitations**: Some events may be restricted by YouTube policies
+
+### Vimeo Embedded Videos
+
+**Supported events**: play, pause, ended, timeupdate
+**Tracking accuracy**: High - via Vimeo Player API
+**Setup requirements**: Vimeo Player SDK integration
+**Benefits**: Detailed analytics and customization options
+
+### Wistia Videos
+
+**Supported events**: play, pause, end, timechange
+**Tracking accuracy**: Excellent - comprehensive API
+**Setup requirements**: Wistia embed code with API enabled
+**Benefits**: Built-in heatmaps and engagement analytics
+
+### vturb v2 Player
+
+**Support level**: Partially supported
+**Tracking accuracy**: Limited - some metrics may not be available
+**Known issues**: 
+- May not fire all standard video events consistently
+- Some engagement metrics might not track properly
+- Completion tracking may be unreliable
+**Recommendation**: Verify specific metrics work in your implementation before depending on them
+
+---
+
+### Custom Video Players
+
+**Requirements**: Must implement standard video events
+**Tracking accuracy**: Varies by implementation
+**Setup**: Custom event tracking implementation needed
+**Considerations**: Ensure consistent event naming and timing
+
+---
+
+## Implementation Requirements
+
+### Basic Tracking Setup
+
+**Required events**:
+- Video load/ready
+- Play start
+- Pause
+- Video end/completion
+- Time updates
+
+**Optional events**:
+- Mute/unmute
+- Quality changes
+- Fullscreen toggle
+- Seek events
+
+### Data Collection
+
+**Essential data points**:
+- Session ID
+- Video ID or URL
+- Timestamp
+- Event type
+- Current time position
+- Video duration
+
+**Enhanced tracking**:
+- User agent
+- Device type
+- Connection speed
+- Video quality
+- Engagement score
+
+---
+
+## Optimization Strategies
+
+### Improving Play Rates
+
+**Video thumbnails**:
+- Use compelling, high-quality thumbnails
+- Test different thumbnail styles
+- Include faces or action shots
+- Avoid misleading thumbnails
+
+**Video placement**:
+- Position videos prominently
+- Use autoplay strategically
+- Add play button overlays
+- Optimize for mobile viewing
+
+### Increasing Completion Rates
+
+**Content optimization**:
+- Hook viewers in first 10 seconds
+- Keep videos concise and focused
+- Use engaging visuals and audio
+- Include clear value propositions
+
+**Technical optimization**:
+- Ensure fast loading times
+- Optimize for different devices
+- Provide quality options
+- Add captions and transcripts
+
+### Maximizing Watch Time
+
+**Content strategies**:
+- Structure content with clear progression
+- Use storytelling techniques
+- Include interactive elements
+- Maintain consistent pacing
+
+**Technical strategies**:
+- Minimize buffering issues
+- Optimize video compression
+- Provide smooth playback
+- Enable quality adaptation
+
+---
+
+## Common Issues and Solutions
+
+### Low Play Rates
+
+**Possible causes**:
+- Poor thumbnail quality
+- Unclear video purpose
+- Slow loading times
+- Poor placement
+
+**Solutions**:
+- A/B test thumbnails
+- Add descriptive titles
+- Optimize video loading
+- Improve video positioning
+
+### High Drop-off Rates
+
+**Possible causes**:
+- Slow start to content
+- Poor audio/video quality
+- Content doesn't match expectations
+- Too long for the context
+
+**Solutions**:
+- Front-load key information
+- Improve production quality
+- Align content with promises
+- Test shorter versions
+
+### Technical Tracking Issues
+
+**Common problems**:
+- Events not firing
+- Duplicate event tracking
+- Cross-browser compatibility
+- Mobile tracking issues
+- Player-specific limitations (e.g., vturb v2 partial support)
+
+**Solutions**:
+- Test across all browsers
+- Implement event deduplication
+- Use progressive enhancement
+- Test on actual mobile devices
+- Verify player-specific event support before implementation
+
+**vturb v2 Specific Issues**:
+- Some video events may not fire consistently
+- Consider alternative tracking methods for critical metrics
+- Test thoroughly in your specific implementation
+- Have fallback tracking for important conversion events
+
+---
+
+## Reporting and Analysis
+
+### Daily Monitoring
+
+**Key metrics to check**:
+- Video play rate
+- Completion rate
+- Average watch time
+- Technical issues
+
+### Weekly Analysis
+
+**Deeper insights**:
+- Content performance trends
+- Device and browser breakdowns
+- User behavior patterns
+- Conversion correlation
+
+### Monthly Optimization
+
+**Strategic reviews**:
+- Content strategy effectiveness
+- Technical performance optimization
+- Player technology evaluation
+- ROI analysis of video content
+
+---
+
+## Getting More Help
+
+For assistance with:
+- Video player integration
+- Custom tracking implementation
+- Performance optimization
+- Analytics setup and interpretation
+
+Contact our support team or explore our detailed video integration guides.

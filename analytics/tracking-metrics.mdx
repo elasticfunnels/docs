@@ -1,0 +1,476 @@
+---
+title: "Tracking Metrics"
+description: "Comprehensive tracking metrics for user behavior, engagement, and funnel performance analysis"
+---
+
+## TLDR
+
+**Quick Summary**: Tracking metrics provide detailed insights into user behavior, engagement patterns, and funnel performance. These metrics help you understand how users interact with your content and identify optimization opportunities.
+
+**Most Important**: Sessions, Page Views, Engagement Rate, and Session Duration are your core tracking performance indicators.
+
+**Bottom Line**: Better tracking leads to better optimization. Monitor these metrics to understand user behavior and improve funnel performance.
+
+---
+
+## Core Tracking Metrics
+
+### Sessions
+
+**What it is**: Individual visits to your website or funnel, regardless of duration
+
+**How it's tracked**: Unique session identifiers that expire after inactivity
+
+**Example**: A user visits your site, browses for 10 minutes, leaves, then returns 2 hours later = 2 sessions
+
+**Why it matters**:
+- Foundation metric for calculating rates and averages
+- Shows traffic volume and user interest
+- Used to calculate conversion rates and engagement metrics
+
+**Technical details**:
+- Session expires after 30 minutes of inactivity (configurable)
+- New session starts with each new visit
+- Cross-device sessions may be counted separately
+
+---
+
+### Page Views
+
+**What it is**: Total number of pages viewed across all sessions
+
+**How it's tracked**: Each page load or route change triggers a page view event
+
+**Different from sessions**: Multiple page views can occur within a single session
+
+**Why it's valuable**:
+- Shows content consumption patterns
+- Indicates user engagement depth
+- Helps identify popular content
+- Used for calculating pages per session
+
+**Optimization insights**:
+- High page views per session indicate good engagement
+- Low page views may suggest navigation issues
+- Track which pages drive the most views
+
+---
+
+### Unique Clicks
+
+**What it is**: Number of distinct sessions that resulted in at least one click
+
+**How it's calculated**: Cardinality count of unique session IDs with click events
+
+**Different from total clicks**: Counts each session only once, regardless of multiple clicks
+
+**Why it's important**:
+- Shows actual user engagement vs bot traffic
+- More accurate than total clicks for engagement analysis
+- Better metric for calculating click-through rates
+
+**Use cases**:
+- Measuring campaign effectiveness
+- Calculating true engagement rates
+- Identifying quality traffic sources
+
+---
+
+## Engagement Metrics
+
+### Engagement Rate
+
+**What it is**: Percentage of sessions that include meaningful user interactions
+
+**How it's calculated**: (Sessions with Engagements ÷ Total Sessions) × 100
+
+**What counts as engagement**:
+- Clicks on interactive elements
+- Form submissions
+- Video plays
+- Downloads
+- Time-based engagement thresholds
+
+**Why it's crucial**:
+- Shows content quality and relevance
+- Indicates user interest and intent
+- Helps identify optimization opportunities
+- Correlates with conversion potential
+
+**Good benchmarks**:
+- 40-60%: Typical performance
+- 60-80%: Good performance
+- 80%+: Excellent performance
+
+---
+
+### Session Duration
+
+**What it is**: Average time users spend on your site per session
+
+**How it's calculated**: Total Time on Page ÷ Number of Sessions
+
+**Technical measurement**: Time between first page load and last recorded activity
+
+**Why it matters**:
+- Indicates content quality and user interest
+- Shows if users find value in your content
+- Helps identify pages that hold attention
+- Correlates with conversion likelihood
+
+**Optimization strategies**:
+- Improve content quality and relevance
+- Enhance page loading speed
+- Add engaging interactive elements
+- Optimize content structure and flow
+
+---
+
+### Time on Page
+
+**What it is**: Total time users spend viewing specific pages
+
+**How it's measured**: Time between page load and next page load or session end
+
+**Aggregation**: Sum of all time spent across all sessions
+
+**Use for**:
+- Identifying most engaging content
+- Understanding user behavior patterns
+- Optimizing page content and layout
+- Calculating average session duration
+
+**Limitations**:
+- Last page of session may not be accurately measured
+- Inactive tabs may inflate time measurements
+- Requires JavaScript-based tracking for accuracy
+
+---
+
+## Funnel-Specific Metrics
+
+### Funnel Clicks
+
+**What it is**: Total number of clicks on funnel-specific elements
+
+**Includes**:
+- CTA button clicks
+- Product link clicks
+- Navigation clicks within funnel
+- Form field interactions
+
+**Why track separately**: Distinguishes funnel engagement from general site navigation
+
+**Optimization insights**:
+- High funnel clicks indicate good user flow
+- Low clicks may suggest unclear CTAs
+- Click patterns show user journey preferences
+
+---
+
+### Funnel Click-Through Rate (CTR)
+
+**What it is**: Percentage of sessions that result in funnel clicks
+
+**How it's calculated**: (Funnel Clicks ÷ Sessions) × 100
+
+**Why it's important**:
+- Shows funnel effectiveness
+- Indicates CTA performance
+- Helps optimize user flow
+- Measures engagement quality
+
+**Optimization tactics**:
+- Test different CTA designs
+- Improve CTA placement
+- Optimize messaging and copy
+- Reduce friction in user flow
+
+---
+
+### Add to Cart Rate
+
+**What it is**: Percentage of visitors who add products to their cart
+
+**How it's calculated**: (Add to Cart Events ÷ Sessions) × 100
+
+**Why it's critical**:
+- Shows product interest level
+- Indicates pricing acceptance
+- Measures funnel effectiveness
+- Predicts conversion potential
+
+**Typical ranges**: 5-15% depending on industry and traffic source
+
+**Improvement strategies**:
+- Optimize product presentation
+- Improve pricing strategy
+- Add social proof elements
+- Simplify add-to-cart process
+
+---
+
+## Advanced Tracking Metrics
+
+### Engagement Time
+
+**What it is**: Total time users spend actively engaging with content
+
+**Different from session duration**: Only counts active interaction time
+
+**Measurement criteria**:
+- Mouse movement and clicks
+- Keyboard interactions
+- Scroll activity
+- Video/audio engagement
+
+**Why it's more accurate**: Filters out inactive time and background tabs
+
+**Use cases**:
+- Content quality assessment
+- User experience optimization
+- Engagement comparison across pages
+- True attention measurement
+
+---
+
+### Split Test Views
+
+**What it is**: Number of times different variations in A/B tests are viewed
+
+**How it's tracked**: Separate counting for each test variation
+
+**Why it's essential**:
+- Ensures statistical significance
+- Validates test results
+- Helps determine winning variations
+- Guides optimization decisions
+
+**Best practices**:
+- Ensure even traffic distribution
+- Track sufficient sample sizes
+- Monitor for external factors
+- Document test parameters
+
+---
+
+### UTM Parameter Tracking
+
+**What it is**: Tracking of campaign parameters in URLs for attribution
+
+**Standard parameters**:
+- utm_source: Traffic source (google, facebook, email)
+- utm_medium: Marketing medium (cpc, social, email)
+- utm_campaign: Campaign name
+- utm_term: Keyword (for paid search)
+- utm_content: Ad content differentiation
+
+**Why it's crucial**:
+- Accurate campaign attribution
+- ROI measurement by source
+- Optimization insights
+- Budget allocation guidance
+
+**Implementation tips**:
+- Use consistent naming conventions
+- Document parameter standards
+- Validate tracking setup
+- Regular attribution analysis
+
+---
+
+## E-commerce Specific Metrics
+
+### Add to Carts
+
+**What it is**: Total number of add-to-cart events across all sessions
+
+**Different from add-to-cart rate**: Raw count vs percentage
+
+**Why track both**:
+- Volume understanding (total events)
+- Performance measurement (rate)
+- Trend analysis over time
+- Capacity planning
+
+**Optimization focus**:
+- Product page improvements
+- Pricing strategy adjustments
+- User experience enhancements
+- Inventory management insights
+
+---
+
+### Cart Conversion Rate
+
+**What it is**: Percentage of cart additions that result in purchases
+
+**How it's calculated**: (Purchases ÷ Add to Carts) × 100
+
+**Industry averages**: 30-40% completion rate
+
+**Why it's critical**:
+- Shows checkout process effectiveness
+- Identifies abandonment issues
+- Measures pricing acceptance
+- Indicates trust and security perception
+
+**Improvement strategies**:
+- Streamline checkout process
+- Add trust signals and security badges
+- Optimize payment options
+- Reduce unexpected costs
+
+---
+
+## Time-Based Metrics
+
+### Time on Page Before First Purchase
+
+**What it is**: Average time users spend on site before making their first purchase
+
+**Why it's valuable**:
+- Shows consideration period length
+- Helps optimize content strategy
+- Indicates decision-making patterns
+- Guides retargeting timing
+
+**Use for**:
+- Content planning and development
+- Email sequence timing
+- Retargeting campaign setup
+- Sales process optimization
+
+---
+
+### Affiliate Clicks
+
+**What it is**: Clicks on affiliate or partner links within your funnel
+
+**Tracking considerations**:
+- Separate from internal navigation
+- Attribution to specific partners
+- Commission calculation basis
+- Performance measurement
+
+**Why monitor**:
+- Partner relationship management
+- Revenue attribution
+- Commission accuracy
+- Partnership optimization
+
+---
+
+## Implementation and Setup
+
+### Basic Tracking Requirements
+
+**Essential events to track**:
+- Page views and route changes
+- Click events on key elements
+- Form submissions and interactions
+- Session start and end times
+- User engagement indicators
+
+**Technical setup**:
+- JavaScript tracking code
+- Event listener implementation
+- Session management
+- Data validation and cleaning
+
+---
+
+### Advanced Tracking Features
+
+**Enhanced data collection**:
+- User agent and device information
+- Geographic location data
+- Referrer and traffic source
+- Custom event parameters
+- Cross-device identification
+
+**Privacy considerations**:
+- GDPR compliance requirements
+- Cookie consent management
+- Data anonymization options
+- User opt-out mechanisms
+
+---
+
+## Data Quality and Validation
+
+### Common Tracking Issues
+
+**Bot traffic filtering**:
+- Identify and exclude automated traffic
+- Validate human interaction patterns
+- Monitor for unusual activity spikes
+- Implement bot detection mechanisms
+
+**Data accuracy checks**:
+- Validate event firing consistency
+- Check for duplicate events
+- Monitor tracking code errors
+- Verify cross-browser compatibility
+
+---
+
+### Performance Monitoring
+
+**Tracking performance metrics**:
+- Event processing speed
+- Data collection accuracy
+- System reliability uptime
+- Error rate monitoring
+
+**Optimization strategies**:
+- Minimize tracking code impact
+- Implement efficient data collection
+- Use asynchronous loading
+- Regular performance audits
+
+---
+
+## Reporting and Analysis
+
+### Real-Time Monitoring
+
+**Key metrics for immediate attention**:
+- Current active sessions
+- Real-time conversion events
+- Traffic source performance
+- System health indicators
+
+**Alert setup**:
+- Unusual traffic patterns
+- Conversion rate drops
+- Technical tracking issues
+- Performance threshold breaches
+
+---
+
+### Historical Analysis
+
+**Trend identification**:
+- Long-term performance patterns
+- Seasonal behavior changes
+- Growth trajectory analysis
+- Comparative period performance
+
+**Strategic insights**:
+- User behavior evolution
+- Content performance trends
+- Channel effectiveness changes
+- Optimization opportunity identification
+
+---
+
+## Getting More Help
+
+For assistance with:
+- Tracking implementation setup
+- Custom event configuration
+- Data analysis and interpretation
+- Performance optimization strategies
+
+Contact our support team or explore our detailed tracking implementation guides.

@@ -1,0 +1,223 @@
+---
+title: "Split Test Analytics"
+description: "Understand split testing metrics, statistical significance, and how to interpret your A/B test results"
+---
+
+## TLDR
+
+**Quick Summary**: Split testing lets you compare different versions of your pages to see which performs better. The system automatically tracks visitors, measures conversions, and tells you which version wins with statistical confidence.
+
+**Key Metrics**: Conversion rate, statistical significance, confidence intervals, sample size, and revenue impact.
+
+**Bottom Line**: Run tests until you get statistically significant results, then implement the winning version to improve your funnel performance.
+
+---
+
+## What is Split Testing?
+
+Split testing (also called A/B testing) is a method of comparing two or more versions of a webpage, offer, or element to determine which one performs better. Instead of guessing what works, you let real visitor data decide.
+
+### How It Works
+
+1. **Create Variants**: Make different versions of what you want to test (headlines, buttons, layouts, etc.)
+2. **Split Traffic**: Visitors are randomly shown different versions (usually 50/50)
+3. **Measure Results**: Track conversions, sales, and other key metrics
+4. **Determine Winner**: Statistical analysis tells you which version actually performs better
+
+## Key Metrics Explained
+
+### Conversion Rate
+**What it is**: The percentage of visitors who complete your desired action (purchase, signup, etc.)
+
+**Example**: If 100 people visit your page and 5 make a purchase, your conversion rate is 5%
+
+**Why it matters**: This is usually your primary metric for determining which variant performs better
+
+### Custom Goals
+**What it is**: Track specific user actions beyond just purchases (email signups, video completions, downloads, etc.)
+
+**How to use**: Define custom goals in your split test settings that match interactions in your page builder
+
+**Example**: Track "email-signup" events to see which variant gets more newsletter subscriptions
+
+### Statistical Significance
+**What it is**: A measure of confidence that your results are real, not just random chance
+
+**How to read it**: 
+- ✅ **Significant**: You can trust the results - implement the winner
+- ⚠️ **Not Significant**: Keep testing - results could be due to random variation
+- ❌ **Insufficient Data**: Not enough visitors yet to draw conclusions
+
+**Rule of thumb**: Wait for 95% statistical significance before making decisions
+
+### Confidence Intervals
+**What it is**: A range showing the likely true performance difference between variants
+
+**Example**: "Variant B improves conversion rate by 2.1% to 7.3%"
+- This means Variant B is definitely better than the original
+- The true improvement is somewhere between 2.1% and 7.3%
+
+**How to interpret**:
+- Range includes zero (e.g., "-1.2% to +4.8%"): **Not significant** - keep testing
+- Range is all positive (e.g., "2.1% to 7.3%"): **Winner found** - implement this variant
+- Range is all negative (e.g., "-5.2% to -1.1%"): **Loser** - stick with original
+
+### Sample Size
+**What it is**: The number of visitors needed to get reliable results
+
+**Why it matters**: 
+- Too few visitors = unreliable results
+- The system calculates minimum sample sizes automatically
+- Larger improvements need fewer visitors to detect
+
+### P-Value
+**What it is**: The probability that your results happened by chance
+
+**How to read it**:
+- p < 0.05: Statistically significant (less than 5% chance it's random)
+- p > 0.05: Not significant yet (could be random variation)
+
+## Understanding Your Results
+
+### When Results Are Ready
+Your split test results are reliable when you have:
+- ✅ **Statistical significance** (p-value < 0.05)
+- ✅ **Sufficient sample size** (system will indicate this)
+- ✅ **Confidence interval** that doesn't include zero
+- ✅ **Test ran for adequate time** (usually at least 1-2 weeks)
+
+### Making Decisions
+
+**Clear Winner**: 
+- High statistical significance
+- Confidence interval shows consistent improvement
+- **Action**: Implement the winning variant
+
+**No Clear Winner**:
+- Results not statistically significant
+- Confidence interval includes zero
+- **Action**: Continue testing or try different variants
+
+**Clear Loser**:
+- Statistically significant negative results
+- **Action**: Stop the test, keep your original version
+
+## Advanced Features
+
+### Automated Winner Selection
+**What it is**: The system can automatically select winners when statistical criteria are met
+
+**Configuration options**:
+- **Significance Level**: Set your confidence threshold (95%, 99%, etc.)
+- **Practical Significance**: Require minimum improvement percentage
+- **Sample Size Limits**: Set minimum/maximum visitors per variant
+- **Duration Controls**: Set minimum and maximum test durations
+- **Guardrail Metrics**: Ensure winners don't hurt other important metrics
+
+### Statistical Settings
+**Significance Level**: Control your confidence threshold (0.01 = 99%, 0.05 = 95%)
+**Statistical Power**: Probability of detecting real effects (0.8 = 80% power)
+**Minimum Detectable Effect**: Smallest improvement you want to detect
+**Multiple Testing Correction**: Adjust for testing multiple metrics simultaneously
+
+### Early Stopping & Sequential Testing
+**Early Stopping**: Allow tests to conclude as soon as significance is reached
+**Sequential Testing**: Check for significance at regular intervals with proper alpha spending
+**Alpha Spending Functions**: Pocock, O'Brien-Fleming methods for controlling false positives
+
+### Timezone Support
+All dates and times are displayed in your brand's configured timezone for accurate local time tracking.
+
+## Best Practices
+
+### Before Starting
+- **Test one thing at a time**: Don't change multiple elements simultaneously
+- **Have a clear hypothesis**: Know what you expect and why
+- **Set success metrics**: Define what "winning" means before you start
+- **Plan for adequate traffic**: Ensure you have enough visitors for reliable results
+- **Configure automation**: Set up automated winner selection criteria if desired
+
+### During Testing
+- **Don't peek too early**: Wait for statistical significance
+- **Run for full business cycles**: Include weekends, different days
+- **Avoid external changes**: Don't make other changes during the test
+- **Monitor for technical issues**: Ensure both variants are working properly
+
+### After Results
+- **Implement winners quickly**: Don't delay acting on clear results
+- **Document learnings**: Keep track of what worked and what didn't
+- **Plan next tests**: Use insights to inform future testing ideas
+- **Monitor post-implementation**: Ensure results hold up after full rollout
+
+## Common Questions
+
+### "How long should I run my test?"
+Run until you achieve statistical significance AND have adequate sample size. This usually takes 1-4 weeks depending on your traffic volume.
+
+### "Can I stop early if I see good results?"
+With early stopping enabled, you can stop as soon as statistical significance is reached. However, ensure you've met minimum duration and sample size requirements.
+
+### "What if my test shows no winner?"
+This is valuable information! It means your variants perform similarly. Try testing more dramatic changes or different elements.
+
+### "How does automated winner selection work?"
+The system runs checks every 5 minutes and can automatically select winners based on your configured criteria:
+- Statistical significance threshold
+- Minimum sample size requirements
+- Practical significance thresholds
+- Guardrail metric protection
+- Duration limits
+
+### "What are guardrail metrics?"
+Metrics that protect your business - the system ensures the winning variant doesn't significantly hurt important metrics like revenue, profit, or user experience.
+
+### "How much improvement should I expect?"
+Typical improvements range from 5-30%. Small improvements (1-2%) are hard to detect and may not be worth implementing.
+
+### "Can I test more than 2 variants?"
+Yes, but more variants require more traffic and time to reach significance. Start with 2 variants when possible.
+
+## Configuration Modes
+
+### Simple Mode
+Choose from preset configurations designed for common testing scenarios:
+- **Sprint Test**: Ultra-fast results in 3-7 days for obvious changes
+- **Standard Test**: 7-14 days for reliable results on most changes  
+- **Deep Test**: 14-30 days for thorough testing of important changes
+- **Revenue Test**: Optimized for revenue and AOV improvements
+- **Engagement Test**: Focus on user engagement and interaction metrics
+
+### Advanced Mode
+Full control over all statistical parameters:
+- Custom significance levels and statistical power
+- Bayesian vs Frequentist statistical methods
+- Sequential testing with alpha spending functions
+- Practical significance thresholds
+- Custom sample size limits and duration controls
+
+## Revenue Impact
+
+Split testing directly impacts your bottom line by:
+- **Increasing conversion rates**: More visitors become customers
+- **Improving average order value**: Better offers and upsells
+- **Reducing bounce rates**: More engaging content keeps visitors on-site
+- **Optimizing customer lifetime value**: Better experiences lead to repeat customers
+
+Even small improvements compound over time. A 10% conversion rate improvement on a page with 1000 monthly visitors and $100 average order value generates an extra $1,000 monthly revenue.
+
+### Automated Optimization
+With automated winner selection enabled, your funnels continuously optimize themselves:
+- Tests run automatically based on your criteria
+- Winners are selected when statistical thresholds are met
+- Traffic is redirected to winning variants without manual intervention
+- Guardrail metrics protect against negative impacts
+
+## Getting Help
+
+If you need assistance with:
+- Setting up tests
+- Interpreting results  
+- Troubleshooting issues
+- Planning testing strategies
+
+Contact our support team or check our detailed guides for specific testing scenarios.
