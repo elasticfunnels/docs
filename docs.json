@@ -26,6 +26,16 @@
             ]
           },
           {
+            "group": "Analytics & Metrics",
+            "pages": [
+              "analytics/split-test",
+              "analytics/conversions",
+              "analytics/ad-spend-metrics",
+              "analytics/video-metrics",
+              "analytics/tracking-metrics"
+            ]
+          },
+          {
             "group": "Funnels",
             "pages": [
               "funnels/create-funnel",
