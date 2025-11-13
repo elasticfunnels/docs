@@ -70,6 +70,18 @@ Perform specific actions based on conditions:
 - Personalize based on visitor data
 - A/B test specific elements
 
+**Set Merchant**
+- Override the active payment processor for the page
+- Controls which Merchant Container displays
+- Useful for affiliate-specific or traffic source-specific merchants
+- Gateway options: Buygoods, Clickbank, Digistore24, and other configured merchants
+
+**Clear Merchant**
+- Resets any merchant that was previously set in the session
+- Returns to the domain's default merchant setting
+- Useful for resetting merchant overrides after specific conditions
+- Clears session-level merchant changes made by Set Merchant node
+
 ### Utility Nodes
 Helper nodes for complex flows:
 
@@ -136,6 +148,34 @@ Rearranging nodes: In the events builder, drag nodes to reposition them. Use the
 - Show different content based on affiliate ID
 - Redirect to affiliate-specific pages
 - Track affiliate performance
+
+### Merchant Switching
+- Show different checkout forms based on traffic source
+- Use affiliate-specific payment processors
+- Override domain-level merchant settings
+- Display merchant-specific pricing or content
+
+**Example Flow:**
+1. **Page Load** → **Query Parameter Condition** (`source` equals `partner1`)
+2. **Yes** → **Set Merchant** (Buygoods)
+3. **No** → **Query Parameter Condition** (`source` equals `partner2`)
+4. **Yes** → **Set Merchant** (Clickbank)
+5. **No** → Use domain default merchant
+
+This ensures only the appropriate Merchant Container displays on the page based on the traffic source.
+
+**Advanced Example with Clear Merchant:**
+
+Some scenarios require resetting the merchant back to default:
+1. **Page Load** → **Query Parameter Condition** (`test_mode` equals `true`)
+2. **Yes** → **Set Merchant** (Test Merchant)
+3. **On Next Page Load** → **Query Parameter Condition** (`test_mode` is empty)
+4. **Yes** → **Clear Merchant** (resets to domain default)
+
+Or reset after a specific action:
+1. **Button Click** → **Query Parameter Condition** (`override` equals `special`)
+2. **Yes** → **Set Merchant** (Special Merchant)
+3. **After Purchase** → **Clear Merchant** (reset for next session)
 
 ### Geographic Targeting
 - Show different offers based on visitor location

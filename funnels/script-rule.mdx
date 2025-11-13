@@ -1,0 +1,805 @@
+---
+title: 'Script Rule'
+description: 'Advanced JavaScript-based conditional logic with access to visitor data, device info, geolocation, and more'
+---
+
+Script Rule is a powerful Page Events node that allows you to write custom JavaScript logic to control your funnel flow based on visitor data, behavior, and characteristics. Unlike simple query parameter conditions, Script Rules give you full programming capabilities with access to comprehensive visitor information.
+
+## When to Use Script Rule
+
+Script Rules are ideal when you need:
+
+- **Complex conditional logic** - Multiple conditions combined with AND/OR operators
+- **Geolocation-based routing** - Direct visitors based on country, region, ISP, or connection type
+- **Behavior-based decisions** - Route based on visit frequency, time between visits, or browsing patterns
+- **Customer segmentation** - Different flows for existing customers vs new visitors
+- **Anti-fraud protection** - Detect suspicious patterns like rapid page visits or VPN usage
+- **Device/Platform targeting** - Advanced device detection beyond simple mobile/tablet/desktop
+- **Tag-based routing** - Check for multiple tags with complex logic
+- **Click attribution** - Route based on traffic source, click age, or IP matching
+
+<Note>
+Script Rules execute on the server before the page loads, making them perfect for security-sensitive decisions that shouldn't be exposed to the browser.
+</Note>
+
+## How Script Rules Work
+
+1. **Server-Side Execution**: Script Rules run on the server before the page loads
+2. **Return Boolean**: Your script must return `true` or `false`
+3. **Flow Control**: 
+   - `true` → Takes the **Yes** (left/top) path
+   - `false` → Takes the **No** (right/bottom) path
+4. **Available Data**: You have access to pre-loaded visitor data (see below)
+
+## Available Data Variables
+
+### Core Variables
+
+#### `is_whitelisted`
+**Type:** Boolean  
+**Description:** Whether the visitor is currently whitelisted
+
+```javascript
+// Route whitelisted visitors differently
+return is_whitelisted === true;
+```
+
+#### `whitelist_source`
+**Type:** String | Null  
+**Values:** `'cookie'`, `'cookie_blocked'`, `'expired_cookie'`, `'domain_all_whitelisted'`, `null`  
+**Description:** How the whitelist status was determined
+
+```javascript
+// Only allow domain-level whitelist
+return whitelist_source === 'domain_all_whitelisted';
+```
+
+#### `query`
+**Type:** Object  
+**Description:** All URL query parameters as key-value pairs
+
+```javascript
+// Check multiple query parameters
+return query.source === 'facebook' && query.campaign === 'spring2024';
+
+// Check if parameter exists
+return query.hasOwnProperty('affiliate_id');
+```
+
+#### `ip_address`
+**Type:** String  
+**Description:** Visitor's IPv4 address
+
+```javascript
+// Block specific IP range
+return !ip_address.startsWith('192.168.');
+```
+
+#### `ip_address6`
+**Type:** String  
+**Description:** Visitor's IPv6 address (if available)
+
+```javascript
+// Allow only IPv6 traffic
+return ip_address6 !== '' && ip_address6 !== null;
+```
+
+#### `referer` / `referrer`
+**Type:** String  
+**Description:** HTTP referrer URL (both spellings available)
+
+```javascript
+// Check traffic source
+return referer.includes('google.com') || referer.includes('facebook.com');
+
+// Direct traffic only
+return referer === '' || referer === null;
+```
+
+#### `merchant_code`
+**Type:** String  
+**Description:** Active payment processor code (e.g., 'buygoods', 'clickbank', 'digistore24')
+
+```javascript
+// Route based on merchant
+return merchant_code === 'buygoods';
+```
+
+---
+
+### Device Information
+
+#### `is_mobile`
+**Type:** Boolean  
+**Description:** Whether visitor is on a mobile device
+
+```javascript
+// Mobile-only offers
+return is_mobile === true;
+```
+
+#### `is_tablet`
+**Type:** Boolean  
+**Description:** Whether visitor is on a tablet device
+
+```javascript
+// Exclude tablets from mobile offers
+return is_mobile === true && is_tablet === false;
+```
+
+#### `device`
+**Type:** Object  
+**Description:** Detailed device information
+
+**Available Properties:**
+- `device.type` - Device type (e.g., 'smartphone', 'tablet', 'desktop')
+- `device.brand` - Device brand (e.g., 'Apple', 'Samsung', 'Google')
+- `device.model` - Device model
+- `device.os` - Operating system
+- `device.os_version` - OS version
+- `device.browser` - Browser name
+- `device.browser_version` - Browser version
+
+```javascript
+// Target specific platforms
+return device.os === 'iOS' && device.brand === 'Apple';
+
+// Exclude old browsers
+return device.browser !== 'Internet Explorer';
+
+// Check OS version
+return device.os === 'Android' && parseInt(device.os_version) >= 10;
+```
+
+---
+
+### Customer Data
+
+#### `is_customer`
+**Type:** Boolean  
+**Description:** Whether visitor has made a purchase
+
+```javascript
+// Existing customers only
+return is_customer === true;
+
+// New visitors only
+return is_customer === false;
+```
+
+#### `is_test_customer`
+**Type:** Boolean  
+**Description:** Whether customer purchase was marked as test
+
+```javascript
+// Exclude test purchases
+return is_customer === true && is_test_customer === false;
+```
+
+#### `customer`
+**Type:** Object  
+**Description:** Customer information from last purchase
+
+**Available Properties:**
+- `customer.name` - Customer name
+- `customer.email` - Customer email
+- `customer.phone` - Customer phone
+- `customer.country` - Customer country
+- `customer.zip` - Postal code
+- `customer.city` - City
+- `customer.address` - Street address
+- `customer.order_id` - Last order ID
+- `customer.order_item` - Last purchased product code
+- `customer.order_item_name` - Last purchased product name
+- `customer.order_ids` - Array of all order IDs
+- `customer.is_test` - Whether it's a test order
+
+```javascript
+// Target customers from specific country
+return is_customer && customer.country === 'US';
+
+// Check if they bought specific product
+return customer.order_item === 'product-123';
+
+// Multiple purchases
+return customer.order_ids && customer.order_ids.length > 1;
+```
+
+---
+
+### Session & Tracking
+
+#### `session.aff_id`
+**Type:** String  
+**Description:** Affiliate ID from session
+
+```javascript
+// Specific affiliate only
+return session.aff_id === 'affiliate-001';
+
+// Any affiliate traffic
+return session.aff_id !== null && session.aff_id !== '';
+```
+
+#### `time` / `utc_timestamp`
+**Type:** Number (Unix timestamp in milliseconds)  
+**Description:** Current server time
+
+```javascript
+// Check time of day (convert to hours)
+const hour = new Date(time).getUTCHours();
+return hour >= 9 && hour <= 17; // Business hours UTC
+
+// Time-based routing
+const now = new Date(utc_timestamp);
+return now.getUTCDay() === 0 || now.getUTCDay() === 6; // Weekends
+```
+
+---
+
+### Tags
+
+#### `tags`
+**Type:** Array of Strings  
+**Description:** All tags assigned to the visitor (from `tag_` cookies)
+
+```javascript
+// Check if visitor has specific tag
+return tags.includes('vip_customer');
+
+// Check multiple tags
+return tags.includes('viewed_vsl') && tags.includes('clicked_cta');
+
+// Has any tags
+return tags.length > 0;
+```
+
+---
+
+### IP Geolocation Data (Advanced)
+
+To use IP geolocation data, your script must reference `ip_whois` - the system automatically loads this data only when needed for performance.
+
+#### `ip_whois`
+**Type:** Object  
+**Description:** Comprehensive IP geolocation and ISP information
+
+**Available Properties:**
+- `ip_whois.country` - Country code (e.g., 'US', 'GB', 'DE')
+- `ip_whois.country_name` - Full country name
+- `ip_whois.region` - Region/state code
+- `ip_whois.region_name` - Full region name
+- `ip_whois.city` - City name
+- `ip_whois.zip` - Postal code
+- `ip_whois.lat` - Latitude
+- `ip_whois.lon` - Longitude
+- `ip_whois.timezone` - Timezone (e.g., 'America/New_York')
+- `ip_whois.isp` - Internet Service Provider
+- `ip_whois.org` - Organization
+- `ip_whois.as` - Autonomous System number
+- `ip_whois.asname` - AS name
+- `ip_whois.mobile` - Is mobile carrier
+- `ip_whois.proxy` - Is proxy detected
+- `ip_whois.hosting` - Is hosting provider
+- `ip_whois.is_government` - Is government IP
+- `ip_whois.is_bot` - Is known bot
+
+<Warning>
+Using `ip_whois` adds ~10-20ms to script execution time as it requires a geolocation lookup. Only use when geographic or ISP information is essential for your logic.
+</Warning>
+
+```javascript
+// Target specific countries
+return ip_whois.country === 'US' || ip_whois.country === 'CA';
+
+// Block certain regions
+return ip_whois.country !== 'CN' && ip_whois.country !== 'RU';
+
+// Block VPNs and proxies
+return ip_whois.proxy !== true && ip_whois.hosting !== true;
+
+// Government/enterprise IPs
+return ip_whois.is_government === true;
+
+// Block bots
+return ip_whois.is_bot !== true;
+
+// ISP-based routing
+return ip_whois.isp.includes('Comcast') || ip_whois.isp.includes('Verizon');
+
+// Mobile carrier traffic
+return ip_whois.mobile === true;
+```
+
+---
+
+### Click Data (Advanced)
+
+<Note>
+Click data is available when there's a click ID present. This is commonly used on upsells but can be available on any page with click tracking.
+</Note>
+
+#### `click_data`
+**Type:** Object  
+**Description:** Information about the original ad click
+
+**Available Properties:**
+- `click_data.time` - Click timestamp (Unix seconds)
+- `click_data.seconds_ago` - Seconds since click
+- `click_data.ip_address` - Click IP address (IPv4)
+- `click_data.ip_address6` - Click IP address (IPv6)
+- `click_data.ip_address_matches` - Does current IP match click IP
+
+```javascript
+// Click must be recent (within 1 hour)
+return click_data.seconds_ago < 3600;
+
+// IP must match original click
+return click_data.ip_address_matches === true;
+
+// Old clicks only
+return click_data.seconds_ago > 86400; // Over 24 hours
+
+// Combined check
+return click_data.ip_address_matches && click_data.seconds_ago < 1800; // Same IP within 30min
+```
+
+---
+
+### Visit Data (Advanced)
+
+To use visit data, your script must reference `visit_data` - the system automatically loads visitor behavior metrics when referenced.
+
+#### `visit_data`
+**Type:** Object  
+**Description:** Comprehensive visitor behavior and history
+
+**Available Properties:**
+- `visit_data.first_visit` - First visit timestamp
+- `visit_data.time_since_first_visit` - Milliseconds since first visit
+- `visit_data.visit_count` - Total number of visits
+- `visit_data.last_visit` - Last visit timestamp
+- `visit_data.time_since_last_visit` - Milliseconds since last visit
+- `visit_data.ip_address` - First visit IP (IPv4)
+- `visit_data.ip_address6` - First visit IP (IPv6)
+- `visit_data.session_id` - First session ID
+- `visit_data.has_multiple_user_agents` - Used different browsers/devices
+- `visit_data.unique_user_agent_count` - Number of different user agents
+- `visit_data.page_visit_count_30min` - Page visits in last 30 minutes
+- `visit_data.page_visit_count_all_time` - Total page visits ever
+- `visit_data.unique_pages_visited` - Number of different pages visited
+- `visit_data.average_time_between_visits` - Average time between visits (ms)
+- `visit_data.direct_visits_count` - Visits without referrer
+- `visit_data.referrer_visits_count` - Visits with referrer
+- `visit_data.rapid_visits_detected` - Suspicious rapid visiting pattern
+
+<Warning>
+Using `visit_data` adds ~100-300ms to script execution time as it queries Elasticsearch. Only use when behavior-based logic is essential.
+</Warning>
+
+```javascript
+// First-time visitors only
+return visit_data.visit_count === 1;
+
+// Returning visitors
+return visit_data.visit_count > 1;
+
+// Visited within last hour
+const oneHour = 60 * 60 * 1000;
+return visit_data.time_since_last_visit < oneHour;
+
+// Visited long ago, re-engagement
+const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+return visit_data.time_since_first_visit > thirtyDays && visit_data.visit_count > 1;
+
+// Block suspicious behavior (bot detection)
+return visit_data.rapid_visits_detected !== true && 
+       visit_data.page_visit_count_30min < 20;
+
+// High-intent visitors
+return visit_data.unique_pages_visited >= 3 && visit_data.visit_count >= 2;
+
+// Check if user switched devices (possible sharing)
+return visit_data.has_multiple_user_agents === false;
+```
+
+---
+
+## Debugging Script Rules
+
+### Using the Debug Window
+
+The best way to debug Script Rules is with the **Debug Window** - a powerful tool that shows you exactly what's happening when your script executes.
+
+**How to Debug:**
+
+1. **Open the Debugger** - Click the **"Debugger"** button in the Page Builder or Page Events interface
+2. This will open your page with the **Debug Window** automatically activated
+3. **Navigate to "Page Events" tab** in the Debug Window to see Script Rule execution details
+4. **Reload the page** if needed to trigger the Script Rule
+
+**What You'll See:**
+
+The Debug Window displays comprehensive Script Rule information:
+
+- **Result**: `TRUE` or `FALSE` - which path was taken
+- **Execution Time**: How long the script took to run (in milliseconds)
+- **Next Path**: Which branch the flow followed
+- **Console Messages**: All your `console.log()`, `console.warn()`, and `console.error()` output
+- **Errors**: Full error messages if the script failed
+- **Used IP Whois**: Whether geolocation data was loaded
+- **Used Click Data**: Whether click data was accessed
+- **Has Customer Data**: Whether customer information was available
+- **Script Preview**: First few lines of your script code
+- **Full Context**: Complete evaluation data with all variable values
+
+<Note>
+The Debug Window is the most efficient way to debug Script Rules. It shows you everything that happened during execution, including all console output and the exact data that was available.
+</Note>
+
+### Console Logging
+
+You can use `console.log()` to debug your Script Rules:
+
+```javascript
+console.log('Current country:', ip_whois.country);
+console.log('Visit count:', visit_data.visit_count);
+console.log('Is customer:', is_customer);
+
+return ip_whois.country === 'US';
+```
+
+Console logs appear in the **Debug Window "Page Events" tab** with real-time, expandable details.
+
+<Tip>
+Use console logging liberally during development to understand what data is available and how your conditions evaluate. Click "Debugger" in the Page Builder to open the Debug Window and see all logs.
+</Tip>
+
+**Example Debugging Session:**
+
+```javascript
+// Log all available data to understand what you have
+console.log('Query params:', query);
+console.log('Is mobile:', is_mobile);
+console.log('Is customer:', is_customer);
+console.log('Visit count:', visit_data?.visit_count);
+console.log('Country:', ip_whois?.country);
+
+// Log your condition results
+const isEligible = ip_whois.country === 'US' && visit_data.visit_count > 1;
+console.log('Is eligible:', isEligible);
+
+return isEligible;
+```
+
+Then in the Debug Window (opened by clicking "Debugger"), you'll see all these logs with their values, making it easy to spot issues with your logic.
+
+For more details on using the Debug Window, see the [Debug Window documentation](/debugging/debug-window).
+
+---
+
+## Example Use Cases
+
+### Example 1: Geographic Targeting
+
+```javascript
+// US and Canada only, block VPNs
+return (ip_whois.country === 'US' || ip_whois.country === 'CA') &&
+       ip_whois.proxy !== true &&
+       ip_whois.hosting !== true;
+```
+
+### Example 2: Customer Segmentation
+
+```javascript
+// Returning customers who haven't visited in 30+ days
+const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+return is_customer === true && 
+       visit_data.time_since_last_visit > thirtyDays;
+```
+
+### Example 3: Anti-Fraud Protection
+
+```javascript
+// Block suspicious patterns when click data is available
+return click_data.ip_address_matches === true &&
+       click_data.seconds_ago < 3600 &&
+       visit_data.rapid_visits_detected !== true &&
+       ip_whois.is_bot !== true &&
+       ip_whois.proxy !== true;
+```
+
+### Example 4: Device & Platform Targeting
+
+```javascript
+// iOS users only, version 14 or higher
+return device.os === 'iOS' && 
+       parseInt(device.os_version) >= 14 &&
+       device.brand === 'Apple';
+```
+
+### Example 5: Behavior-Based Routing
+
+```javascript
+// High-engagement visitors: viewed 3+ pages, visited 2+ times
+return visit_data.unique_pages_visited >= 3 &&
+       visit_data.visit_count >= 2 &&
+       tags.includes('viewed_vsl');
+```
+
+### Example 6: Multi-Condition Affiliate Routing
+
+```javascript
+// Specific affiliate from US, mobile device, first-time visitor
+return session.aff_id === 'AFF123' &&
+       ip_whois.country === 'US' &&
+       is_mobile === true &&
+       visit_data.visit_count === 1;
+```
+
+### Example 7: Time-Based Offers
+
+```javascript
+// Weekend special offer (UTC)
+const now = new Date(utc_timestamp);
+const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 6 = Saturday
+return dayOfWeek === 0 || dayOfWeek === 6;
+```
+
+### Example 8: Tag-Based Progressive Disclosure
+
+```javascript
+// Visitor watched VSL and clicked CTA but hasn't purchased
+return tags.includes('watched_vsl') &&
+       tags.includes('clicked_cta') &&
+       is_customer === false;
+```
+
+---
+
+## Best Practices
+
+### Performance Optimization
+
+1. **Avoid Heavy Operations When Possible**
+   - Only reference `ip_whois` if you need geolocation
+   - Only reference `click_data` if you need click attribution (requires click ID)
+   - Only reference `visit_data` if you need behavior metrics
+
+2. **Simple Checks First**
+   ```javascript
+   // Good: Check simple conditions before heavy operations
+   if (!is_customer) return false; // Fast check first
+   
+   // Then check heavy data
+   return ip_whois.country === 'US';
+   ```
+
+3. **Use Tags for Behavior Tracking**
+   ```javascript
+   // Show different upsell based on whether they watched the VSL
+   // Tag 'watched_vsl' is set on VSL page when video completes
+   return tags.includes('watched_vsl');
+   ```
+
+### Logic Clarity
+
+1. **Comment Your Code**
+   ```javascript
+   // Route high-value traffic: US/CA, mobile, new visitors
+   return (ip_whois.country === 'US' || ip_whois.country === 'CA') &&
+          is_mobile === true &&
+          visit_data.visit_count === 1;
+   ```
+
+2. **Break Complex Logic into Steps**
+   ```javascript
+   // Check geographic eligibility
+   const isEligibleCountry = ip_whois.country === 'US';
+   
+   // Check device requirements
+   const isCorrectDevice = is_mobile && !is_tablet;
+   
+   // Check behavior requirements
+   const isNewVisitor = visit_data.visit_count === 1;
+   
+   return isEligibleCountry && isCorrectDevice && isNewVisitor;
+   ```
+
+3. **Use Meaningful Variable Names**
+   ```javascript
+   const isVipCustomer = is_customer && customer.order_ids.length > 3;
+   const isRecentVisit = visit_data.time_since_last_visit < (7 * 24 * 60 * 60 * 1000);
+   
+   return isVipCustomer && isRecentVisit;
+   ```
+
+### Error Handling
+
+1. **Check for Null/Undefined**
+   ```javascript
+   // Good: Check if data exists before using it
+   return ip_whois && ip_whois.country === 'US';
+   
+   // Good: Array check
+   return customer.order_ids && customer.order_ids.length > 0;
+   ```
+
+2. **Provide Fallback Values**
+   ```javascript
+   // Fallback to false if data unavailable
+   const country = ip_whois?.country || 'unknown';
+   return country === 'US';
+   ```
+
+### Testing
+
+1. **Test Both Paths**
+   - Verify the `true` path works as expected
+   - Verify the `false` path works as expected
+   - Test edge cases (missing data, null values, etc.)
+
+2. **Use Debug Window**
+   - Click "Debugger" in Page Builder or Page Events to open Debug Window
+   - View console logs and script execution details in the "Page Events" tab
+
+3. **Test with Different IPs/Devices**
+   - Use VPN to test different countries
+   - Use browser dev tools to simulate mobile devices
+   - Test with different referrers and query parameters
+
+---
+
+## Troubleshooting
+
+### Script Returns Unexpected Results
+
+**Problem:** Script always takes same path regardless of data
+
+**Solutions:**
+1. **Use the Debug Window** - Click "Debugger" in the Page Builder or Page Events to see the actual result and all data
+2. Check your return statement - must return boolean
+3. Use `console.log()` to debug variable values
+4. Verify data is available (not null/undefined)
+5. Check for typos in property names
+
+```javascript
+// Debug example - add these logs and check Debug Window
+console.log('Country:', ip_whois?.country);
+console.log('Visit count:', visit_data?.visit_count);
+console.log('Is customer:', is_customer);
+
+return ip_whois.country === 'US';
+```
+
+Then check the Debug Window → Page Events tab to see:
+- The actual `Result` (TRUE or FALSE)
+- All your console logs
+- What data was actually available
+- The exact path taken (`Next Path`)
+
+### Script Execution Errors
+
+**Problem:** Script fails and takes `false` path
+
+**Solutions:**
+1. **Check Debug Window** - Click "Debugger" in the Page Builder to see the exact error message
+2. Check for syntax errors in your code
+3. Look at the error details in Debug Window → Page Events → script_rule event
+4. Ensure you're not using unsupported JavaScript features
+5. Verify all referenced variables exist
+
+**Debugging Steps:**
+1. Click **"Debugger"** in the Page Builder or Page Events interface
+2. The Debug Window will open automatically
+3. Go to **Page Events** tab
+4. Find the `script_rule` event with red/error status
+5. Look at the **Error** field for the exact error message
+6. Check **Full Context** to see what data was available
+
+**Common Errors:**
+```javascript
+// Bad: Using unsupported features
+const result = array.flatMap(x => x);  // flatMap not supported
+
+// Good: Use supported methods
+const result = array.map(x => x);
+
+// Bad: Undefined variable
+return customVariable === true;  // customVariable doesn't exist
+
+// Good: Use available variables
+return is_customer === true;
+```
+
+The Debug Window will show you the exact line and error type, making it much easier to fix.
+
+### Slow Performance
+
+**Problem:** Page loads slowly when script rule executes
+
+**Solutions:**
+1. Remove `ip_whois` reference if not needed
+2. Remove `click_data` reference if not needed (requires click ID to be present)
+3. Remove `visit_data` reference if not needed
+4. Simplify logic to avoid heavy operations
+
+```javascript
+// Slow: Uses all heavy operations
+return ip_whois.country === 'US' &&
+       click_data.seconds_ago < 3600 &&
+       visit_data.visit_count > 1;
+
+// Fast: Use simple checks only
+return query.country === 'US' && is_customer === true;
+```
+
+### Data Not Available
+
+**Problem:** `ip_whois`, `click_data`, or `visit_data` is empty/null
+
+**Solutions:**
+1. **ip_whois**: Make sure you reference it in your script (triggers lookup)
+2. **click_data**: Only available when there's a click ID present
+3. **visit_data**: Data may not be available for first-time, brand-new visitors
+
+```javascript
+// Safe check with fallback
+if (!ip_whois || !ip_whois.country) {
+    return false; // Default behavior if geolocation fails
+}
+
+return ip_whois.country === 'US';
+```
+
+---
+
+## JavaScript Limitations
+
+Script Rules have some JavaScript limitations due to server-side execution:
+
+### Supported Features
+- Basic JavaScript syntax (ES5 + some ES6)
+- Variables (`let`, `const`, `var`)
+- Functions and arrow functions
+- Arrays and objects
+- Loops (`for`, `while`, `forEach`)
+- Conditionals (`if`, `switch`, `ternary`)
+- Comparison and logical operators
+- `Math`, `Date`, `JSON` objects
+- `String` and `Array` methods (most common ones)
+- `console.log()` for debugging
+
+### NOT Supported
+- Async/await operations
+- Promises
+- Fetch API or HTTP requests
+- Browser APIs (window, document, localStorage, etc.)
+- ES6+ features like `flatMap`, `Object.fromEntries`
+- Regular expressions with some advanced features
+- Modules and imports
+
+### Polyfills Included
+The following are polyfilled automatically:
+- `Array.prototype.includes()`
+- `String.prototype.includes()`
+
+<Warning>
+Always test your script rules thoroughly. If unsure about a JavaScript feature, test it with simple logic first before deploying to production.
+</Warning>
+
+---
+
+## Related Documentation
+
+- [Debug Window](/debugging/debug-window) - Learn how to debug Script Rules with the Debug Window
+- [Page Events](/funnels/page-events) - Overview of the Page Events system
+- [Query Parameter Conditions](/funnels/query-parameters) - Simpler alternative for URL parameter checks
+- [Visitor-Based Content](/pages/visitor-based-content) - Using whitelisting with containers
+- [Dynamic Content](/funnels/dynamic-content) - Personalizing content based on conditions
+- [Exit Popups](/funnels/exit-popups) - Behavior-based exit intent detection
+
+<Note>
+Script Rules are one of the most powerful features in Elastic Funnels. Start with simple logic and gradually add complexity as you become comfortable with the available data and patterns.
+</Note>
+

@@ -1,0 +1,444 @@
+---
+title: 'Containers'
+description: 'Specialized containers for dynamic content, lazy loading, split testing, and conditional displays'
+---
+
+Containers are powerful page elements that control when and how content is displayed to visitors. They enable advanced functionality like conditional visibility, performance optimization, and personalized experiences.
+
+## Overview
+
+Containers wrap your page content and add special behaviors based on visitor actions, page events, or other conditions. Each container type serves a specific purpose in creating dynamic, high-performing funnels.
+
+## Available Containers
+
+### CTA Container
+
+The **CTA Container** (Call-to-Action Container) is hidden by default and only appears when the CTA is triggered, typically used to reveal purchase buttons, pricing tables, or order forms after a visitor watches your Video Sales Letter (VSL).
+
+**Key Features:**
+- Hidden by default (`display: none`)
+- Transforms to visible (`display: block`) when CTA is executed
+- Can persist once triggered during the session
+- Commonly contains buy buttons, pricing, checkout forms
+
+**How to Trigger:**
+
+The CTA can be executed in three ways:
+
+1. **VSL CTA**: At a specific timestamp in your Video Sales Letter, you call `getStarted()` to trigger the CTA when that point is reached in the video
+2. **Manual Button Click**: Add a button with click interaction that executes `getStarted()` JavaScript function
+3. **Timed Event**: Use Page Events with JavaScript to execute `getStarted()` after a delay
+
+**Example Button Click Setup:**
+
+```javascript
+// In Interactions Panel (Ctrl+I) on your button:
+// Trigger: On Click
+// Action: Execute JavaScript
+
+getStarted();
+```
+
+**Common Use Cases:**
+- Reveal order button after VSL completes
+- Show pricing after engagement threshold
+- Display purchase options on manual trigger
+- Progressive disclosure of sales information
+
+<Note>
+The CTA Container uses the `getStarted()` global function which is available throughout your page. Once triggered, the container can remain visible for the visitor's session.
+</Note>
+
+---
+
+### Hide on CTA Container
+
+The **Hide on CTA Container** is the opposite of the CTA Container - it's visible by default and gets hidden when the CTA is executed.
+
+**Key Features:**
+- Visible by default
+- Hides automatically when `getStarted()` is executed
+- Useful for removing content that shouldn't appear with purchase options
+- Often used in conjunction with CTA Container
+
+**How It Works:**
+
+When `getStarted()` is called (via VSL, button, or JavaScript), this container automatically hides while the CTA Container shows.
+
+**Common Use Cases:**
+- Hide video player when purchase form appears
+- Remove promotional content after CTA
+- Clear page space for checkout elements
+- Create seamless transitions between sales pitch and purchase
+
+**Example Pattern:**
+
+```
+Before CTA:
+  ✓ Hide on CTA Container (visible) - Contains VSL video
+  ✗ CTA Container (hidden) - Contains buy button
+
+After CTA triggered:
+  ✗ Hide on CTA Container (hidden) - VSL disappears
+  ✓ CTA Container (visible) - Buy button appears
+```
+
+<Tip>
+Use both containers together to create smooth transitions from your sales content to purchase forms. This creates a clean, focused buying experience.
+</Tip>
+
+---
+
+### Merchant Container
+
+The **Merchant Container** displays content conditionally based on the active payment processor (merchant) for the current page view.
+
+**Key Features:**
+- Shows content only for specific merchants
+- Hides all non-matching merchant containers
+- Can be set per domain or overridden in Page Events
+- Useful for merchant-specific disclaimers, policies, and branding
+
+**How Merchants Are Determined:**
+
+1. **Domain-Level Setting**: Default merchant set in Domain settings
+2. **Page Events Override**: Use the "Set Merchant" node in Page Events to override for specific conditions
+
+**Supported Merchants:**
+- Buygoods
+- Clickbank
+- Digistore24
+- Other configured payment processors
+
+**Configuration:**
+
+1. **Add Merchant Container** to your page
+2. **Select Merchant** from the container settings
+3. **Add Content** specific to that merchant
+4. **Repeat** for each merchant you want to support
+
+**Example Scenario:**
+
+You have different footer disclaimers specific to each merchant:
+
+```
+Page contains:
+  - Merchant Container (Buygoods) → Buygoods-specific disclaimer and policies
+  - Merchant Container (Clickbank) → Clickbank-specific disclaimer and policies
+  - Merchant Container (Digistore24) → Digistore24-specific disclaimer and policies
+
+When visitor arrives:
+  - Domain merchant = Buygoods
+  → Only Buygoods disclaimer displays
+
+Override in Page Events:
+  - Query Parameter (affiliate_id = 100)
+  → Set Merchant to Clickbank
+  → Only Clickbank disclaimer displays
+```
+
+**Common Use Cases:**
+- Merchant-specific disclaimers and legal policies
+- Payment processor-specific trust badges and seals
+- Different refund policies based on merchant
+- Merchant-specific support information and contact details
+- Custom branding elements per merchant
+- Merchant-specific terms and conditions
+
+**Setting Merchant in Page Events:**
+
+Use the **Set Merchant** node to dynamically change which merchant container displays:
+
+1. Go to **Page Events** for your page
+2. Add a condition (Query Parameter, Script Rule, etc.)
+3. Connect to **Set Merchant** node
+4. Select the merchant to activate
+5. Merchant containers will show/hide accordingly
+
+**Resetting Merchant:**
+
+Use the **Clear Merchant** node to reset back to the domain's default merchant:
+
+1. Add **Clear Merchant** node in Page Events
+2. Connect it to a condition or event
+3. When triggered, clears any session merchant override
+4. Page returns to using the domain's default merchant
+
+This is useful for:
+- Resetting test merchants back to production
+- Clearing affiliate-specific merchants after purchase
+- Returning to default after special conditions expire
+
+<Note>
+If no merchant is set (neither at domain level nor via Page Events), merchant containers will not display. Ensure you have a default merchant configured.
+</Note>
+
+---
+
+### Split Test Container
+
+The **Split Test Container** allows you to run A/B tests on specific sections of your page through Page Events.
+
+**Key Features:**
+- Test different content variations
+- Controlled through Page Events
+- Tracks performance of each variant
+- Can split test any page element or section
+
+**How to Use:**
+
+1. **Add Split Test Container** to your page
+2. **Configure in Page Events**:
+   - Add Split Test Component node
+   - Set traffic distribution percentages
+   - Connect to Dynamic Container nodes to load different content
+3. **Track Results** in Analytics
+
+**Common Use Cases:**
+- Test different headlines
+- Compare pricing presentations
+- Test different images or videos
+- Optimize form layouts
+
+**Best Practices:**
+- Test one element at a time
+- Run tests long enough for statistical significance
+- Track meaningful conversion goals
+- Document your test results
+
+<Tip>
+For complete split testing documentation, including setup and analysis, see [Split Testing](/funnels/split-testing).
+</Tip>
+
+---
+
+### Lazy Load Container
+
+The **Lazy Load Container** defers loading of content inside it until the visitor scrolls to that section of the page.
+
+**Key Features:**
+- Improves initial page load performance
+- Loads content "just in time" when visitor scrolls near it
+- Reduces bandwidth for content visitors never see
+- Seamless loading experience
+
+**How It Works:**
+
+1. Page loads with empty lazy load containers
+2. Visitor scrolls down the page
+3. When container enters viewport (or approaches it), content loads
+4. Content appears smoothly without page disruption
+
+**What to Lazy Load:**
+- Below-the-fold content
+- Large images or videos
+- Comment sections
+- Secondary information
+- Resource-heavy widgets or embeds
+
+**What NOT to Lazy Load:**
+- Above-the-fold content
+- Critical purchase buttons
+- Forms that need immediate interaction
+- Content needed for SEO
+
+**Performance Tips:**
+- Use for content below the fold only
+- Combine with image optimization
+- Test on slow connections
+- Monitor Core Web Vitals impact
+
+<Warning>
+Don't lazy load critical conversion elements like buy buttons or lead capture forms. Visitors should be able to interact with these immediately.
+</Warning>
+
+---
+
+## Related Containers
+
+Some specialized containers are documented in dedicated pages:
+
+### Dynamic Container
+The **Dynamic Container** allows you to change content from Page Events based on conditions, visitor data, or user actions.
+
+[View Dynamic Content Documentation →](/funnels/dynamic-content)
+
+### Whitelisted Containers
+**Whitelisted Container** and **Non-Whitelisted Container** display different content based on visitor whitelisting status, commonly used for ad compliance.
+
+[View Visitor-Based Content Documentation →](/pages/visitor-based-content)
+
+---
+
+## Container Combination Patterns
+
+### Progressive Sales Flow
+
+Combine multiple containers for a complete sales experience:
+
+```
+Initial Page Load:
+  ✓ Hide on CTA Container
+    - VSL video
+    - Sales copy
+  ✗ CTA Container (hidden)
+    - Pricing
+    - Buy button
+
+After VSL triggers CTA:
+  ✗ Hide on CTA Container (hidden)
+  ✓ CTA Container (visible)
+    - Pricing
+    - Buy button
+    ✓ Merchant Container (Buygoods)
+      - Buygoods disclaimer
+    ✗ Merchant Container (Clickbank) - hidden
+```
+
+### Performance-Optimized Page
+
+Use lazy loading for better page speed:
+
+```
+Above the fold:
+  - Hero section (loads immediately)
+  - VSL player (loads immediately)
+  - CTA button (loads immediately)
+
+Below the fold (lazy loaded):
+  ✓ Lazy Load Container
+    - Testimonials section
+    - FAQ accordion
+    - Detailed features
+    - Footer content
+```
+
+### Dynamic Merchant Selection
+
+Adapt disclaimers and policies based on traffic source:
+
+```
+Page Events Flow:
+  1. On Page Load
+  2. Query Parameter Condition (source = partner1)
+     → Set Merchant to Buygoods
+  3. Query Parameter Condition (source = partner2)
+     → Set Merchant to Clickbank
+  4. Default
+     → Domain default merchant
+
+Result:
+  - Only matching merchant container displays
+  - Visitor sees appropriate disclaimers and policies
+```
+
+---
+
+## Best Practices
+
+### Container Organization
+
+1. **Clear Naming**: Name containers descriptively in the page builder
+2. **Document Logic**: Note which containers work together
+3. **Test All Paths**: Verify all show/hide conditions work correctly
+4. **Consider Mobile**: Ensure container behaviors work on all devices
+
+### Performance Guidelines
+
+1. **Lazy Load Wisely**: Use for below-fold content only
+2. **Minimize Nesting**: Don't nest containers unnecessarily
+3. **Test Load Times**: Monitor impact on page speed
+4. **Optimize Content**: Compress images and minimize resources inside containers
+
+### User Experience
+
+1. **Smooth Transitions**: Avoid jarring content shifts when containers appear
+2. **Visual Feedback**: Let users know when content is loading
+3. **Fallback Content**: Have defaults for when conditions aren't met
+4. **Test Edge Cases**: What happens if no merchant is set? Test it.
+
+### Development Workflow
+
+1. **Start Simple**: Add containers one at a time
+2. **Test Immediately**: Verify each container works before adding more
+3. **Use Preview Mode**: Test without affecting live traffic
+4. **Clear Cache**: Clear browser cache when testing changes
+
+---
+
+## Troubleshooting
+
+### CTA Container Not Showing
+
+**Symptoms**: CTA container remains hidden after trigger
+
+**Possible Causes:**
+- `getStarted()` not being called correctly
+- JavaScript errors preventing execution
+- Container selector issues
+
+**Solutions:**
+1. Check browser console for JavaScript errors
+2. Verify button click triggers `getStarted()`
+3. Test VSL CTA timestamp is reached
+4. Confirm container has correct ID/class
+
+### Merchant Container Not Displaying
+
+**Symptoms**: No merchant containers showing
+
+**Possible Causes:**
+- No merchant set at domain level
+- No merchant selected in Page Events
+- Merchant ID mismatch
+
+**Solutions:**
+1. Check domain settings for default merchant
+2. Verify Set Merchant node in Page Events
+3. Confirm merchant containers have correct merchant assigned
+4. Check browser console for errors
+
+### Lazy Load Issues
+
+**Symptoms**: Content not loading when scrolling
+
+**Possible Causes:**
+- Container too small to trigger
+- JavaScript not initializing properly
+- Content inside container has errors
+
+**Solutions:**
+1. Ensure container has minimum height
+2. Check browser console for errors
+3. Test without lazy loading first
+4. Verify content loads normally outside container
+
+### Multiple Containers Conflicting
+
+**Symptoms**: Unexpected show/hide behavior
+
+**Possible Causes:**
+- Overlapping container logic
+- Multiple merchants set incorrectly
+- CTA and Hide on CTA not paired properly
+
+**Solutions:**
+1. Review Page Events flow carefully
+2. Test each container individually
+3. Check for conflicting JavaScript
+4. Simplify logic and add complexity gradually
+
+---
+
+## Related Documentation
+
+- [Page Events](/funnels/page-events) - Set up merchant switching and complex flows
+- [Dynamic Content](/funnels/dynamic-content) - Learn about Dynamic Containers
+- [Visitor-Based Content](/pages/visitor-based-content) - Whitelisting containers
+- [Split Testing](/funnels/split-testing) - A/B testing with containers
+- [Interactions Panel](/pages/interactions-panel) - Add click handlers to trigger CTAs
+
+<Note>
+Containers are powerful tools for creating dynamic, personalized funnels. Start with basic use cases and gradually explore advanced patterns as you become more comfortable with the system.
+</Note>
+

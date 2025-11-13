@@ -77,7 +77,41 @@ Inspect backend-evaluated page events (populated by the server during the reques
 - **Export**: Download a JSON file with the full backend debug payload
 - **Status**: See whether debug is enabled, total events, event types, last event time, and the current debug key
 
-Each event shows its type, relative time, status, and a details section. Expand “Full Context” to view the entire event payload.
+Each event shows its type, relative time, status, and a details section. Expand "Full Context" to view the entire event payload.
+
+#### Script Rule Debugging
+
+The Page Events tab provides comprehensive debugging for Script Rule nodes:
+
+**Script Rule Information Displayed:**
+- **Result**: `TRUE` or `FALSE` - which path the flow took
+- **Execution Time**: How long the script took to execute (milliseconds)
+- **Next Path**: The branch that was followed (`true` or `false`)
+- **Script Length**: Number of characters in your script
+- **Used Click Data**: Whether click data was accessed
+- **Used IP Whois**: Whether geolocation data was loaded
+- **Has Customer Data**: Whether customer information was available
+- **Device Type**: The device type during execution
+- **Console Messages**: All `console.log()`, `console.warn()`, and `console.error()` output from your script
+- **Errors**: Full error messages if the script failed
+- **Script Preview**: First portion of your script code
+- **Full Context**: Complete evaluation data with all available variables
+
+<Tip>
+To debug Script Rules, click **"Debugger"** in the Page Builder or Page Events interface. The Debug Window will open automatically with your page, showing detailed information about each Script Rule execution, including all console output and errors in the Page Events tab.
+</Tip>
+
+**Example Use Case:**
+
+When your Script Rule isn't working as expected:
+1. Add `console.log()` statements to your script to output variable values
+2. Click **"Debugger"** in the Page Builder or Page Events interface
+3. The page opens with Debug Window activated
+4. Go to **Page Events** tab
+5. Find the `script_rule` event
+6. Click "View Console Messages" to see all your logs
+7. Check the "Result" to see which path was taken
+8. Review "Full Context" to see all available data
 
 ### Funnel
 
@@ -254,6 +288,7 @@ The Debug Window only loads when you trigger the hotkey and does not affect page
 
 ## Related Documentation
 
+- [Script Rule](/funnels/script-rule) - Learn about Script Rules and how to debug them
 - [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior#default-redirect-behavior) - Understand default redirects and funnel assignment
 - [Page Events](/funnels/page-events) - Configure page-level events
 - [Create Funnel](/funnels/create-funnel) - Build and connect funnels

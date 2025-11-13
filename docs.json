@@ -47,6 +47,7 @@
             "group": "Page Events",
             "pages": [
               "funnels/page-events",
+              "funnels/script-rule",
               "funnels/dynamic-content",
               "funnels/split-testing",
               "funnels/exit-popups",
@@ -60,7 +61,8 @@
               "pages/create-landing-page",
               "pages/page-variants",
               "pages/visitor-based-content",
-              "pages/interactions-panel"
+              "pages/interactions-panel",
+              "pages/containers"
             ]
           },
           {
