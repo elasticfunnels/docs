@@ -1,30 +1,414 @@
 ---
 title: 'Meta Ads Integration'
-description: 'Connect Facebook/Meta Ads to track ad performance and conversions'
+description: 'Connect Facebook/Meta Ads to track ad performance, sync spend data, and send conversion postbacks'
 ---
 
-Integrating Meta Ads (Facebook) lets you track ad performance and conversions within your funnel.
+## Overview
 
-1. Go to "Settings" or "Integrations"
-2. Click "New Integration" and follow the redirect to Facebook
-3. Once back, select the ad account ID associated with this project
+The Meta Ads integration allows you to automatically sync your advertising data from Facebook/Meta Ads and send conversion information back to Meta to optimize your campaigns. This creates a powerful feedback loop that improves your ad targeting and ROI over time.
 
 ## What This Integration Provides
 
-- **Conversion Tracking**: Automatically track purchases and leads from your Meta ads
-- **Performance Analytics**: See which ads are driving the most conversions
-- **Attribution Data**: Understand the customer journey from ad click to conversion
-- **Optimization**: Use conversion data to optimize your ad campaigns
+<CardGroup cols={2}>
+  <Card title="Ad Spend Tracking" icon="dollar-sign">
+    Automatically import your daily ad spend, clicks, and impressions for accurate ROI reporting
+  </Card>
+  <Card title="Conversion Postbacks" icon="arrow-trend-up">
+    Send purchase data back to Meta to improve campaign optimization and attribution
+  </Card>
+  <Card title="Unified Reporting" icon="chart-mixed">
+    See your ad performance alongside your funnel metrics in one dashboard
+  </Card>
+  <Card title="Multi-Account Support" icon="layer-group">
+    Connect multiple ad accounts if you manage different businesses or campaigns
+  </Card>
+</CardGroup>
 
-## Prerequisites
+## Setup Guide
 
-- Active Meta Ads account
-- Admin access to the ad account you want to connect
-- Proper permissions to install tracking pixels
+### Step 1: Connect Your Meta Ads Account
+
+1. Navigate to **Settings → Integrations → Advertising**
+2. Find **Meta Ads** and click **"New integration"** or **"Manage integrations"**
+3. Click **"Connect your Meta Ads Account"**
+4. You'll be redirected to Facebook to authorize access
+5. Grant the necessary permissions for ad data access
+
+<Info>
+You'll need admin access to your Meta Ads account to complete the authorization.
+</Info>
+
+### Step 2: Select Your Ad Account
+
+After authorization, you'll see a list of all ad accounts you have access to:
+
+1. Review the available accounts (shown with account ID, name, and currency)
+2. Click **Select** next to the ad account you want to track
+3. The selected account will be highlighted with a blue checkmark
+
+<Tip>
+If you manage multiple businesses, you can create separate integrations for each ad account to keep reporting organized.
+</Tip>
+
+### Step 3: Configure Conversion Tracking (Optional)
+
+To enable conversion postbacks (highly recommended):
+
+1. **Enter your Meta Pixel ID**
+   - Find it in Meta Business Manager → Events Manager → Data Sources
+   - It's a 15-16 digit number
+   
+2. **Enable Conversion Postbacks**
+   - Check the box to enable automatic postback sending
+   - This sends purchase data back to Meta when customers complete orders
+
+3. Click **"Update Integration"** to save
+
+<Warning>
+Conversion postbacks require a valid Pixel ID. If you enable postbacks without a Pixel ID, the system will warn you.
+</Warning>
+
+## Understanding Pixel Attribution
+
+### How It Works
+
+ElasticFunnels uses a **page-based pixel tracking system** to ensure accurate attribution:
+
+1. **Each page** in your funnel can have its own Meta Pixel ID
+2. When a visitor lands on a page, we **track which pixels they were exposed to**
+3. When they make a purchase, we **send conversion data to the correct pixel(s)**
+
+### Why This Matters
+
+```
+Example: Multi-Business Scenario
+
+Page 1 (Product A): Uses Pixel 111
+Page 2 (Product B): Uses Pixel 222
+
+If customer visits both pages and purchases:
+→ Both Pixel 111 and Pixel 222 receive the conversion
+→ Accurate attribution for partnership/referral funnels
+```
+
+### Setting Pixel ID per Page
+
+You can configure the Meta Pixel ID at two levels:
+
+<AccordionGroup>
+  <Accordion title="Integration Level (Recommended for Single Business)">
+    Set one Pixel ID in the integration settings. This pixel will receive conversions from any page the customer visited during their journey.
+    
+    **Best for:** Single business with one website
+  </Accordion>
+
+  <Accordion title="Page Level (Advanced Multi-Business)">
+    Set different Pixel IDs on individual pages in your funnel settings. This allows different businesses or partners to track their own conversions.
+    
+    **Best for:** Agency managing multiple clients, partnership funnels
+  </Accordion>
+</AccordionGroup>
+
+## Ad Spend Syncing
+
+### Automatic Sync Schedule
+
+Your ad spend data syncs automatically **every 2 hours**. This includes:
+
+- Daily spend amounts
+- Click counts
+- Impression counts
+- Campaign names
+- Ad set information
+
+<Note>
+Historical data is available immediately after connecting. Future data syncs automatically without any action needed.
+</Note>
+
+### Viewing Your Ad Data
+
+After your first sync completes, you can view your ad performance:
+
+1. Go to **Analytics → Ad Spend Reports**
+2. Select your date range
+3. View spend, clicks, and ROI metrics
+4. Filter by campaign, ad set, or specific ads
+
+## Conversion Postbacks
+
+### What Are Conversion Postbacks?
+
+Conversion postbacks send purchase information back to Meta when a customer completes an order. This helps Meta:
+
+- Optimize your campaigns for conversions (not just clicks)
+- Improve audience targeting based on who actually buys
+- Provide accurate attribution data
+- Enable features like automated bidding
+
+### What Data is Sent
+
+When a conversion occurs, we send:
+
+- Purchase event
+- Order value and currency
+- Order ID
+- Customer information (hashed for privacy)
+- Click identifier (fbclid)
+
+<Info>
+All customer data is hashed and encrypted according to Meta's privacy requirements. We never send raw personal information.
+</Info>
+
+### When Postbacks Are Triggered
+
+Postbacks fire automatically when:
+
+1. ✅ Customer clicked a Meta ad (fbclid present)
+2. ✅ Customer visited a page with a Meta Pixel
+3. ✅ Customer completed a purchase
+4. ✅ Integration has postbacks enabled
+5. ✅ Pixel ID matches the page they visited
+
+<Check>
+The system intelligently determines which pixel to fire based on which pages the customer visited. If they saw multiple pixels, all relevant pixels receive the conversion.
+</Check>
+
+## Managing Multiple Integrations
+
+If you manage multiple businesses or clients, you can create multiple Meta Ads integrations:
+
+### When to Create Multiple Integrations
+
+- Managing different client accounts (agencies)
+- Separate businesses with different websites
+- Different brands under one ElasticFunnels account
+- Testing vs. production campaigns
+
+### How It Works
+
+Each integration is independent:
+- Has its own ad account
+- Has its own Pixel ID
+- Has its own postback settings
+- Syncs separately
+
+<Tip>
+Name each integration clearly (e.g., "Client A - Supplements", "Client B - Software") to keep them organized.
+</Tip>
+
+## Connection Status & Health
+
+### Status Indicators
+
+Your integration status shows real-time health:
+
+- **🟢 Active** - Integration is working, data syncing normally
+- **🔵 Syncing...** - Currently pulling new data from Meta
+- **🔴 Error** - Connection issue that needs attention
+- **⚪ Not Configured** - Integration not fully set up
+
+### Last Sync Information
+
+The integration card shows:
+- **Last synced:** How long ago data was last updated
+- **Records synced:** Number of records imported
+- **Total spend:** Recent spending tracked
+
+### Testing Your Connection
+
+Use the **"Test Connection"** button to verify:
+- Your access token is valid
+- You have permission to access the ad account
+- Data can be retrieved successfully
+
+<Warning>
+If you see an error status, check if your Meta session has expired. Click the re-authenticate button to refresh your connection.
+</Warning>
 
 ## Troubleshooting
 
-- Ensure you have the correct permissions on your Meta Ads account
-- Double-check that the ad account ID matches your active campaigns
-- Allow 24-48 hours for data to start appearing
-- Verify that your domain is properly verified in Meta Business Manager 
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="No Data Appearing After Setup">
+    **Possible Causes:**
+    - First sync hasn't run yet (syncs every 2 hours)
+    - No ad spend in the selected date range
+    - Ad account has no active campaigns
+    
+    **Solution:** Wait 2 hours for first sync, or contact support to trigger manual sync
+  </Accordion>
+
+  <Accordion title="Session Expired / Connection Error">
+    **Cause:** Meta access tokens expire after 60 days
+    
+    **Solution:** Click the blue "Re-authenticate" button on your integration to refresh your connection
+  </Accordion>
+
+  <Accordion title="Conversions Not Showing in Meta">
+    **Possible Causes:**
+    - Postbacks not enabled
+    - No Pixel ID configured
+    - Customer didn't visit a page with your pixel
+    
+    **Solution:** 
+    1. Verify Pixel ID is entered correctly
+    2. Check "Enable Conversion Postbacks" is checked
+    3. Ensure your funnel pages have pixel configured
+  </Accordion>
+
+  <Accordion title="Multiple Ad Accounts - Which to Choose?">
+    **Question:** I have 5 ad accounts listed, which should I select?
+    
+    **Answer:** Select the ad account that contains the campaigns you want to track. You can create multiple integrations if you need to track multiple ad accounts.
+  </Accordion>
+
+  <Accordion title="Pixel ID vs Ad Account - What's the Difference?">
+    **Pixel ID:** Tracking code on your website (one per business/website)
+    
+    **Ad Account:** Where you manage your ad campaigns in Meta
+    
+    **Relationship:** Multiple ad accounts can share one pixel if they're promoting the same website.
+  </Accordion>
+</AccordionGroup>
+
+### Getting Help
+
+If you encounter issues:
+
+1. Check the **Status** indicator on your integration
+2. Click **"Test Connection"** to diagnose issues
+3. Review the error message if one is shown
+4. Contact support with your integration ID
+
+## Best Practices
+
+### Optimization Tips
+
+<Steps>
+  <Step title="Set Up Conversion Postbacks">
+    Always enable postbacks to help Meta optimize your campaigns for actual purchases, not just clicks.
+  </Step>
+  
+  <Step title="Use Descriptive Names">
+    Name your integrations clearly, especially if managing multiple accounts (e.g., "Main Campaign - US", "Testing Account").
+  </Step>
+  
+  <Step title="Monitor Sync Status">
+    Check your integration status regularly to ensure data is syncing properly and connections haven't expired.
+  </Step>
+  
+  <Step title="Test After Setup">
+    Use the "Test Connection" button after setup to verify everything is working before running campaigns.
+  </Step>
+</Steps>
+
+### Pixel Configuration Strategy
+
+**Single Business:**
+- Use ONE Pixel ID in your integration
+- Apply to all funnel pages
+- Simplest setup for most users
+
+**Multi-Business or Agency:**
+- Create SEPARATE integrations for each client
+- Each integration gets its own Pixel ID
+- Keeps reporting and postbacks isolated
+
+**Partnership Funnels:**
+- Set different Pixel IDs on different pages
+- Partner pages fire partner's pixel
+- Main pages fire your pixel
+- Both get conversion credit
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="How often does ad spend data sync?">
+    Every 2 hours automatically. Your data is always up-to-date without manual work.
+  </Accordion>
+
+  <Accordion title="Can I connect multiple Meta Ads accounts?">
+    Yes! Click "Manage integrations" and then "Add integration" to connect additional accounts. Perfect for agencies or users managing multiple businesses.
+  </Accordion>
+
+  <Accordion title="Do I need a Pixel ID to use this integration?">
+    No, Pixel ID is optional. It's only required if you want to send conversion postbacks to Meta. You can still sync and view ad spend data without it.
+  </Accordion>
+
+  <Accordion title="Will this affect my existing Meta Pixel setup?">
+    No. This integration works alongside your existing pixel. It sends server-side conversion events that complement your pixel tracking.
+  </Accordion>
+
+  <Accordion title="How long until I see results in Meta?">
+    Conversion postbacks appear in Meta Events Manager within 5-10 minutes. Ad spend data appears in ElasticFunnels within 2 hours of your first sync.
+  </Accordion>
+
+  <Accordion title="What if I manage campaigns for different clients?">
+    Create separate integrations for each client. Each integration can have:
+    - Different ad account
+    - Different Pixel ID
+    - Independent postback settings
+    
+    This keeps your client data properly separated.
+  </Accordion>
+</AccordionGroup>
+
+## Data Privacy & Security
+
+### What Data We Access
+
+When you connect Meta Ads, we request permission to:
+
+- Read your ad account information
+- Access ad performance metrics (spend, clicks, impressions)
+- View campaign and ad set names
+- No access to modify or create ads
+
+### How We Store Your Data
+
+- Access tokens are encrypted and stored securely
+- Ad spend data is stored for historical reporting
+- Conversion data is hashed before sending to Meta
+- You can disconnect at any time and data will be removed
+
+### Compliance
+
+Our integration follows:
+- Meta's Platform Terms and Developer Policies
+- GDPR and privacy regulations
+- Secure OAuth 2.0 authentication
+- Industry-standard encryption
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="View Ad Reports"
+    icon="chart-line"
+    href="/analytics/ad-spend"
+  >
+    See your ad performance and ROI metrics
+  </Card>
+  <Card
+    title="Google Ads Integration"
+    icon="rectangle-ad"
+    href="/integrations/google-ads"
+  >
+    Connect Google Ads for complete cross-platform tracking
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    Unified view of all your marketing metrics
+  </Card>
+  <Card
+    title="Conversion Tracking"
+    icon="bullseye-arrow"
+    href="/analytics/conversions"
+  >
+    Deep dive into your conversion data and attribution
+  </Card>
+</CardGroup>

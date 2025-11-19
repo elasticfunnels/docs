@@ -1,13 +1,273 @@
 ---
 title: 'Google Ads Integration'
-description: 'Connect Google Ads to track clicks and conversions from your campaigns'
+description: 'Connect Google Ads to track clicks, conversions, and sync ad spend data with automatic postbacks'
 ---
 
-Integrating Google Ads helps you track clicks and conversions directly from your funnel pages.
+## Overview
 
-1. Go to "Settings" or "Integrations"
-2. Click "New Integration" and follow the prompts for Google
-3. Select the ad account ID associated with this project
+The Google Ads integration allows you to automatically sync your advertising data from Google Ads and send conversion information back to Google to optimize your campaigns. This creates a powerful feedback loop that improves your ad targeting and ROI over time.
+
+## What This Integration Provides
+
+<CardGroup cols={2}>
+  <Card title="Conversion Tracking" icon="arrow-trend-up">
+    Automatically send conversion postbacks using Google Click ID (gclid) for accurate attribution
+  </Card>
+  <Card title="Ad Spend Syncing" icon="dollar-sign">
+    Automatically import your daily ad spend, clicks, and impressions for accurate ROI reporting
+  </Card>
+  <Card title="Campaign Management" icon="sliders">
+    Sync campaign data, update status, and manage budgets directly from ElasticFunnels
+  </Card>
+  <Card title="Tracking Link Builder" icon="link">
+    Generate UTM parameters with Google Ads format for proper attribution
+  </Card>
+</CardGroup>
+
+## Setup Guide
+
+### Step 1: Connect Your Google Ads Account
+
+1. Navigate to **Settings → Integrations → Advertising**
+2. Find **Google Ads** and click **"New integration"** or **"Manage integrations"**
+3. Click **"Connect your Google Ads Account"**
+4. You'll be redirected to Google to authorize access
+5. Grant the necessary permissions for ad data access
+
+<Info>
+You'll need admin access to your Google Ads account to complete the authorization. A Google Ads Developer Token must be configured at the application level (contact support if needed).
+</Info>
+
+### Step 2: Select Your Ad Account
+
+After authorization, you'll see a list of all Google Ads accounts you have access to:
+
+1. Review the available accounts (shown with account ID and name)
+2. Select the account you want to track
+3. The selected account will be saved to your integration
+
+<Tip>
+If you manage multiple businesses, you can create separate integrations for each Google Ads account to keep reporting organized.
+</Tip>
+
+### Step 3: Configure Conversion Tracking (Required for Postbacks)
+
+To enable conversion postbacks (highly recommended):
+
+1. **Enter your Conversion Action ID**
+   - Find it in Google Ads → Tools & Settings → Conversions
+   - Create a new conversion action if you don't have one
+   - Copy the Conversion Action ID (numeric value)
+   
+2. **Enable Conversion Postbacks**
+   - Check the box to enable automatic postback sending
+   - This sends purchase data back to Google Ads when customers complete orders
+
+3. Click **"Update Integration"** to save
+
+<Warning>
+Conversion postbacks require a valid Conversion Action ID. If you enable postbacks without a Conversion Action ID, the system will warn you. The postback will only fire when conversions have a valid gclid (Google Click ID) parameter.
+</Warning>
+
+## Understanding Google Click ID (gclid)
+
+### How It Works
+
+Google Ads uses **gclid** (Google Click ID) to track which clicks lead to conversions:
+
+1. When someone clicks your Google Ads link, Google adds a `gclid` parameter to the URL
+2. ElasticFunnels automatically captures this `gclid` in the click tracking data
+3. When a conversion occurs, we send the `gclid` back to Google Ads
+4. Google Ads attributes the conversion to the original click
+
+### Why This Matters
+
+```
+Example: Conversion Attribution
+
+User clicks Google Ad → URL includes gclid=abc123
+User visits your funnel → gclid is captured
+User makes purchase → Conversion postback sent with gclid=abc123
+Google Ads → Attributes conversion to original click
+```
+
+<Check>
+The gclid is automatically captured when users click Google Ads links. You don't need to manually configure anything - just ensure you're using Google Ads tracking links.
+</Check>
+
+## Ad Spend Syncing
+
+### Automatic Sync Schedule
+
+Your ad spend data syncs automatically on a regular schedule. This includes:
+
+- Daily spend amounts
+- Click counts
+- Impression counts
+- Campaign names
+- Ad group information
+
+<Note>
+Historical data is available immediately after connecting. Future data syncs automatically without any action needed.
+</Note>
+
+### Viewing Your Ad Data
+
+After your first sync completes, you can view your ad performance:
+
+1. Go to **Analytics → Ad Spend Reports**
+2. Select your date range
+3. View spend, clicks, and ROI metrics
+4. Filter by campaign, ad group, or specific ads
+
+## Conversion Postbacks
+
+### What Are Conversion Postbacks?
+
+Conversion postbacks send purchase information back to Google Ads when a customer completes an order. This helps Google Ads:
+
+- Optimize your campaigns for conversions (not just clicks)
+- Improve audience targeting based on who actually buys
+- Provide accurate attribution data
+- Enable features like automated bidding
+
+### What Data is Sent
+
+When a conversion occurs, we send:
+
+- Purchase event
+- Order value and currency
+- Order ID
+- Google Click ID (gclid)
+- Conversion Action ID
+
+<Info>
+All customer data is handled according to Google's privacy requirements. Conversion data is sent securely to Google Ads.
+</Info>
+
+### When Postbacks Are Triggered
+
+Postbacks fire automatically when:
+
+1. ✅ Customer clicked a Google Ad (gclid present in click data)
+2. ✅ Customer completed a purchase
+3. ✅ Integration has postbacks enabled
+4. ✅ Conversion Action ID is configured
+
+<Warning>
+If a conversion doesn't have a gclid (e.g., user didn't come from Google Ads), no postback will be sent. This is expected behavior.
+</Warning>
+
+## Tracking Link Builder Integration
+
+The Tracking Link Builder automatically generates the correct UTM parameters for Google Ads:
+
+**Google Ads Template:**
+```
+utm_source=google
+utm_medium=cpc
+utm_campaign={campaignid}
+utm_term={keyword}
+utm_content={creative}
+adid=ga_{creative}_{campaignid}
+```
+
+<Info>
+Access the Tracking Link Builder from **Tools → Tracking → Tracking Link Builder** or from the Pages/Funnels list dropdown menu.
+</Info>
+
+## Campaign Management
+
+You can view and manage your Google Ads campaigns:
+
+- View campaign information and performance
+- Monitor ad group performance
+- Track campaign metrics alongside funnel data
+
+## Managing Multiple Integrations
+
+If you manage multiple businesses or clients, you can create multiple Google Ads integrations:
+
+### When to Create Multiple Integrations
+
+- Managing different client accounts (agencies)
+- Separate businesses with different Google Ads accounts
+- Different brands under one ElasticFunnels account
+- Testing vs. production campaigns
+
+### How It Works
+
+Each integration is independent:
+- Has its own Google Ads account
+- Has its own Conversion Action ID
+- Has its own postback settings
+- Syncs separately
+
+<Tip>
+Name each integration clearly (e.g., "Client A - Supplements", "Client B - Software") to keep them organized.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No Data Appearing After Setup">
+    **Possible Causes:**
+    - First sync hasn't run yet
+    - No ad spend in the selected date range
+    - Ad account has no active campaigns
+    
+    **Solution:** Wait for first sync, or contact support to trigger manual sync
+  </Accordion>
+
+  <Accordion title="Session Expired / Connection Error">
+    **Cause:** Google OAuth tokens expire after a period of time
+    
+    **Solution:** Click the "Re-authenticate" button on your integration to refresh your connection
+  </Accordion>
+
+  <Accordion title="Conversions Not Showing in Google Ads">
+    **Possible Causes:**
+    - Postbacks not enabled
+    - No Conversion Action ID configured
+    - Customer didn't click a Google Ad (no gclid)
+    - gclid expired (Google Ads has a 90-day attribution window)
+    
+    **Solution:** 
+    1. Verify Conversion Action ID is entered correctly
+    2. Check "Enable Conversion Postbacks" is checked
+    3. Ensure customers are clicking Google Ads links (gclid must be present)
+  </Accordion>
+
+  <Accordion title="What is a Developer Token?">
+    **Answer:** A Developer Token is required for Google Ads API access. It's configured at the application level by ElasticFunnels support, not per integration. If you see errors about Developer Token, contact support.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Steps>
+  <Step title="Set Up Conversion Postbacks">
+    Always enable postbacks to help Google Ads optimize your campaigns for actual purchases, not just clicks.
+  </Step>
+  
+  <Step title="Use Tracking Link Builder">
+    Always use the Tracking Link Builder when creating Google Ads links to ensure proper gclid tracking and UTM parameters.
+  </Step>
+  
+  <Step title="Configure Conversion Action">
+    Set up a conversion action in Google Ads before enabling postbacks. Use a meaningful name like "Purchase" or "Lead Form Submission".
+  </Step>
+  
+  <Step title="Monitor Postback Success">
+    Check your integration status regularly to ensure postbacks are being sent successfully.
+  </Step>
+</Steps>
+
+## Required Information
+
+- Google Ads account access with admin permissions
+- Conversion Action ID (created in Google Ads)
+- Google Ads Developer Token (configured at application level)
 
 ## Benefits of Integration
 
@@ -15,16 +275,37 @@ Integrating Google Ads helps you track clicks and conversions directly from your
 - **Smart Bidding**: Use conversion data for automated bidding strategies
 - **Audience Insights**: Better understand your converting audience
 - **ROI Measurement**: Calculate exact return on ad spend
+- **Campaign Optimization**: Google Ads uses conversion data to improve targeting
 
-## Required Information
+## Next Steps
 
-- Google Ads account access
-- Conversion tracking ID
-- Admin permissions for the Google Ads account
-
-## Best Practices
-
-- Set up different conversion actions for different funnel steps
-- Use conversion values to optimize for revenue, not just volume
-- Implement enhanced conversions for better data accuracy
-- Regular review and optimization based on conversion data 
+<CardGroup cols={2}>
+  <Card
+    title="View Ad Reports"
+    icon="chart-line"
+    href="/analytics/ad-spend"
+  >
+    See your ad performance and ROI metrics
+  </Card>
+  <Card
+    title="Meta Ads Integration"
+    icon="rectangle-ad"
+    href="/integrations/meta-ads"
+  >
+    Connect Meta Ads for complete cross-platform tracking
+  </Card>
+  <Card
+    title="Tracking Link Builder"
+    icon="link"
+    href="/integrations/affiliate-tracking#tracking-link-builder"
+  >
+    Create properly formatted tracking URLs
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    Unified view of all your marketing metrics
+  </Card>
+</CardGroup>

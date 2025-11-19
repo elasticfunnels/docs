@@ -1,19 +1,136 @@
 ---
 title: 'Google Analytics Integration'
-description: 'Connect Google Analytics for comprehensive traffic and behavior insights'
+description: 'Connect Google Analytics 4 (GA4) for comprehensive traffic, behavior insights, and multi-touch attribution'
 ---
 
-Google Analytics provides insight into user behavior, traffic sources, and conversions.
+## Overview
 
-1. Go to "Settings" or "Integrations"
-2. Click "Activate" and provide your Measurement ID
+Google Analytics integration provides comprehensive website analytics and conversion tracking through Google Analytics 4 (GA4). This integration supports page-level measurement ID configuration, allowing different pages to use different GA4 properties for flexible tracking across funnels and campaigns.
 
-## Finding Your Measurement ID
+## What This Integration Provides
+
+<CardGroup cols={2}>
+  <Card title="Page-Level Tracking" icon="file-text">
+    Configure different GA4 Measurement IDs for each page, enabling flexible tracking across funnels
+  </Card>
+  <Card title="Automatic Page Views" icon="eye">
+    Page views are tracked automatically when pages load - no manual configuration needed
+  </Card>
+  <Card title="Custom Event Tracking" icon="code">
+    Track custom events through page interactions (button clicks, form submissions, etc.)
+  </Card>
+  <Card title="Multi-Touch Attribution" icon="sitemap">
+    Integrates with pixel attribution system for accurate conversion attribution across multiple pages
+  </Card>
+</CardGroup>
+
+## Setup Guide
+
+### Step 1: Find Your Measurement ID
 
 Your Measurement ID can be found in your Google Analytics account:
-- Go to Admin → Property Settings
-- Look for "Measurement ID" (starts with G- for GA4)
-- Copy the entire ID including the G- prefix
+
+1. Go to **Admin → Property Settings** in Google Analytics
+2. Look for **"Measurement ID"** (starts with `G-` for GA4)
+3. Copy the entire ID including the `G-` prefix
+
+<Info>
+The Measurement ID format is `G-XXXXXXXXXX` where X is alphanumeric. Make sure to copy the entire ID including the `G-` prefix.
+</Info>
+
+### Step 2: Configure Measurement ID
+
+You can configure Google Analytics at two levels:
+
+<AccordionGroup>
+  <Accordion title="Page-Level Configuration (Recommended)">
+    Set a Measurement ID for each individual page in your funnel.
+    
+    **How to:**
+    1. Go to **Pages** in the main menu
+    2. Edit the page you want to track
+    3. Find the **Google Analytics** section in page settings
+    4. Enter your Measurement ID (format: `G-XXXXXXXXXX`)
+    5. Save the page
+    
+    **Best for:** Different funnels, brands, or campaigns that need separate GA4 properties
+  </Accordion>
+
+  <Accordion title="Global Script Configuration (Alternative)">
+    Configure a global tracking script that applies to all pages.
+    
+    **How to:**
+    1. Go to **Settings → Tracking Scripts**
+    2. Add a new tracking script
+    3. Select **Google Analytics** as the script type
+    4. Enter your Measurement ID
+    5. Save the script
+    
+    **Best for:** Single brand with one GA4 property for all pages
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Page-level configuration gives you more flexibility. You can use different GA4 properties for different funnels, brands, or campaigns, enabling better segmentation and reporting.
+</Tip>
+
+## How It Works
+
+### Automatic Page View Tracking
+
+When a page loads with a configured Measurement ID:
+
+1. The GA4 tracking script is automatically injected
+2. A page view event is sent to Google Analytics
+3. The Measurement ID is captured in the pixel attribution system
+4. User behavior and traffic sources are tracked
+
+<Check>
+Page views are tracked automatically - you don't need to add any tracking code manually. Just configure the Measurement ID and it works.
+</Check>
+
+### Pixel Attribution Integration
+
+Google Analytics Measurement IDs are integrated with the pixel attribution system:
+
+- Enables multi-touch attribution across multiple pages
+- Works with conversion postbacks for advertising platforms
+- Supports accurate conversion attribution
+
+<Info>
+The pixel attribution system tracks which GA4 properties a visitor was exposed to, enabling accurate multi-touch conversion attribution.
+</Info>
+
+## Custom Event Tracking
+
+### Setting Up Custom Events
+
+You can track custom events through page interactions:
+
+1. **In Page Builder:**
+   - Add an interaction to a button, link, or element
+   - Select **"Custom GA Event"** as the interaction type
+   - Configure the event name and parameters
+
+2. **Event Parameters:**
+   - Event name (required)
+   - Event category (optional)
+   - Event label (optional)
+   - Event value (optional)
+
+### Example Custom Events
+
+Track important user actions:
+
+- **Form Submissions:** Track when users submit lead forms
+- **Button Clicks:** Track clicks on important CTAs
+- **Video Plays:** Track video engagement
+- **Scroll Depth:** Track how far users scroll
+- **Time on Page:** Track engagement duration
+
+<Note>
+Custom events appear in Google Analytics Real-Time reports within seconds.
+</Note>
 
 ## What You'll Track
 
@@ -22,17 +139,145 @@ Your Measurement ID can be found in your Google Analytics account:
 - **Traffic Sources**: Identify your best-performing channels
 - **Conversion Paths**: See the complete customer journey
 - **Demographic Data**: Learn about your audience demographics
+- **Custom Events**: Track specific user interactions
+- **Multi-Touch Attribution**: See which pages contributed to conversions
+
+## Integration with Conversion Postbacks
+
+Google Analytics integrates with the conversion postback system:
+
+- GA4 Measurement IDs are captured when visitors view pages
+- When conversions occur, the system knows which GA4 properties were viewed
+- This enables accurate attribution for advertising platforms
+- Supports multi-touch attribution across the customer journey
+
+<Info>
+The integration works seamlessly with Meta Ads, Google Ads, and other advertising platforms for comprehensive conversion tracking.
+</Info>
 
 ## Advanced Setup
 
-- Configure custom events for specific actions
-- Set up conversion goals in Google Analytics
-- Create custom audiences for remarketing
-- Use enhanced ecommerce tracking for detailed purchase data
+### Custom Events Configuration
+
+Configure custom events for specific actions:
+
+1. Use the page builder to add interactions
+2. Select "Custom GA Event" interaction type
+3. Configure event name and parameters
+4. Test in GA4 Real-Time reports
+
+### Conversion Goals
+
+Set up conversion goals in Google Analytics:
+
+1. Go to **Admin → Events** in Google Analytics
+2. Mark important events as conversions
+3. Configure conversion values if applicable
+4. View conversions in GA4 reports
+
+### Custom Audiences
+
+Create custom audiences for remarketing:
+
+1. Use GA4 audience builder
+2. Define audience criteria
+3. Use audiences in Google Ads campaigns
+4. Track audience performance
+
+## Best Practices
+
+<Steps>
+  <Step title="Use Page-Level Configuration">
+    Configure Measurement IDs at the page level for maximum flexibility. This allows different funnels to use different GA4 properties.
+  </Step>
+  
+  <Step title="Set Up Custom Events">
+    Track important user actions (form submissions, button clicks) using custom events to understand user engagement.
+  </Step>
+  
+  <Step title="Test Event Tracking">
+    After setting up custom events, test them in GA4 Real-Time reports to verify they're working correctly.
+  </Step>
+  
+  <Step title="Use Consistent Naming">
+    Use consistent event names and parameters across your funnel for easier reporting and analysis.
+  </Step>
+  
+  <Step title="Monitor Attribution">
+    Use the pixel attribution system to understand which pages contribute to conversions for multi-touch attribution.
+  </Step>
+</Steps>
 
 ## Tips for Better Analytics
 
-- Set up goal funnels to identify drop-off points
-- Use UTM parameters to track campaign performance
-- Create custom dashboards for quick insights
-- Regular data review and analysis for optimization opportunities 
+- **Set up goal funnels** to identify drop-off points in your conversion process
+- **Use UTM parameters** to track campaign performance (see [Tracking Link Builder](/integrations/affiliate-tracking#tracking-link-builder))
+- **Create custom dashboards** in GA4 for quick insights
+- **Regular data review** and analysis for optimization opportunities
+- **Use separate GA4 properties** for different brands or campaigns when needed
+- **Test custom events** in Real-Time reports before relying on them
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Page Views Not Showing in GA4">
+    **Possible Causes:**
+    - Measurement ID not configured on the page
+    - Incorrect Measurement ID format (must include G- prefix)
+    - GA4 property not receiving data
+    
+    **Solution:** 
+    1. Verify Measurement ID is entered correctly (format: `G-XXXXXXXXXX`)
+    2. Check page settings to ensure Measurement ID is saved
+    3. Test in GA4 Real-Time reports
+  </Accordion>
+
+  <Accordion title="Custom Events Not Tracking">
+    **Possible Causes:**
+    - Event not configured correctly in page builder
+    - Event name contains invalid characters
+    - GA4 property not receiving events
+    
+    **Solution:**
+    1. Verify event is configured in page interactions
+    2. Check event name format (alphanumeric, underscores, hyphens only)
+    3. Test in GA4 Real-Time reports
+  </Accordion>
+
+  <Accordion title="Different Pages Need Different GA4 Properties">
+    **Answer:** Yes! Configure Measurement IDs at the page level. Each page can have its own GA4 Measurement ID, allowing you to use different GA4 properties for different funnels or brands.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Tracking Link Builder"
+    icon="link"
+    href="/integrations/affiliate-tracking#tracking-link-builder"
+  >
+    Create properly formatted tracking URLs with UTM parameters
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    View comprehensive analytics and conversion data
+  </Card>
+  <Card
+    title="Conversion Tracking"
+    icon="bullseye-arrow"
+    href="/analytics/conversions"
+  >
+    Deep dive into your conversion data and attribution
+  </Card>
+  <Card
+    title="Meta Ads Integration"
+    icon="rectangle-ad"
+    href="/integrations/meta-ads"
+  >
+    Connect Meta Ads for advertising platform integration
+  </Card>
+</CardGroup>

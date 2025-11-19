@@ -1,20 +1,190 @@
 ---
 title: 'Clickbank Integration'
-description: 'Connect Clickbank for affiliate tracking and automated conversions'
+description: 'Connect Clickbank for affiliate tracking, automated conversions, and secure postback validation'
 ---
 
-Clickbank integration for affiliates automatically tracks conversions and postbacks.
+## Overview
 
-1. Go to "Settings" or "Integrations"
-2. Click "Activate" and provide the API key (see How to Create ClickBank API Keys)
+Clickbank S2S (Server-to-Server) integration handles postbacks from the Clickbank affiliate network. The integration receives webhook postbacks, creates conversion records, and provides automation triggers for Clickbank events. It uses secret key encryption for secure postback validation.
 
-## Creating ClickBank API Keys
+## What This Integration Provides
+
+<CardGroup cols={2}>
+  <Card title="Secure Postbacks" icon="lock">
+    Secret key encryption for secure postback validation
+  </Card>
+  <Card title="Real-time Tracking" icon="bolt">
+    Instant notification of sales and commissions
+  </Card>
+  <Card title="Automation Triggers" icon="workflow">
+    Trigger automation workflows on Clickbank postbacks
+  </Card>
+  <Card title="Transaction Types" icon="list">
+    Support for purchases, refunds, chargebacks, and upsells
+  </Card>
+</CardGroup>
+
+## Setup Guide
+
+### Step 1: Get Your Secret Key
+
+<Warning>
+**Important:** Clickbank uses a **Secret Key** (not an API key) for postback validation. This is different from other integrations.
+</Warning>
 
 1. Log into your ClickBank account
-2. Go to Settings → My Account
-3. Click on "API Keys" section
-4. Generate a new API key with appropriate permissions
-5. Copy the API key for use in the integration
+2. Go to **Settings → My Account**
+3. Navigate to the **Secret Key** section (not API Keys)
+4. Generate or copy your Secret Key
+5. Keep this key secure - you'll need it for validation
+
+<Info>
+The Secret Key is used to validate that postbacks are actually coming from Clickbank. It's encrypted and stored securely in ElasticFunnels.
+</Info>
+
+### Step 2: Configure Integration
+
+1. Go to **Settings → Integrations → Affiliate Networks**
+2. Find **Clickbank (S2S)** and click **"Activate"** or **"Manage"**
+3. Enter your **Secret Key**
+4. Copy the **Postback URL** provided
+5. Save the integration
+
+<Note>This integration is used as an affiliate. To set up ClickBank as a merchant, see [ClickBank](/merchants/clickbank).</Note>
+
+### Step 3: Configure in Clickbank
+
+1. Log into your ClickBank account
+2. Go to **Settings → My Site → Advanced Tools**
+3. Navigate to **Postback URLs** or **S2S Postback**
+4. Add the postback URL from ElasticFunnels
+5. Save your settings
+
+<Check>
+The postback URL is unique to your ElasticFunnels account. Clickbank will send postbacks to this URL when orders are placed.
+</Check>
+
+## Secret Key Encryption
+
+### How It Works
+
+The Secret Key is used to validate postbacks:
+
+1. **Encrypted Storage:** Secret key is encrypted before being stored
+2. **Postback Validation:** Each postback is validated using the secret key
+3. **Security:** Only postbacks with valid secret keys are processed
+4. **Privacy:** Secret key is never exposed in logs or responses
+
+### Security Best Practices
+
+- **Never Share:** Keep your secret key secure and never share it
+- **Regular Rotation:** Consider rotating your secret key periodically
+- **Monitor Usage:** Watch for any unusual postback activity
+- **Encrypted Storage:** Secret key is automatically encrypted in ElasticFunnels
+
+<Warning>
+If you suspect your secret key has been compromised, generate a new one in Clickbank and update it in ElasticFunnels immediately.
+</Warning>
+
+## Click ID Tracking
+
+### How Click Tracking Works
+
+Clickbank uses click tracking to identify which affiliate links led to conversions:
+
+- **Automatic Tracking:** Click tracking information is automatically captured from Clickbank postbacks
+- **Attribution:** Conversions are automatically attributed to the affiliate link that generated the click
+- **Validation:** System validates click tracking data before processing conversions
+
+<Info>
+Click tracking information is automatically handled by the system. You don't need to configure anything manually.
+</Info>
+
+## Transaction Types
+
+The integration supports multiple transaction types:
+
+<AccordionGroup>
+  <Accordion title="Purchase">
+    When a customer completes a purchase, Clickbank automatically sends a postback. This creates a purchase conversion in ElasticFunnels.
+  </Accordion>
+
+  <Accordion title="Refund">
+    When a refund is processed, Clickbank automatically sends a postback. This creates a refund conversion linked to the original purchase.
+  </Accordion>
+
+  <Accordion title="Chargeback">
+    When a chargeback occurs, Clickbank automatically sends a postback. This creates a chargeback conversion.
+  </Accordion>
+
+  <Accordion title="Upsell">
+    When an upsell is purchased, Clickbank automatically sends a postback. Upsells are tracked separately from initial purchases.
+  </Accordion>
+</AccordionGroup>
+
+## Order Tracking
+
+### How Orders Are Tracked
+
+Clickbank uses receipt tracking to link transactions:
+
+- **Purchase Receipts:** Each purchase gets a unique receipt identifier
+- **Refund/Chargeback Linking:** Refunds and chargebacks are automatically linked back to the original purchase
+
+### How It Works
+
+When a refund or chargeback occurs, the system automatically links it to the original purchase using receipt tracking. This ensures accurate commission tracking and order history.
+
+<Info>
+Receipt tracking is handled automatically by the system. Refunds and chargebacks are always linked to their original purchases.
+</Info>
+
+## Automation Integration
+
+### Triggering Automations
+
+You can trigger automation workflows when Clickbank postbacks are received:
+
+1. Go to **Automations** in the main menu
+2. Create or edit an automation
+3. Add a trigger node
+4. Select **"On Clickbank Postback"** from the trigger options
+5. Configure your automation actions
+
+### Use Cases
+
+- **Welcome Emails:** Send welcome emails when purchases are received
+- **Follow-up Sequences:** Start email sequences based on Clickbank events
+- **CRM Updates:** Update CRM records when conversions occur
+- **Custom Workflows:** Build custom automation workflows for Clickbank events
+
+<Info>
+Automation triggers fire automatically when Clickbank postbacks are received and processed successfully.
+</Info>
+
+## Tracking Pixels
+
+When you configure Clickbank as a merchant:
+
+- Tracking pixels are automatically created
+- Pixels track page views and conversions
+- Enables accurate attribution for Clickbank orders
+- Works with the pixel attribution system
+
+<Info>
+Tracking pixels are created automatically when the merchant is configured. You don't need to manually set them up.
+</Info>
+
+## What Information is Tracked
+
+The integration automatically receives and processes the following information from Clickbank:
+
+- **Order Information:** Receipt ID, transaction type, and order details
+- **Customer Information:** Customer email (when available)
+- **Transaction Type:** Purchase, refund, chargeback, or upsell
+- **Affiliate Earnings:** Commission amount for the transaction
+- **Product Information:** Product name or vendor information
+- **Click Tracking:** Information about which affiliate link generated the conversion
 
 ## Integration Benefits
 
@@ -22,19 +192,121 @@ Clickbank integration for affiliates automatically tracks conversions and postba
 - **Automated Reporting**: Automatic sync of performance data
 - **Commission Management**: Track earnings across all your promotions
 - **Refund Handling**: Automated processing of refunds and chargebacks
+- **Secure Validation**: Secret key encryption ensures postback security
+- **Automation Support**: Trigger custom workflows based on Clickbank events
 
-<Note>This integration is used as an affiliate. To set up ClickBank as a merchant, see [ClickBank](/merchants/clickbank).</Note>
+## Troubleshooting
 
-## API Key Permissions
+<AccordionGroup>
+  <Accordion title="Postbacks Not Being Received">
+    **Possible Causes:**
+    - Postback URL not configured correctly in Clickbank
+    - Secret key mismatch
+    - Postback URL format incorrect
+    
+    **Solution:**
+    1. Verify postback URL is copied correctly (no extra spaces)
+    2. Check that secret key matches in both Clickbank and ElasticFunnels
+    3. Test with a small purchase to verify tracking works
+  </Accordion>
 
-Ensure your API key has the following permissions:
-- Read access to order data
-- Access to commission information
-- Refund and chargeback data access
+  <Accordion title="Secret Key Validation Failing">
+    **Issue:** Postbacks are being rejected due to secret key validation
+    
+    **Solution:**
+    1. Verify secret key is entered correctly in ElasticFunnels
+    2. Ensure secret key matches the one in Clickbank
+    3. Check that secret key hasn't been rotated in Clickbank
+    4. Regenerate secret key if needed
+  </Accordion>
 
-## Security Best Practices
+  <Accordion title="Refunds Not Linking to Original Purchase">
+    **Issue:** Refunds not showing connection to original purchase
+    
+    **Solution:**
+    1. Verify that the original purchase was processed successfully
+    2. Check that Clickbank is sending complete refund information
+    3. Contact support if refunds are not linking correctly
+  </Accordion>
 
-- Keep your API key secure and never share it
-- Regularly rotate API keys for security
-- Monitor API usage for any unusual activity
-- Use the minimum required permissions for your needs 
+  <Accordion title="Automation Triggers Not Firing">
+    **Issue:** Automations not triggering on Clickbank postbacks
+    
+    **Solution:**
+    1. Verify automation has "On Clickbank Postback" trigger node
+    2. Check that postbacks are being received successfully
+    3. Ensure automation is active and enabled
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Steps>
+  <Step title="Secure Your Secret Key">
+    Keep your secret key secure and never share it. It's automatically encrypted in ElasticFunnels, but you should still treat it as sensitive information.
+  </Step>
+  
+  <Step title="Verify Postback URL">
+    Double-check that the postback URL is configured correctly in Clickbank. Any typos will prevent postbacks from working.
+  </Step>
+  
+  <Step title="Test with Small Purchase">
+    Test the integration with a small purchase first to verify tracking works before running large campaigns.
+  </Step>
+  
+  <Step title="Monitor Receipt IDs">
+    Monitor receipt IDs to ensure refunds and chargebacks are properly linked to original purchases.
+  </Step>
+  
+  <Step title="Set Up Automation Triggers">
+    Use automation triggers to build custom workflows based on Clickbank events (welcome emails, CRM updates, etc.).
+  </Step>
+  
+  <Step title="Handle Upsell Transactions">
+    Upsell transactions are automatically tracked separately from initial purchases. Monitor your conversion data to see both initial purchases and upsells.
+  </Step>
+</Steps>
+
+## Security & Privacy
+
+- **Secret Key Encryption:** Secret keys are encrypted before storage
+- **Postback Validation:** All postbacks are validated using secret key
+- **Secure Storage:** Customer data is handled securely
+- **Audit Logging:** All transactions are logged for audit purposes
+
+<Info>
+Allow up to 15 minutes for data to appear after a purchase. Postbacks are processed in real-time, but there may be a slight delay.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Clickbank Merchant Setup"
+    icon="store"
+    href="/merchants/clickbank"
+  >
+    Learn how to set up Clickbank as a merchant
+  </Card>
+  <Card
+    title="Automation Builder"
+    icon="workflow"
+    href="/automations"
+  >
+    Set up automation triggers for Clickbank events
+  </Card>
+  <Card
+    title="Buygoods Integration"
+    icon="link"
+    href="/integrations/buygoods"
+  >
+    Set up Buygoods for additional affiliate tracking
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    View your conversion and performance data
+  </Card>
+</CardGroup>

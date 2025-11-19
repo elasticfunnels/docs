@@ -1,34 +1,284 @@
 ---
 title: 'Buygoods Integration'
-description: 'Connect Buygoods for affiliate tracking and automated postbacks'
+description: 'Connect Buygoods for affiliate tracking, automated postbacks, and order processing'
 ---
 
-Buygoods integration for affiliates enables automatic tracking and postback across your funnel.
+## Overview
 
-1. Go to "Settings" or "Integrations"
-2. Click "Activate" and copy the conversion and refund URLs
-3. Go to Buygoods Backoffice and add the URLs
+Buygoods integration handles server-to-server (S2S) postbacks from the Buygoods affiliate network. The integration automatically receives order information, creates conversion records, and can be configured as both a payment gateway and fulfillment provider.
 
-## How to Add URLs in Buygoods
+## What This Integration Provides
+
+<CardGroup cols={2}>
+  <Card title="Automatic Postbacks" icon="arrow-trend-up">
+    Receive and process Buygoods webhook postbacks automatically
+  </Card>
+  <Card title="Conversion Tracking" icon="chart-line">
+    Automatically create conversion records from Buygoods orders
+  </Card>
+  <Card title="Transaction Types" icon="list">
+    Support for purchases, refunds, cancellations, chargebacks, and commission voids
+  </Card>
+  <Card title="Tracking Pixels" icon="eye">
+    Automatically create tracking pixels for Buygoods merchants
+  </Card>
+</CardGroup>
+
+## Setup Guide
+
+### Step 1: Configure as Merchant
+
+1. Go to **Settings → Merchants**
+2. Create or edit a merchant
+3. Select **Buygoods** as the payment gateway
+4. Configure merchant settings
+
+<Note>This integration is used as an affiliate. To set up Buygoods as a merchant, see [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).</Note>
+
+### Step 2: Get Postback URLs
+
+1. Go to **Settings → Integrations → Affiliate Networks**
+2. Find **Buygoods** and click **"Activate"** or **"Manage"**
+3. Copy the **Conversion URL** and **Refund URL** provided
+4. These URLs will be used in your Buygoods backoffice
+
+### Step 3: Configure in Buygoods Backoffice
 
 1. Log into your Buygoods affiliate account
-2. Navigate to the postback/tracking section
-3. Add the conversion URL for successful purchases
-4. Add the refund URL for processing refunds
+2. Navigate to the **postback/tracking section**
+3. Add the **conversion URL** for successful purchases
+4. Add the **refund URL** for processing refunds
 5. Save your settings
+
+<Info>
+The postback URLs are unique to your ElasticFunnels account and will automatically receive postbacks from Buygoods when orders are placed.
+</Info>
+
+## Transaction Types
+
+The integration supports multiple transaction types:
+
+<AccordionGroup>
+  <Accordion title="Purchase">
+    When a customer completes a purchase, Buygoods automatically sends a postback. This creates a purchase conversion in ElasticFunnels.
+  </Accordion>
+
+  <Accordion title="Refund">
+    When a refund is processed, Buygoods automatically sends a postback. This creates a refund conversion linked to the original purchase.
+  </Accordion>
+
+  <Accordion title="Cancel">
+    When an order is cancelled, Buygoods automatically sends a postback. This creates a cancel conversion.
+  </Accordion>
+
+  <Accordion title="Chargeback">
+    When a chargeback occurs, Buygoods automatically sends a postback. This creates a chargeback conversion.
+  </Accordion>
+
+  <Accordion title="Commission Void">
+    When a commission is voided, Buygoods automatically sends a postback. This is processed separately from order conversions.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+Commission notifications are processed separately from order conversions. Only actual order postbacks create conversion records.
+</Info>
+
+## Click ID Tracking
+
+### How Click IDs Work
+
+Buygoods uses click tracking to identify which affiliate links led to conversions:
+
+- **Automatic Tracking:** Click information is automatically captured from Buygoods postbacks
+- **Validation:** System validates click tracking data and handles any formatting issues
+- **Attribution:** Conversions are automatically attributed to the affiliate link that generated the click
+
+### Malformed Click ID Handling
+
+If a click ID contains placeholder characters or is malformed:
+
+- The system automatically detects invalid click IDs
+- Conversion is still processed and tracked
+- Issues are logged for review
+
+<Info>
+The system automatically handles malformed click IDs to ensure conversions are still tracked even if the click ID format is incorrect.
+</Info>
+
+## Conversion Updates
+
+If you need to update an existing conversion (for example, to correct order amounts or customer information), you can configure Buygoods to send an update postback. The system will automatically update the existing conversion instead of creating a new one.
+
+<Info>
+Contact support if you need to update existing conversions. The system handles this automatically when configured properly.
+</Info>
+
+## Payment Gateway & Fulfillment Provider
+
+### Payment Gateway Configuration
+
+Buygoods can be configured as a payment gateway:
+
+1. Go to **Settings → Merchants**
+2. Edit your merchant
+3. Select **Buygoods** as the payment gateway
+4. Configure payment settings
+
+### Fulfillment Provider Configuration
+
+Buygoods can also be configured as a fulfillment provider:
+
+1. Go to **Products** in the main menu
+2. Edit a product
+3. Select **Buygoods** as the fulfillment provider
+4. Configure fulfillment settings
+
+<Tip>
+You can use Buygoods as both a payment gateway and fulfillment provider, or use it for just one function depending on your needs.
+</Tip>
+
+## Automatic Tracking Pixel Creation
+
+When you configure Buygoods as a merchant:
+
+- Tracking pixels are automatically created
+- Pixels track page views and conversions
+- Enables accurate attribution for Buygoods orders
+- Works with the pixel attribution system
+
+<Info>
+Tracking pixels are created automatically when the merchant is configured. You don't need to manually set them up.
+</Info>
 
 ## What Gets Tracked
 
 - **Conversion Data**: Automatically receive purchase notifications
 - **Commission Tracking**: See your earnings in real-time
 - **Refund Processing**: Handle refunds automatically
+- **Cancellation Tracking**: Track cancelled orders
+- **Chargeback Tracking**: Monitor chargebacks
 - **Performance Metrics**: Track your promotional performance
+- **Click Attribution**: Track which affiliate links generated conversions
 
-<Note>This integration is used as an affiliate. To set up Buygoods as a merchant, see [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).</Note>
+## What Information is Tracked
+
+The integration automatically receives and processes the following information from Buygoods:
+
+- **Order Information:** Order ID, order amount, and transaction details
+- **Customer Information:** Customer name and email address
+- **Transaction Type:** Purchase, refund, cancellation, chargeback, or commission void
+- **Click Tracking:** Information about which affiliate link generated the conversion
 
 ## Troubleshooting
 
-- Ensure URLs are added correctly in Buygoods backoffice
-- Test with a small purchase to verify tracking works
-- Check that your affiliate ID is properly configured
-- Allow up to 15 minutes for data to appear after purchase 
+<AccordionGroup>
+  <Accordion title="No Conversions Appearing">
+    **Possible Causes:**
+    - Postback URLs not added correctly in Buygoods backoffice
+    - Click tracking information not being passed correctly
+    - Postback URL format incorrect
+    
+    **Solution:**
+    1. Verify postback URLs are copied correctly (no extra spaces)
+    2. Check that Buygoods links include proper tracking information
+    3. Test with a small purchase to verify tracking works
+  </Accordion>
+
+  <Accordion title="Click Tracking Issues">
+    **Issue:** Conversions not being attributed to the correct affiliate links
+    
+    **Solution:**
+    - System automatically handles click tracking issues
+    - Ensure Buygoods links are formatted correctly
+    - Contact support if attribution issues persist
+  </Accordion>
+
+  <Accordion title="Refunds Not Processing">
+    **Possible Causes:**
+    - Refund URL not configured in Buygoods
+    - Refund postback not being sent
+    
+    **Solution:**
+    1. Verify refund URL is added in Buygoods backoffice
+    2. Check that refund postbacks are being sent
+    3. Allow up to 15 minutes for data to appear
+  </Accordion>
+
+  <Accordion title="Conversion Updates Not Working">
+    **Issue:** Updates to existing conversions not processing
+    
+    **Solution:**
+    1. Contact support to verify update postback configuration
+    2. Ensure the order ID matches the original conversion
+    3. Check that Buygoods is sending update postbacks correctly
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Steps>
+  <Step title="Verify Postback URLs">
+    Double-check that postback URLs are copied correctly into Buygoods backoffice. Any typos will prevent postbacks from working.
+  </Step>
+  
+  <Step title="Test with Small Purchase">
+    Test the integration with a small purchase first to verify tracking works before running large campaigns.
+  </Step>
+  
+  <Step title="Monitor Click IDs">
+    Check your conversion data regularly. While the system handles malformed click IDs automatically, it's better to ensure Buygoods links are formatted correctly.
+  </Step>
+  
+  <Step title="Verify Tracking Pixels">
+    Tracking pixels are created automatically when you configure Buygoods as a merchant. Verify they're working by checking your conversion attribution.
+  </Step>
+  
+  <Step title="Handle All Transaction Types">
+    Ensure your Buygoods configuration handles all transaction types (purchases, refunds, cancellations, chargebacks) appropriately.
+  </Step>
+</Steps>
+
+## Security & Privacy
+
+- Postback URLs are unique to your account
+- Click IDs are validated before processing
+- Customer data is handled securely
+- All transactions are logged for audit purposes
+
+<Info>
+Allow up to 15 minutes for data to appear after a purchase. Postbacks are processed in real-time, but there may be a slight delay.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Merchant Setup Guide"
+    icon="store"
+    href="/guides/how-to-set-up-a-new-merchant"
+  >
+    Learn how to set up Buygoods as a merchant
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    View your conversion and performance data
+  </Card>
+  <Card
+    title="Clickbank Integration"
+    icon="link"
+    href="/integrations/clickbank"
+  >
+    Set up Clickbank for additional affiliate tracking
+  </Card>
+  <Card
+    title="Affiliate Tracking"
+    icon="chart-line"
+    href="/integrations/affiliate-tracking"
+  >
+    Learn about affiliate tracking and attribution
+  </Card>
+</CardGroup>

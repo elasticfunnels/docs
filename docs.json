@@ -78,6 +78,7 @@
             "group": "Integrations",
             "pages": [
               "integrations/meta-ads",
+              "integrations/campaigns-management",
               "integrations/google-ads",
               "integrations/google-analytics",
               "integrations/buygoods",

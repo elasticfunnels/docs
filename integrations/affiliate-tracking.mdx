@@ -9,6 +9,7 @@ Automatically capturing affiliate data helps you track marketing performance acr
 
 - Affiliate data is automatically tracked for affiliates from Buygoods, Clickbank, and Digistore24 once you've defined a merchant
 - View stats on your dashboard for each affiliate individually
+- Use the Tracking Link Builder to create properly formatted tracking URLs with UTM parameters for accurate attribution
 
 ## Supported Platforms
 
@@ -27,6 +28,200 @@ Automatically capturing affiliate data helps you track marketing performance acr
 - Multi-tier affiliate support
 - Performance analytics
 
+## Tracking Link Builder
+
+The Tracking Link Builder is a powerful tool that helps you create properly formatted tracking URLs with UTM parameters for accurate attribution across all your marketing channels.
+
+### Accessing the Tracking Link Builder
+
+You can access the Tracking Link Builder in several ways:
+
+<AccordionGroup>
+  <Accordion title="From Tools Menu">
+    1. Navigate to **Tools** in the main menu
+    2. Click on the **Tracking** tab
+    3. Select **Tracking Link Builder**
+  </Accordion>
+
+  <Accordion title="From Pages List">
+    1. Go to **Pages** in the main menu
+    2. Find the page you want to create a tracking link for
+    3. Click the dropdown menu (three dots) on the page row
+    4. Select **"Get Tracking Link"**
+    
+    The builder will automatically open with the selected page pre-filled.
+  </Accordion>
+
+  <Accordion title="From Funnels List">
+    1. Go to **Funnels** in the main menu
+    2. Find the funnel you want to create a tracking link for
+    3. Click the dropdown menu (three dots) on the funnel row
+    4. Select **"Get Tracking Link"**
+    
+    The builder will automatically open with the selected funnel pre-filled.
+  </Accordion>
+</AccordionGroup>
+
+### How to Use the Tracking Link Builder
+
+#### Step 1: Select Your Destination
+
+Choose how you want to specify your destination URL:
+
+<CardGroup cols={3}>
+  <Card title="URL Tab" icon="link">
+    Enter a custom URL manually. Perfect for external landing pages or specific URLs.
+  </Card>
+  <Card title="Page Tab" icon="file-text">
+    Select an existing page from your ElasticFunnels account. The page URL will be automatically populated.
+  </Card>
+  <Card title="Funnel Tab" icon="sitemap">
+    Select an existing funnel from your account. The funnel URL will be automatically generated.
+  </Card>
+</CardGroup>
+
+#### Step 2: Choose Your Ad Platform (Optional)
+
+Select an ad platform from the **"Auto Cost Update"** dropdown to automatically populate UTM parameters with the correct format:
+
+- **Meta Ads** - Facebook/Meta advertising campaigns
+- **Google Ads** - Google advertising campaigns
+- **TikTok Ads** - TikTok advertising campaigns
+- **Bing Ads** - Microsoft Bing advertising campaigns
+- **LinkedIn Ads** - LinkedIn advertising campaigns
+
+<Info>
+When you select a platform, the UTM parameters are automatically populated with the correct tokens and format for that platform. You can still customize them manually if needed.
+</Info>
+
+#### Step 3: Configure UTM Parameters
+
+The builder includes fields for all standard UTM parameters:
+
+- **UTM Source** - The source of your traffic (e.g., "facebook", "google", "email")
+- **UTM Medium** - The marketing medium (e.g., "cpc", "email", "social")
+- **UTM Campaign** - The campaign name or identifier
+- **UTM Term** - Keywords or ad identifiers (often used for ad names)
+- **UTM Content** - Additional content identifier (often used for ad set names)
+
+<Warning>
+For proper attribution in Campaigns Management, ensure UTM parameters match your campaign structure:
+- `utm_campaign` = Campaign name
+- `utm_content` = Ad set name
+- `utm_term` = Ad name
+</Warning>
+
+#### Step 4: Add Dynamic Tokens
+
+Click the **"Add Token"** button next to any UTM field to insert dynamic tokens that will be replaced by the ad platform:
+
+**Meta Ads Tokens:**
+
+| Token | Description |
+|-------|-------------|
+| `{{campaign.name}}` | Campaign name |
+| `{{adset.name}}` | Ad set name |
+| `{{ad.name}}` | Ad name |
+| `{{campaign.id}}` | Campaign ID |
+| `{{adset.id}}` | Ad set ID |
+| `{{ad.id}}` | Ad ID |
+| `{{site_source_name}}` | Site source name |
+| `{{placement}}` | Ad placement |
+
+**Google Ads Tokens:**
+
+| Token | Description |
+|-------|-------------|
+| `{campaignid}` | Campaign ID |
+| `{keyword}` | Keyword |
+| `{creative}` | Creative ID |
+| `{adgroupid}` | Ad group ID |
+| `{placement}` | Placement |
+| `{device}` | Device type |
+| `{network}` | Network type |
+| `{matchtype}` | Match type |
+| `{target}` | Target |
+
+**TikTok Ads Tokens:**
+
+| Token | Description |
+|-------|-------------|
+| `__CAMPAIGN_NAME__` | Campaign name |
+| `__CID_NAME__` | Campaign group name |
+| `__AID_NAME__` | Ad name |
+| `__CAMPAIGN_ID__` | Campaign ID |
+| `__CID__` | Campaign group ID |
+| `__AID__` | Ad ID |
+| `__PLACEMENT__` | Placement |
+
+**Bing Ads Tokens:**
+
+| Token | Description |
+|-------|-------------|
+| `{Campaign}` | Campaign name |
+| `{CampaignId}` | Campaign ID |
+| `{AdGroupName}` | Ad group name |
+| `{AdGroupId}` | Ad group ID |
+| `{AdTitle}` | Ad title |
+| `{AdId}` | Ad ID |
+| `{Keyword}` | Keyword |
+| `{QueryString}` | Query string |
+| `{Device}` | Device type |
+| `{MatchType}` | Match type |
+| `{Network}` | Network type |
+
+**LinkedIn Ads Tokens:**
+
+| Token | Description |
+|-------|-------------|
+| `{{CAMPAIGN_NAME}}` | Campaign name |
+| `{{CAMPAIGN_ID}}` | Campaign ID |
+| `{{CAMPAIGN_GROUP_NAME}}` | Campaign group name |
+| `{{CAMPAIGN_GROUP_ID}}` | Campaign group ID |
+| `{{CREATIVE_ID}}` | Creative ID |
+| `{{ACCOUNT_ID}}` | Account ID |
+| `{{ACCOUNT_NAME}}` | Account name |
+
+<Note>
+Tokens are automatically replaced by the ad platform when someone clicks your link. This ensures accurate tracking even if campaign names change.
+</Note>
+
+#### Step 5: Copy Your Final Link
+
+Once you've configured all parameters:
+
+1. Review the **Final Link** at the bottom of the builder
+2. Click the **"Copy Link"** button to copy it to your clipboard
+3. Use this link in your ad campaigns
+
+<Info>
+The final link includes all UTM parameters and the `adid` parameter (automatically added based on your selected platform) for proper attribution and ad spend tracking.
+</Info>
+
+### Best Practices for Tracking Links
+
+<Steps>
+  <Step title="Use Platform Templates">
+    Always select your ad platform to ensure UTM parameters are formatted correctly for that platform's requirements.
+  </Step>
+  
+  <Step title="Match Campaign Names Exactly">
+    Ensure UTM parameter values match your campaign, ad set, and ad names exactly in Meta Ads (or other platforms) for proper attribution.
+  </Step>
+  
+  <Step title="Use Dynamic Tokens">
+    Prefer dynamic tokens (like `{{campaign.name}}`) over static values when possible. This ensures tracking continues to work if you rename campaigns.
+  </Step>
+  
+  <Step title="Test Your Links">
+    After creating a tracking link, test it by clicking it and verifying the UTM parameters appear correctly in your analytics.
+  </Step>
+  
+  <Step title="Keep Links Organized">
+    Use consistent naming conventions in your UTM parameters to make reporting and analysis easier.
+  </Step>
+</Steps>
+
 ## Viewing Affiliate Data
 
 1. Go to your main dashboard
@@ -42,10 +237,24 @@ Automatically capturing affiliate data helps you track marketing performance acr
 - **Conversion Rate**: Percentage of clicks that convert
 - **Average Order Value**: Average purchase amount per affiliate
 
+## Integration with Campaigns Management
+
+Tracking links created with the Tracking Link Builder work seamlessly with Campaigns Management:
+
+- **Proper Attribution**: UTM parameters ensure conversions are correctly attributed to campaigns, ad sets, and ads
+- **Funnel Analytics**: When UTM parameters match your campaign structure, you'll see funnel metrics (revenue, sales, profit) in Campaigns Management
+- **Ad Spend Tracking**: The `adid` parameter enables automatic ad spend tracking and ROI calculations
+
+<Info>
+For detailed information about managing campaigns and viewing unified metrics, see the [Campaigns Management](/integrations/campaigns-management) documentation.
+</Info>
+
 ## Best Practices
 
 - Regularly review affiliate performance data
 - Identify your top-performing affiliates for special promotions
 - Use data to optimize commission structures
 - Provide performance feedback to your affiliate partners
-- Set up alerts for significant performance changes 
+- Set up alerts for significant performance changes
+- **Always use the Tracking Link Builder** for creating tracking URLs to ensure proper formatting and attribution
+- **Test tracking links** before launching campaigns to verify parameters are working correctly 
