@@ -1,0 +1,280 @@
+---
+title: 'reCAPTCHA Setup'
+description: 'Configure Google reCAPTCHA v3 for domain security and spam protection'
+---
+
+reCAPTCHA v3 provides advanced spam protection and fraud detection for your forms without interrupting user experience. This guide will walk you through setting up reCAPTCHA keys for your domains.
+
+<Info>
+**Important**: reCAPTCHA is **only used in Collection Forms** within Elastic Funnels. This includes lead capture forms, contact forms, newsletter signups, and other collection form types. It is not used for other form types or page elements.
+</Info>
+
+## Understanding reCAPTCHA v3
+
+### What is reCAPTCHA v3?
+- **Score-based verification** - Works invisibly in the background
+- **No user interaction** - No "I'm not a robot" checkboxes
+- **Better user experience** - Seamless protection without friction
+- **Advanced fraud detection** - Uses machine learning to detect suspicious activity
+
+### Benefits
+- **Spam protection** - Prevents automated form submissions
+- **Fraud prevention** - Detects suspicious behavior patterns
+- **User-friendly** - No interruptions to legitimate users
+- **Free tier** - Up to 10,000 assessments per month at no cost
+
+## Creating reCAPTCHA Keys
+
+### Step 1: Access Google reCAPTCHA Admin
+1. Go to [Google reCAPTCHA Admin Console](https://www.google.com/recaptcha/admin/create)
+2. Sign in with your Google account
+3. Click **"Create"** to register a new site
+
+### Step 2: Configure Your reCAPTCHA Site
+1. **Enter a Label**: 
+   - Use a descriptive name like "Elastic Funnels Domains"
+   - This helps you identify the site later
+
+2. **Select reCAPTCHA Type**:
+   - Choose **"Score based (v3)"**
+   - This is the recommended type for seamless user experience
+
+3. **Add Domains**:
+   - Click **"Add a domain"** button
+   - Enter your domain (e.g., `example.com`)
+   - **Important**: Add both www and non-www versions separately:
+     - `example.com`
+     - `www.example.com`
+   - Repeat for all domains you want to protect
+   - **Note**: You can use one reCAPTCHA key for all domains inside Elastic Funnels
+
+4. **Select Google Cloud Platform Project**:
+   - Choose an existing project from the dropdown
+   - Or create a new project if needed
+   - The project will be used for reCAPTCHA analytics and management
+
+5. **Accept Terms**:
+   - Review and accept the reCAPTCHA Terms of Service
+   - Click **"Submit"** to create your site
+
+### Step 3: Copy Your Keys
+After creating your site, you'll see two keys:
+
+1. **Site Key** (Public Key):
+   - This is the public key that will be used in your frontend
+   - Copy this value
+
+2. **Secret Key** (Private Key):
+   - This is the private key used for server-side verification
+   - Keep this secure and never expose it publicly
+   - Copy this value
+
+## Configuring reCAPTCHA in Elastic Funnels
+
+### Step 1: Access Domain Settings
+1. Go to **Domains** in your ElasticFunnels.io dashboard
+2. Find the domain you want to configure
+3. Click **"Edit"** on that domain
+4. Navigate to the **"Security"** tab
+
+### Step 2: Enter Your Keys
+1. **reCAPTCHA Site Key**:
+   - Paste your Site Key from Google reCAPTCHA
+   - This is the public key
+
+2. **reCAPTCHA Secret Key**:
+   - Paste your Secret Key from Google reCAPTCHA
+   - This is the private key used for verification
+
+3. Click **"Save"** to apply the configuration
+
+## Important: reCAPTCHA Usage & Cost Considerations
+
+<Warning>
+**Cost Management**: Understanding how reCAPTCHA is used and optimizing placement can help you stay within the free tier and avoid unexpected costs.
+</Warning>
+
+### Where reCAPTCHA is Used
+**reCAPTCHA is only used in Collection Forms** within Elastic Funnels. This includes:
+- Lead capture forms
+- Contact forms
+- Newsletter signups
+- Other collection form types
+
+reCAPTCHA is **not** used for other form types or page elements.
+
+### Cost-Effective Placement
+
+#### Recommended: Dedicated Form Pages
+**Best Practice**: Place collection forms on their own dedicated pages rather than in modals or popups.
+
+**Why this matters:**
+- **Reduced API calls**: reCAPTCHA v3 makes API calls each time a form is loaded
+- **Cost efficiency**: Google provides 10,000 free assessments per month, but exceeding this incurs costs
+- **Better user experience**: Dedicated pages provide more space and better mobile experience
+- **Lower request volume**: Forms on dedicated pages are only loaded when users navigate to them
+
+#### Avoid: Forms in Modals
+**Not Recommended**: Avoid placing collection forms (especially contact forms) in modals that appear on every page load.
+
+**Why this is problematic:**
+- **Excessive API calls**: If a contact form modal loads on every page, reCAPTCHA makes a request on every page view
+- **Cost implications**: High-traffic sites can quickly exceed the free tier (10,000 assessments/month)
+- **Unnecessary usage**: Users may not interact with the form, but you're still paying for assessments
+- **Poor ROI**: Paying for reCAPTCHA assessments that don't result in form submissions
+
+### Best Practice
+**Use dedicated form pages** (e.g., `/contact`) instead of modal forms to avoid unnecessary reCAPTCHA API calls. This ensures reCAPTCHA assessments are only made when users actually navigate to the form page, not on every page load.
+
+## Domain Whitelisting Best Practices
+
+### Adding Multiple Domains
+When adding domains to your reCAPTCHA site:
+
+- **Add each domain separately**: Each domain must be explicitly listed
+- **Include both www and non-www**: Add both versions:
+  - `example.com`
+  - `www.example.com`
+- **Add all subdomains**: If you use subdomains, add them too:
+  - `subdomain.example.com`
+- **One key for all domains**: You can use a single reCAPTCHA key for all your Elastic Funnels domains
+
+### Example Domain List
+For a complete setup, your domain list might look like:
+```
+example.com
+www.example.com
+another-domain.com
+www.another-domain.com
+subdomain.example.com
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### reCAPTCHA Not Working
+- **Verify domain is whitelisted**: Check that your domain is added in Google reCAPTCHA console
+- **Check both keys**: Ensure both Site Key and Secret Key are correctly entered
+- **Verify domain spelling**: Make sure the domain matches exactly (including www/non-www)
+- **Check key validity**: Ensure keys haven't expired or been deleted
+
+#### Domain Not Recognized
+- **Add both www and non-www**: Google treats these as separate domains
+- **Check domain format**: Use the exact domain format (no trailing slashes)
+- **Wait for propagation**: Changes may take a few minutes to take effect
+
+#### Form Submission Errors
+- **Verify secret key**: Ensure the Secret Key is correctly configured
+- **Check server logs**: Review error logs for reCAPTCHA verification failures
+- **Test with different domains**: Verify keys work across all configured domains
+
+### Testing Your Setup
+1. **Submit a test form**: Try submitting a form on your domain
+2. **Check browser console**: Look for any reCAPTCHA-related errors
+3. **Verify in Google Console**: Check reCAPTCHA analytics for activity
+4. **Test different domains**: Ensure all whitelisted domains work correctly
+
+## Security Best Practices
+
+### Key Management
+- **Keep Secret Key secure**: Never expose it in client-side code
+- **Rotate keys periodically**: Update keys if compromised
+- **Monitor usage**: Check Google reCAPTCHA console for unusual activity
+- **Document your setup**: Keep records of which domains use which keys
+
+### Domain Security
+- **Only whitelist your domains**: Don't add domains you don't control
+- **Regular audits**: Review whitelisted domains periodically
+- **Remove unused domains**: Clean up domains you no longer use
+- **Monitor for abuse**: Watch for suspicious activity in reCAPTCHA analytics
+
+## Advanced Configuration
+
+### Using Multiple Keys
+You can use different reCAPTCHA keys for different domains:
+- **Separate keys per brand**: Use different keys for different brands
+- **Testing vs Production**: Use separate keys for testing environments
+
+### Analytics and Monitoring
+- **Google reCAPTCHA Console**: Monitor requests and scores
+- **Score thresholds**: Adjust verification thresholds based on your needs
+- **Performance metrics**: Track reCAPTCHA impact on form submissions
+- **Fraud detection**: Review suspicious activity reports
+
+## Integration with Collection Forms
+
+### Where reCAPTCHA is Used
+reCAPTCHA is **only used in Collection Forms** within Elastic Funnels. This includes:
+- **Lead capture forms**: Prevents spam submissions
+- **Contact forms**: Blocks automated form filling
+- **Newsletter signups**: Reduces fake email addresses
+- **Custom collection forms**: Works with all collection form types
+
+<Warning>
+reCAPTCHA is **not** used for other form types or page elements. It specifically protects collection forms that gather user data.
+</Warning>
+
+### Cost-Effective Form Placement
+
+#### Recommended: Dedicated Form Pages
+**Best Practice**: Place collection forms on their own dedicated pages rather than in modals or popups.
+
+**Why this matters:**
+- **Reduced API calls**: reCAPTCHA v3 makes API calls each time a form is loaded
+- **Cost efficiency**: Google provides 10,000 free assessments per month, but exceeding this incurs costs
+- **Better user experience**: Dedicated pages provide more space and better mobile experience
+- **Lower request volume**: Forms on dedicated pages are only loaded when users navigate to them
+
+#### Avoid: Forms in Modals
+**Not Recommended**: Avoid placing collection forms (especially contact forms) in modals that appear on every page load.
+
+**Why this is problematic:**
+- **Excessive API calls**: If a contact form modal loads on every page, reCAPTCHA makes a request on every page view
+- **Cost implications**: High-traffic sites can quickly exceed the free tier (10,000 assessments/month)
+- **Unnecessary usage**: Users may not interact with the form, but you're still paying for assessments
+- **Poor ROI**: Paying for reCAPTCHA assessments that don't result in form submissions
+
+#### Example Scenarios
+
+**✅ Good Practice:**
+- Contact form on a dedicated `/contact` page
+- Lead capture form on a dedicated landing page
+- Newsletter signup on a dedicated `/newsletter` page
+- Forms that only load when users explicitly navigate to them
+
+**❌ Not Recommended:**
+- Contact form modal that appears on every page load
+- Popup forms that trigger on page entry
+- Forms embedded in modals that load automatically
+- Multiple forms on the same page that all load simultaneously
+
+### User Experience
+- **Invisible protection**: Users won't see any reCAPTCHA challenges
+- **No interruptions**: Legitimate users experience no friction
+- **Automatic verification**: Happens in the background
+- **Fast processing**: Minimal impact on form submission speed
+
+## Cost Management
+
+### Understanding reCAPTCHA Pricing
+- **Free tier**: 10,000 assessments per month at no cost
+- **Paid tier**: Additional assessments are charged per 1,000 requests
+- **Assessment = API call**: Each time a form loads, reCAPTCHA makes an assessment
+
+### Optimizing Costs
+1. **Use dedicated form pages**: Only load forms when users navigate to them
+2. **Avoid modal forms on every page**: Don't load forms that users may never interact with
+3. **Monitor usage**: Check Google reCAPTCHA console regularly for usage patterns
+4. **Strategic placement**: Place forms where users are most likely to engage
+
+### Monitoring Usage
+- **Google reCAPTCHA Console**: Track your monthly assessment count
+- **Set up alerts**: Configure notifications when approaching free tier limits
+- **Analyze patterns**: Review which forms generate the most assessments
+- **Optimize placement**: Adjust form placement based on actual usage data
+
+<Note>
+reCAPTCHA v3 provides powerful spam protection without impacting user experience. Remember to add both www and non-www versions of your domains, and you can use one key for all your Elastic Funnels domains. For cost-effective usage, place collection forms on dedicated pages rather than in modals that load on every page view.
+</Note>
+

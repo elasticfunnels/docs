@@ -113,7 +113,8 @@
             "pages": [
               "domains/custom-domains",
               "domains/customization",
-              "domains/whitelisting"
+              "domains/whitelisting",
+              "domains/recaptcha-setup"
             ]
           },
           {
