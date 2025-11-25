@@ -58,11 +58,16 @@
           {
             "group": "Pages",
             "pages": [
+              "pages/overview",
               "pages/create-landing-page",
               "pages/page-variants",
               "pages/visitor-based-content",
               "pages/interactions-panel",
-              "pages/containers"
+              "pages/containers",
+              "pages/order-tag",
+              "pages/product-item-tag",
+              "pages/collection-item-tag",
+              "pages/page-variables"
             ]
           },
           {

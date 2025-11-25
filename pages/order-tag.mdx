@@ -1,0 +1,440 @@
+---
+title: 'Order Tag'
+description: 'Display customer order history and details using the order tag system'
+---
+
+The `<order>` tag allows you to display customer purchase history and order details on your pages. This is perfect for order confirmation pages, account pages, or any page where customers need to view their past purchases.
+
+## Overview
+
+The order tag system dynamically displays purchase conversions grouped by session. It automatically shows all orders associated with the current customer's email or session, making it easy to create personalized order history pages.
+
+## Basic Usage
+
+### Simple Order Display
+
+```html
+<order>
+  <h2>Order #{order_number}</h2>
+  <p>Date: {order_date}</p>
+  <p>Billing Address: {billing_address}</p>
+  <p>Shipping Address: {shipping_address}</p>
+</order>
+```
+
+### With Styling Attributes
+
+You can add HTML attributes (like `class` or `id`) to the order tag:
+
+```html
+<order class="order-card" id="order-history">
+  <div class="order-header">
+    <h3>Order #{order_number}</h3>
+    <span class="order-date">{order_date}</span>
+  </div>
+  <div class="order-details">
+    <p><strong>Billing:</strong> {billing_address}</p>
+    <p><strong>Shipping:</strong> {shipping_address}</p>
+  </div>
+</order>
+```
+
+## Order Selection
+
+The order tag automatically retrieves and displays orders based on the current customer session. Here's how orders are selected:
+
+### Selection Criteria
+
+1. **Customer Identification**: Orders are retrieved using:
+   - The customer's email address (if available in session)
+   - The current session ID (as a fallback)
+
+2. **Order Type Filtering**: Only orders with `type="purchase"` are displayed. This ensures that:
+   - Only actual purchases are shown (not leads, opt-ins, or other conversion types)
+   - The order history is clean and relevant
+   - Security is maintained by filtering out non-purchase conversions
+
+3. **Grouping**: Orders are grouped by `session_id`, so multiple conversions from the same purchase session are displayed together as a single order.
+
+### Sorting Orders
+
+By default, orders are displayed with the **newest orders first**. You can control the sort order using the `sort-by` attribute:
+
+```html
+<!-- Newest orders first (default) -->
+<order sort-by="newest">
+  <h3>Order #{order_number}</h3>
+  <p>Date: {order_date}</p>
+</order>
+
+<!-- Oldest orders first -->
+<order sort-by="oldest">
+  <h3>Order #{order_number}</h3>
+  <p>Date: {order_date}</p>
+</order>
+```
+
+**Available sort options:**
+- `sort-by="newest"` - Most recent orders first (default)
+- `sort-by="oldest"` - Oldest orders first
+
+### Limiting Orders
+
+You can limit the number of orders displayed using the `limit` attribute:
+
+```html
+<!-- Show only the 5 most recent orders -->
+<order sort-by="newest" limit="5">
+  <h3>Order #{order_number}</h3>
+  <p>Date: {order_date}</p>
+</order>
+
+<!-- Show the 3 oldest orders -->
+<order sort-by="oldest" limit="3">
+  <h3>Order #{order_number}</h3>
+  <p>Date: {order_date}</p>
+</order>
+```
+
+**Limit behavior:**
+- Must be a positive integer (1, 2, 3, etc.)
+- If not specified, all orders are displayed
+- Applied after sorting, so `limit="5"` with `sort-by="newest"` shows the 5 newest orders
+
+### Combining Attributes
+
+You can combine `sort-by` and `limit` with styling attributes:
+
+```html
+<order class="recent-orders" sort-by="newest" limit="10">
+  <div class="order-card">
+    <h3>Order #{order_number}</h3>
+    <p>Placed on {order_date}</p>
+  </div>
+</order>
+```
+
+## Security & Data Protection
+
+The order tag system includes built-in security measures:
+
+1. **Type Filtering**: Only `type="purchase"` conversions are displayed, preventing access to other conversion types
+2. **Input Validation**: All attributes are validated and sanitized:
+   - `sort-by` only accepts `"newest"` or `"oldest"` (case-insensitive)
+   - `limit` must be a positive integer
+   - Invalid values are ignored and defaults are used
+3. **Attribute Escaping**: All attribute values are properly escaped to prevent injection attacks
+4. **Session-Based Access**: Orders are only shown to customers with valid sessions (email or customer flag)
+
+## Order-Level Placeholders
+
+These placeholders work within the `<order>` tag to display order information:
+
+### `{order_date}`
+Displays the formatted order date and time.
+- **Format**: "Month Day, Year, Hour:Minute AM/PM"
+- **Example**: "January 15, 2024, 2:30 PM"
+
+```html
+<order>
+  <p>Order placed on {order_date}</p>
+</order>
+```
+
+### `{order_number}`
+Shows the public order ID for the purchase.
+
+```html
+<order>
+  <p>Order Number: {order_number}</p>
+</order>
+```
+
+### `{billing_address}`
+Displays the complete billing address (address, city, state, zip).
+
+```html
+<order>
+  <div>
+    <strong>Billing Address:</strong>
+    <p>{billing_address}</p>
+  </div>
+</order>
+```
+
+### `{shipping_address}`
+Displays the complete shipping address (address, city, state, zip).
+
+```html
+<order>
+  <div>
+    <strong>Shipping Address:</strong>
+    <p>{shipping_address}</p>
+  </div>
+</order>
+```
+
+### `{order_status_text}`
+Order status text (currently empty, reserved for future use).
+
+### `{charge_code}`
+Charge code information (currently empty, reserved for future use).
+
+### `{customer_name}`
+Customer name placeholder. This works both inside and outside the order tag.
+
+```html
+<h1>Welcome, {customer_name}!</h1>
+<order>
+  <p>Your order history:</p>
+</order>
+```
+
+**Note**: If there's no customer session or no orders, `{customer_name}` will be removed from the page. Use `,{customer_name}` if you want the comma removed when the name is empty (e.g., "Hello, {customer_name}" becomes "Hello" if no customer).
+
+## Nested Tags
+
+### Order Products
+
+Use `<order-product>` to display individual products in an order. This tag automatically loops through all non-bonus products in the order.
+
+```html
+<order>
+  <h3>Order #{order_number}</h3>
+  <div class="products">
+    <order-product class="product-item">
+      <img src="{product_image_url}" alt="{product_name}">
+      <h4>{product_name}</h4>
+      <p class="price">{price}</p>
+    </order-product>
+  </div>
+</order>
+```
+
+#### Order Product Placeholders
+
+- **`{product_image_url}`**: URL of the product image
+- **`{product_name}`**: Name of the product
+- **`{price}`**: Formatted price with currency symbol (e.g., "$97.00")
+
+### Bonus Products
+
+Use `<order-bonus-product>` to display bonus products included with the order. Each bonus product is shown only once, even if it appears multiple times in the order.
+
+```html
+<order>
+  <h3>Order #{order_number}</h3>
+  
+  <div class="bonus-products">
+    <h4>Bonus Items Included:</h4>
+    <order-bonus-product class="bonus-item">
+      <img src="{bonus_product_image_url}" alt="{bonus_product_name}">
+      <h5>{bonus_product_name}</h5>
+      <a href="{bonus_download}" download>Download</a>
+    </order-bonus-product>
+  </div>
+</order>
+```
+
+#### Bonus Product Placeholders
+
+- **`{bonus_product_image_url}`**: URL of the bonus product image
+- **`{bonus_product_name}`**: Name of the bonus product
+- **`{bonus_download}`**: Download link/file for the bonus product
+
+### Order Product Tracking
+
+The `<order-product-tracking>` tag is reserved for future tracking functionality. Currently, it returns empty content.
+
+```html
+<order>
+  <order-product-tracking>
+    <!-- Tracking information will be available in future updates -->
+  </order-product-tracking>
+</order>
+```
+
+## Complete Example
+
+Here's a complete example of an order history page:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order History</title>
+  <style>
+    .order-container {
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    .product-item {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .product-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+    }
+    .bonus-item {
+      background: #f0f9ff;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome, {customer_name}!</h1>
+  <h2>Your Order History</h2>
+  
+  <order class="order-container">
+    <div class="order-header">
+      <h3>Order #{order_number}</h3>
+      <p class="order-date">Placed on {order_date}</p>
+    </div>
+    
+    <div class="order-addresses">
+      <div>
+        <strong>Billing Address:</strong>
+        <p>{billing_address}</p>
+      </div>
+      <div>
+        <strong>Shipping Address:</strong>
+        <p>{shipping_address}</p>
+      </div>
+    </div>
+    
+    <div class="order-products">
+      <h4>Products:</h4>
+      <order-product class="product-item">
+        <img src="{product_image_url}" alt="{product_name}">
+        <div>
+          <h5>{product_name}</h5>
+          <p class="price">{price}</p>
+        </div>
+      </order-product>
+    </div>
+    
+    <div class="bonus-section">
+      <h4>Bonus Items:</h4>
+      <order-bonus-product class="bonus-item">
+        <img src="{bonus_product_image_url}" alt="{bonus_product_name}" style="width: 50px; height: 50px;">
+        <div>
+          <strong>{bonus_product_name}</strong>
+          <br>
+          <a href="{bonus_download}" download>Download Bonus</a>
+        </div>
+      </order-bonus-product>
+    </div>
+  </order>
+</body>
+</html>
+```
+
+## How It Works
+
+1. **Customer Detection**: The system checks if the visitor has a customer session (email or customer flag).
+
+2. **Order Retrieval**: If a customer session exists, the system retrieves all conversions associated with:
+   - The customer's email address (primary method)
+   - The current session ID (fallback method)
+
+3. **Order Filtering**: Only conversions with `type="purchase"` are included. This ensures:
+   - Only actual purchases are displayed
+   - Other conversion types (leads, opt-ins, etc.) are excluded
+   - Security is maintained
+
+4. **Order Sorting**: Orders are sorted based on the `sort-by` attribute:
+   - `"newest"` (default): Most recent orders first
+   - `"oldest"`: Oldest orders first
+   - Sorting is based on the `created_at` timestamp
+
+5. **Order Limiting**: If a `limit` attribute is specified, only that many orders are displayed (after sorting).
+
+6. **Order Grouping**: Orders are grouped by `session_id`, so multiple conversions from the same purchase session are displayed together as a single order.
+
+7. **Tag Processing**: 
+   - The `<order>` tag is replaced with HTML for each order group
+   - Nested tags (`<order-product>`, `<order-bonus-product>`) are processed within each order
+   - All placeholders are replaced with actual order data
+   - Attributes are validated and sanitized for security
+
+8. **Empty State**: If no customer session exists or no orders are found:
+   - The entire `<order>` tag is removed from the page
+   - `{customer_name}` placeholders are removed
+   - The page displays without order information
+
+## Important Notes
+
+### Customer Session Required
+
+The order tag only displays content when:
+- The visitor has a customer email in their session, OR
+- The visitor has the `is_customer` flag set in their session
+
+If neither condition is met, the order tag and customer name placeholders are removed from the page.
+
+### Order Type Restriction
+
+**Only purchase orders are displayed.** The system automatically filters to show only conversions with `type="purchase"`. This means:
+- Leads, opt-ins, and other conversion types are never shown
+- Only actual completed purchases appear in order history
+- This is a security feature that cannot be overridden
+
+### Multiple Orders
+
+If a customer has multiple orders (from different sessions), each order group will be displayed as a separate `<order>` block. The system automatically handles multiple orders and can sort/limit them as needed.
+
+### Sorting Behavior
+
+- **Default**: Orders are sorted newest first
+- **Per-Tag**: Each `<order>` tag can have its own `sort-by` and `limit` attributes
+- **Group Sorting**: Orders are sorted by the first conversion's `created_at` date within each session group
+
+### Styling
+
+You can style order tags using CSS classes or IDs:
+
+```html
+<order class="my-order-card" sort-by="newest" limit="5">
+  <!-- Order content -->
+</order>
+```
+
+The attributes you add to the `<order>` tag (except `sort-by` and `limit`) are applied to the wrapper `<div>` that contains each order.
+
+## Best Practices
+
+1. **Always include order number**: Use `{order_number}` so customers can reference their orders
+2. **Show order date**: Display `{order_date}` to help customers identify when they made purchases
+3. **Organize products clearly**: Use proper HTML structure and CSS to make product lists readable
+4. **Handle empty states**: Design your page to look good even when no orders are present
+5. **Mobile responsive**: Ensure your order display works well on mobile devices
+6. **Test with multiple orders**: Verify that multiple orders display correctly
+
+## Troubleshooting
+
+### Orders Not Showing
+
+- **Check customer session**: Ensure the visitor is logged in or has a customer session
+- **Verify purchases**: Confirm that purchase conversions exist for the customer
+- **Check order type**: Only "purchase" type conversions are displayed
+
+### Customer Name Not Appearing
+
+- The `{customer_name}` placeholder requires at least one order to exist
+- If no orders exist, the placeholder is removed from the page
+- Use `,{customer_name}` if you want the comma removed when the name is empty
+
+### Products Not Displaying
+
+- Ensure products are associated with the order conversions
+- Check that products are not marked as bonus products (use `<order-bonus-product>` for those)
+- Verify product data exists in the system
+

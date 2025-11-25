@@ -1,0 +1,540 @@
+---
+title: 'Page Variables & Placeholders'
+description: 'Use dynamic variables and placeholders to personalize your pages with customer data, dates, query parameters, and more'
+---
+
+Page variables and placeholders allow you to dynamically insert content into your pages. They're automatically replaced with actual values when the page is rendered, making it easy to personalize content for each visitor.
+
+## Variable Formats
+
+ElasticFunnels supports two variable formats:
+
+- **Percent Format**: `%VARIABLE_NAME%` - Used for simple replacements
+- **Brace Format**: `{variable_name}` - Used for more complex data structures
+
+Both formats work in HTML content. The brace format also works in JavaScript code.
+
+## Date Variables
+
+Display current date and time information using these placeholders:
+
+### `%DAY_NAME%`
+Full name of the day of the week.
+
+**Example**: "Monday", "Tuesday", "Wednesday"
+
+```html
+<p>Today is %DAY_NAME%</p>
+<!-- Output: Today is Monday -->
+```
+
+### `%DAY%`
+Day of the month (1-31).
+
+**Example**: 1, 15, 31
+
+```html
+<p>Today is the %DAY%</p>
+<!-- Output: Today is the 15 -->
+```
+
+### `%DAY_POSTFIX%`
+Ordinal suffix for the day (st, nd, rd, th).
+
+**Example**: "st", "nd", "rd", "th"
+
+```html
+<p>Today is the %DAY%%DAY_POSTFIX%</p>
+<!-- Output: Today is the 15th -->
+```
+
+### `%MONTH_NAME%`
+Full name of the month.
+
+**Example**: "January", "February", "March"
+
+```html
+<p>It's %MONTH_NAME%</p>
+<!-- Output: It's January -->
+```
+
+### `%MONTH%`
+Month number (0-11, where 0 = January).
+
+**Example**: 0, 5, 11
+
+```html
+<p>Month number: %MONTH%</p>
+<!-- Output: Month number: 0 -->
+```
+
+### `%YEAR%`
+Full 4-digit year.
+
+**Example**: 2024, 2025
+
+```html
+<p>Copyright %YEAR%</p>
+<!-- Output: Copyright 2024 -->
+```
+
+### `%HOUR%`
+Current hour in 24-hour format (0-23).
+
+**Example**: 0, 14, 23
+
+```html
+<p>Current hour: %HOUR%</p>
+<!-- Output: Current hour: 14 -->
+```
+
+### Complete Date Example
+
+```html
+<div class="date-display">
+  <p>Today is %DAY_NAME%, %MONTH_NAME% %DAY%%DAY_POSTFIX%, %YEAR%</p>
+  <p>Current time: %HOUR%:00</p>
+</div>
+<!-- Output: Today is Monday, January 15th, 2024 -->
+<!-- Output: Current time: 14:00 -->
+```
+
+## Customer Variables
+
+Display customer information when a customer session exists.
+
+### `%CUSTOMER_FNAME%`
+Customer's first name from session.
+
+```html
+<p>Hello, %CUSTOMER_FNAME%!</p>
+<!-- Output: Hello, John! -->
+```
+
+### `%CUSTOMER_FNAME%,`
+Customer's first name with a trailing comma. The comma is removed if no first name is available.
+
+```html
+<p>Welcome%CUSTOMER_FNAME%, to our store!</p>
+<!-- With name: Welcome John, to our store! -->
+<!-- Without name: Welcome to our store! -->
+```
+
+### `{customer_name}`
+Customer's full name. Works in both HTML and JavaScript.
+
+```html
+<h1>Welcome, {customer_name}!</h1>
+
+<script>
+  console.log('Customer: {customer_name}');
+</script>
+```
+
+**Note**: This variable is populated from order data. If no orders exist, it will be empty.
+
+### `{customer.*}` Variables
+
+Access detailed customer information using the `{customer.*}` format. These variables are populated from the customer's most recent conversion/purchase.
+
+**Personal Information:**
+- `{customer.email}` - Customer email address
+- `{customer.name}` - Full name
+- `{customer.first_name}` - First name
+- `{customer.last_name}` - Last name
+- `{customer.phone}` - Phone number
+- `{customer.country}` - Country
+
+**Address Information:**
+- `{customer.address}` - Street address
+- `{customer.city}` - City
+- `{customer.state}` - State/Province
+- `{customer.zip}` - ZIP/Postal code
+
+**Billing Information:**
+- `{customer.billing_address}` - Billing street address
+- `{customer.billing_city}` - Billing city
+- `{customer.billing_state}` - Billing state
+- `{customer.billing_zip}` - Billing ZIP code
+- `{customer.billing_country}` - Billing country
+
+**Shipping Information:**
+- `{customer.shipping_address}` - Shipping street address
+- `{customer.shipping_city}` - Shipping city
+- `{customer.shipping_state}` - Shipping state
+- `{customer.shipping_zip}` - Shipping ZIP code
+- `{customer.shipping_country}` - Shipping country
+
+**Order History:**
+- `{customer.total_orders}` - Total number of orders
+- `{customer.last_order_date}` - Date of most recent order
+- `{customer.last_order_total}` - Total amount of most recent order
+- `{customer.last_order_currency}` - Currency of most recent order
+- `{customer.order_ids}` - Comma-separated list of order IDs
+
+**Special Variables:**
+- `{customer.email_hashed}` - SHA-256 hashed email (for privacy/analytics)
+
+### Customer Variable Examples
+
+```html
+<!-- Personalization -->
+<h1>Welcome back, {customer.first_name}!</h1>
+<p>Your email: {customer.email}</p>
+
+<!-- Address display -->
+<div class="shipping-info">
+  <p>{customer.shipping_address}</p>
+  <p>{customer.shipping_city}, {customer.shipping_state} {customer.shipping_zip}</p>
+</div>
+
+<!-- Order history -->
+<p>You have {customer.total_orders} order(s)</p>
+<p>Last order: {customer.last_order_date}</p>
+
+<!-- In JavaScript -->
+<script>
+  const customerEmail = '{customer.email}';
+  const orderCount = '{customer.total_orders}';
+</script>
+```
+
+**Important Notes:**
+- Customer variables require a valid customer session (email or `is_customer` flag)
+- If no session exists, customer variables are removed from the page
+- Variables are populated from the most recent conversion/purchase
+- Empty values are replaced with empty strings
+
+## Brand & System Variables
+
+Display brand information and system-level data that's available on all pages.
+
+### `brand_name`
+Your brand/company name.
+
+**Formats**: `[brand_name]`, `%brand_name%`, `{brand_name}`
+
+```html
+<h1>Welcome to [brand_name]</h1>
+<!-- Output: Welcome to My Company -->
+
+<p>© %brand_name% %YEAR%</p>
+<!-- Output: © My Company 2024 -->
+
+<footer>
+  <p>{brand_name} - All rights reserved</p>
+</footer>
+```
+
+### `domain`
+Current domain name.
+
+**Formats**: `{domain}`, `%domain%`
+
+```html
+<p>Visit us at {domain}</p>
+<!-- Output: Visit us at example.com -->
+
+<a href="https://%domain%">Home</a>
+<!-- Output: <a href="https://example.com">Home</a> -->
+```
+
+### `click_id`
+Click tracking ID for the current session.
+
+**Formats**: `{click_id}`, `[click_id]`
+
+```html
+<!-- Pass click ID to tracking -->
+<script>
+  const clickId = '{click_id}';
+  // Use for analytics or tracking
+</script>
+
+<!-- In URLs -->
+<a href="/checkout?c=[click_id]">Buy Now</a>
+```
+
+### IP & Location Variables
+
+Access visitor IP address and location information (when available).
+
+#### `{ip_whois.ip}`
+Visitor's IP address.
+
+```html
+<!-- Display IP (usually for debugging) -->
+<p>Your IP: {ip_whois.ip}</p>
+```
+
+#### `{ip_whois.country}`
+Visitor's country based on IP geolocation.
+
+```html
+<p>Country: {ip_whois.country}</p>
+<!-- Output: Country: United States -->
+```
+
+#### `{ip_whois.city}`
+Visitor's city based on IP geolocation.
+
+```html
+<p>City: {ip_whois.city}</p>
+<!-- Output: City: New York -->
+```
+
+#### `{ip_whois.region}`
+Visitor's region/state based on IP geolocation.
+
+```html
+<p>Region: {ip_whois.region}</p>
+<!-- Output: Region: New York -->
+```
+
+**Important Notes:**
+- IP geolocation data is approximate and may not be 100% accurate
+- Location data is only available when `{ip_whois.*}` variables are used in the page
+- IP address is always available, but country/city/region require geolocation lookup
+- Use these variables responsibly and in compliance with privacy regulations
+
+### Custom Brand Variables (`{var.*}`)
+
+Access custom variables defined in your brand settings using dot notation.
+
+**Format**: `{var.path.to.variable}`
+
+**Default Values**: `{var.path.to.variable=default_value}`
+
+Custom brand variables are defined in your brand settings as JSON. You can access nested values using dot notation.
+
+**Example Brand Variables JSON:**
+```json
+{
+  "company": {
+    "name": "My Company",
+    "phone": "1-800-123-4567",
+    "email": "support@example.com"
+  },
+  "social": {
+    "facebook": "https://facebook.com/mycompany",
+    "twitter": "https://twitter.com/mycompany"
+  },
+  "settings": {
+    "shipping_days": 5,
+    "return_policy": "30 days"
+  }
+}
+```
+
+**Usage Examples:**
+
+```html
+<!-- Access nested values -->
+<p>Company: {var.company.name}</p>
+<!-- Output: Company: My Company -->
+
+<p>Phone: {var.company.phone}</p>
+<!-- Output: Phone: 1-800-123-4567 -->
+
+<a href="{var.social.facebook}">Facebook</a>
+<!-- Output: <a href="https://facebook.com/mycompany">Facebook</a> -->
+
+<p>Shipping: {var.settings.shipping_days} days</p>
+<!-- Output: Shipping: 5 days -->
+```
+
+**Default Values:**
+
+If a variable doesn't exist, you can provide a default value:
+
+```html
+<!-- Use default if variable doesn't exist -->
+<p>Phone: {var.company.phone=Not available}</p>
+<!-- If var.company.phone exists: Phone: 1-800-123-4567 -->
+<!-- If it doesn't exist: Phone: Not available -->
+
+<p>Support: {var.support.email=support@example.com}</p>
+```
+
+**Important Notes:**
+- Custom variables are defined in your brand settings
+- Use dot notation to access nested values
+- Variables work in HTML, head HTML, and JavaScript
+- If a variable doesn't exist and no default is provided, you'll see: `<ef-undefined>undefined: var.path</ef-undefined>`
+- Default values are only used when the variable is undefined
+
+### Brand Variable Examples
+
+```html
+<!-- Footer with brand info -->
+<footer>
+  <div class="company-info">
+    <h3>{brand_name}</h3>
+    <p>Domain: {domain}</p>
+    <p>Phone: {var.company.phone}</p>
+    <p>Email: {var.company.email}</p>
+  </div>
+  
+  <div class="social-links">
+    <a href="{var.social.facebook}">Facebook</a>
+    <a href="{var.social.twitter}">Twitter</a>
+  </div>
+  
+  <p>© {brand_name} %YEAR%</p>
+</footer>
+
+<!-- Tracking with click ID -->
+<script>
+  // Track page view
+  gtag('event', 'page_view', {
+    'click_id': '{click_id}',
+    'domain': '{domain}',
+    'brand': '{brand_name}'
+  });
+</script>
+```
+
+## Query Parameter Variables
+
+Access URL query parameters to personalize content based on traffic source, campaigns, or other URL data.
+
+### `%query.*%`
+Access any query parameter from the URL.
+
+**Format**: `%query.parameter_name%`
+
+**Example URL**: `https://yoursite.com/page?aff_id=123&source=facebook`
+
+```html
+<p>Affiliate ID: %query.aff_id%</p>
+<!-- Output: Affiliate ID: 123 -->
+
+<p>Source: %query.source%</p>
+<!-- Output: Source: facebook -->
+```
+
+### `{query.*}`
+Alternative format for query parameters (works in HTML and JavaScript).
+
+```html
+<p>Campaign: {query.campaign}</p>
+
+<script>
+  const campaign = '{query.campaign}';
+</script>
+```
+
+### `{queryparams}`
+Get the complete query string for use in URLs.
+
+```html
+<a href="/checkout?{queryparams}">Checkout</a>
+<!-- Output: <a href="/checkout?aff_id=123&source=facebook">Checkout</a> -->
+```
+
+### Query Parameter Examples
+
+```html
+<!-- Track affiliate -->
+<p>Referred by: %query.aff_id%</p>
+
+<!-- Campaign tracking -->
+<div data-campaign="%query.utm_campaign%">
+  Campaign content
+</div>
+
+<!-- Pass parameters to checkout -->
+<a href="/checkout?{queryparams}">Buy Now</a>
+
+<!-- Conditional content based on parameter -->
+<script>
+  const source = '{query.source}';
+  if (source === 'email') {
+    // Show email-specific content
+  }
+</script>
+```
+
+**Important Notes:**
+- Query parameters are case-sensitive
+- If a parameter doesn't exist, the variable is replaced with an empty string
+- All query parameter values are automatically escaped for security
+- Unused query parameter variables are cleaned up automatically
+
+## Variable Usage Tips
+
+### Combining Variables
+
+You can combine multiple variables for rich personalization:
+
+```html
+<p>Hello %CUSTOMER_FNAME%, today is %DAY_NAME%, %MONTH_NAME% %DAY%%DAY_POSTFIX%</p>
+<!-- Output: Hello John, today is Monday, January 15th -->
+```
+
+### Conditional Display
+
+Use variables with CSS or JavaScript for conditional display:
+
+```html
+<!-- Hide if no customer name -->
+<div id="welcome" style="display: {customer.name ? 'block' : 'none'}">
+  Welcome, {customer.name}!
+</div>
+
+<!-- JavaScript conditional -->
+<script>
+  if ('{customer.email}') {
+    console.log('Customer logged in');
+  }
+</script>
+```
+
+### Security Considerations
+
+- All variable values are automatically escaped to prevent XSS attacks
+- Customer data is only shown to authenticated customers
+- Query parameters are sanitized before use
+- Empty variables are safely removed
+
+### Performance
+
+- Variables are replaced server-side during page rendering
+- No client-side processing required
+- Variables that don't exist are efficiently removed
+
+## Troubleshooting
+
+### Variables Not Showing
+
+**Issue**: Variable appears as literal text (e.g., `%DAY_NAME%` instead of "Monday")
+
+**Solutions:**
+- Check spelling and case sensitivity
+- Ensure you're using the correct format (`%` vs `{}`)
+- Verify the variable name matches exactly
+
+### Customer Variables Empty
+
+**Issue**: `{customer.*}` variables are empty or removed
+
+**Solutions:**
+- Ensure visitor has a customer session (email or `is_customer` flag)
+- Check that customer has made at least one purchase
+- Verify the variable name is correct
+
+### Query Parameters Not Working
+
+**Issue**: `%query.*%` variables are empty
+
+**Solutions:**
+- Verify the parameter exists in the URL
+- Check parameter name spelling (case-sensitive)
+- Ensure the URL includes `?parameter=value` format
+
+## Related Documentation
+
+- [Order Tag](/pages/order-tag) - Display customer order history
+- [Product Item Tag](/pages/product-item-tag) - Display product listings
+- [Collection Item Tag](/pages/collection-item-tag) - Display collection entries
+

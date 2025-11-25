@@ -1,0 +1,350 @@
+---
+title: 'Collection Item Tag'
+description: 'Display dynamic content from collections using the collection-item tag'
+---
+
+The `<collection-item>` tag allows you to display entries from a collection on your pages. Collections are reusable content sets (like testimonials, FAQs, features, etc.) that you can manage centrally and display dynamically.
+
+## Overview
+
+Collections are perfect for:
+- Testimonials and reviews
+- FAQ sections
+- Feature lists
+- Team member profiles
+- Case studies
+- Product benefits
+- Any repeating content structure
+
+The collection-item tag loops through all entries in a collection and displays them using your template.
+
+## Basic Usage
+
+### Simple Collection Display
+
+```html
+<collection-item code="testimonials">
+  <div class="testimonial">
+    <p>{$content}</p>
+    <p class="author">- {$author}</p>
+  </div>
+</collection-item>
+```
+
+### With Styling
+
+```html
+<collection-item code="features" id="feature-item">
+  <div class="feature-card">
+    <h3>{$title}</h3>
+    <p>{$description}</p>
+    <img src="{$image_url}" alt="{$title}">
+  </div>
+</collection-item>
+```
+
+## Attributes
+
+### Required Attributes
+
+#### `code`
+The collection code that identifies which collection to display.
+
+**Format**: Any string that matches your collection code
+
+**Example:**
+```html
+<collection-item code="testimonials">
+  <!-- Displays entries from the "testimonials" collection -->
+</collection-item>
+```
+
+### Optional Attributes
+
+#### `id`
+Element ID applied to each collection entry wrapper.
+
+**Example:**
+```html
+<collection-item code="faq" id="faq-item">
+  <!-- Each FAQ entry will be wrapped in <div id="faq-item"> -->
+</collection-item>
+```
+
+## Collection Placeholders
+
+Within the `<collection-item>` template, use `{$field_name}` to access collection entry fields.
+
+### Placeholder Format
+
+**Format**: `{$field_name}`
+
+The `$` prefix indicates this is a collection field placeholder.
+
+### Common Fields
+
+Collection fields depend on how your collection is structured. Common examples include:
+
+- `{$title}` - Entry title
+- `{$content}` - Main content
+- `{$description}` - Description text
+- `{$author}` - Author name
+- `{$image_url}` - Image URL
+- `{$name}` - Name field
+- `{$email}` - Email field
+- `{$rating}` - Rating value
+- `{$date}` - Date field
+
+**Note**: Available fields depend on your collection structure. Check your collection settings to see available fields.
+
+### Example with Multiple Fields
+
+```html
+<collection-item code="testimonials">
+  <div class="testimonial">
+    <div class="rating">
+      <!-- Display 5 stars based on rating -->
+      <span>{$rating}/5</span>
+    </div>
+    <p class="quote">"{$content}"</p>
+    <div class="author-info">
+      <img src="{$author_image}" alt="{$author_name}">
+      <div>
+        <p class="author-name">{$author_name}</p>
+        <p class="author-title">{$author_title}</p>
+      </div>
+    </div>
+    <p class="date">{$date}</p>
+  </div>
+</collection-item>
+```
+
+## Complete Examples
+
+### Testimonials Collection
+
+```html
+<section class="testimonials">
+  <h2>What Our Customers Say</h2>
+  
+  <collection-item code="customer-testimonials">
+    <div class="testimonial-card">
+      <div class="stars">
+        <!-- Assuming rating is 1-5 -->
+        <span>★★★★★</span>
+      </div>
+      <blockquote>
+        <p>"{$content}"</p>
+      </blockquote>
+      <div class="author">
+        <img src="{$customer_photo}" alt="{$customer_name}">
+        <div>
+          <p class="name">{$customer_name}</p>
+          <p class="location">{$customer_location}</p>
+        </div>
+      </div>
+    </div>
+  </collection-item>
+</section>
+```
+
+### FAQ Collection
+
+```html
+<section class="faq">
+  <h2>Frequently Asked Questions</h2>
+  
+  <collection-item code="faq-items">
+    <details class="faq-item">
+      <summary>{$question}</summary>
+      <div class="answer">
+        <p>{$answer}</p>
+        <p class="category">Category: {$category}</p>
+      </div>
+    </details>
+  </collection-item>
+</section>
+```
+
+### Features Collection
+
+```html
+<section class="features">
+  <h2>Product Features</h2>
+  
+  <div class="features-grid">
+    <collection-item code="product-features">
+      <div class="feature">
+        <div class="feature-icon">
+          <img src="{$icon_url}" alt="{$title}">
+        </div>
+        <h3>{$title}</h3>
+        <p>{$description}</p>
+        <ul>
+          <li>{$benefit_1}</li>
+          <li>{$benefit_2}</li>
+          <li>{$benefit_3}</li>
+        </ul>
+      </div>
+    </collection-item>
+  </div>
+</section>
+```
+
+### Team Members Collection
+
+```html
+<section class="team">
+  <h2>Our Team</h2>
+  
+  <div class="team-grid">
+    <collection-item code="team-members">
+      <div class="team-member">
+        <img src="{$photo_url}" alt="{$name}">
+        <h3>{$name}</h3>
+        <p class="role">{$role}</p>
+        <p class="bio">{$bio}</p>
+        <div class="social">
+          <a href="{$linkedin_url}">LinkedIn</a>
+          <a href="{$twitter_url}">Twitter</a>
+        </div>
+      </div>
+    </collection-item>
+  </div>
+</section>
+```
+
+## Styling Collections
+
+### CSS Grid Layout
+
+```html
+<style>
+  .collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .collection-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+  }
+</style>
+
+<div class="collection-grid">
+  <collection-item code="features" id="collection-item">
+    <div class="collection-item">
+      <h3>{$title}</h3>
+      <p>{$description}</p>
+    </div>
+  </collection-item>
+</div>
+```
+
+### Flexbox Layout
+
+```html
+<style>
+  .collection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+</style>
+
+<div class="collection-list">
+  <collection-item code="testimonials">
+    <div class="testimonial">
+      <p>{$content}</p>
+      <p>- {$author}</p>
+    </div>
+  </collection-item>
+</div>
+```
+
+## How It Works
+
+1. **Collection Lookup**: The system finds the collection by the `code` attribute
+2. **Entry Retrieval**: All entries from that collection are retrieved
+3. **Template Rendering**: For each entry, the template is rendered
+4. **Placeholder Replacement**: Collection placeholders (`{$field_name}`) are replaced with entry data
+5. **Output**: Each entry is wrapped in a `<div>` with the specified `id` (if provided)
+
+## Managing Collections
+
+Collections are managed in your dashboard:
+
+1. **Create Collection**: Go to Collections → Create Collection
+2. **Define Fields**: Set up the fields your collection entries will have
+3. **Add Entries**: Add individual entries to your collection
+4. **Use Code**: Use the collection code in your `<collection-item>` tags
+
+### Collection Structure
+
+When creating a collection, you define:
+- **Collection Code**: The identifier used in `code="..."` attribute
+- **Fields**: Custom fields for each entry (title, content, image, etc.)
+- **Entries**: Individual items in the collection
+
+## Best Practices
+
+### Content Organization
+
+- **Logical Grouping**: Group related content into collections
+- **Consistent Structure**: Keep entry fields consistent within a collection
+- **Reusable Content**: Use collections for content you'll display in multiple places
+
+### Template Design
+
+- **Responsive**: Design templates that work on all devices
+- **Consistent Styling**: Keep styling consistent across entries
+- **Flexible Layout**: Design templates that work with varying content lengths
+
+### Performance
+
+- **Limit Entries**: Don't create collections with hundreds of entries if you only need a few
+- **Optimize Images**: Ensure collection images are optimized
+- **Cache Considerations**: Collections are rendered server-side for performance
+
+## Troubleshooting
+
+### No Entries Displaying
+
+**Possible Causes:**
+- Collection code doesn't exist
+- Collection has no entries
+- Collection code is misspelled
+
+**Solutions:**
+- Verify the collection code in your dashboard
+- Check that the collection has entries
+- Ensure the `code` attribute matches exactly (case-sensitive)
+
+### Placeholders Not Replacing
+
+**Issue**: Placeholders show as literal text (e.g., `{$title}`)
+
+**Solutions:**
+- Check placeholder spelling (case-sensitive)
+- Ensure you're using `{$field_name}` format with `$` prefix
+- Verify the field exists in your collection structure
+- Check that entries have values for those fields
+
+### Missing Fields
+
+**Issue**: Some fields are empty
+
+**Solutions:**
+- Verify the field name matches your collection structure
+- Check that entries have values for those fields
+- Ensure field names are spelled correctly (case-sensitive)
+
+## Related Documentation
+
+- [Product Item Tag](/pages/product-item-tag) - Display product listings
+- [Page Variables](/pages/page-variables) - Use variables and placeholders
+- [Containers](/pages/containers) - Dynamic content containers
+

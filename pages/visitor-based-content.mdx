@@ -1,141 +1,389 @@
 ---
-title: 'Visitor-Based Content Display'
-description: 'Show different content to different visitors based on their whitelisting status'
+title: 'Content Visibility Control'
+description: 'Control which visitors can see specific content on your pages'
 ---
 
-Visitor-based content display allows you to show different content to different visitors - typically compliant content to ad platform reviewers and actual content to real customers.
+Content Visibility Control allows you to show different content to different visitors based on their whitelisting status. This is useful for personalizing experiences, protecting sensitive content from competitors, and showing appropriate content to different visitor segments.
 
-## Understanding Content Containers
+<CardGroup cols={2}>
+  <Card
+    title="Whitelisted Container"
+    icon="eye"
+  >
+    Contains full content visible only to whitelisted visitors (VSL, sales pages, etc.)
+  </Card>
+  <Card
+    title="Non-Whitelisted Container"
+    icon="eye-slash"
+  >
+    Contains standard content visible to all non-whitelisted visitors (TSL, basic info)
+  </Card>
+</CardGroup>
 
-Elastic Funnels uses two types of containers for visitor-based content display:
+## How It Works
+
+Content Visibility Control uses a whitelisting system to determine which visitors see which content. When a visitor is whitelisted, they see the full content in Whitelisted Containers. Non-whitelisted visitors see the standard content in Non-Whitelisted Containers.
+
+<Info>
+Both container types can exist on the same page. The system automatically shows the appropriate container based on the visitor's whitelist status.
+</Info>
+
+## Content Containers
 
 ### Whitelisted Container
-- Contains the **actual content** you want real visitors to see
-- Shows **full content** (VSL, sales pages, etc.)
-- Hidden from ad platform compliance teams
-- Only visible to whitelisted visitors
 
-### Non Whitelisted Container  
-- Contains **compliant content** for ad platform review
-- Shows **safe content** (TSL, basic landing pages)
+The **Whitelisted Container** displays content exclusively to whitelisted visitors.
+
+**Features:**
+- Contains **full content** (VSL, sales pages, complete offers)
+- Only visible to whitelisted visitors
+- Used for personalized visitor experiences
+- Perfect for protecting sensitive information
+
+**Use Cases:**
+- Full sales presentations
+- Complete product details
+- Exclusive offers and pricing
+- Detailed testimonials and case studies
+
+### Non-Whitelisted Container
+
+The **Non-Whitelisted Container** displays standard content to visitors who aren't whitelisted.
+
+**Features:**
+- Contains **standard content** (TSL, basic landing pages)
 - Always visible to non-whitelisted visitors
-- What compliance teams and ad platforms see
+- Default content for visitors without whitelist status
+- Ensures all visitors see appropriate content
+
+**Use Cases:**
+- Basic landing pages
+- General information
+- Standard pricing displays
+- Simplified content versions
 
 ## Content Display Methods
 
-### 1. Container-Based Display (Recommended)
-Use Whitelisted and Non Whitelisted containers on the same page:
+Choose the method that best fits your needs:
+
+<CardGroup cols={3}>
+  <Card
+    title="Container-Based"
+    icon="layout"
+    href="#container-based-display"
+  >
+    **Recommended** - Use both containers on the same page for easy management
+  </Card>
+  <Card
+    title="Page Loading"
+    icon="file"
+    href="#page-loading-method"
+  >
+    Load entirely different pages based on visitor status
+  </Card>
+  <Card
+    title="Redirect Method"
+    icon="arrow-right"
+    href="#redirect-method"
+  >
+    Redirect users to different URLs based on their status
+  </Card>
+</CardGroup>
+
+### Container-Based Display
+
+<Note>
+This is the recommended method for most use cases.
+</Note>
+
+Use Whitelisted and Non-Whitelisted containers on the same page:
 
 **Benefits:**
-- Both versions exist on the same URL
-- Easy to understand and manage
-- Clear separation of compliant vs uncompliant content
-- No confusion about redirect destinations
+- ✅ Both versions exist on the same URL
+- ✅ Easy to understand and manage
+- ✅ Clear separation of standard vs full content
+- ✅ No confusion about redirect destinations
+- ✅ Better SEO and link management
 
-**Setup:**
-1. Add a "Whitelisted Container" to your page
-2. Add your actual content (VSL, sales copy, etc.) inside this container
-3. Add a "Non Whitelisted Container" to your page  
-4. Add compliant content (TSL, basic info) inside this container
-5. Configure whitelisting rules in Page Events (see detailed steps below)
+**Setup Steps:**
 
-### 2. Page Loading Method
+1. **Add Whitelisted Container** to your page
+2. **Add your full content** (VSL, sales copy, etc.) inside this container
+3. **Add Non-Whitelisted Container** to your page  
+4. **Add standard content** (TSL, basic info) inside this container
+5. **Configure whitelisting rules** in Page Events (see Whitelisting section below)
+
+### Page Loading Method
+
 Load entirely different pages based on visitor status:
 
 **When to use:**
 - Completely different page layouts needed
 - Complex content differences
 - Multiple page variants
+- Different design systems per visitor type
 
 **Setup:**
-1. Create separate compliant and uncompliant pages
-2. Use "Load Page" node in Page Events
+
+1. Create separate pages for different visitor segments
+2. Use **"Load Page"** node in Page Events
 3. Connect to query parameter conditions
 
-### 3. Redirect Method
+<Tip>
+This method is useful when you need dramatically different layouts or when managing multiple page variants.
+</Tip>
+
+### Redirect Method
+
 Redirect users to different URLs based on their status:
 
 **When to use:**
 - External landing pages
 - Different domains for different content
 - Integration with existing systems
+- Third-party platform requirements
+
+**Setup:**
+
+1. Configure redirect rules in Page Events
+2. Use **"Redirect to URL"** node
+3. Connect to whitelisting conditions
 
 ## Whitelisting Visitors
 
+Whitelisting determines which visitors see full content. There are three main methods:
+
+<CardGroup cols={3}>
+  <Card
+    title="Domain-Level"
+    icon="globe"
+    href="#domain-level-whitelisting"
+  >
+    Automatically whitelist all visitors to a specific domain
+  </Card>
+  <Card
+    title="Query Parameter"
+    icon="link"
+    href="#query-parameter-whitelisting"
+  >
+    Whitelist visitors based on URL parameters (most common)
+  </Card>
+  <Card
+    title="Session-Based"
+    icon="clock"
+    href="#session-based-whitelisting"
+  >
+    Whitelisting persists across page navigation
+  </Card>
+</CardGroup>
+
 ### Domain-Level Whitelisting
+
 Automatically whitelist all visitors to a specific domain:
+
+**Setup:**
 
 1. Go to **Domains** → **Edit Domain**
 2. Enable **"Whitelist all visitors"**
 3. All visitors to this domain will automatically see full content
 
-**Use case:** When you have a separate domain for real traffic vs compliance review
+**Use case:** When you have a separate domain for different visitor segments or traffic sources
 
-### Query Parameter Whitelisting  
+**Example:**
+- `main-site.com` - Whitelisted (shows full content)
+- `review-site.com` - Non-whitelisted (shows standard content)
+
+### Query Parameter Whitelisting
+
+<Note>
+This is the most common method for whitelisting visitors.
+</Note>
+
 Whitelist visitors based on URL parameters:
+
+**Setup Steps:**
 
 1. Go to **Page Events** for the specific page you want to configure
 2. From the **"On Page Loaded"** node, drag a new **"Query Parameter Condition"** node
 3. Configure the parameter you want to check (e.g., `vtID` equals `k`)
-4. From the **"Query Parameter Condition"** node, drag a **"Whitelist Visitor"** node (or **"Mark Visitor as Not Whitelisted"** if needed)
+4. From the **"Query Parameter Condition"** node, drag a **"Whitelist Visitor"** node
 5. Visitors with the correct parameter will be whitelisted for their entire session
 
-**Example URL:** `https://yoursite.com/page?vtID=k`
+**Example URL:**
+```
+https://yoursite.com/page?vtID=k
+```
+
+**Common Parameters:**
+- `vtID=k` - General whitelisting
+- `access=premium` - Premium content access
+- `preview=true` - Preview mode
+
+<Tip>
+You can also use **"Mark Visitor as Not Whitelisted"** to remove whitelist status under specific conditions.
+</Tip>
 
 ### Session-Based Whitelisting
+
 Once a visitor is whitelisted, they remain whitelisted for their entire session:
 
+**Features:**
 - **Persistent:** Whitelisting survives page navigation
 - **Session-wide:** Applies to all pages in the funnel
 - **Automatic:** No need to re-whitelist on each page
+- **Cookie-based:** Uses session cookies to maintain status
+
+**How it works:**
+1. Visitor arrives with whitelisting parameter
+2. System whitelists visitor for the session
+3. Visitor navigates to other pages
+4. Whitelist status persists automatically
+5. Status expires when session ends
 
 ## Advanced Whitelisting Scenarios
 
 ### Conditional Whitelisting
+
 Use **"Mark visitor as not whitelisted"** if you need to:
+
 - Remove whitelist status under certain conditions
 - Require the parameter on every page visit
 - Reset whitelisting for testing
+- Create time-limited access
+
+**Example Flow:**
+```
+Page Load → Query Parameter (vtID=k) → Whitelist Visitor
+         → Query Parameter (reset=true) → Mark as Not Whitelisted
+```
 
 ### Multiple Whitelisting Methods
-You can combine different whitelisting methods:
+
+You can combine different whitelisting methods for complex scenarios:
+
+**Combinations:**
 - Domain-level + Query parameters
 - Different parameters for different content
 - Conditional logic based on traffic source
+- Geographic-based whitelisting
+
+**Example:**
+```
+Domain: main-site.com (auto-whitelisted)
+  → Query Parameter (source=partner) → Additional premium content
+  → Query Parameter (source=competitor) → Mark as Not Whitelisted
+```
 
 ## Best Practices
 
 ### Content Strategy
-- **Keep compliant content functional** - don't make it obviously fake
-- **Maintain similar layout** between versions when possible
-- **Test both versions** regularly to ensure they work
-- **Consider loading speed** - avoid bloated containers
+
+<CardGroup cols={2}>
+  <Card title="Content Quality">
+    Keep standard content functional and valuable - ensure it provides real value to visitors
+  </Card>
+  <Card title="Layout Consistency">
+    Maintain similar layout between versions when possible for better user experience
+  </Card>
+  <Card title="Testing">
+    Test both versions regularly to ensure they work correctly
+  </Card>
+  <Card title="Performance">
+    Consider loading speed - avoid bloated containers that slow down pages
+  </Card>
+</CardGroup>
 
 ### Implementation Tips
-- **Use descriptive container names** for easy identification
-- **Test whitelisting logic** thoroughly before going live
-- **Monitor both versions** for performance and compliance
-- **Document your whitelisting rules** for team members
 
-### Compliance Considerations
-- **Follow platform policies** - this is for legitimate compliance, not deception
-- **Keep compliant content relevant** to your actual offering
-- **Don't use visitor-based content to hide prohibited content** from platforms
+- **Use descriptive container names** for easy identification in the page builder
+- **Test whitelisting logic** thoroughly before going live
+- **Monitor both versions** for performance and functionality
+- **Document your whitelisting rules** for team members
+- **Use consistent parameter names** across all pages
+
+### Platform Compliance
+
+- **Follow platform policies** - ensure all content meets platform requirements
+- **Keep content relevant** - both versions should accurately represent your offering
+- **Use responsibly** - content visibility control should enhance user experience, not mislead
 - **Review platform terms** regularly as they change
+
+<Warning>
+Content Visibility Control should be used responsibly and in accordance with all platform terms of service. Ensure all content meets platform requirements and accurately represents your offering.
+</Warning>
 
 ## Troubleshooting
 
 ### Common Issues
-- **Whitelisting not working:** Check query parameter spelling and case sensitivity
-- **Content not switching:** Verify container names and page events connections
-- **Session issues:** Clear browser cache and cookies for testing
+
+<CardGroup cols={2}>
+  <Card title="Whitelisting Not Working">
+    **Solution:** Check query parameter spelling and case sensitivity. Parameters are case-sensitive.
+  </Card>
+  <Card title="Content Not Switching">
+    **Solution:** Verify container names and Page Events connections. Check browser console for errors.
+  </Card>
+  <Card title="Session Issues">
+    **Solution:** Clear browser cache and cookies for testing. Test in incognito mode.
+  </Card>
+  <Card title="Parameter Not Recognized">
+    **Solution:** Ensure the parameter is set correctly in Page Events and matches the URL exactly.
+  </Card>
+</CardGroup>
 
 ### Testing Your Setup
-1. Visit your page without whitelisting - should see compliant content
-2. Add the whitelisting parameter - should see full content  
-3. Navigate to other pages - should remain whitelisted
-4. Test in incognito mode to verify session behavior
 
-<Warning>
-Visitor-based content display should only be used for legitimate compliance purposes. Using it to deceive ad platforms or hide prohibited content violates platform terms of service and can result in account suspension.
-</Warning> 
+Follow these steps to verify your Content Visibility Control setup:
+
+1. **Test Standard Content**
+   - Visit your page without whitelisting parameter
+   - Should see standard content (Non-Whitelisted Container)
+
+2. **Test Full Content**
+   - Add the whitelisting parameter to URL (e.g., `?vtID=k`)
+   - Should see full content (Whitelisted Container)
+
+3. **Test Session Persistence**
+   - Navigate to other pages in the funnel
+   - Should remain whitelisted across pages
+
+4. **Test in Incognito Mode**
+   - Verify session behavior without cached data
+   - Test parameter recognition
+
+<Tip>
+Use browser developer tools to inspect cookies and session data when troubleshooting whitelisting issues.
+</Tip>
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card
+    title="Page Events"
+    icon="code"
+    href="/funnels/page-events"
+  >
+    Learn how to set up whitelisting logic with Page Events
+  </Card>
+  <Card
+    title="Query Parameters"
+    icon="link"
+    href="/funnels/query-parameters"
+  >
+    Understand how to use URL parameters for whitelisting
+  </Card>
+  <Card
+    title="Containers"
+    icon="layout"
+    href="/pages/containers"
+  >
+    Learn about all available container types
+  </Card>
+  <Card
+    title="Domain Whitelisting"
+    icon="globe"
+    href="/domains/whitelisting"
+  >
+    Set up domain-level whitelisting
+  </Card>
+</CardGroup>
