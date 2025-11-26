@@ -14,7 +14,7 @@ Buy links let customers purchase products directly from your page.
 
 ### Step 2: Embedding the Buy Link
 1. Create a link tag and insert `[BUY=product_code]` or `[UPSELL=product_code]`
-2. You can pass more data, e.g., `[BUY=product_code cbfid=1234 extra=abcd]`
+2. You can pass more data, e.g., `[BUY=product_code extra=abcd]`
 
 ### Step 3: Merchant Information
 1. If you have a different code on Buygoods, Clickbank, or Digistore24, go to the "Merchant Information" tab
@@ -34,21 +34,26 @@ Buy links let customers purchase products directly from your page.
 
 ### Advanced Parameters
 ```
-[BUY=product_code cbfid=affiliate_id extra=campaign_data]
+[BUY=product_code extra=campaign_data]
 ```
 
 ## Parameter Options
 
 ### Standard Parameters
-- **cbfid**: ClickBank affiliate ID
 - **extra**: Additional tracking data
 - **quantity**: Pre-set purchase quantity
 - **discount**: Apply discount codes
 
-### Platform-Specific
-- **ClickBank**: cbfid, tid (tracking ID)
-- **Buygoods**: bgfid (Buygoods affiliate ID)
-- **Digistore24**: ds24aid (affiliate ID)
+### Platform-Specific Affiliate Parameters
+Affiliate parameters are typically passed via URL query strings to the landing page, not in buy links. The system automatically captures and tracks them:
+
+- **ClickBank**: `hop` or `affiliate` (affiliate ID), `tid` (tracking ID/sub-affiliate)
+- **Buygoods**: `aff_id` (affiliate ID), `subid` (sub-affiliate tracking)
+- **Digistore24**: `aff` (affiliate ID)
+
+<Note>
+**CBFID** (ClickBank Pitch Flow ID) is configured at the funnel level and automatically included in purchase links. You don't need to add it manually to buy links.
+</Note>
 
 ## Product Setup Best Practices
 
