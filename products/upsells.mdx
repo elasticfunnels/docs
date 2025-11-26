@@ -1,39 +1,180 @@
 ---
 title: 'Upsells'
-description: 'Set up upsell pages and redirects to maximize revenue per customer'
+description: 'Set up upsell and downsell pages with one-click purchasing to maximize revenue per customer'
 ---
 
-Redirecting users to an upsell page after purchase allows you to present additional offers or upgrades.
+Upsells allow you to present additional offers after a customer makes their initial purchase. ElasticFunnels supports one-click upsells that process payments instantly without redirecting customers to a checkout page.
 
-## Set Up Upsell Redirect
+## How Upsells Work
 
-### Step 1: Locate Purchase Node
-1. In your funnel builder, locate the page node where the purchase will occur
-2. Add a "Purchase" node to the page node
+After a customer completes their initial purchase, they're redirected through your funnel flow. Upsell pages present additional offers that customers can accept or decline:
 
-### Step 2: Configure Redirect
-1. After adding it, use a "Page" node to select an upsell page or a "Redirect to URL" node to enter the upsell URL
-2. Connect the "Purchase" node to the next step
+1. **Customer purchases main product** → Redirected to upsell page
+2. **Upsell page displays** → Customer sees additional offer
+3. **Customer accepts or declines** → Flow continues to next step or thank you page
 
-### Step 3: Test the Flow
-1. Save your funnel and perform a test purchase to ensure redirection works as expected
+### One-Click Upsells vs Checkout Redirect
+
+The tag you use determines the customer experience:
+
+| Tag | Behavior | When to Use |
+|-----|----------|-------------|
+| `[UPSELL=]` or `[DOWNSELL=]` | **One-click purchase** - No checkout page, payment processed instantly | Post-purchase upsell pages (customer already has an active purchase session) |
+| `[BUY=]` | **Redirect to checkout** - Customer goes to merchant checkout page | Main sales pages, or when there's no active purchase session |
+
+<Note>
+**Important:** One-click upsells require an active purchase session. If the customer doesn't have an active session (e.g., they navigated directly to an upsell page), clicking an `[UPSELL=]` link will redirect them to the checkout page instead.
+</Note>
+
+## Setting Up Upsell Pages
+
+### Step 1: Create Your Upsell Page
+
+1. Go to **Pages** → **Create New Page**
+2. Design your upsell offer page with:
+   - Clear value proposition
+   - Product benefits
+   - Accept button (upsell link)
+   - Decline button (decline link)
+
+### Step 2: Add Upsell Links
+
+Use these tags in your page links:
+
+#### Accept Upsell Button
+```
+[UPSELL=your_product_code]
+```
+
+#### Decline Button
+```
+[UPSELL_DECLINE]
+```
+
+You can also specify a product for the decline (useful for downsells):
+```
+[UPSELL_DECLINE=downsell_product_code]
+```
+
+### Step 3: Configure Funnel Flow
+
+Each page node in the funnel builder has built-in **On Purchase** and **On Decline** connection points.
+
+1. Open your funnel in the builder
+2. Add a **Page node** for your upsell page
+3. The page node automatically shows **On Purchase** and **On Decline** connections
+4. Connect **On Purchase** to the next step (another page, redirect, split test, etc.)
+5. Connect **On Decline** to a downsell page or thank you page
+
+**Example Flow:**
+```
+Upsell Page (6 Bottles)
+    ├── On Purchase → Thank You Page
+    └── On Decline → Downsell Page (3 Bottles)
+                         ├── On Purchase → Thank You Page
+                         └── On Decline → Thank You Page
+```
+
+### Available Nodes After Purchase/Decline
+
+After the On Purchase or On Decline connection, you can add:
+
+- **Go to Page** - Navigate to another page in your funnel
+- **Redirect to URL** - Redirect to an external URL
+- **Split Test** - A/B test different paths
+- **Product Check** - Check which product was purchased
+- **Script Rule** - Apply conditional logic
+- **Tag User** - Add tags to the customer
+- **Whitelist visitor** - Mark visitor as whitelisted
+- **Is Whitelisted?** - Check if visitor is whitelisted
+- **Has Tag** - Check if user has a specific tag
+- **Is Test Order?** - Check if this is a test transaction
+
+## Upsell Link Tags
+
+### Basic Upsell
+```
+[UPSELL=product_code]
+```
+Processes the upsell purchase and continues the funnel flow.
+
+### Downsell
+```
+[DOWNSELL=product_code]
+```
+Works the same as `[UPSELL]` but allows you to semantically differentiate downsell offers in your tracking and analytics.
+
+### Decline Link
+```
+[UPSELL_DECLINE]
+```
+Skips the current upsell and proceeds to the next funnel step (either another upsell or the thank you page).
+
+### Decline with Downsell Tracking
+```
+[UPSELL_DECLINE=product_code]
+```
+Declines the current offer but tracks which product was declined for analytics.
+
+### With Extra Parameters
+```
+[UPSELL=product_code extra=campaign_data]
+```
+
+## Funnel Node Configuration
+
+### Using Copy Node URL
+
+For ClickBank, Buygoods, and Digistore24, you need to configure redirect URLs in the merchant's platform (pitch flow settings).
+
+Each **On Purchase** and **On Decline** node has a **Copy Node URL** button:
+
+1. In your funnel builder, locate the **On Purchase** or **On Decline** node
+2. Click the **Copy Node URL** button
+3. Paste this URL into your merchant's pitch flow or redirect settings
+
+This decouples your funnel from specific page URLs, allowing you to:
+- Split test different upsell pages without changing merchant settings
+- Swap pages without re-approval from the merchant
+- Maintain consistent tracking across page changes
+
+<Warning>
+Always use Copy Node URL when configuring your merchant's pitch flow. Direct page URLs will break if you rename or replace pages.
+</Warning>
+
+## How One-Click Upsells Work
+
+When a customer has an active purchase session:
+
+1. **Customer clicks `[UPSELL=]` button** → Payment processed by the merchant (ClickBank, Buygoods, or Digistore24)
+2. **No checkout page shown** → Customer stays in the funnel flow
+3. **Automatic redirect** → Customer proceeds to the next funnel step
+
+### Session Requirements
+
+For one-click upsells to work:
+- Customer must have completed a purchase in the current session
+- The purchase session must still be active
+- The upsell must be part of the same funnel flow
+
+<Note>
+Use **Copy Node URL** in your funnel builder to get the correct redirect URLs for configuring your merchant's pitch flow settings.
+</Note>
 
 ## Types of Upsells
 
-### Order Bump
-- Additional item added to the same purchase
-- Shown on the checkout page
-- Usually complementary to main product
-
 ### One-Click Upsell
-- Post-purchase offer with simplified checkout
+- Post-purchase offer using `[UPSELL=product_code]` tag
 - Customer can purchase with one click
-- No need to re-enter payment information
+- No checkout page - payment processed instantly
+- Requires active purchase session
 
 ### Downsell
-- Lower-priced alternative if upsell is declined
+- Lower-priced alternative shown when upsell is declined
+- Uses `[DOWNSELL=product_code]` tag
 - Helps recover potential lost sales
 - Often a scaled-down version of the upsell
+- Can be chained: Upsell → Decline → Downsell → Decline → Thank You
 
 ## Upsell Page Best Practices
 
@@ -41,7 +182,7 @@ Redirecting users to an upsell page after purchase allows you to present additio
 - **Clear value proposition**: Why they need this additional product
 - **Urgency**: Limited time or quantity offers
 - **Social proof**: Testimonials specific to the upsell
-- **Simple checkout**: Minimize friction in purchase process
+- **Simple checkout**: One clear "Yes" button, one clear "No Thanks" button
 
 ### Content Strategy
 - **Complement the main purchase**: Related but distinct value
@@ -49,33 +190,97 @@ Redirecting users to an upsell page after purchase allows you to present additio
 - **Show before/after scenarios**: Demonstrate the enhanced outcome
 - **Use purchase confirmation**: "Since you just purchased X, you qualify for Y"
 
+### Button Placement
+```html
+<!-- Accept button - make it prominent -->
+<a href="[UPSELL=premium_package]" class="btn-accept">
+  Yes! Add This To My Order
+</a>
+
+<!-- Decline button - clear but less prominent -->
+<a href="[UPSELL_DECLINE]" class="btn-decline">
+  No thanks, I'll pass on this offer
+</a>
+```
+
 ## Advanced Upsell Strategies
 
 ### Sequential Upsells
-- Chain multiple upsell offers together
-- Each subsequent offer builds on the previous
-- Track performance at each stage
+Chain multiple upsell offers:
+```
+Main Sale → Upsell 1 ($97) → Upsell 2 ($47) → Downsell ($27) → Thank You
+```
 
 ### Conditional Upsells
-- Show different upsells based on original purchase
-- Personalize offers based on customer data
-- Use dynamic content for relevance
+Use Page Events to show different upsells based on:
+- Original purchase amount
+- Customer location
+- Traffic source
+- Previous purchase history
 
-### Time-Delayed Upsells
-- Email sequence with additional offers
-- Retargeting ads for complementary products
-- Follow-up phone calls for high-value items
+### Tracking Accepted Upsells
+Use the `accepted_upsells` variable in Script Rules to customize content based on whether the customer has accepted any upsells:
+
+```javascript
+// In a Script Rule condition
+customer.accepted_upsells === true
+```
 
 ## Measuring Upsell Performance
 
 ### Key Metrics
-- **Upsell conversion rate**: Percentage who purchase the upsell
-- **Average order value increase**: How much upsells boost AOV
-- **Revenue per visitor**: Total revenue including upsells
-- **Customer lifetime value**: Long-term impact of upselling
+- **Upsell take rate**: Percentage who accept each upsell
+- **Average order value (AOV)**: Total revenue including upsells
+- **Revenue per visitor (RPV)**: Lifetime value impact
+- **Decline rate**: How many skip each offer
 
 ### Optimization Tips
-- A/B test different upsell offers
-- Test timing of upsell presentation
-- Experiment with pricing and discount levels
-- Monitor customer feedback and satisfaction 
+- A/B test different upsell offers and pricing
+- Test upsell page designs and copy
+- Experiment with the number of upsells in a sequence
+- Monitor customer satisfaction (too many upsells can harm brand)
+
+## Troubleshooting
+
+### Common Issues
+
+**Upsell link not working:**
+- Verify the product code matches exactly
+- Check that the product exists in your Products list
+- Ensure the product has the correct merchant mapping
+
+**One-click not processing:**
+- Verify you're using `[UPSELL=]` or `[DOWNSELL=]` tags (not `[BUY=]`)
+- Check that session data is preserved (cookies enabled)
+- Ensure the main sale completed successfully
+- Customer must have an active purchase session
+
+**Redirect failing after purchase/decline:**
+- Verify Copy Node URL was used correctly in merchant pitch flow
+- Check merchant pitch flow configuration
+- Ensure redirect URLs are properly URL-encoded
+
+**Wrong page showing after purchase/decline:**
+- Check funnel node connections
+- Verify Purchase and Decline nodes point to correct pages
+- Test the full flow from main sale to thank you page
+
+### Testing Your Upsells
+1. Complete a test purchase through the main sale
+2. Verify upsell page loads correctly
+3. Test both accept and decline paths
+4. Confirm correct pages display at each step
+5. Verify payments process correctly (use test mode)
+
+<Note>
+For ClickBank, Buygoods, and Digistore24, use the platform's test mode or sandbox environment to verify the complete flow without processing real payments.
+</Note>
+
+## Related Documentation
+
+- [Buy Links](/products/buy-links) - Setting up purchase buttons
+- [Checkout Redirect Behavior](/funnels/checkout-redirect-behavior) - Understanding redirect flows
+- [Create Funnel](/funnels/create-funnel) - Building your funnel structure
+- [ClickBank Merchant](/merchants/clickbank) - ClickBank pitch flow setup
+- [Buygoods Merchant](/merchants/buygoods) - Buygoods configuration
+- [Digistore24 Merchant](/merchants/digistore24) - Digistore24 setup
