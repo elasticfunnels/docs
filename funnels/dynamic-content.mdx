@@ -5,16 +5,47 @@ description: 'Create content that changes based on user behavior, location, or o
 
 Dynamic content automatically updates elements for scenarios like showing special pricing to certain affiliates or location-based offers.
 
+## Core Concepts
+
+Before setting up, it helps to understand the relationship between containers and components:
+
+- **1 Container = 1 Page Location**: Think of a Dynamic Container as a specific "slot" on your page (e.g., the Header slot, the Video slot, or a Banner slot).
+- **Multiple Containers**: If you want to change both the Header AND the Footer, you need **two separate** Dynamic Containers.
+- **Variations**: If you want 4 different versions of a specific section (e.g., 4 different banners), the setup is:
+  - **1 Dynamic Container** placed on the page where the banner goes.
+  - **1 Default Version** built directly inside that container (shown if no conditions are met).
+  - **3 Alternative Versions** built and saved as **Custom Components** (swapped in when conditions are met).
+
 ## Setup
 
-### Step 1: Wrap Components
-In the page builder, wrap the desired element (e.g., packages) in a "Dynamic Container" block. Name the block for easy reference.
+### Step 1: Create Custom Components
+Dynamic content works by swapping **Custom Components**. You cannot dynamically swap raw elements (like Divs or Sections) unless they are converted first.
 
-### Step 2: Define Conditions
-In the page events builder, click "Add Node" and select "Script Rule." Specify conditions (e.g., affiliate ID, location).
+1. Build the section or element you want to display (e.g., a specific pricing table).
+2. Right-click the element and select **Transform to Component**.
+3. Once saved, you can remove it from the page (unless it serves as your default content).
+4. Repeat this for every variation you need.
 
-### Step 3: Set Up the Dynamic Container
-Add a "Dynamic Container" node and specify the content to replace when conditions are met.
+### Step 2: Add Dynamic Container
+To add a container to your page:
+1. Right-click the element you want to make dynamic (or the area where you want the container).
+2. Select **Wrap in** > **Dynamic Container**.
+3. **Default Content**: Any content directly inside this container acts as the default view.
+4. **Dynamic Swapping**: The container will swap this default content with the **Custom Components** you created in Step 1 based on your rules.
+
+### Step 3: Define Logic
+You can use any logic within the **Page Events** system to trigger content swaps. This gives you flexibility to use URL parameters, Split Tests, or user behavior as triggers.
+
+**Example Workflow:**
+1. Open the **Manage Page Events** screen.
+2. Start with a trigger like **On Page Loaded**.
+3. Add a "Condition" node (e.g., "Product Check" or "Script Rule").
+4. Connect the condition to a **Dynamic Content** action.
+5. Select your target **Container** and the **Component** to show for that condition.
+
+> **Troubleshooting:**
+> - **"No dynamic components found"**: Verify that you have successfully transformed your content variations into Custom Components as described in Step 1.
+> - **Components not appearing in list**: Ensure you have **saved the page** after creating your components. Click the **reload icon** next to the component dropdown to refresh the list.
 
 ## Use Cases
 
@@ -29,4 +60,4 @@ Add a "Dynamic Container" node and specify the content to replace when condition
 - Use multiple conditions for more precise targeting
 - Test your dynamic content thoroughly across different scenarios
 - Keep fallback content for when conditions aren't met
-- Monitor performance of different content variations 
+- Monitor performance of different content variations
