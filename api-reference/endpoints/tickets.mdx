@@ -1,0 +1,346 @@
+---
+title: 'Tickets'
+description: 'Manage support tickets and customer inquiries'
+---
+
+## List Tickets
+
+Retrieve all support tickets for a project.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number for pagination (default: 1)
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Number of results per page (default: 30)
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by status: `open`, `closed`, `waiting`, `resolved`, `spam`
+</ParamField>
+
+<ParamField query="searchQuery" type="string">
+  Search tickets by subject, email, or content
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Sort order: `date_asc` or `date_desc`
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/tickets
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/tickets?status=open&page=1" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "brand_id": 123,
+      "ticket_code": "TKT-12345",
+      "type": "support",
+      "status": "open",
+      "subject": "Question about my order",
+      "from_name": "John Doe",
+      "from_email": "john@example.com",
+      "customer_email": "john@example.com",
+      "preview_message": "I have a question about...",
+      "read": false,
+      "created_at": "2024-12-10T10:30:00.000000Z",
+      "updated_at": "2024-12-10T10:30:00.000000Z",
+      "created_at_label": "2 hours ago",
+      "status_label": "Open"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 30,
+    "total": 45
+  },
+  "statuses": {
+    "open": 15,
+    "waiting": 10,
+    "closed": 18,
+    "resolved": 2,
+    "spam": 0
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Ticket Statuses
+
+Get count of tickets by status.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/tickets/statuses
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/tickets/statuses \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "open": 15,
+  "waiting": 10,
+  "closed": 18,
+  "resolved": 2,
+  "spam": 0
+}
+```
+</ResponseExample>
+
+---
+
+## Mark Ticket as Read
+
+Mark a ticket as read.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="ticket_code" type="string" required>
+  The ticket code (e.g., "TKT-12345")
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/tickets/{ticket_code}/mark-as-read
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/tickets/TKT-12345/mark-as-read \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Ticket marked as read"
+}
+```
+</ResponseExample>
+
+---
+
+## Mark Ticket as Unread
+
+Mark a ticket as unread.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="ticket_code" type="string" required>
+  The ticket code (e.g., "TKT-12345")
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/tickets/{ticket_code}/mark-as-unread
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/tickets/TKT-12345/mark-as-unread \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Ticket marked as unread"
+}
+```
+</ResponseExample>
+
+---
+
+## List Ticket Messages
+
+Get all messages in a ticket conversation.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="ticket_code" type="string" required>
+  The ticket code (e.g., "TKT-12345")
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/tickets/{ticket_code}/messages
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/tickets/TKT-12345/messages \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "brand_id": 123,
+      "ticket_code": "TKT-12345",
+      "status": "open",
+      "type": "customer_message",
+      "message": "<p>I have a question about my order...</p>",
+      "message_type": "text",
+      "from_name": "John Doe",
+      "created_at": "2024-12-10T10:30:00.000000Z",
+      "created_at_label": "2 hours ago",
+      "status_label": "Open"
+    },
+    {
+      "brand_id": 123,
+      "ticket_code": "TKT-12345",
+      "status": "waiting",
+      "type": "agent_message",
+      "message": "<p>Hi John, I'd be happy to help...</p>",
+      "message_type": "text",
+      "from_name": "Support Agent",
+      "created_at": "2024-12-10T10:45:00.000000Z",
+      "created_at_label": "1 hour ago",
+      "status_label": "Waiting"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Send Ticket Reply
+
+Send a reply message to a ticket.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="ticket_code" type="string" required>
+  The ticket code (e.g., "TKT-12345")
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  The reply message (HTML supported)
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  Message type: `agent_message` or `system_message`
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/tickets/{ticket_code}/messages
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/tickets/TKT-12345/messages \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "<p>Thank you for contacting us. Your order is being processed...</p>",
+    "type": "agent_message"
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "brand_id": 123,
+  "ticket_code": "TKT-12345",
+  "status": "waiting",
+  "type": "agent_message",
+  "message": "<p>Thank you for contacting us. Your order is being processed...</p>",
+  "from_name": "Support Agent",
+  "created_at": "2024-12-10T12:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Set Ticket Status
+
+Update the status of a ticket.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="ticket_code" type="string" required>
+  The ticket code (e.g., "TKT-12345")
+</ParamField>
+
+<ParamField path="status" type="string" required>
+  New status: `open`, `waiting`, `closed`, `resolved`, `spam`
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/tickets/{ticket_code}/set-status/{status}
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/tickets/TKT-12345/set-status/resolved \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Email sent"
+}
+```
+</ResponseExample>
+
+---
+
+## Ticket Status Values
+
+| Status | Description |
+|--------|-------------|
+| `open` | New ticket or reopened ticket |
+| `waiting` | Waiting for customer response |
+| `closed` | Ticket has been closed |
+| `resolved` | Issue has been resolved |
+| `spam` | Marked as spam |
+
+---
+
+## Message Types
+
+| Type | Description |
+|------|-------------|
+| `customer_message` | Message from customer |
+| `agent_message` | Message from support agent |
+| `system_message` | Automated system message |
+
+---
+
+## Notes
+
+<Info>
+  - Tickets are automatically sorted by `created_at` for open tickets and `updated_at` for closed/resolved/spam tickets
+  - Sending a reply automatically changes ticket status to "waiting"
+  - The AI reply generation uses customer order history and purchase data when available
+  - All ticket messages support HTML formatting
+</Info>
+

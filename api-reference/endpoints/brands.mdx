@@ -1,0 +1,156 @@
+---
+title: 'Brands (Projects)'
+description: 'Manage your projects and retrieve project information'
+---
+
+## Get Brand Details
+
+Retrieve details about a specific project (brand).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 123,
+  "name": "My Awesome Funnel",
+  "subdomain": "myawesomefunnel",
+  "timezone": "America/New_York",
+  "currency": "USD",
+  "subscription_status": "active",
+  "created_at": "2024-01-15T10:30:00.000000Z",
+  "updated_at": "2024-12-10T08:20:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## List All Brands
+
+Get a list of all projects you have access to.
+
+```bash Request
+GET /api/brands/all
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/all \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": 123,
+      "name": "My Awesome Funnel",
+      "subdomain": "myawesomefunnel",
+      "subscription_status": "active"
+    },
+    {
+      "id": 456,
+      "name": "Another Project",
+      "subdomain": "anotherproject",
+      "subscription_status": "active"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Update Brand
+
+Update project settings (requires admin/owner permissions).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="name" type="string">
+  Project name
+</ParamField>
+
+<ParamField body="timezone" type="string">
+  Project timezone (e.g., "America/New_York")
+</ParamField>
+
+<ParamField body="currency" type="string">
+  Currency code (e.g., "USD", "EUR")
+</ParamField>
+
+```bash Request
+PUT /api/brands/{brand}
+```
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Project Name",
+    "timezone": "America/Los_Angeles"
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 123,
+  "name": "Updated Project Name",
+  "subdomain": "myawesomefunnel",
+  "timezone": "America/Los_Angeles",
+  "currency": "USD",
+  "subscription_status": "active",
+  "updated_at": "2024-12-10T15:45:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Get Brand Metrics
+
+Retrieve configured metrics for the project.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/metrics
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/metrics \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "metrics": [
+    "orders",
+    "revenue",
+    "aov",
+    "conversion_rate",
+    "roas"
+  ]
+}
+```
+</ResponseExample>
+

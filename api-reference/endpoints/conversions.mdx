@@ -1,0 +1,208 @@
+---
+title: 'Conversions'
+description: 'Retrieve and manage order conversions'
+---
+
+## List Conversions
+
+Retrieve all conversions (orders) for a project.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number for pagination (default: 1)
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Number of results per page (default: 15)
+</ParamField>
+
+<ParamField query="search" type="string">
+  Search by order code, customer email, or name
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/conversions
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/conversions?page=1&per_page=15" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "code": "ORD-12345",
+      "customer_email": "customer@example.com",
+      "customer_name": "John Doe",
+      "total": 149.97,
+      "currency": "USD",
+      "status": "completed",
+      "created_at": "2024-12-10T10:30:00.000000Z"
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 15,
+    "total": 150
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Conversion Details
+
+Retrieve details about a specific conversion.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="code" type="string" required>
+  The order code
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/conversions/{code}
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/conversions/ORD-12345 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "code": "ORD-12345",
+  "customer_email": "customer@example.com",
+  "customer_name": "John Doe",
+  "customer_phone": "+1234567890",
+  "total": 149.97,
+  "currency": "USD",
+  "status": "completed",
+  "items": [
+    {
+      "product_name": "Main Product",
+      "price": 49.99,
+      "quantity": 1,
+      "type": "main"
+    },
+    {
+      "product_name": "Upsell Product",
+      "price": 99.98,
+      "quantity": 2,
+      "type": "upsell"
+    }
+  ],
+  "shipping_address": {
+    "address_1": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zip": "10001",
+    "country": "US"
+  },
+  "created_at": "2024-12-10T10:30:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Export Conversions
+
+Export conversions to CSV.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="start_date" type="string">
+  Start date (YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="end_date" type="string">
+  End date (YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="status" type="string">
+  Filter by status: `completed`, `refunded`, `chargeback`
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/conversions/export
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/conversions/export \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "start_date": "2024-12-01",
+    "end_date": "2024-12-10"
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Export is being processed",
+  "export_id": "exp_abc123",
+  "download_url": "https://app.elasticfunnels.io/api/brands/{brand_id}/exports/exp_abc123/download/{token}"
+}
+```
+</ResponseExample>
+
+---
+
+## Refund Conversion
+
+Process a refund for a conversion (requires admin/owner permissions).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="code" type="string" required>
+  The order code
+</ParamField>
+
+<ParamField body="amount" type="number">
+  Refund amount (optional, defaults to full refund)
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Refund reason
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/conversions/{code}/refund
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/conversions/ORD-12345/refund \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reason": "Customer request"
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Refund processed successfully",
+  "code": "ORD-12345",
+  "refund_amount": 149.97,
+  "status": "refunded"
+}
+```
+</ResponseExample>
+

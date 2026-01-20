@@ -1,0 +1,324 @@
+---
+title: 'Errors & Status Codes'
+description: 'Understanding API error responses'
+---
+
+## Error Response Format
+
+When an API request fails, ElasticFunnels returns an error response with a standard format:
+
+```json
+{
+  "message": "Error message describing what went wrong",
+  "errors": {
+    "field_name": [
+      "Specific validation error for this field"
+    ]
+  }
+}
+```
+
+## HTTP Status Codes
+
+ElasticFunnels uses conventional HTTP response codes to indicate the success or failure of an API request.
+
+### Success Codes
+
+<ResponseField name="200" type="OK">
+  The request was successful.
+</ResponseField>
+
+<ResponseField name="201" type="Created">
+  The resource was successfully created.
+</ResponseField>
+
+<ResponseField name="204" type="No Content">
+  The request was successful but there's no content to return (typically for DELETE requests).
+</ResponseField>
+
+### Client Error Codes
+
+<ResponseField name="400" type="Bad Request">
+  The request was malformed or contains invalid parameters.
+</ResponseField>
+
+<ResponseField name="401" type="Unauthorized">
+  Authentication failed. Check your API key.
+</ResponseField>
+
+<ResponseField name="403" type="Forbidden">
+  You don't have permission to access this resource.
+</ResponseField>
+
+<ResponseField name="404" type="Not Found">
+  The requested resource doesn't exist.
+</ResponseField>
+
+<ResponseField name="422" type="Unprocessable Entity">
+  Validation failed. Check the `errors` field in the response.
+</ResponseField>
+
+<ResponseField name="429" type="Too Many Requests">
+  Rate limit exceeded. Slow down your requests.
+</ResponseField>
+
+### Server Error Codes
+
+<ResponseField name="500" type="Internal Server Error">
+  Something went wrong on our end. Please contact support if this persists.
+</ResponseField>
+
+<ResponseField name="503" type="Service Unavailable">
+  The service is temporarily unavailable. Please try again later.
+</ResponseField>
+
+## Common Error Scenarios
+
+### Authentication Errors
+
+#### Invalid API Key
+
+```json
+{
+  "message": "Invalid API key"
+}
+```
+
+**Status Code:** `401`
+
+**Solution:** Check that your API key is correct and hasn't been regenerated.
+
+#### No Brand Access
+
+```json
+{
+  "message": "Invalid API key or brand access denied"
+}
+```
+
+**Status Code:** `401`
+
+**Solution:** Ensure your API key has access to the specified brand/project.
+
+### Validation Errors
+
+#### Missing Required Fields
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "name": [
+      "The name field is required."
+    ],
+    "price": [
+      "The price field is required."
+    ]
+  }
+}
+```
+
+**Status Code:** `422`
+
+**Solution:** Include all required fields in your request.
+
+#### Invalid Field Values
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "price": [
+      "The price must be a number.",
+      "The price must be at least 0."
+    ],
+    "status": [
+      "The selected status is invalid."
+    ]
+  }
+}
+```
+
+**Status Code:** `422`
+
+**Solution:** Ensure field values meet the requirements (correct type, valid options, etc.).
+
+### Permission Errors
+
+#### Insufficient Permissions
+
+```json
+{
+  "message": "You don't have permission to perform this action."
+}
+```
+
+**Status Code:** `403`
+
+**Solution:** This action requires higher permissions (e.g., Admin or Owner role).
+
+### Resource Errors
+
+#### Resource Not Found
+
+```json
+{
+  "message": "Resource not found"
+}
+```
+
+**Status Code:** `404`
+
+**Solution:** Check that the resource ID is correct and the resource exists.
+
+### Rate Limiting
+
+#### Too Many Requests
+
+```json
+{
+  "message": "Too many requests. Please slow down."
+}
+```
+
+**Status Code:** `429`
+
+**Solution:** Implement exponential backoff or reduce request frequency.
+
+## Best Practices for Error Handling
+
+<CardGroup cols={2}>
+  <Card title="Check Status Codes" icon="check">
+    Always check the HTTP status code before parsing the response
+  </Card>
+  <Card title="Handle Validation Errors" icon="triangle-exclamation">
+    Display validation errors to users in a friendly format
+  </Card>
+  <Card title="Implement Retry Logic" icon="rotate">
+    Retry failed requests with exponential backoff for 5xx errors
+  </Card>
+  <Card title="Log Errors" icon="file-lines">
+    Log error responses for debugging and monitoring
+  </Card>
+</CardGroup>
+
+## Example Error Handling
+
+Here are examples of proper error handling in different languages:
+
+### JavaScript
+
+```javascript
+try {
+  const response = await fetch(
+    'https://app.elasticfunnels.io/api/brands/123/pages',
+    {
+      method: 'POST',
+      headers: {
+        'EF-Access-Key': 'your_api_key_here',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: 'New Page' })
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    
+    if (response.status === 401) {
+      console.error('Authentication failed:', error.message);
+    } else if (response.status === 422) {
+      console.error('Validation errors:', error.errors);
+    } else {
+      console.error('API error:', error.message);
+    }
+    
+    throw new Error(error.message);
+  }
+
+  const data = await response.json();
+  console.log('Success:', data);
+} catch (error) {
+  console.error('Request failed:', error);
+}
+```
+
+### Python
+
+```python
+import requests
+
+try:
+    response = requests.post(
+        'https://app.elasticfunnels.io/api/brands/123/pages',
+        headers={
+            'EF-Access-Key': 'your_api_key_here',
+            'Content-Type': 'application/json'
+        },
+        json={'name': 'New Page'}
+    )
+    
+    response.raise_for_status()
+    data = response.json()
+    print('Success:', data)
+    
+except requests.exceptions.HTTPError as e:
+    error_data = e.response.json()
+    
+    if e.response.status_code == 401:
+        print('Authentication failed:', error_data['message'])
+    elif e.response.status_code == 422:
+        print('Validation errors:', error_data['errors'])
+    else:
+        print('API error:', error_data['message'])
+        
+except requests.exceptions.RequestException as e:
+    print('Request failed:', str(e))
+```
+
+### PHP
+
+```php
+<?php
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, 'https://app.elasticfunnels.io/api/brands/123/pages');
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'EF-Access-Key: your_api_key_here',
+    'Content-Type: application/json'
+]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['name' => 'New Page']));
+
+$response = curl_exec($ch);
+$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+$data = json_decode($response, true);
+
+if ($statusCode >= 200 && $statusCode < 300) {
+    echo 'Success: ' . print_r($data, true);
+} else {
+    if ($statusCode === 401) {
+        echo 'Authentication failed: ' . $data['message'];
+    } elseif ($statusCode === 422) {
+        echo 'Validation errors: ' . print_r($data['errors'], true);
+    } else {
+        echo 'API error: ' . $data['message'];
+    }
+}
+```
+
+## Need Help?
+
+If you encounter persistent errors or need assistance:
+
+<Card
+  title="Contact Support"
+  icon="life-ring"
+  href="mailto:support@elasticfunnels.io"
+>
+  support@elasticfunnels.io
+</Card>
+

@@ -1,0 +1,592 @@
+---
+title: 'Pages'
+description: 'Manage landing pages and retrieve page information'
+---
+
+## List All Pages
+
+Retrieve all pages for a project.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/pages/all
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/pages/all \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Landing Page",
+      "slug": "landing-page",
+      "status": "active",
+      "type": "landing",
+      "created_at": "2024-01-15T10:30:00.000000Z"
+    },
+    {
+      "id": 2,
+      "name": "Thank You Page",
+      "slug": "thank-you",
+      "status": "active",
+      "type": "thankyou",
+      "created_at": "2024-01-16T11:20:00.000000Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Get Page Details
+
+Retrieve details about a specific page.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="page" type="string" required>
+  The page ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/pages/{page}
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 1,
+  "name": "Landing Page",
+  "slug": "landing-page",
+  "status": "active",
+  "type": "landing",
+  "meta_title": "Amazing Product",
+  "meta_description": "Get your product now",
+  "url": "https://yourdomain.com/landing-page",
+  "created_at": "2024-01-15T10:30:00.000000Z",
+  "updated_at": "2024-12-10T08:20:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Create Page
+
+Create a new page.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Page title
+</ParamField>
+
+<ParamField body="page_type" type="string">
+  Page builder type: must be `editor` (optional if `html` is provided, required otherwise)
+</ParamField>
+
+<ParamField body="slug" type="string">
+  URL-friendly slug (optional, auto-generated if not provided)
+</ParamField>
+
+<ParamField body="status" type="string">
+  Page status: `published`, `draft`, `offline`, `imported` (default: `draft`)
+</ParamField>
+
+<ParamField body="html" type="string">
+  Raw HTML content (automatically sets page_type to `editor`)
+</ParamField>
+
+<ParamField body="domain_id" type="number">
+  Custom domain ID (optional)
+</ParamField>
+
+<ParamField body="funnel_id" type="number">
+  Funnel ID to associate with (optional)
+</ParamField>
+
+<ParamField body="folder_id" type="number">
+  Folder ID to organize page (optional)
+</ParamField>
+
+<ParamField body="is_index" type="boolean">
+  Set as index page (default: false)
+</ParamField>
+
+<ParamField body="css" type="string">
+  Custom CSS styles
+</ParamField>
+
+<ParamField body="type" type="string">
+  Template type: `nutra-prelander`, `nutra-advertorial`, `leadgen`, `webinar-registration`
+</ParamField>
+
+<ParamField body="template_id" type="string">
+  Template ID to use (optional)
+</ParamField>
+
+<ParamField body="seo_title" type="string">
+  SEO meta title
+</ParamField>
+
+<ParamField body="seo_blur_title" type="string">
+  Alternative title when tab is not focused
+</ParamField>
+
+<ParamField body="seo_description" type="string">
+  SEO meta description
+</ParamField>
+
+<ParamField body="requires_login" type="boolean">
+  Require user login to access
+</ParamField>
+
+<ParamField body="requires_password" type="boolean">
+  Require password to access
+</ParamField>
+
+<ParamField body="password" type="string">
+  Page password (required if requires_password is true)
+</ParamField>
+
+<ParamField body="redirect_url" type="string">
+  URL to redirect to
+</ParamField>
+
+<ParamField body="ga_measurement_id" type="string">
+  Google Analytics measurement ID
+</ParamField>
+
+<ParamField body="meta_pixel_id" type="string">
+  Meta (Facebook) Pixel ID
+</ParamField>
+
+<ParamField body="custom_javascript" type="string">
+  Custom JavaScript code
+</ParamField>
+
+<ParamField body="is_upsell_page" type="boolean">
+  Mark as upsell page
+</ParamField>
+
+<ParamField body="show_affiliate_pixels" type="boolean">
+  Show affiliate tracking pixels
+</ParamField>
+
+<ParamField body="disable_default_scripts" type="boolean">
+  Disable default tracking scripts
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/pages
+```
+
+### Create Basic Page
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/pages \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Landing Page",
+    "slug": "new-landing",
+    "page_type": "editor",
+    "status": "published"
+  }'
+```
+
+### Create Page with HTML
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/pages \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Custom HTML Page",
+    "slug": "custom-page",
+    "status": "published",
+    "html": "<!DOCTYPE html><html><head><title>My Page</title></head><body><h1>Hello World</h1></body></html>",
+    "css": "body { background: #f5f5f5; font-family: Arial, sans-serif; }"
+  }'
+```
+
+<Note>
+  - When you provide `html` in the request, `page_type` is automatically set to `editor`, so you don't need to specify it
+  - The API only supports **editor** type pages. The visual drag-and-drop builder is available only through the web dashboard
+  - On update, providing `html` will automatically convert the page to `editor` type if it isn't already
+</Note>
+
+<ResponseExample>
+```json Response
+{
+  "id": 3,
+  "title": "New Landing Page",
+  "slug": "new-landing",
+  "status": "published",
+  "page_type": "editor",
+  "url": "https://yourdomain.com/new-landing",
+  "created_at": "2024-12-10T15:45:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Update Page
+
+Update an existing page. Only include fields you want to update.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="page" type="string" required>
+  The page ID
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Page title
+</ParamField>
+
+<ParamField body="slug" type="string">
+  URL-friendly slug
+</ParamField>
+
+<ParamField body="status" type="string">
+  Page status: `published`, `draft`, `offline`, `imported`
+</ParamField>
+
+<ParamField body="domain_id" type="number">
+  Custom domain ID
+</ParamField>
+
+<ParamField body="folder_id" type="number">
+  Folder ID to organize page
+</ParamField>
+
+<ParamField body="is_index" type="boolean">
+  Set as index page
+</ParamField>
+
+<ParamField body="html" type="string">
+  Raw HTML content (automatically sets page_type to `editor`)
+</ParamField>
+
+<ParamField body="css" type="string">
+  Custom CSS styles
+</ParamField>
+
+<ParamField body="seo_title" type="string">
+  SEO meta title
+</ParamField>
+
+<ParamField body="seo_blur_title" type="string">
+  Alternative title when tab is not focused
+</ParamField>
+
+<ParamField body="seo_description" type="string">
+  SEO meta description
+</ParamField>
+
+<ParamField body="requires_login" type="boolean">
+  Require user login to access
+</ParamField>
+
+<ParamField body="requires_password" type="boolean">
+  Require password to access
+</ParamField>
+
+<ParamField body="password" type="string">
+  Page password
+</ParamField>
+
+<ParamField body="redirect_url" type="string">
+  URL to redirect to
+</ParamField>
+
+<ParamField body="disable_right_click" type="boolean">
+  Disable right-click on page
+</ParamField>
+
+<ParamField body="prevent_indexing" type="boolean">
+  Prevent search engine indexing
+</ParamField>
+
+<ParamField body="funnel_visible_only" type="boolean">
+  Only accessible through funnel flow
+</ParamField>
+
+<ParamField body="ga_measurement_id" type="string">
+  Google Analytics measurement ID
+</ParamField>
+
+<ParamField body="meta_pixel_id" type="string">
+  Meta (Facebook) Pixel ID
+</ParamField>
+
+<ParamField body="custom_header_code" type="string">
+  Custom header code
+</ParamField>
+
+<ParamField body="custom_javascript" type="string">
+  Custom JavaScript code (must be valid script tags only)
+</ParamField>
+
+<ParamField body="is_upsell_page" type="boolean">
+  Mark as upsell page
+</ParamField>
+
+<ParamField body="show_affiliate_pixels" type="boolean">
+  Show affiliate tracking pixels
+</ParamField>
+
+<ParamField body="disable_default_scripts" type="boolean">
+  Disable default tracking scripts
+</ParamField>
+
+```bash Request
+PUT /api/brands/{brand}/pages/{page}
+```
+
+### Update Basic Information
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Page Name",
+    "status": "published"
+  }'
+```
+
+### Update HTML Content
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My Custom Page",
+    "html": "<!DOCTYPE html><html><body><h1>Updated Content</h1></body></html>",
+    "css": "body { font-family: Arial; }"
+  }'
+```
+
+<Note>
+  Providing `html` in an update request automatically converts the page to `editor` type if it isn't already.
+</Note>
+
+### Update SEO Settings
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My Landing Page",
+    "seo_title": "Best Product Ever - Buy Now",
+    "seo_description": "Discover the amazing benefits of our product",
+    "prevent_indexing": false
+  }'
+```
+
+---
+
+## Page Types and Fields
+
+### API Page Type: Editor Only
+
+<Info>
+  The API only supports creating **editor** pages. The visual drag-and-drop builder is only available through the web dashboard interface.
+</Info>
+
+**Editor Pages** allow direct HTML/CSS editing through the API:
+
+- `html` - Raw HTML content
+- `css` - Custom CSS styles
+- `page_type` - Must be `editor` (or automatically set when `html` is provided)
+
+### Automatic Editor Type Assignment
+
+When you provide the `html` field in a create or update request, the page is automatically set to `editor` type, even if you don't specify `page_type`.
+
+```json
+{
+  "title": "My Page",
+  "html": "<html>...</html>"
+  // page_type is automatically set to "editor"
+}
+```
+
+### Update Behavior
+
+When updating pages:
+- **Only provided fields are updated** - omitted fields remain unchanged
+- `html` field is updated if provided in the request
+- `css` field is updated if provided in the request
+- Providing `html` will automatically set/update `page_type` to `editor`
+- Empty strings will clear the field value
+
+### Custom JavaScript Validation
+
+The `custom_javascript` field must contain only valid `<script>` tags. HTML comments and `<noscript>` tags are allowed.
+
+```html
+<!-- Valid -->
+<script>
+  console.log('Hello World');
+</script>
+
+<!-- Invalid - contains non-script elements -->
+<div>Some content</div>
+<script>console.log('test');</script>
+```
+
+---
+
+## Delete Page
+
+Delete a page.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="page" type="string" required>
+  The page ID
+</ParamField>
+
+```bash Request
+DELETE /api/brands/{brand}/pages/{page}
+```
+
+```bash cURL
+curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Page deleted successfully"
+}
+```
+</ResponseExample>
+
+---
+
+## Plan Limits and Errors
+
+When creating pages, the API checks against your plan limits:
+
+### Plan Limit Exceeded Error
+
+```json
+{
+  "error": "Plan limit exceeded",
+  "plan_error": {
+    "type": "plan_limit_exceeded",
+    "feature": "pages",
+    "message": "You have reached the maximum number of pages (10) allowed for your plan.",
+    "current_count": 10,
+    "limit": 10,
+    "plan_name": "Starter",
+    "upgrade_info": {
+      "required_plan": "Professional",
+      "feature_description": "Unlimited pages"
+    }
+  },
+  "errors": {
+    "title": ["You have reached the maximum number of pages (10) allowed for your plan. Please upgrade to create more pages."]
+  }
+}
+```
+
+**Status Code:** `422 Unprocessable Entity`
+
+### Plan Feature Not Available Error
+
+```json
+{
+  "error": "Plan limit exceeded",
+  "plan_error": {
+    "type": "plan_upgrade_required",
+    "feature": "pages",
+    "message": "Your current plan does not allow creating pages.",
+    "plan_name": "Free Trial",
+    "upgrade_info": {
+      "required_plan": "Starter",
+      "feature_description": "Create landing pages"
+    }
+  },
+  "errors": {
+    "title": ["Your current plan does not allow creating pages. Please upgrade to access this feature."]
+  }
+}
+```
+
+**Status Code:** `422 Unprocessable Entity`
+
+---
+
+## Clone Page
+
+Create a copy of an existing page.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="page" type="string" required>
+  The page ID to clone
+</ParamField>
+
+<ParamField body="name" type="string">
+  Name for the cloned page (optional, defaults to "Copy of [original name]")
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/pages/{page}/clone
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id}/clone \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Cloned Landing Page"
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 4,
+  "name": "Cloned Landing Page",
+  "slug": "cloned-landing-page",
+  "status": "inactive",
+  "type": "landing",
+  "created_at": "2024-12-10T16:00:00.000000Z"
+}
+```
+</ResponseExample>
+

@@ -1,0 +1,516 @@
+---
+title: 'Products'
+description: 'Manage products and SKUs'
+---
+
+## List All Products
+
+Retrieve all products for a project with pagination.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number for pagination (default: 1)
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Number of results per page (default: 25)
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/products
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/products \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 2,
+      "brand_id": 1,
+      "code": "glucotil",
+      "type": "physical",
+      "title": "1 Bottle",
+      "checkout_title": null,
+      "price": 69,
+      "retail_price": 99,
+      "image": "https://storage.googleapis.com/asper-digital/1/1-bottle.png",
+      "image_link": "https://storage.googleapis.com/asper-digital/1/1-bottle.png",
+      "units": 1,
+      "sku": "prod1",
+      "classification": "main",
+      "bonus_file": null,
+      "bonus_file_link": null,
+      "unit_cost": null,
+      "unit_weight_oz": null,
+      "fulfillment_cost": null,
+      "packaging_cost": null,
+      "fuel_surcharge_cost": null,
+      "cogs": null,
+      "custom_attributes": null,
+      "merchant_product_ids": [],
+      "physical_units_per_product": null,
+      "fulfillment_multiply_sku": 0,
+      "sku_category": null,
+      "sku_subcategory": null,
+      "product_specifications": null,
+      "shipping_profile_id": null,
+      "is_subscription": false,
+      "subscription_frequency": null,
+      "subscription_frequency_unit": null,
+      "subscription_trial_days": null,
+      "subscription_first_charge_free": false,
+      "average_shipping_cost": null,
+      "bonuses": []
+    }
+  ],
+  "first_page_url": "https://app.elasticfunnels.io/api/brands/1/products?page=1",
+  "from": 1,
+  "last_page": 1,
+  "last_page_url": "https://app.elasticfunnels.io/api/brands/1/products?page=1",
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "url": "https://app.elasticfunnels.io/api/brands/1/products?page=1",
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "path": "https://app.elasticfunnels.io/api/brands/1/products",
+  "per_page": 25,
+  "prev_page_url": null,
+  "to": 8,
+  "total": 8
+}
+```
+</ResponseExample>
+
+---
+
+## List All Products (Unpaginated)
+
+Get all products without pagination for dropdown lists.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/products/all
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/products/all \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Get Product Details
+
+Retrieve details about a specific product.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="product" type="string" required>
+  The product ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/products/{product}
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/products/2 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 2,
+  "brand_id": 1,
+  "code": "glucotil",
+  "type": "physical",
+  "title": "1 Bottle",
+  "checkout_title": null,
+  "price": 69,
+  "retail_price": 99,
+  "image": "https://storage.googleapis.com/asper-digital/1/1-bottle.png",
+  "image_link": "https://storage.googleapis.com/asper-digital/1/1-bottle.png",
+  "units": 1,
+  "sku": "prod1",
+  "classification": "main",
+  "bonus_file": null,
+  "bonus_file_link": null,
+  "unit_cost": null,
+  "unit_weight_oz": null,
+  "fulfillment_cost": null,
+  "packaging_cost": null,
+  "fuel_surcharge_cost": null,
+  "cogs": null,
+  "custom_attributes": null,
+  "merchant_product_ids": {},
+  "physical_units_per_product": null,
+  "fulfillment_multiply_sku": 0,
+  "sku_category": null,
+  "sku_subcategory": null,
+  "product_specifications": null,
+  "shipping_profile_id": null,
+  "is_subscription": false,
+  "subscription_frequency": null,
+  "subscription_frequency_unit": null,
+  "subscription_trial_days": null,
+  "subscription_first_charge_free": false,
+  "average_shipping_cost": null,
+  "bonuses": []
+}
+```
+</ResponseExample>
+
+---
+
+## Product Fields Reference
+
+<AccordionGroup>
+  <Accordion title="Basic Information">
+    - `code` - Unique product code/identifier
+    - `title` - Product display name
+    - `checkout_title` - Alternative title for checkout (optional)
+    - `type` - Product type: `physical`, `digital`
+    - `classification` - Product classification: `main`, `upsell`, `downsell`, `bump`, `bonus`
+  </Accordion>
+
+  <Accordion title="Pricing">
+    - `price` - Selling price (in currency units)
+    - `retail_price` - Suggested retail/original price
+    - `units` - Number of units included
+  </Accordion>
+
+  <Accordion title="Inventory & Fulfillment">
+    - `sku` - Stock Keeping Unit identifier
+    - `unit_cost` - Cost per unit
+    - `unit_weight_oz` - Weight per unit in ounces
+    - `fulfillment_cost` - Cost to fulfill the order
+    - `packaging_cost` - Packaging cost
+    - `fuel_surcharge_cost` - Fuel surcharge
+    - `cogs` - Cost of Goods Sold
+    - `physical_units_per_product` - Physical units per product
+    - `fulfillment_multiply_sku` - Multiply fulfillment by SKU quantity
+    - `average_shipping_cost` - Average shipping cost
+  </Accordion>
+
+  <Accordion title="Media">
+    - `image` - Product image URL
+    - `image_link` - Full URL to product image
+    - `bonus_file` - Bonus/digital file path
+    - `bonus_file_link` - Full URL to bonus file
+  </Accordion>
+
+  <Accordion title="Subscription Products">
+    - `is_subscription` - Whether this is a subscription product
+    - `subscription_frequency` - Billing frequency (e.g., 1, 2, 3)
+    - `subscription_frequency_unit` - Unit: `day`, `week`, `month`, `year`
+    - `subscription_trial_days` - Number of trial days
+    - `subscription_first_charge_free` - Whether first charge is free
+  </Accordion>
+
+  <Accordion title="Additional">
+    - `custom_attributes` - Array of custom key-value pairs
+    - `merchant_product_ids` - Object mapping merchant names to product IDs
+    - `product_specifications` - Array of product specifications
+    - `shipping_profile_id` - Associated shipping profile
+    - `sku_category` - SKU category
+    - `sku_subcategory` - SKU subcategory
+    - `bonuses` - Array of bonus products associated with this product
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Create Product
+
+Create a new product.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="code" type="string" required>
+  Unique product code
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Product title
+</ParamField>
+
+<ParamField body="price" type="number" required>
+  Product price
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  Product type: `physical` or `digital`
+</ParamField>
+
+<ParamField body="classification" type="string" required>
+  Classification: `main`, `upsell`, `downsell`, `bump`, or `bonus`
+</ParamField>
+
+<ParamField body="retail_price" type="number">
+  Retail/original price
+</ParamField>
+
+<ParamField body="units" type="number">
+  Number of units
+</ParamField>
+
+<ParamField body="sku" type="string">
+  Stock Keeping Unit
+</ParamField>
+
+<ParamField body="image" type="string">
+  Product image URL
+</ParamField>
+
+<ParamField body="is_subscription" type="boolean">
+  Whether this is a subscription product
+</ParamField>
+
+<ParamField body="subscription_frequency" type="number">
+  Billing frequency (required if is_subscription is true)
+</ParamField>
+
+<ParamField body="subscription_frequency_unit" type="string">
+  Frequency unit: `day`, `week`, `month`, `year`
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/products
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/products \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "product_123",
+    "title": "Premium Product",
+    "price": 49.99,
+    "retail_price": 79.99,
+    "type": "physical",
+    "classification": "main",
+    "units": 1,
+    "sku": "PREM-001"
+  }'
+```
+
+### Subscription Product Example
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/products \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "monthly_subscription",
+    "title": "Monthly Subscription",
+    "price": 29.99,
+    "type": "physical",
+    "classification": "main",
+    "is_subscription": true,
+    "subscription_frequency": 1,
+    "subscription_frequency_unit": "month",
+    "subscription_trial_days": 14,
+    "subscription_first_charge_free": true
+  }'
+```
+
+---
+
+## Update Product
+
+Update an existing product.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="product" type="string" required>
+  The product ID
+</ParamField>
+
+```bash Request
+PUT /api/brands/{brand}/products/{product}
+```
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/products/{product_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Product Name",
+    "price": 59.99
+  }'
+```
+
+---
+
+## Delete Product
+
+Delete a product.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="product" type="string" required>
+  The product ID
+</ParamField>
+
+```bash Request
+DELETE /api/brands/{brand}/products/{product}
+```
+
+```bash cURL
+curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/products/{product_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Clone Product
+
+Create a copy of an existing product.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="product" type="string" required>
+  The product ID to clone
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/products/{product}/clone
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/products/2/clone \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Product Classifications
+
+| Classification | Description | Usage |
+|----------------|-------------|-------|
+| `main` | Main product offer | Primary product in funnel |
+| `upsell` | Upsell product | Offered after initial purchase |
+| `downsell` | Downsell product | Offered if upsell is declined |
+| `bump` | Order bump | Checkbox add-on at checkout |
+| `bonus` | Bonus product | Free gift or bonus item |
+
+---
+
+## Product Bonuses
+
+Products can have associated bonus products. The `bonuses` array contains bonus product relationships:
+
+```json
+{
+  "bonuses": [
+    {
+      "bonus_product_id": 23,
+      "product_id": 3,
+      "brand_id": 1
+    },
+    {
+      "bonus_product_id": 24,
+      "product_id": 3,
+      "brand_id": 1
+    }
+  ]
+}
+```
+
+When a customer purchases a product with bonuses, they automatically receive the bonus products.
+
+---
+
+## Custom Attributes
+
+Products support custom key-value attributes for flexibility:
+
+```json
+{
+  "custom_attributes": [
+    {
+      "key": "download",
+      "value": "https://example.com/download"
+    },
+    {
+      "key": "access_code",
+      "value": "ABC123"
+    }
+  ]
+}
+```
+
+Common uses:
+- Download links for digital products
+- Access codes for member areas
+- Special instructions
+- Custom tracking parameters
+
+---
+
+## Merchant Product IDs
+
+Map your ElasticFunnels products to merchant platform product IDs:
+
+```json
+{
+  "merchant_product_ids": {
+    "buygoods": "1234",
+    "clickbank": "PROD-001",
+    "stripe": "prod_abc123"
+  }
+}
+```
+
+---
+
+## Notes
+
+<Info>
+  - Product `code` must be unique within the brand
+  - `classification` of `bonus` products are automatically included with their parent products
+  - Subscription products require `subscription_frequency` and `subscription_frequency_unit`
+  - All costs (COGS, fulfillment, packaging) are tracked for profit margin calculations
+  - Images are returned as both `image` (relative path) and `image_link` (full URL)
+</Info>
+
+<Warning>
+  When updating products that are actively used in funnels, changes may affect existing customer orders and analytics.
+</Warning>
+

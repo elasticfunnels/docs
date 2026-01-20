@@ -1,0 +1,592 @@
+---
+title: 'Shopify Order Sync'
+description: 'Automatically sync ElasticFunnels orders to Shopify for tax reporting and 3PL fulfillment'
+---
+
+## Overview
+
+The Shopify Order Sync integration automatically creates orders in Shopify when customers purchase through ElasticFunnels. This keeps Shopify as your central hub for tax reporting, accounting, and 3PL fulfillment while allowing you to use ElasticFunnels for your checkout experience.
+
+## What This Integration Provides
+
+<CardGroup cols={2}>
+  <Card title="Automatic Order Sync" icon="rotate">
+    Orders sync to Shopify automatically 15 seconds after purchase completion
+  </Card>
+  <Card title="Tax Reporting" icon="receipt">
+    Maintain accurate records for your accountant and tax consultants
+  </Card>
+  <Card title="3PL Fulfillment" icon="truck">
+    Fulfill orders through your existing Shopify-connected 3PL providers
+  </Card>
+  <Card title="Pricing Flexibility" icon="dollar-sign">
+    Charge different prices in ElasticFunnels than what appears in Shopify
+  </Card>
+</CardGroup>
+
+## Setup Guide
+
+### Step 1: Connect Your Shopify Store
+
+1. Navigate to **Integrations → Order Sync**
+2. Find **Shopify** and click **"New integration"**
+3. Enter your Shopify store domain (e.g., `yourstore.myshopify.com`)
+4. Click **"Connect to Shopify"**
+5. You'll be redirected to Shopify to authorize access
+6. Grant the necessary permissions for order management
+
+<Info>
+You'll need admin access to your Shopify store to complete the authorization.
+</Info>
+
+### Step 2: Authorize the App
+
+After clicking connect, Shopify will ask you to grant permissions:
+
+- **Read orders** - View existing orders
+- **Write orders** - Create new orders
+- **Read customers** - View customer information
+- **Write customers** - Create customer records
+
+Click **"Install app"** to authorize ElasticFunnels.
+
+### Step 3: Configure Your Merchant
+
+To enable order syncing for specific merchants:
+
+1. Go to **Merchants** in ElasticFunnels
+2. Edit the merchant you want to sync orders from
+3. Open the **Order Sync** tab
+4. Select your Shopify integration from the dropdown
+5. Click **"Save"**
+
+<Tip>
+You can configure multiple merchants to sync to the same Shopify store, or create different integrations for different stores if you manage multiple businesses.
+</Tip>
+
+### Step 4: Test the Integration
+
+Make a test purchase through your funnel:
+
+1. Complete a test transaction
+2. Wait 15 seconds
+3. Check your Shopify admin → Orders
+4. Look for orders tagged with **"ElasticFunnel"**
+
+<Check>
+Test orders should appear in Shopify with full details including customer info, line items, and payment status marked as "paid".
+</Check>
+
+## How Order Sync Works
+
+### Sync Timeline
+
+```
+Purchase Completed in ElasticFunnels
+         ↓ (10 seconds)
+Fulfillment Scheduled (if configured)
+         ↓ (15 seconds)
+Order Sync to Shopify
+         ↓
+Order Appears in Shopify Admin
+```
+
+### What Gets Synced
+
+When an order syncs to Shopify, we include:
+
+<AccordionGroup>
+  <Accordion title="Customer Information">
+    - Email address
+    - First and last name
+    - Phone number
+    - Billing address
+    - Shipping address
+  </Accordion>
+
+  <Accordion title="Order Details">
+    - Line items (products purchased)
+    - Quantities and prices
+    - Order number from ElasticFunnels
+    - Purchase timestamp
+    - Payment method used
+  </Accordion>
+
+  <Accordion title="Financial Information">
+    - Subtotal amount
+    - Tax calculations from ElasticFunnels
+    - Shipping costs
+    - Discount codes applied
+    - Total order value
+  </Accordion>
+
+  <Accordion title="Metadata & Tags">
+    - Order tagged as "ElasticFunnel"
+    - EF order ID and number in order notes
+    - Funnel ID reference
+    - Source identified as "ElasticFunnel"
+  </Accordion>
+
+  <Accordion title="Fulfillment Status (if available)">
+    - Fulfillment provider name
+    - Tracking number
+    - Carrier information
+    - Shipment status
+  </Accordion>
+</AccordionGroup>
+
+## What Information Gets Synced
+
+When an order syncs to Shopify, all essential details are included:
+
+- **Customer name and email** - Full contact information
+- **Billing and shipping addresses** - Complete address details
+- **Products purchased** - Item names, quantities, and prices
+- **Order totals** - Subtotal, tax, shipping, and final total
+- **Payment information** - Payment method and status (marked as "paid")
+- **Order number** - Your ElasticFunnels order reference
+- **Tracking details** - Shipping tracking if fulfillment was processed
+
+<Warning>
+Orders are created with **custom line items** and are not linked to your Shopify product catalog. This means you don't need to create products in Shopify first - everything is sent from ElasticFunnels.
+</Warning>
+
+## Financial Status
+
+All orders synced from ElasticFunnels are marked with:
+
+- **Financial Status:** `paid` - Payment already collected in ElasticFunnels
+- **Payment Gateway:** Shows the payment method used (e.g., "Stripe", "PayPal")
+- **Transaction Type:** Marked as `sale` with `success` status
+
+<Info>
+Since payment is collected in ElasticFunnels before syncing, all orders appear as "paid" in Shopify. This is correct and expected behavior.
+</Info>
+
+## Fulfillment Integration
+
+If your merchant has fulfillment configured:
+
+### Fulfillment Data Included
+
+When orders have fulfillment information from your 3PL provider:
+
+- Fulfillment status
+- Provider name (e.g., "ShipOffers", "Jetpack")
+- Tracking number
+- Carrier information
+
+This information is added to the **order notes** in Shopify for your 3PL to reference.
+
+### Order Notes Example
+
+```
+Order Source: ElasticFunnel
+EF Order ID: ord_12345
+EF Order Number: ABC123XYZ
+Funnel ID: 42
+
+=== Fulfillment Information ===
+Status: shipped
+Provider: ShipOffers
+Tracking: 1Z999AA10123456784
+Carrier: UPS
+```
+
+## Managing Multiple Stores
+
+If you manage multiple Shopify stores:
+
+### Create Multiple Integrations
+
+1. Go to **Integrations → Order Sync**
+2. Click **"New integration"** for each store
+3. Connect each store separately
+4. Name them clearly (e.g., "Shopify - US Store", "Shopify - EU Store")
+
+### Assign to Merchants
+
+Each merchant can sync to a different Shopify store:
+
+- **Merchant A** → Shopify US Store
+- **Merchant B** → Shopify EU Store
+- **Merchant C** → No syncing
+
+<Tip>
+This is useful if you run multiple brands or international stores. Each ElasticFunnels merchant can sync to the appropriate Shopify store.
+</Tip>
+
+## Reconnecting Your Store
+
+If your integration shows an error or needs reconnection:
+
+1. Open your Shopify integration in **Integrations → Order Sync**
+2. Click **"Reconnect"** button
+3. You'll be redirected through the authorization flow again
+4. A new access token will be obtained
+5. Order syncing will resume automatically
+
+<Note>
+Shopify OAuth tokens don't expire unless you uninstall the app or regenerate your API credentials. Reconnection is rarely needed.
+</Note>
+
+## Sync Status & Monitoring
+
+### Order Sync Statuses
+
+Each order has a sync status:
+
+- **Pending** - Scheduled, waiting to be sent
+- **Synced** - Successfully sent to Shopify
+- **Failed** - Error occurred (will retry automatically)
+
+### Automatic Retries
+
+If an order fails to sync, the system automatically tries again:
+
+- First few retries happen within minutes
+- Later retries happen after longer intervals
+- System retries up to 5 times over several hours
+
+After all retries fail, you'll see a "Failed" status and may need to reconnect your integration.
+
+<Warning>
+If multiple orders show as failed, check your integration status. You may need to reconnect to Shopify.
+</Warning>
+
+## Finding Synced Orders in Shopify
+
+To locate orders that came from ElasticFunnels:
+
+### Method 1: Tag Filter
+
+1. Go to Shopify Admin → **Orders**
+2. Click **"Filters"**
+3. Add filter: **Tagged with** = `ElasticFunnel`
+4. View all EF orders
+
+### Method 2: Source Filter
+
+Orders show **"ElasticFunnel"** as the source in the order details.
+
+### Method 3: Order Notes
+
+Check order notes for:
+- EF Order ID
+- EF Order Number
+- Funnel ID
+- Fulfillment information
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Orders Not Syncing">
+    **Possible Causes:**
+    - Integration not assigned to merchant
+    - Shopify access token invalid
+    - Network connectivity issue
+    
+    **Solution:**
+    1. Verify integration is selected in merchant's Order Sync tab
+    2. Check integration status shows "Active"
+    3. Try reconnecting the integration
+    4. Contact support if issue persists
+  </Accordion>
+
+  <Accordion title="Connection Failed During Setup">
+    **Possible Causes:**
+    - Incorrect store domain entered
+    - Authorization cancelled
+    - Session expired
+    
+    **Solution:**
+    1. Verify your store domain is correct (e.g., yourstore.myshopify.com)
+    2. Try connecting again
+    3. Clear browser cookies if session issues persist
+  </Accordion>
+
+  <Accordion title="Orders Syncing with Wrong Prices">
+    **Expected Behavior:** Prices in Shopify match what customers paid in ElasticFunnels, not your Shopify catalog prices.
+    
+    **This is correct!** The integration is designed to allow different pricing in ElasticFunnels vs Shopify. The synced price is the actual amount the customer was charged.
+  </Accordion>
+
+  <Accordion title="Integration Shows as Disabled">
+    **Possible Causes:**
+    - App uninstalled from Shopify
+    - Access token revoked
+    - API credentials changed
+    
+    **Solution:**
+    1. Check if app is still installed in Shopify Admin → Apps
+    2. Click "Reconnect" in ElasticFunnels to re-authorize
+    3. Verify Shopify app is active in your store
+  </Accordion>
+
+  <Accordion title="Missing Customer Information">
+    **Cause:** Not all customer fields are required
+    
+    **Solution:** This is normal if customers didn't provide optional information. Essential fields (email, name) will always be present.
+  </Accordion>
+</AccordionGroup>
+
+## Connection & Authentication
+
+Once you connect your Shopify store, the integration remains active indefinitely:
+
+- No need to reconnect regularly
+- Connection stays active until you uninstall the app
+- Secure authorization through Shopify's standard process
+
+### If You Need to Reconnect
+
+You may need to reconnect if:
+
+1. You see a "Disconnected" status in your integration
+2. Orders stop syncing unexpectedly
+3. You reinstall the app in Shopify
+
+Simply click the **"Reconnect"** button and authorize again.
+
+## Data Privacy & Compliance
+
+### What Data We Access
+
+When you connect Shopify, we request permission to:
+
+- Read and write orders
+- Read and write customer information
+- Read product catalog (for future features)
+- Read inventory levels (for future features)
+
+### How We Store Your Data
+
+- OAuth tokens encrypted in database
+- Order sync records stored for status tracking
+- No sensitive customer data retained long-term
+- Customer PII only used during sync operation
+
+### GDPR Compliance
+
+Our Shopify app implements all mandatory compliance webhooks:
+
+- **customers/data_request** - Responds to customer data export requests
+- **customers/redact** - Handles customer data deletion requests
+- **shop/redact** - Deletes shop data 48 hours after uninstall
+
+<Info>
+ElasticFunnels doesn't store customer PII separately. Customer data is only synced to Shopify and not retained in ElasticFunnels after the order is created.
+</Info>
+
+## Best Practices
+
+<Steps>
+  <Step title="Test First">
+    Make a test purchase to verify orders sync correctly before going live with real customers.
+  </Step>
+  
+  <Step title="Tag for Organization">
+    All orders are automatically tagged "ElasticFunnel" in Shopify for easy filtering and reporting.
+  </Step>
+  
+  <Step title="Monitor Sync Status">
+    Check your integration status regularly to ensure orders are syncing without issues.
+  </Step>
+  
+  <Step title="Configure Per Merchant">
+    Set up order sync for each merchant individually. Not all merchants may need Shopify syncing.
+  </Step>
+  
+  <Step title="Keep Integration Connected">
+    Don't uninstall the Shopify app. If you need to disconnect, do so through ElasticFunnels settings.
+  </Step>
+</Steps>
+
+## Advanced Configuration
+
+### Custom Line Items vs Product Linking
+
+Orders are created with **custom line items** that don't link to your Shopify product catalog:
+
+**Advantages:**
+- No product setup required in Shopify
+- Prices can differ between platforms
+- Product names/descriptions come from ElasticFunnels
+- Faster setup and configuration
+
+**Considerations:**
+- Reports based on Shopify product variants won't include EF orders
+- Inventory tracking doesn't affect EF orders
+- Product changes in Shopify don't affect synced orders
+
+<Info>
+This approach is intentional. It allows maximum flexibility with pricing and doesn't require maintaining a product catalog in both systems.
+</Info>
+
+### Syncing Tax Calculations
+
+Tax amounts calculated in ElasticFunnels are sent to Shopify exactly as charged:
+
+- Tax rate preserved
+- Tax amount matches what customer paid
+- Proper tax reporting for accountants
+- No recalculation in Shopify
+
+<Check>
+This ensures your tax records in Shopify match what customers actually paid, which is critical for accounting and tax compliance.
+</Check>
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Will this create products in Shopify?">
+    No. Orders are created with custom line items that don't link to Shopify products. This means you don't need to maintain a product catalog in both systems.
+  </Accordion>
+
+  <Accordion title="Can I sync different prices in EF vs Shopify?">
+    Yes! That's the main benefit. The price sent to Shopify is the actual price charged in ElasticFunnels, which can be different from your Shopify catalog prices.
+  </Accordion>
+
+  <Accordion title="What happens if Shopify is down?">
+    Orders will retry automatically up to 5 times with exponential backoff. Most temporary issues resolve themselves without intervention.
+  </Accordion>
+
+  <Accordion title="Can I manually sync an order?">
+    If an order fails to sync, contact support and we can manually trigger a resync for specific orders.
+  </Accordion>
+
+  <Accordion title="Does this sync refunds?">
+    Currently only new orders are synced. Refund syncing is planned for a future update.
+  </Accordion>
+
+  <Accordion title="Can I sync historical orders?">
+    Yes. Contact support if you need to sync existing orders from before you connected the integration.
+  </Accordion>
+
+  <Accordion title="Do I need products in Shopify first?">
+    No! Orders are created with custom line items. You don't need any products in your Shopify catalog.
+  </Accordion>
+
+  <Accordion title="What if my 3PL is connected to Shopify?">
+    Perfect! Your 3PL will see the synced orders in Shopify and can fulfill them normally. Tracking information can be added to Shopify as usual.
+  </Accordion>
+</AccordionGroup>
+
+## Use Cases
+
+### Tax Reporting & Compliance
+
+**Scenario:** You need accurate records for your tax consultant
+
+**Solution:**
+- All orders sync to Shopify with correct tax calculations
+- Tax amounts match what customers actually paid
+- Easy export from Shopify for quarterly/annual tax filing
+- Accountant can access Shopify admin directly
+
+### 3PL Fulfillment
+
+**Scenario:** Your fulfillment center only integrates with Shopify
+
+**Solution:**
+- Orders automatically appear in Shopify
+- 3PL fulfills from Shopify as normal
+- Tracking numbers can be added in Shopify
+- Fulfillment status visible in both systems
+
+### Multi-Platform Strategy
+
+**Scenario:** You want different pricing on your funnel vs your Shopify store
+
+**Solution:**
+- Charge premium prices through ElasticFunnels
+- Maintain standard prices in Shopify for direct traffic
+- Orders sync with actual price paid
+- Both channels tracked separately
+
+### Agency Management
+
+**Scenario:** You manage multiple client stores
+
+**Solution:**
+- Create separate integration for each client
+- Each merchant syncs to correct Shopify store
+- Client reports stay separated
+- Easy handoff to client for fulfillment
+
+## Connection Status & Health
+
+### Status Indicators
+
+Your integration status shows real-time health:
+
+- **🟢 Active** - Integration working, orders syncing normally
+- **🟡 Pending** - Initial setup not complete
+- **🔴 Disconnected** - Needs reconnection
+- **⚪ Disabled** - Integration disabled (app uninstalled)
+
+### Monitoring Sync Status
+
+Check individual order sync status:
+
+1. Go to **Analytics → Conversions**
+2. View order details
+3. Check **Order Sync Status** field:
+   - Pending
+   - Synced (with Shopify order ID)
+   - Failed (with error message)
+
+## What Happens to Your Data
+
+### App Uninstall
+
+If you uninstall the ElasticFunnels app from Shopify:
+
+- Order syncing stops automatically
+- Previously synced orders remain in Shopify
+- You can reinstall and reconnect anytime
+- No data is lost
+
+### Privacy & Data Handling
+
+- Customer information only used during order creation
+- Data sent to Shopify matches what customers provided at checkout
+- No customer data stored long-term in ElasticFunnels
+- Orders exist in Shopify for your records
+
+<Info>
+We don't retain customer information after syncing orders. All customer data lives in Shopify where you can manage it according to your privacy policy.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Merchant Setup"
+    icon="store"
+    href="/guides/how-to-set-up-a-new-merchant"
+  >
+    Learn how to configure merchants for order syncing
+  </Card>
+  <Card
+    title="Fulfillment Guide"
+    icon="truck"
+    href="/guides/fulfillment-setup"
+  >
+    Set up fulfillment providers for automated shipping
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    View your order data and performance metrics
+  </Card>
+  <Card
+    title="Tax Configuration"
+    icon="calculator"
+    href="/guides/tax-configuration"
+  >
+    Configure tax calculations for accurate reporting
+  </Card>
+</CardGroup>

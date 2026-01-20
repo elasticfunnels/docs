@@ -1,33 +1,80 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Introduction'
+description: 'Getting started with the ElasticFunnels API'
 ---
 
+## Welcome to ElasticFunnels API
+
+The ElasticFunnels API allows you to programmatically manage your projects, pages, products, conversions, and analytics. Our API is organized around REST principles with predictable resource-oriented URLs, returns JSON-encoded responses, and uses standard HTTP response codes.
+
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  All API requests must be made over HTTPS. Calls made over plain HTTP will fail.
 </Note>
 
-## Welcome
+## Base URL
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+All API endpoints are relative to the base URL:
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+```
+https://app.elasticfunnels.io/api
+```
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+The ElasticFunnels API uses API keys for authentication. You can generate and manage your API keys from your project settings under the API tab.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+<Card
+  title="Authentication Guide"
+  icon="key"
+  href="/api-reference/authentication"
+>
+  Learn how to authenticate your API requests
+</Card>
+
+## Making Your First Request
+
+Here's a simple example to get your project details:
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id} \
+  -H "EF-Access-Key: your_api_key_here"
 ```
+
+```javascript JavaScript
+const response = await fetch('https://app.elasticfunnels.io/api/brands/{brand_id}', {
+  headers: {
+    'EF-Access-Key': 'your_api_key_here'
+  }
+});
+
+const brand = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://app.elasticfunnels.io/api/brands/{brand_id}',
+    headers={'EF-Access-Key': 'your_api_key_here'}
+)
+
+brand = response.json()
+```
+
+## Rate Limits
+
+<Info>
+  Rate limiting information will be added in a future update. Currently, reasonable use is expected.
+</Info>
+
+## Support
+
+Need help with the API? Contact our support team:
+
+<Card
+  title="Email Support"
+  icon="envelope"
+  href="mailto:support@elasticfunnels.io"
+>
+  support@elasticfunnels.io
+</Card>

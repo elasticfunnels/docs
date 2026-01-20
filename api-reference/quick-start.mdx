@@ -1,0 +1,268 @@
+---
+title: 'Quick Start Guide'
+description: 'Get up and running with the ElasticFunnels API in minutes'
+---
+
+## 5-Minute Setup
+
+Follow these steps to make your first API request:
+
+<Steps>
+  <Step title="Generate Your API Key">
+    1. Log in to your ElasticFunnels account
+    2. Navigate to **Settings** → **API**
+    3. Click **Generate API Key**
+    4. Copy and securely store your key
+  </Step>
+  
+  <Step title="Find Your Brand ID">
+    Your brand (project) ID is in the URL when you're viewing your project:
+    
+    ```
+    https://app.elasticfunnels.io/123/analytics
+                                    ^^^
+                                 Brand ID
+    ```
+  </Step>
+  
+  <Step title="Make Your First Request">
+    Test your authentication by fetching your project details:
+    
+    ```bash
+    curl https://app.elasticfunnels.io/api/brands/{brand_id} \
+      -H "EF-Access-Key: your_api_key_here"
+    ```
+  </Step>
+  
+  <Step title="Start Building">
+    You're ready! Explore the endpoints documentation to build your integration.
+  </Step>
+</Steps>
+
+## Common Use Cases
+
+### Sync Conversions to Your CRM
+
+Automatically sync new orders to your CRM or analytics platform:
+
+```javascript
+// Fetch recent conversions
+const response = await fetch(
+  'https://app.elasticfunnels.io/api/brands/123/conversions?page=1&per_page=50',
+  {
+    headers: {
+      'EF-Access-Key': 'your_api_key_here'
+    }
+  }
+);
+
+const { data } = await response.json();
+
+// Process each conversion
+for (const order of data) {
+  await syncToCRM({
+    email: order.customer_email,
+    name: order.customer_name,
+    revenue: order.total,
+    order_id: order.code
+  });
+}
+```
+
+### Monitor Split Test Performance
+
+Check split test results programmatically:
+
+```python
+import requests
+
+# Get split test results
+response = requests.get(
+    'https://app.elasticfunnels.io/api/brands/123/split-tests/456',
+    headers={'EF-Access-Key': 'your_api_key_here'}
+)
+
+split_test = response.json()
+
+# Find the winning variant
+winner = next(v for v in split_test['variants'] if v['is_winner'])
+print(f"Winner: {winner['name']} with {winner['conversion_rate']}% CR")
+
+# Alert if improvement is significant
+if winner['conversion_rate'] > 5.0:
+    send_slack_notification(f"🎉 Split test winner: {winner['conversion_rate']}% CR!")
+```
+
+### Bulk Create Pages from Templates
+
+Automate page creation for new campaigns:
+
+```javascript
+const campaigns = [
+  { name: 'Summer Sale', slug: 'summer-sale' },
+  { name: 'Black Friday', slug: 'black-friday' },
+  { name: 'New Year', slug: 'new-year' }
+];
+
+for (const campaign of campaigns) {
+  const response = await fetch(
+    'https://app.elasticfunnels.io/api/brands/123/pages',
+    {
+      method: 'POST',
+      headers: {
+        'EF-Access-Key': 'your_api_key_here',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: campaign.name,
+        slug: campaign.slug,
+        type: 'landing',
+        status: 'inactive'
+      })
+    }
+  );
+  
+  const page = await response.json();
+  console.log(`Created page: ${page.url}`);
+}
+```
+
+### Daily Revenue Report
+
+Generate and email daily performance reports:
+
+```python
+from datetime import date, timedelta
+import requests
+
+# Get yesterday's metrics
+yesterday = date.today() - timedelta(days=1)
+
+response = requests.get(
+    f'https://app.elasticfunnels.io/api/brands/123/analytics/metrics',
+    params={
+        'start_date': yesterday.isoformat(),
+        'end_date': yesterday.isoformat()
+    },
+    headers={'EF-Access-Key': 'your_api_key_here'}
+)
+
+metrics = response.json()['metrics']
+
+# Format report
+report = f"""
+Daily Performance Report - {yesterday}
+
+📊 Visitors: {metrics['visitors']:,}
+📧 Leads: {metrics['leads']:,}
+🛒 Orders: {metrics['orders']:,}
+💰 Revenue: ${metrics['revenue']:,.2f}
+📈 AOV: ${metrics['aov']:.2f}
+🎯 Conversion Rate: {metrics['conversion_rate']:.2f}%
+"""
+
+send_email(to='team@example.com', subject='Daily Report', body=report)
+```
+
+### Export Conversion Data
+
+Export conversion data for analysis in your BI tool:
+
+```bash
+# Request export
+curl -X POST https://app.elasticfunnels.io/api/brands/123/conversions/export \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "start_date": "2024-12-01",
+    "end_date": "2024-12-31"
+  }'
+
+# Response includes download URL
+{
+  "message": "Export is being processed",
+  "export_id": "exp_abc123",
+  "download_url": "https://app.elasticfunnels.io/api/brands/123/exports/exp_abc123/download/token"
+}
+
+# Download the file
+curl -O "https://app.elasticfunnels.io/api/brands/123/exports/exp_abc123/download/token"
+```
+
+## SDKs and Libraries
+
+While ElasticFunnels doesn't provide official SDKs yet, the API works with any HTTP client library:
+
+<CardGroup cols={3}>
+  <Card title="JavaScript" icon="js">
+    - `fetch` (native)
+    - `axios`
+    - `node-fetch`
+  </Card>
+  <Card title="Python" icon="python">
+    - `requests`
+    - `httpx`
+    - `aiohttp`
+  </Card>
+  <Card title="PHP" icon="php">
+    - `cURL`
+    - `Guzzle`
+    - `HTTP Client`
+  </Card>
+</CardGroup>
+
+## Rate Limiting Best Practices
+
+<Info>
+  While rate limits aren't strictly enforced currently, follow these best practices for optimal performance:
+</Info>
+
+1. **Batch Requests**: Fetch multiple items in one request when possible
+2. **Cache Responses**: Cache data that doesn't change frequently
+3. **Use Pagination**: Don't try to fetch all records at once
+4. **Implement Backoff**: Retry failed requests with exponential backoff
+
+Example retry logic:
+
+```javascript
+async function fetchWithRetry(url, options, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      
+      if (response.ok) {
+        return await response.json();
+      }
+      
+      // If rate limited, wait before retry
+      if (response.status === 429) {
+        const waitTime = Math.pow(2, attempt) * 1000; // Exponential backoff
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      
+      throw new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      if (attempt === maxRetries - 1) throw error;
+    }
+  }
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Browse Endpoints" icon="code" href="/api-reference/endpoints/brands">
+    Explore all available API endpoints
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/api-reference/errors">
+    Learn how to handle errors properly
+  </Card>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    Deep dive into API authentication
+  </Card>
+  <Card title="Get Support" icon="life-ring" href="mailto:support@elasticfunnels.io">
+    Contact our support team
+  </Card>
+</CardGroup>
+

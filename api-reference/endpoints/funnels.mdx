@@ -1,0 +1,216 @@
+---
+title: 'Funnels'
+description: 'Manage sales funnels'
+---
+
+## List All Funnels
+
+Retrieve all funnels for a project.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/funnels/all
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/all \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Main Sales Funnel",
+      "status": "active",
+      "pages_count": 4,
+      "created_at": "2024-01-15T10:30:00.000000Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Get Funnel Details
+
+Retrieve details about a specific funnel.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="funnel" type="string" required>
+  The funnel ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/funnels/{funnel}
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 1,
+  "name": "Main Sales Funnel",
+  "status": "active",
+  "pages": [
+    {
+      "id": 1,
+      "name": "Landing Page",
+      "type": "landing",
+      "order": 1
+    },
+    {
+      "id": 2,
+      "name": "Checkout",
+      "type": "checkout",
+      "order": 2
+    },
+    {
+      "id": 3,
+      "name": "Upsell",
+      "type": "upsell",
+      "order": 3
+    },
+    {
+      "id": 4,
+      "name": "Thank You",
+      "type": "thankyou",
+      "order": 4
+    }
+  ],
+  "created_at": "2024-01-15T10:30:00.000000Z",
+  "updated_at": "2024-12-10T08:20:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Create Funnel
+
+Create a new funnel.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Funnel name
+</ParamField>
+
+<ParamField body="status" type="string">
+  Funnel status: `active` or `inactive` (default: `active`)
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/funnels
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/funnels \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "New Funnel",
+    "status": "active"
+  }'
+```
+
+---
+
+## Update Funnel
+
+Update an existing funnel.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="funnel" type="string" required>
+  The funnel ID
+</ParamField>
+
+```bash Request
+PUT /api/brands/{brand}/funnels/{funnel}
+```
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Funnel Name"
+  }'
+```
+
+---
+
+## Delete Funnel
+
+Delete a funnel.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="funnel" type="string" required>
+  The funnel ID
+</ParamField>
+
+```bash Request
+DELETE /api/brands/{brand}/funnels/{funnel}
+```
+
+```bash cURL
+curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Clone Funnel
+
+Create a copy of an existing funnel with all its pages.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="funnel" type="string" required>
+  The funnel ID to clone
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/funnels/{funnel}/clone
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel_id}/clone \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 2,
+  "name": "Copy of Main Sales Funnel",
+  "status": "inactive",
+  "pages_count": 4,
+  "created_at": "2024-12-10T16:00:00.000000Z"
+}
+```
+</ResponseExample>
+

@@ -1,0 +1,165 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate your API requests'
+---
+
+## Overview
+
+The ElasticFunnels API uses **API keys** for authentication. Each API key is tied to a specific user and project (brand), inheriting all the permissions of that user for that project.
+
+<Warning>
+  Keep your API keys secure! Never share them publicly or commit them to version control. Treat them like passwords.
+</Warning>
+
+## Generating an API Key
+
+1. Navigate to your project dashboard
+2. Go to **Settings** → **API**
+3. Click **Generate API Key**
+4. Copy and securely store your API key
+
+<Note>
+  You can regenerate your API key at any time, but this will immediately invalidate the old key. Make sure to update any integrations using the old key.
+</Note>
+
+## Using Your API Key
+
+Include your API key in the request header using the `EF-Access-Key` header:
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/pages/all \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```javascript JavaScript
+const headers = {
+  'EF-Access-Key': 'your_api_key_here',
+  'Content-Type': 'application/json'
+};
+
+const response = await fetch('https://app.elasticfunnels.io/api/brands/{brand_id}/pages/all', {
+  headers: headers
+});
+```
+
+```python Python
+import requests
+
+headers = {
+    'EF-Access-Key': 'your_api_key_here',
+    'Content-Type': 'application/json'
+}
+
+response = requests.get(
+    'https://app.elasticfunnels.io/api/brands/{brand_id}/pages/all',
+    headers=headers
+)
+```
+
+```php PHP
+<?php
+
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, 'https://app.elasticfunnels.io/api/brands/' . $brandId . '/pages/all');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'EF-Access-Key: your_api_key_here',
+    'Content-Type: application/json'
+]);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+```
+
+## Authentication Errors
+
+If authentication fails, you'll receive one of the following responses:
+
+### Invalid API Key
+
+```json
+{
+  "message": "Invalid API key"
+}
+```
+**Status Code:** `401 Unauthorized`
+
+### No Brand Access
+
+```json
+{
+  "message": "Invalid API key or brand access denied"
+}
+```
+**Status Code:** `401 Unauthorized`
+
+This error occurs when:
+- Your API key is valid but doesn't have access to the specified brand/project
+- You're trying to access a project you're not a member of
+
+### Missing API Key
+
+If you don't include the `EF-Access-Key` header, you'll be redirected to the login page (for browser requests) or receive a 404 error (for API requests).
+
+## API Key Scope and Permissions
+
+<Info>
+  Your API key inherits all permissions from your user account for the specific project.
+</Info>
+
+API keys are:
+- **User-specific**: Each key is tied to your user account
+- **Project-specific**: Each key is tied to a specific project (brand)
+- **Permission-aware**: Your API requests have the same permissions as your user role (Owner, Admin, Editor, etc.)
+
+### Example Permission Scenarios
+
+**Owner/Admin**: Full access to all endpoints including team management, billing, and settings
+
+**Editor**: Access to content management endpoints (pages, products, funnels) but not billing or team management
+
+**Viewer**: Read-only access to analytics and content
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Rotate Keys Regularly" icon="rotate">
+    Regenerate your API keys periodically for enhanced security
+  </Card>
+  <Card title="Use Environment Variables" icon="code">
+    Store API keys in environment variables, never in your codebase
+  </Card>
+  <Card title="One Key Per Integration" icon="layer-group">
+    Use separate API keys for different integrations to easily revoke access
+  </Card>
+  <Card title="Monitor Usage" icon="chart-line">
+    Keep track of which integrations use which keys
+  </Card>
+</CardGroup>
+
+## Regenerating Your API Key
+
+If your API key is compromised or you need to revoke access:
+
+1. Go to **Settings** → **API**
+2. Click **Regenerate API Key**
+3. Confirm the action
+4. Update all integrations with the new key
+
+<Warning>
+  Regenerating an API key immediately invalidates the old key. Any integrations using the old key will stop working until updated.
+</Warning>
+
+## Testing Your Authentication
+
+You can test your API key with a simple GET request to retrieve your brand details:
+
+```bash
+curl https://app.elasticfunnels.io/api/brands/{brand_id} \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+A successful response will return your project information with a `200 OK` status.
+

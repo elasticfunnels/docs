@@ -1,0 +1,466 @@
+---
+title: 'Analytics'
+description: 'Retrieve analytics metrics and performance data'
+---
+
+## Get Available Metrics
+
+Retrieve the list of available metrics you can track.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="split_test_id" type="string">
+  Filter metrics relevant to split tests (optional)
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/analytics/metrics
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "revenue": {
+    "type": "revenue",
+    "name": "Revenue",
+    "base": "revenue",
+    "color": "#10b981",
+    "icon": "<svg>...</svg>",
+    "info": "Total revenue from orders",
+    "group_name": "Sales",
+    "modules": ["conversions"]
+  },
+  "sales": {
+    "type": "sales",
+    "name": "Sales",
+    "base": "sales",
+    "color": "#3b82f6",
+    "group_name": "Sales",
+    "modules": ["conversions"]
+  },
+  "page_views": {
+    "type": "page_views",
+    "name": "Page Views",
+    "base": "page_views",
+    "group_name": "Traffic",
+    "modules": ["tracking"]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Metrics Data
+
+Retrieve actual metrics values for a date range.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="start" type="string" required>
+  Start date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="end" type="string" required>
+  End date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="tz" type="string">
+  Timezone (e.g., "America/New_York")
+</ParamField>
+
+<ParamField query="selected_metrics" type="array">
+  Array of metric keys to retrieve
+</ParamField>
+
+<ParamField query="filter[field]" type="string">
+  Filter by specific field values (e.g., `filter[aff_id]=123`)
+</ParamField>
+
+<ParamField query="page_id" type="string">
+  Filter by specific page
+</ParamField>
+
+<ParamField query="split_test_id" type="string">
+  Filter by specific split test
+</ParamField>
+
+<ParamField query="engine" type="string">
+  Analytics engine: `elasticsearch` or `clickhouse` (optional)
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/analytics/metrics/data
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/data?start=2024-12-01T00:00:00Z&end=2024-12-10T23:59:59Z&selected_metrics[]=revenue&selected_metrics[]=sales&selected_metrics[]=page_views" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "revenue": {
+    "value": 15750.00,
+    "formatted_value": "$15,750.00",
+    "previous_value": 12300.00,
+    "change": 28.05,
+    "change_symbol": "+",
+    "current_range": "Dec 1 - Dec 10",
+    "previous_range": "Nov 20 - Nov 30",
+    "previous_range_label": "Previous Period",
+    "lower_is_better": false,
+    "neutral": false
+  },
+  "sales": {
+    "value": 315,
+    "formatted_value": "315",
+    "previous_value": 246,
+    "change": 28.05,
+    "change_symbol": "+",
+    "lower_is_better": false
+  },
+  "page_views": {
+    "value": 10500,
+    "formatted_value": "10,500",
+    "previous_value": 8750,
+    "change": 20.00,
+    "change_symbol": "+"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Analytics Cards
+
+Retrieve specialized analytics cards data (video analytics, fulfillment metrics, etc.).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="start" type="string" required>
+  Start date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="end" type="string" required>
+  End date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="enabled_cards" type="array">
+  Array of card types to retrieve
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/analytics/metrics/cards
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/cards?start=2024-12-01T00:00:00Z&end=2024-12-10T23:59:59Z&enabled_cards[]=video_play_rate&enabled_cards[]=time_on_page_before_purchase" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "cards": {
+    "video_analytics": {
+      "video_play_rate": {
+        "value": 0.65,
+        "formatted_value": "65%"
+      },
+      "average_video_watch_time": {
+        "value": 185.5,
+        "formatted_value": "3:05"
+      }
+    },
+    "advanced_metrics": {
+      "time_on_page_before_purchase": {
+        "value": 320,
+        "formatted": "5:20",
+        "sample_size": 315
+      }
+    }
+  },
+  "enabled_cards": ["video_play_rate", "time_on_page_before_purchase"],
+  "filters_applied": {
+    "date_range": ["2024-12-01T00:00:00Z", "2024-12-10T23:59:59Z"],
+    "page_id": null,
+    "split_test_id": null
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Grouped Metrics
+
+Retrieve metrics grouped by a specific field (e.g., by product, page, affiliate).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="field" type="string" required>
+  Grouping field: `product`, `page`, `aff_id`, `day`, `hour`, `country`, `device`, `utm_source`, etc.
+</ParamField>
+
+<ParamField query="start" type="string" required>
+  Start date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="end" type="string" required>
+  End date (ISO 8601 format)
+</ParamField>
+
+<ParamField query="selected_metrics" type="array">
+  Array of metric keys to retrieve
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/analytics/metrics/{field}/data
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/product/data?start=2024-12-01T00:00:00Z&end=2024-12-10T23:59:59Z&selected_metrics[]=revenue&selected_metrics[]=sales" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "row_key": "PROD-001",
+    "row_name": "Main Product",
+    "revenue": {
+      "value": 9875.00,
+      "formatted_value": "$9,875.00"
+    },
+    "sales": {
+      "value": 198,
+      "formatted_value": "198"
+    }
+  },
+  {
+    "row_key": "PROD-002",
+    "row_name": "Upsell Product",
+    "revenue": {
+      "value": 5875.00,
+      "formatted_value": "$5,875.00"
+    },
+    "sales": {
+      "value": 117,
+      "formatted_value": "117"
+    }
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## Export Grouped Metrics
+
+Export grouped metrics to CSV or Excel.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="field" type="string" required>
+  Grouping field
+</ParamField>
+
+<ParamField body="metrics" type="array">
+  Array of metric keys to export
+</ParamField>
+
+<ParamField body="format" type="string">
+  Export format: `csv` or `excel` (default: `csv`)
+</ParamField>
+
+<ParamField body="date_range" type="object">
+  Date range object with start/end dates
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/analytics/metrics/{field}/export
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/product/export" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metrics": ["revenue", "sales", "aov"],
+    "format": "csv",
+    "date_range": {
+      "start": "2024-12-01",
+      "end": "2024-12-10"
+    }
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Export has been queued. You will receive an email when it's ready.",
+  "status": "queued",
+  "field": "product"
+}
+```
+</ResponseExample>
+
+---
+
+## Available Grouping Fields
+
+<AccordionGroup>
+  <Accordion title="Time & Date">
+    - `hour` - Hour of day (0-23)
+    - `day` - Calendar day
+    - `week` - Week number
+    - `month` - Month
+    - `year` - Year
+    - `hour_of_day` - Time grouping
+  </Accordion>
+
+  <Accordion title="Business">
+    - `aff_id` - Affiliate (requires permission)
+    - `subid` - Sub ID
+    - `merchant_id` - Merchant
+    - `page` - Landing page
+    - `product` - Product
+    - `funnel_id` - Funnel
+  </Accordion>
+
+  <Accordion title="Geography">
+    - `country` - Visitor country
+    - `region` - Visitor region
+    - `shipping_country` - Shipping destination
+    - `shipping_state` - Shipping state
+  </Accordion>
+
+  <Accordion title="Technology">
+    - `device` - Device type (desktop/mobile/tablet)
+    - `os` - Operating system
+    - `browser` - Browser type
+    - `screen_resolution` - Screen size
+    - `language` - Browser language
+  </Accordion>
+
+  <Accordion title="Marketing">
+    - `utm_source` - Traffic source
+    - `utm_medium` - Marketing medium
+    - `utm_campaign` - Campaign
+    - `utm_term` - Keyword/term
+    - `utm_content` - Ad content
+    - `referrer` - Referring website
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Compound Grouping
+
+You can group by multiple fields simultaneously using semicolon separation:
+
+```bash
+GET /api/brands/{brand}/analytics/metrics/product;page/data
+```
+
+This groups metrics by both product AND page.
+
+---
+
+## Filtering
+
+Apply filters using the `filter[field]` query parameter:
+
+```bash
+# Filter by affiliate
+GET /api/brands/{brand}/analytics/metrics/data?filter[aff_id]=123
+
+# Filter by device
+GET /api/brands/{brand}/analytics/metrics/data?filter[device]=mobile
+
+# Filter by country
+GET /api/brands/{brand}/analytics/metrics/data?filter[country]=US
+
+# Multiple filters
+GET /api/brands/{brand}/analytics/metrics/data?filter[device]=mobile&filter[country]=US
+```
+
+---
+
+## Custom Metrics
+
+You can create custom metrics using formulas:
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/data?start=2024-12-01T00:00:00Z&end=2024-12-10T23:59:59Z&selected_metrics[]=metric_0" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "metric": {
+      "0": {
+        "name": "Profit Margin",
+        "formula": "($revenue - $cogs - $ad_spend) / $revenue * 100",
+        "as": "pct"
+      }
+    }
+  }'
+```
+
+Custom metric formulas support:
+- Basic math operators: `+`, `-`, `*`, `/`, `()`
+- Variables: `$metric_name` (e.g., `$revenue`, `$sales`)
+- Format types: `currency`, `pct` (percentage), `time`, `number`
+
+---
+
+## Common Metrics
+
+| Metric | Description | Module Required |
+|--------|-------------|-----------------|
+| `revenue` | Total revenue | conversions |
+| `sales` | Number of orders | conversions |
+| `aov` | Average order value | conversions |
+| `conversion_rate` | Conversion percentage | conversions, tracking |
+| `page_views` | Total page views | tracking |
+| `sessions` | Unique sessions | tracking |
+| `engagement_rate` | User engagement | tracking |
+| `time_on_page` | Avg time on page | tracking |
+| `ad_spend` | Advertising cost | integrations |
+| `roas` | Return on ad spend | conversions, integrations |
+| `cogs` | Cost of goods sold | conversions |
+| `net_revenue` | Revenue minus costs | conversions |
+
+---
+
+## Notes
+
+<Info>
+  - All dates should be in ISO 8601 format
+  - The system automatically compares current period with previous period of equal length
+  - Some metrics require specific modules to be enabled
+  - Permission-restricted metrics (like `aff_id`) require appropriate user permissions
+  - Both Elasticsearch and ClickHouse backends are supported (auto-selected based on brand configuration)
+</Info>
+
+<Warning>
+  When grouping by `aff_id`, ensure your API key's user has the `affiliates.view` permission
+</Warning>

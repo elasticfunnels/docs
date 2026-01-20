@@ -86,6 +86,7 @@
               "integrations/campaigns-management",
               "integrations/google-ads",
               "integrations/google-analytics",
+              "integrations/shopify-order-sync",
               "integrations/buygoods",
               "integrations/clickbank",
               "integrations/affiliate-tracking"
@@ -122,6 +123,32 @@
             "pages": [
               "debugging/overview",
               "debugging/debug-window"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/quick-start",
+              "api-reference/authentication",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoints/brands",
+              "api-reference/endpoints/pages",
+              "api-reference/endpoints/products",
+              "api-reference/endpoints/funnels",
+              "api-reference/endpoints/conversions",
+              "api-reference/endpoints/analytics",
+              "api-reference/endpoints/tickets"
             ]
           }
         ]
