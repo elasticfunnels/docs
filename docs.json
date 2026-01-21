@@ -61,6 +61,7 @@
               "pages/overview",
               "pages/create-landing-page",
               "pages/page-variants",
+              "pages/page-revisions",
               "pages/visitor-based-content",
               "pages/interactions-panel",
               "pages/containers",
