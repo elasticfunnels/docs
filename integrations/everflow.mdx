@@ -5,7 +5,7 @@ description: 'Send conversion postbacks to Everflow for attribution tracking and
 
 ## Overview
 
-The Everflow integration enables outbound conversion tracking to the Everflow affiliate platform. When users click Everflow tracking links and land on your pages, the transaction_id is captured. When conversions occur (from BuyGoods, ClickBank, or other merchants), postbacks are automatically sent to Everflow with conversion data, enabling accurate attribution and split test tracking.
+The Everflow integration enables outbound conversion tracking to the Everflow affiliate platform. When users click Everflow tracking links and land on your pages, the transaction_id is captured. When conversions occur (from any payment gateway or affiliate network), postbacks are automatically sent to Everflow with conversion data, enabling accurate attribution and split test tracking.
 
 ## What This Integration Provides
 
@@ -31,7 +31,7 @@ The Everflow integration enables outbound conversion tracking to the Everflow af
 1. **User clicks Everflow tracking link** → Everflow generates transaction_id
 2. **Everflow redirects to your page** → Appends transaction_id to URL (e.g., `?transaction_id=ABC123` or `?sub1=ABC123`)
 3. **ElasticFunnels captures parameters** → Stored in click tracking data
-4. **Customer makes purchase** → Via BuyGoods, ClickBank, or other payment gateway
+4. **Customer makes purchase** → Via any payment gateway or affiliate network
 5. **Postback automatically sent** → Conversion data sent to Everflow with transaction_id for attribution
 
 ```mermaid
@@ -45,7 +45,7 @@ graph LR
 
 ### What Makes This Unique
 
-Unlike BuyGoods or ClickBank integrations (which **receive** conversions), Everflow is **outbound only** - we send conversion data to Everflow for attribution, similar to how Google Ads and Meta Ads integrations work.
+Unlike affiliate network integrations that **receive** conversions, Everflow is **outbound only** - we send conversion data to Everflow for attribution, similar to how Google Ads and Meta Ads integrations work.
 
 <Info>
 This integration is perfect for affiliates and media buyers who want to track which landers and pre-landers generate the best conversions in Everflow.
@@ -145,7 +145,7 @@ Choose which merchants should send postbacks to Everflow:
 
 **All Merchants (Default):**
 - Postbacks sent for conversions from any payment gateway
-- Works with BuyGoods, ClickBank, Stripe, PayPal, etc.
+- Works with any payment gateway or affiliate network
 
 **Specific Merchants:**
 - Click "Specific merchants" radio button
@@ -489,7 +489,7 @@ The integration respects your privacy settings. Optional parameters are only sen
 - **No incoming postbacks** - Everflow doesn't send data to us
 - **Triggered by conversions** - Postbacks fire when purchases occur in ElasticFunnels
 - **Attribution only** - Used to tell Everflow which tracking links generated conversions
-- **Works with any merchant** - Compatible with BuyGoods, ClickBank, Stripe, or any other payment processor
+- **Works with any merchant** - Compatible with any payment gateway or affiliate network
 
 ## Frequently Asked Questions
 
@@ -502,12 +502,12 @@ The integration respects your privacy settings. Optional parameters are only sen
     - The system automatically checks fallbacks if the configured parameter isn't found
   </Accordion>
 
-  <Accordion title="Can I use Everflow with BuyGoods/ClickBank?">
-    **Answer:** Yes! Everflow tracks attribution (which lander generated the conversion), while BuyGoods/ClickBank handles the actual payment processing. They work together perfectly:
+  <Accordion title="Can I use Everflow with my payment processor?">
+    **Answer:** Yes! Everflow tracks attribution (which lander generated the conversion), while your payment gateway handles the actual payment processing. They work together perfectly:
     
     1. Customer clicks Everflow link (transaction_id captured)
     2. Customer lands on your page
-    3. Customer purchases via BuyGoods/ClickBank
+    3. Customer purchases via your payment gateway
     4. ElasticFunnels sends postback to Everflow with transaction_id
     5. Everflow attributes the conversion to the original tracking link
   </Accordion>
@@ -599,17 +599,7 @@ Async processing ensures that even if Everflow is temporarily slow or unavailabl
 
 ### Works With Any Payment Gateway
 
-The Everflow integration works regardless of which payment gateway you use:
-
-- ✅ BuyGoods
-- ✅ ClickBank
-- ✅ Digistore24
-- ✅ Stripe
-- ✅ PayPal
-- ✅ NMI
-- ✅ Any other payment processor
-
-Everflow tracks attribution (which link/lander generated the conversion), independent of how payment is processed.
+The Everflow integration works regardless of which payment gateway you use. Everflow tracks attribution (which link/lander generated the conversion), independent of how payment is processed - whether you're using an affiliate network, credit card processor, or any other payment method.
 
 ### Works With Split Tests
 
@@ -623,18 +613,11 @@ Compatible with ElasticFunnels' built-in split testing:
 
 <CardGroup cols={2}>
   <Card
-    title="Set Up BuyGoods"
-    icon="link"
-    href="/integrations/buygoods"
+    title="Affiliate Tracking"
+    icon="chart-line"
+    href="/integrations/affiliate-tracking"
   >
-    Configure BuyGoods for payment processing
-  </Card>
-  <Card
-    title="Set Up ClickBank"
-    icon="link"
-    href="/integrations/clickbank"
-  >
-    Configure ClickBank for affiliate tracking
+    Learn about affiliate tracking and attribution
   </Card>
   <Card
     title="Analytics Dashboard"
@@ -644,10 +627,17 @@ Compatible with ElasticFunnels' built-in split testing:
     View your conversion and performance data
   </Card>
   <Card
-    title="Affiliate Tracking"
-    icon="chart-line"
-    href="/integrations/affiliate-tracking"
+    title="Split Test Analytics"
+    icon="chart-bar"
+    href="/analytics/split-test"
   >
-    Learn about affiliate tracking and attribution
+    Analyze your split test performance
+  </Card>
+  <Card
+    title="Conversion Tracking"
+    icon="bullseye-arrow"
+    href="/analytics/conversions"
+  >
+    Deep dive into your conversion data
   </Card>
 </CardGroup>
