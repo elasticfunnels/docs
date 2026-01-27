@@ -521,6 +521,22 @@ The integration respects your privacy settings. Optional parameters are only sen
     5. View results in Everflow showing which lander performed best
   </Accordion>
 
+  <Accordion title="What's the difference between Whitelist and Blacklist?">
+    **Answer:**
+    - **Whitelist** - Only send postbacks for specific affiliate IDs (e.g., only your top 5 affiliates)
+    - **Blacklist** - Block specific affiliate IDs from sending postbacks (e.g., exclude fraudulent affiliates)
+    - **All affiliates** - Send postbacks for everyone (default)
+    
+    Affiliate IDs come from your payment gateway and identify which affiliate generated the sale.
+  </Accordion>
+
+  <Accordion title="Can I filter by both Merchants and Affiliates?">
+    **Answer:** Yes! You can combine filters:
+    - Merchant filter: Only specific payment gateways
+    - Affiliate whitelist: Only specific affiliate IDs
+    - Result: Very targeted tracking (e.g., only BuyGoods conversions from affiliate 12345)
+  </Accordion>
+
   <Accordion title="What if I don't see transaction_id in my URL?">
     **Answer:** Everflow might be passing the transaction_id via a sub-parameter (like sub1). Check your Everflow offer configuration or contact your affiliate manager to find out which parameter is used.
   </Accordion>

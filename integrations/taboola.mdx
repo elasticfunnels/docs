@@ -133,7 +133,28 @@ Choose which merchants should send postbacks to Taboola:
 - Select which merchants to track
 - Only selected merchants will send postbacks
 
-### Step 7: Save and Test
+### Step 7: Configure Affiliate Filtering (Optional)
+
+Control which affiliates' conversions are sent to Taboola:
+
+**All Affiliates (Default):**
+- Postbacks sent for all affiliate conversions
+
+**Whitelist (Only These):**
+- Click "+ Add Affiliate ID" to add allowed affiliate IDs
+- Only conversions from these affiliate IDs will send postbacks
+- Useful for tracking only your top-performing affiliates
+
+**Blacklist (Exclude These):**
+- Click "+ Add Affiliate ID" to add blocked affiliate IDs
+- Conversions from these affiliate IDs will NOT send postbacks
+- Useful for excluding fraudulent or low-quality affiliates
+
+<Tip>
+Affiliate IDs come from your payment gateway (BuyGoods, ClickBank, etc.). They identify which affiliate generated the sale.
+</Tip>
+
+### Step 8: Save and Test
 
 1. Click **"Save Integration"**
 2. Test by clicking a Taboola ad and making a purchase
@@ -440,6 +461,22 @@ Compatible with running multiple Taboola campaigns:
     3. Make a small test purchase
     4. Check Taboola dashboard to verify conversion was received
     5. Review ElasticFunnels Logs → External Postbacks to confirm sending
+  </Accordion>
+
+  <Accordion title="What's the difference between Whitelist and Blacklist for affiliates?">
+    **Answer:**
+    - **Whitelist** - Only send postbacks for specific affiliate IDs (e.g., only your top performers)
+    - **Blacklist** - Block specific affiliate IDs from sending postbacks (e.g., exclude fraud)
+    - **All affiliates** - Send postbacks for everyone (default)
+    
+    Affiliate IDs come from your payment gateway and identify which affiliate generated the sale.
+  </Accordion>
+
+  <Accordion title="Can I filter by both Merchants and Affiliates?">
+    **Answer:** Yes! Filters can be combined:
+    - Merchant filter: Only specific payment gateways
+    - Affiliate whitelist: Only specific affiliate IDs
+    - Result: Highly targeted tracking
   </Accordion>
 </AccordionGroup>
 
