@@ -1,0 +1,589 @@
+---
+title: 'Taboola Integration'
+description: 'Send conversion postbacks to Taboola for native advertising campaign optimization'
+---
+
+## Overview
+
+The Taboola integration enables S2S (server-to-server) conversion tracking to Taboola's native advertising platform. When conversions occur in ElasticFunnels, postbacks are automatically sent to Taboola with conversion data, enabling accurate campaign attribution and optimization.
+
+## What This Integration Provides
+
+<CardGroup cols={2}>
+  <Card title="Conversion Postbacks" icon="arrow-trend-up">
+    Automatically send conversion data to Taboola when purchases occur
+  </Card>
+  <Card title="Campaign Optimization" icon="chart-line">
+    Help Taboola optimize your campaigns based on actual conversions
+  </Card>
+  <Card title="Multiple Accounts" icon="layer-group">
+    Support for multiple Taboola accounts with different settings
+  </Card>
+  <Card title="Flexible Parameters" icon="sliders">
+    Configurable parameter builder with all Taboola-supported variables
+  </Card>
+</CardGroup>
+
+## How It Works
+
+### The Flow
+
+1. **User clicks Taboola ad** → Taboola generates click ID
+2. **Taboola redirects to your page** → Appends click ID to URL (e.g., `?click_id=ABC123`)
+3. **ElasticFunnels captures click ID** → Stored in click tracking data
+4. **Customer makes purchase** → Via any payment gateway
+5. **Postback automatically sent** → Conversion data sent to Taboola with click ID for attribution
+
+### What Makes This Unique
+
+Taboola postbacks help optimize your native advertising campaigns by sending conversion data back to Taboola, similar to how conversion pixels work for Facebook or Google Ads.
+
+<Info>
+This integration is perfect for native advertising campaigns where you want Taboola's algorithm to optimize based on actual conversions, not just clicks.
+</Info>
+
+## Setup Guide
+
+### Step 1: Get Your Account ID
+
+1. Log into your Taboola account
+2. Navigate to **Account Settings**
+3. Find your **Account ID** (format: `networkname-advertiser`)
+4. Copy this ID - you'll need it in the next step
+
+<Info>
+The Account ID identifies your Taboola advertiser account. It's typically in the format `networkname-advertiser`.
+</Info>
+
+### Step 2: Configure Event in Taboola Realize
+
+Before setting up the integration, configure your conversion event in Taboola:
+
+1. Go to **Taboola Realize** (Taboola's tracking platform)
+2. Navigate to **Conversion Settings**
+3. Create or note your **Event Name** (e.g., `purchase`)
+4. This must match **exactly** (case-sensitive)
+
+<Warning>
+The Event Name must match exactly what you configure in ElasticFunnels, or conversions won't be tracked. It's case-sensitive!
+</Warning>
+
+### Step 3: Create Taboola Integration
+
+1. Navigate to **Settings → Integrations → Advertising**
+2. Find **Taboola** and click **"Activate"**
+3. Enter your **Account ID**
+4. Enter your **Event Name** (must match Taboola Realize)
+5. The postback URL will be automatically generated
+
+### Step 4: Configure Click ID Parameter
+
+Select which parameter Taboola uses to pass the click ID to your pages:
+
+<AccordionGroup>
+  <Accordion title="click_id or click-id (Most Common)">
+    Taboola passes the click ID as `click_id` or `click-id` in the URL.
+    
+    **Example:** `yoursite.com/page?click_id=ABC123`
+    
+    **Use when:** Your Taboola campaign uses standard tracking parameters.
+  </Accordion>
+
+  <Accordion title="taboola_click_id (Alternative)">
+    Some Taboola campaigns use a prefixed parameter name.
+    
+    **Example:** `yoursite.com/page?taboola_click_id=ABC123`
+    
+    **Use when:** Your Taboola tracking links use this parameter name.
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+**How to check:** Look at a sample Taboola tracking link. The parameter that contains the long unique ID is your click ID parameter.
+</Info>
+
+### Step 5: Customize Parameters (Optional)
+
+Use the parameter builder to customize what data is sent to Taboola:
+
+1. **Default parameters** are pre-configured (click-id, name, revenue, currency, orderid)
+2. **Add custom parameters** by clicking "+ Add Parameter"
+3. **Select variables** from the dropdown for each parameter
+4. **Remove optional parameters** by clicking the X button
+
+**Available Variables:**
+
+- **Required:** click_id, event_name
+- **Conversion:** order_id, revenue, currency, quantity
+- **Customer:** email, phone
+
+<Warning>
+**click-id and name are required** and cannot be removed. Taboola needs these to attribute conversions correctly.
+</Warning>
+
+### Step 6: Configure Merchant Filtering (Optional)
+
+Choose which merchants should send postbacks to Taboola:
+
+**All Merchants (Default):**
+- Postbacks sent for conversions from any payment gateway
+
+**Specific Merchants:**
+- Click "Specific merchants" radio button
+- Select which merchants to track
+- Only selected merchants will send postbacks
+
+### Step 7: Save and Test
+
+1. Click **"Save Integration"**
+2. Test by clicking a Taboola ad and making a purchase
+3. Verify conversion appears in Taboola dashboard
+
+## Configuration Options
+
+### Postback URL
+
+The postback URL is automatically generated from your Account ID and parameters:
+
+**Format:**
+```
+https://trc.taboola.com/actions-handler/log/{ACCOUNT_ID}/s2s-action?click-id={click_id}&name={event_name}&revenue={revenue}&currency={currency}&orderid={order_id}
+```
+
+**When a conversion happens, macros are replaced:**
+```
+https://trc.taboola.com/actions-handler/log/mynetwork-advertiser/s2s-action?click-id=ABC123&name=purchase&revenue=99.99&currency=USD&orderid=ORD456
+```
+
+### Account ID
+
+Your Taboola advertiser account identifier. Typically in format `networkname-advertiser`.
+
+### Event Name
+
+The event name **must match** what's configured in Taboola Realize. Common values:
+- `purchase` - For completed purchases
+- `lead` - For lead submissions
+- `signup` - For registrations
+- Custom names as configured in your Taboola account
+
+<Warning>
+Event Name is **case-sensitive**. `purchase` ≠ `Purchase` ≠ `PURCHASE`
+</Warning>
+
+### Click ID Parameter
+
+Tells ElasticFunnels which URL parameter contains Taboola's click ID. Options:
+- `click_id` (common)
+- `click-id` (Taboola standard)
+- `taboola_click_id` (alternative)
+
+## Parameter Builder
+
+### How to Use
+
+<Steps>
+  <Step title="Add Parameter">
+    Click "+ Add Parameter" to add a new field
+  </Step>
+  
+  <Step title="Enter Parameter Name">
+    Type the parameter name (must match Taboola's requirements)
+  </Step>
+  
+  <Step title="Select Variable">
+    Choose from the dropdown which data to send
+  </Step>
+  
+  <Step title="View Generated URL">
+    The URL field updates automatically
+  </Step>
+</Steps>
+
+### Two-Way Sync
+
+The URL and parameter builder stay in sync:
+
+- **Edit URL directly** → Parameters automatically parse and display
+- **Change parameters** → URL automatically updates
+- **Change Account ID or Event Name** → URL updates to match
+
+## Available Variables
+
+### Required Variables
+
+<ParamField path="click-id" type="string" required>
+  Taboola click ID captured from the tracking URL. **Required for attribution.** Must be exactly `click-id` (with hyphen).
+</ParamField>
+
+<ParamField path="name" type="string" required>
+  Event name as configured in Taboola Realize. **Case-sensitive.** Must match exactly.
+</ParamField>
+
+### Conversion Data
+
+<ParamField path="revenue" type="number">
+  Conversion amount (formatted as decimal, e.g., 99.99)
+</ParamField>
+
+<ParamField path="currency" type="string">
+  Currency code (e.g., USD, GBP, EUR). Supports 19 currencies.
+</ParamField>
+
+<ParamField path="orderid" type="string">
+  Your order/conversion ID from ElasticFunnels
+</ParamField>
+
+<ParamField path="quantity" type="integer">
+  Item quantity in the order
+</ParamField>
+
+### Customer Information
+
+<ParamField path="email" type="string">
+  Customer email address (optional)
+</ParamField>
+
+<ParamField path="phone" type="string">
+  Customer phone number (optional)
+</ParamField>
+
+## Supported Currencies
+
+Taboola supports the following currencies:
+
+`AUD`, `BRL`, `CAD`, `CNY`, `EUR`, `GBP`, `HKD`, `ILS`, `INR`, `JPY`, `KRW`, `MXN`, `NZD`, `RUB`, `SGD`, `THB`, `TRY`, `USD`, `ZAR`
+
+<Info>
+If currency is omitted, Taboola uses your account's default currency.
+</Info>
+
+## Use Cases
+
+### For Advertisers
+
+Track your native advertising performance:
+- Optimize campaigns based on conversions
+- Track ROI and ROAS accurately
+- Multiple campaign tracking with different account IDs
+- Event-based conversion tracking
+
+### For Agencies
+
+Manage multiple client accounts:
+- Separate integration per client
+- Different event names per campaign type
+- Merchant-specific tracking
+- Campaign performance isolation
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No Conversions Showing in Taboola">
+    **Possible Causes:**
+    - Click ID not found in click data
+    - Event Name doesn't match Taboola Realize
+    - Integration not enabled
+    
+    **Solution:**
+    1. Verify customer clicked a Taboola ad before purchasing
+    2. Check Event Name matches Taboola Realize exactly (case-sensitive)
+    3. Verify integration is enabled
+    4. Check ElasticFunnels logs for postback attempts
+  </Accordion>
+
+  <Accordion title="Event Name Not Matching">
+    **Issue:** Taboola reports "Event not found" or similar error
+    
+    **Solution:**
+    1. Log into Taboola Realize
+    2. Check the exact Event Name (case-sensitive)
+    3. Update ElasticFunnels integration to match exactly
+    4. Event Name must be configured in Taboola first
+  </Accordion>
+
+  <Accordion title="Click ID Not Found">
+    **Issue:** Postbacks not sending because click ID isn't detected
+    
+    **Solution:**
+    1. Check which parameter Taboola uses in tracking URLs
+    2. Update "Click ID Parameter" dropdown to match
+    3. Common options: click_id, click-id, taboola_click_id
+    4. System automatically checks fallbacks
+  </Accordion>
+
+  <Accordion title="204 No Content Response">
+    **Explanation:** This is normal! Taboola returns HTTP 204 (No Content) for successful postbacks.
+    
+    **What it means:** Your postback was received and processed successfully by Taboola.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Steps>
+  <Step title="Configure Event in Taboola First">
+    Always set up your conversion event in Taboola Realize before configuring ElasticFunnels.
+  </Step>
+  
+  <Step title="Match Event Name Exactly">
+    Event Name is case-sensitive. `purchase` ≠ `Purchase`. Double-check spelling and capitalization.
+  </Step>
+  
+  <Step title="Test with Small Campaign">
+    Test the integration with a small Taboola campaign first to verify tracking works.
+  </Step>
+  
+  <Step title="Monitor Taboola Dashboard">
+    Check your Taboola dashboard to confirm conversions are being received.
+  </Step>
+  
+  <Step title="Use Standard Parameter Names">
+    Stick to Taboola's standard parameter names (click-id, revenue, orderid) for compatibility.
+  </Step>
+</Steps>
+
+## Technical Details
+
+### Postback Method
+
+Postbacks are sent via **HTTP GET requests**, which is the standard for Taboola S2S integration.
+
+### Response Codes
+
+- **204 No Content** - Success (standard Taboola response)
+- **200 OK** - Also considered success
+- **4xx/5xx** - Error (logged for debugging)
+
+### Error Handling
+
+The integration includes comprehensive error handling:
+- Failed postbacks are logged but don't break conversion creation
+- Network timeouts handled gracefully
+- Invalid URLs caught and logged
+- System continues working even if Taboola is temporarily unavailable
+
+### Queue Processing
+
+Postbacks are processed asynchronously via the `conversions` queue:
+- Doesn't slow down conversion creation
+- Automatic retry on temporary failures
+- Can be monitored via queue logs
+
+## Compatibility
+
+### Works With Any Payment Gateway
+
+The Taboola integration works regardless of which payment gateway you use. Taboola tracks attribution (which ad generated the conversion), independent of how payment is processed.
+
+### Works With Multiple Campaigns
+
+Compatible with running multiple Taboola campaigns:
+- Different Account IDs per campaign
+- Different Event Names per conversion type
+- Merchant-specific tracking per campaign
+
+## Integration Architecture
+
+<Note>
+**Important:** Taboola is an **outbound integration** - we send conversion data TO Taboola, we don't receive data FROM Taboola. This is the same pattern as Google Ads and Meta Ads conversion tracking.
+</Note>
+
+### What This Means
+
+- **No incoming postbacks** - Taboola doesn't send data to us
+- **Triggered by conversions** - Postbacks fire when purchases occur
+- **Attribution only** - Used to tell Taboola which ads generated conversions
+- **Works with any merchant** - Compatible with any payment processor
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Which click ID parameter should I use?">
+    **Answer:** Look at a sample Taboola tracking link. The parameter containing the unique ID is your click ID parameter.
+    
+    - Most campaigns use `click_id` or `click-id`
+    - Some use `taboola_click_id`
+    - The system automatically checks fallbacks
+  </Accordion>
+
+  <Accordion title="What's the difference between Event Name and Conversion Name?">
+    **Answer:** 
+    - **Event Name** - Technical identifier used in postbacks (e.g., `purchase`)
+    - **Conversion Name** - Display name in Taboola dashboard (e.g., "Product Purchase")
+    
+    Use the Event Name from Taboola Realize, not the Conversion Name.
+  </Accordion>
+
+  <Accordion title="Can I track multiple conversion types?">
+    **Answer:** Yes! Create separate integrations for each conversion type:
+    
+    - Integration 1: Event Name = `purchase` (completed purchases)
+    - Integration 2: Event Name = `lead` (lead submissions)
+    - Integration 3: Event Name = `signup` (registrations)
+    
+    Each integration can have different merchant filtering and settings.
+  </Accordion>
+
+  <Accordion title="Why does Taboola return 204 No Content?">
+    **Answer:** This is normal and expected. HTTP 204 means "success with no response body." It's Taboola's standard way of acknowledging receipt of your postback.
+  </Accordion>
+
+  <Accordion title="How long until conversions appear in Taboola?">
+    **Answer:** Postbacks are sent immediately when conversions are created (within seconds). Taboola should show the conversion in real-time or within a few minutes.
+  </Accordion>
+
+  <Accordion title="Can I test before going live?">
+    **Answer:** Yes!
+    1. Set up the integration
+    2. Click a Taboola test ad
+    3. Make a small test purchase
+    4. Check Taboola dashboard to verify conversion was received
+    5. Review ElasticFunnels Logs → External Postbacks to confirm sending
+  </Accordion>
+</AccordionGroup>
+
+## URL Parameter Format
+
+### Standard Taboola Format
+
+Taboola requires the `click-id` parameter to use a **hyphen** (not underscore):
+
+```
+✅ Correct: ?click-id=ABC123
+❌ Wrong:   ?click_id=ABC123  (underscore)
+```
+
+<Warning>
+The parameter name must be exactly `click-id` in the URL sent to Taboola, or conversions won't be recorded.
+</Warning>
+
+### How We Handle This
+
+Our integration automatically:
+- Uses `click-id` (with hyphen) in the postback URL to Taboola
+- But can detect `click_id`, `click-id`, or `taboola_click_id` from incoming URLs
+- You don't need to worry about the hyphen/underscore difference
+
+## Multiple Integrations
+
+You can create multiple Taboola integrations for different use cases:
+
+### When to Create Multiple Integrations
+
+- **Different campaigns** - Separate account IDs
+- **Different conversion types** - Different event names (purchase, lead, signup)
+- **Different merchants** - Track specific payment gateways
+- **Client separation** - Agencies managing multiple clients
+
+### How It Works
+
+Each integration is independent:
+- Has its own Account ID
+- Has its own Event Name  
+- Has its own merchant filtering
+- Sends separately to Taboola
+
+<Tip>
+Name each integration clearly (e.g., "Taboola - Purchase Events", "Taboola - Lead Events") to keep them organized.
+</Tip>
+
+## Logging & Monitoring
+
+### View Postback Logs
+
+1. Navigate to **Logs → External Postbacks**
+2. Filter to see Taboola postbacks
+3. View success/failure status
+4. See request/response details
+5. Debug any issues
+
+### What Gets Logged
+
+- Postback URL sent
+- All parameters and values
+- Response code (204 = success)
+- Response body
+- Timing information
+
+## Security & Privacy
+
+### Data Handling
+
+- **Click ID** - Unique identifier from Taboola (not sensitive)
+- **Customer Data** - Only sent if configured (email, phone are optional)
+- **HTTPS Only** - All postbacks use secure connections
+- **URL Encoding** - All data properly encoded
+
+### Privacy Considerations
+
+You can exclude customer information:
+- Disable email parameter if needed
+- Disable phone parameter
+- Still track conversions with just revenue and order ID
+
+## External Resources
+
+<CardGroup cols={2}>
+  <Card
+    title="Taboola S2S Integration Docs"
+    icon="book"
+    href="https://developers.taboola.com/pixel/docs/s2s-manual-integration"
+  >
+    Official Taboola server-to-server integration guide
+  </Card>
+  <Card
+    title="Taboola Postback URL Reference"
+    icon="link"
+    href="https://developers.taboola.com/pixel/docs/the-postback-url"
+  >
+    Complete postback URL parameter reference
+  </Card>
+  <Card
+    title="Taboola Realize"
+    icon="chart-line"
+    href="https://ads.realizeperformance.com/tracking"
+  >
+    Configure conversion events and tracking
+  </Card>
+  <Card
+    title="Taboola Help Center"
+    icon="question-circle"
+    href="https://help.taboola.com/hc/en-us"
+  >
+    Taboola's support documentation
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Google Ads Integration"
+    icon="rectangle-ad"
+    href="/integrations/google-ads"
+  >
+    Set up Google Ads for additional conversion tracking
+  </Card>
+  <Card
+    title="Meta Ads Integration"
+    icon="rectangle-ad"
+    href="/integrations/meta-ads"
+  >
+    Connect Meta Ads for Facebook conversion tracking
+  </Card>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-mixed"
+    href="/analytics/overview"
+  >
+    View your conversion and performance data
+  </Card>
+  <Card
+    title="External Postbacks Log"
+    icon="list"
+    href="/logs"
+  >
+    Monitor your Taboola postback attempts
+  </Card>
+</CardGroup>

@@ -91,6 +91,7 @@
               "integrations/buygoods",
               "integrations/clickbank",
               "integrations/everflow",
+              "integrations/taboola",
               "integrations/affiliate-tracking"
             ]
           },
