@@ -90,6 +90,7 @@
               "integrations/shopify-order-sync",
               "integrations/buygoods",
               "integrations/clickbank",
+              "integrations/everflow",
               "integrations/affiliate-tracking"
             ]
           },
