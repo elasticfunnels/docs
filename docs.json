@@ -77,7 +77,9 @@
               "guides/how-to-set-up-a-new-merchant",
               "merchants/clickbank",
               "merchants/buygoods",
-              "merchants/digistore24"
+              "merchants/digistore24",
+              "merchants/shopify-checkout",
+              "merchants/shop-pay"
             ]
           },
           {
@@ -88,6 +90,8 @@
               "integrations/google-ads",
               "integrations/google-analytics",
               "integrations/shopify-order-sync",
+              "integrations/fulfillment",
+              "integrations/callcenters",
               "integrations/buygoods",
               "integrations/clickbank",
               "integrations/everflow",

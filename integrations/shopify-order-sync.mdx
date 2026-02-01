@@ -28,8 +28,8 @@ The Shopify Order Sync integration automatically creates orders in Shopify when 
 
 ### Step 1: Connect Your Shopify Store
 
-1. Navigate to **Integrations → Order Sync**
-2. Find **Shopify** and click **"New integration"**
+1. Navigate to **Integrations**, open the **Operations** tab, and find **Shopify**
+2. Click **"New integration"** (or open your existing Shopify integration)
 3. Enter your Shopify store domain (e.g., `yourstore.myshopify.com`)
 4. Click **"Connect to Shopify"**
 5. You'll be redirected to Shopify to authorize access
@@ -199,8 +199,8 @@ If you manage multiple Shopify stores:
 
 ### Create Multiple Integrations
 
-1. Go to **Integrations → Order Sync**
-2. Click **"New integration"** for each store
+1. Go to **Integrations** → **Operations**
+2. Click **"New integration"** for **Shopify** for each store
 3. Connect each store separately
 4. Name them clearly (e.g., "Shopify - US Store", "Shopify - EU Store")
 
@@ -220,7 +220,7 @@ This is useful if you run multiple brands or international stores. Each ElasticF
 
 If your integration shows an error or needs reconnection:
 
-1. Open your Shopify integration in **Integrations → Order Sync**
+1. Open your Shopify integration in **Integrations** → **Operations**
 2. Click **"Reconnect"** button
 3. You'll be redirected through the authorization flow again
 4. A new access token will be obtained
@@ -557,6 +557,15 @@ If you uninstall the ElasticFunnels app from Shopify:
 <Info>
 We don't retain customer information after syncing orders. All customer data lives in Shopify where you can manage it according to your privacy policy.
 </Info>
+
+## Using Shopify as checkout
+
+If you want to **sell through Shopify** from your funnels (instead of or in addition to syncing orders from other gateways), use one of these merchants:
+
+- **[Shopify Checkout](/merchants/shopify-checkout)** — Redirects visitors to your Shopify cart and native checkout. Simple cart link; no upsells in the same flow.
+- **[Shop Pay](/merchants/shop-pay)** — Creates a draft order in Shopify and sends the customer to checkout (Shop Pay one-click for returning customers; supports bumps).
+
+Both require your Shopify store to be connected in **Integrations** → **Operations** (Shopify). Map each product to a **Shopify variant ID** in the product’s **Merchant information** tab. See the linked guides for step-by-step setup.
 
 ## Next Steps
 

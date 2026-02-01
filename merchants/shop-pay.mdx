@@ -1,0 +1,79 @@
+---
+title: 'Shop Pay'
+description: 'Set up Shop Pay (Shopify draft order checkout) as a merchant, assign to a domain, and map products to Shopify variant IDs'
+---
+
+This guide explains how to set up Shop Pay as a merchant. When a visitor clicks a buy link, a draft order is created in your Shopify store and they are sent to Shopify checkout — with Shop Pay one-click for returning customers. The overall flow matches the generic merchant setup; use this page for Shop Pay–specific notes.
+
+<Note>
+**Shop Pay** uses Shopify’s Draft Order API and supports bumps (multiple line items). For a simple cart redirect to your Shopify store, see [Shopify Checkout](/merchants/shopify-checkout) instead.
+</Note>
+
+## Prerequisites
+
+- A Shopify store (same connection as Order Sync)
+- Admin access to your Shopify store and to ElasticFunnels
+
+## Step 1: Connect Shopify and enable Shop Pay
+
+Shop Pay requires your Shopify store to be connected so ElasticFunnels can create draft orders.
+
+1. Go to **Integrations** → **Operations**, find **Shopify**, and connect your store (see [Shopify Order Sync](/integrations/shopify-order-sync) for the full flow)
+2. When connecting (or in the integration settings), enable **Shop Pay** so the integration can create draft orders
+
+When you enable **Shop Pay**, a **Shop Pay** merchant is created automatically and linked to the integration. You do not need to create the merchant manually.
+
+## Step 2: Assign merchant to domain
+
+1. Go to **Settings** → **Domains** → **Edit Domain**
+2. Select your **Shop Pay** merchant (created in Step 1)
+3. Save
+
+## Step 3: Map products
+
+Each product must be linked to a **Shopify variant ID** (a numeric ID from your Shopify store).
+
+1. Go to **Settings** → **Products** → **Edit** the product
+2. Open the **Merchant information** tab
+3. Find the row for your **Shop Pay** merchant
+4. Enter the **Shopify variant ID** (numbers only) for this product
+5. Save
+
+### How to find your Shopify variant ID
+
+- **Products with variants:** In Shopify Admin go to **Products** → open the product → **Variants** → click the variant. The URL in your browser will look like `.../variants/36485954240671`. The number after `/variants/` is the variant ID.
+- **Products with a single variant:** Open the product in Shopify Admin, add `.json` to the end of the URL, and press Enter. In the JSON, look at the `variants` array and use the `id` of the first (or only) variant.
+
+<Info>
+Every Shopify product has at least one variant. Use the variant ID, not the product ID.
+</Info>
+
+## How it works
+
+When a visitor clicks a buy link on your funnel:
+
+- A **draft order** is created in your Shopify store with the selected product (and any bump products)
+- The customer is redirected to Shopify checkout to complete payment
+- Returning customers can use **Shop Pay** one-click checkout when available
+- Bumps are supported — multiple line items can be added to the same draft order
+
+There is no “decline” link; if the customer does not complete checkout, they simply leave. Use the **Setup** modal in the **Merchants** list for postback configuration and validation.
+
+## Links and Funnels
+
+Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded Shopify or Shop Pay URLs.
+
+- See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant)
+- See [Buy Links](/products/buy-links)
+- See [Advanced Purchase Links](/products/advanced-purchase-links)
+
+## Postbacks
+
+Use the **Setup** modal in the **Merchants** list for step-by-step postback instructions and your unique URL. After you configure the postback and trigger a test (or complete a test purchase), the modal will automatically mark the connection as validated once the webhook is received.
+
+## Troubleshooting
+
+- **"Product missing Shopify product ID"** or **"missing Shopify product ID"**: In the product’s **Merchant information** tab, enter the Shopify variant ID for the Shop Pay merchant. Use the steps above to find the variant ID in Shopify Admin.
+- **"Shop Pay gateway requires a Shopify integration"** or **"requires a Shopify store domain"**: Connect Shopify under **Integrations** → **Operations** and ensure the merchant is linked to that integration (e.g. via the Order Sync tab on the merchant).
+- **Wrong gateway on checkout**: Verify the domain is assigned to your Shop Pay merchant.
+- **Link not working**: Confirm the product has the correct Shopify variant ID in **Merchant information** for this merchant.

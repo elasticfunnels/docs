@@ -1,0 +1,60 @@
+---
+title: 'Fulfillment Integration'
+description: 'Automate your order fulfillment by connecting with 3PL providers like ShipOffers and Jetpack.'
+---
+
+## Overview
+
+The fulfillment integration allows you to automatically send conversion data to your fulfillment providers. Once an order is placed, ElasticFunnels syncs the details with your 3PL (Third-Party Logistics) provider to handle shipping and tracking.
+
+## Supported Providers
+
+<CardGroup cols={2}>
+  <Card title="ShipOffers" icon="ship">
+    Seamless integration with ShipOffers for automated order processing.
+  </Card>
+  <Card title="Jetpack Orders" icon="jet-fighter">
+    Fast and reliable order fulfillment via the Jetpack API.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+1. **Order Received** → A customer completes a purchase on your funnel.
+2. **Merchant Mapping** → The system identifies the merchant associated with the sale.
+3. **Integration Trigger** → If a fulfillment integration is assigned to that merchant, a job is queued.
+4. **Data Sync** → Order details (customer info, shipping address, products) are sent to the provider.
+5. **Tracking Update** → Once shipped, the provider sends back a tracking number which is synced to your dashboard.
+
+## Setup Guide
+
+### Step 1: Connect your Provider
+
+1. Go to **Settings → Integrations**.
+2. Select your fulfillment provider (e.g., **ShipOffers** or **Jetpack**).
+3. Enter your API credentials (API Key, Secret, etc.) provided by your 3PL.
+4. Save the integration.
+
+### Step 2: Assign to Merchants
+
+Unlike pixel integrations which can run globally, fulfillment is tied directly to your **Merchants**.
+
+1. Navigate to **Settings → Merchants**.
+2. Edit the merchant that should use this fulfillment provider.
+3. Select the integration in the **Fulfillment Integration** dropdown.
+4. Save the merchant settings.
+
+### Step 3: Map Product SKUs
+
+To ensure the correct items are shipped, you must ensure your product SKUs in ElasticFunnels match the SKUs in your fulfillment provider's system.
+
+1. Go to **Products**.
+2. Ensure each product has a valid **SKU** that matches your 3PL's catalog.
+
+## Automation & Sync
+
+Orders are typically processed in real-time or via a scheduled queue (usually every hour) depending on your system configuration. You can monitor the status of every fulfillment attempt in the **Conversions → Fulfillment** section.
+
+<Info>
+  If a fulfillment attempt fails (e.g., due to an invalid address), you can manually retry or edit the order details from the Fulfillment list.
+</Info>

@@ -1,0 +1,61 @@
+---
+title: 'Call Center Integration'
+description: 'Connect with call center services like HelpGrid, Logicall, and SalesBound for abandoned cart recovery and sales coaching.'
+---
+
+## Overview
+
+ElasticFunnels supports deep integration with major call center providers. These integrations allow you to recover abandoned carts or send new sales data to coaching and fulfillment teams in real-time.
+
+## Support Services
+
+<CardGroup cols={2}>
+  <Card title="HelpGrid" icon="headphones">
+    Primary integration for abandoned cart recovery and customer support postbacks.
+  </Card>
+  <Card title="SalesBound" icon="chart-line-up">
+    Send new order data for sales follow-ups and high-ticket coaching.
+  </Card>
+  <Card title="Committed Coaches" icon="users">
+    Specialized integration for high-touch coaching and sales environments.
+  </Card>
+  <Card title="Logicall" icon="phone">
+    Enterprise-grade call center integration for high-volume sales.
+  </Card>
+</CardGroup>
+
+## Common Use Cases
+
+### Abandoned Cart Recovery (HelpGrid)
+When a customer enters their email but doesn't complete the purchase, their data is sent to HelpGrid. A call center agent can then reach out to help them complete the sale.
+
+### New Order Sales (SalesBound / Committed Coaches)
+Immediately after a successful purchase, order data is sent to your sales team. This is ideal for high-ticket offers where a "welcome call" or "upsell call" is part of the flow.
+
+## Setup Guide
+
+### Step 1: Create the Integration
+
+1. Navigate to **Settings → Integrations**.
+2. Choose your provider from the list.
+3. Enter the **Webhook URL** or **API Keys** provided by your call center account manager.
+4. Save the integration.
+
+### Step 2: Configure Merchant Filtering
+
+By default, integrations can be set to listen to **All Merchants** or a specific **Whitelist**.
+
+- **All Merchants**: Every conversion or abandon across your entire brand will trigger a postback.
+- **Whitelist**: Only conversions from the selected merchants will be sent. Use this if you have different call centers for different products or regions.
+
+### Step 3: Test the Connection
+
+Most call center integrations (like HelpGrid) include a **Test Webhook** button. Use this to send a sample payload to their system and verify that the connection is active.
+
+<Tip>
+  Always verify your Webhook URL with a test before going live to ensure your data is being captured correctly.
+</Tip>
+
+## Monitoring Data
+
+You can see all outbound postbacks to your call centers in the **Logs** section of your dashboard. If a postback fails, the system will log the error response from the provider, allowing you to troubleshoot quickly.
