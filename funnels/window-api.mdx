@@ -1,0 +1,217 @@
+---
+title: 'EF API (window.ef)'
+description: 'Use the global ef object in client scripts and on the page — tags, visibility, next step, and delays.'
+---
+
+The **`window.ef`** object is available on every funnel page. Use it in **Client script** nodes, in inline scripts, or anywhere on the page to work with tags, visibility, flow control, and timing — without loading the full funnel engine.
+
+<CardGroup cols={2}>
+  <Card title="Tags" icon="cookie" href="#tags">
+    Add, check, or remove tags (same as Add tag / Has tag nodes).
+  </Card>
+  <Card title="Flow control" icon="code-branch" href="#flow-control">
+    Advance to the next step from a client script with <code>ef.nextNode()</code>.
+  </Card>
+  <Card title="Visibility" icon="eye" href="#visibility">
+    Check if an element is visible or wait until it appears.
+  </Card>
+  <Card title="Timing" icon="clock" href="#timing">
+    Delay execution with <code>ef.wait()</code>.
+  </Card>
+</CardGroup>
+
+---
+
+## Where you can use it
+
+- **Client script** node — Your script runs in the page; you can call `ef.addTag()`, `ef.nextNode()`, `ef.waitForVisible()`, etc. The flow does **not** auto-advance after a client script; call `ef.nextNode()` when you want to continue.
+- **Any inline or page script** — `window.ef` is defined early, so you can use it in `onclick`, in a `<script>` block, or from other JS.
+- **Click tracking** — Buttons or links with `data-ef-add-tag="tagname"` will add that tag when clicked (no client script needed).
+
+---
+
+## Tags
+
+Tags are stored in cookies (same as the **Add tag** and **Has tag** nodes). Use the same tag name in the builder and in `ef` so conditions and scripts stay in sync.
+
+### ef.addTag(name)
+
+Sets a tag (session cookie). Use after a conversion, CTA click, or in a client script.
+
+```javascript
+ef.addTag('saw_popup');
+ef.addTag('newsletter_signup');
+```
+
+### ef.hasTag(name)
+
+Returns `true` if the tag is set, `false` otherwise.
+
+```javascript
+if (ef.hasTag('saw_popup')) {
+  // Already saw the popup, skip
+} else {
+  // Show popup, then ef.addTag('saw_popup')
+}
+```
+
+### ef.removeTag(name)
+
+Removes the tag (deletes the cookie).
+
+```javascript
+ef.removeTag('saw_popup');
+```
+
+---
+
+## Flow control
+
+### ef.nextNode()
+
+Only meaningful inside a **Client script** node. Advances the funnel to the next step. You can call it immediately or later (e.g. after `ef.waitForVisible` or `ef.wait`).
+
+<Note>
+  In the client script you write <code>ef.nextNode()</code> with no arguments. The funnel engine replaces this with a call that knows the current node, so each script gets the correct "next" step.
+</Note>
+
+```javascript
+// Continue right away
+ef.nextNode();
+```
+
+```javascript
+// Continue after something is visible
+ef.waitForVisible('.thank-you-message', function() {
+  ef.nextNode();
+});
+```
+
+```javascript
+// Continue after a delay
+ef.wait(2000, function() {
+  ef.nextNode();
+});
+```
+
+---
+
+## Visibility
+
+### ef.isVisible(selectorOrElement)
+
+Returns `true` if the element exists and is visible (non-zero size, not `display: none`, not `visibility: hidden`, opacity &gt; 0). Accepts a CSS selector string or a DOM element.
+
+```javascript
+if (ef.isVisible('.banner')) {
+  // Banner is on screen
+}
+
+var el = document.querySelector('#my-div');
+if (ef.isVisible(el)) {
+  // Element is visible
+}
+```
+
+### ef.waitForVisible(selector, callback)
+
+Waits until an element matching the selector is in the DOM and visible, then runs the callback once. Works on refresh if the element is already visible. Returns a **cancel** function so you can stop waiting.
+
+```javascript
+ef.waitForVisible('.thank-you-message', function() {
+  ef.nextNode();
+});
+```
+
+```javascript
+// Optional: cancel if needed
+var cancel = ef.waitForVisible('.popup', function() {
+  ef.nextNode();
+});
+// cancel(); // to stop waiting
+```
+
+---
+
+## Timing
+
+### ef.wait(ms, callback)
+
+Runs the callback after `ms` milliseconds. Returns a **cancel** function (clears the timeout).
+
+```javascript
+ef.wait(3000, function() {
+  ef.nextNode();
+});
+```
+
+```javascript
+var cancel = ef.wait(5000, function() {
+  doSomething();
+});
+// cancel(); // to clear the timeout
+```
+
+---
+
+## Client script examples
+
+**Wait for an element, then continue:**
+
+```javascript
+ef.waitForVisible('.order-confirmation', function() {
+  ef.nextNode();
+});
+```
+
+**Delay, then continue:**
+
+```javascript
+ef.wait(2000, function() {
+  ef.nextNode();
+});
+```
+
+**Set a tag and continue:**
+
+```javascript
+ef.addTag('completed_survey');
+ef.nextNode();
+```
+
+**Branch in script (then continue when ready):**
+
+```javascript
+if (ef.hasTag('saw_offer')) {
+  ef.nextNode(); // go to next step
+} else {
+  ef.addTag('saw_offer');
+  ef.waitForVisible('#offer-cta', function() {
+    ef.nextNode();
+  });
+}
+```
+
+---
+
+## Adding a tag from a click (no script)
+
+Add `data-ef-add-tag="tagname"` to a link or button (or to a parent component with `data-cid`). When the user clicks, the tag is set automatically. Useful for "clicked CTA" or "opened modal" without a client script.
+
+```html
+<button data-ef-add-tag="clicked_cta">Get started</button>
+```
+
+---
+
+## Summary
+
+| Method | Description |
+|--------|-------------|
+| `ef.addTag(name)` | Set a tag (session cookie). |
+| `ef.hasTag(name)` | Returns whether the tag is set. |
+| `ef.removeTag(name)` | Remove the tag. |
+| `ef.nextNode()` | Advance to the next step (use inside Client script). |
+| `ef.isVisible(selectorOrElement)` | Returns true if the element is visible. |
+| `ef.waitForVisible(selector, callback)` | Run callback when the element is visible; returns cancel. |
+| `ef.wait(ms, callback)` | Run callback after ms milliseconds; returns cancel. |

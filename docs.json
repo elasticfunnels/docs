@@ -48,6 +48,7 @@
             "pages": [
               "funnels/page-events",
               "funnels/script-rule",
+              "funnels/window-api",
               "funnels/dynamic-content",
               "funnels/split-testing",
               "funnels/exit-popups",
