@@ -1,0 +1,60 @@
+---
+title: 'Frontend Templates'
+description: 'Use templates and variables that update in the visitor’s browser for dynamic content like cart items'
+---
+
+Frontend templates let you design content that updates in the visitor’s browser—for example, a list of cart items, totals, or conditional blocks—without reloading the page. You build the layout in the page builder; the system fills in the values when the page runs.
+
+## When to use them
+
+Use frontend templates when:
+
+- **The content depends on the visitor** – e.g. cart items, item count, total
+- **You want it to update live** – e.g. when they add to cart or change quantity, the list and total update immediately
+- **You control the layout** – you design the look (rows, labels, buttons) in the builder; only the data is dynamic
+
+If the content is the same for everyone and doesn’t change after load (e.g. a fixed headline), use normal content or [page variables](/pages/page-variables) instead.
+
+## Variables: `[[ path ]]`
+
+Values are inserted using **double square brackets** with a path:
+
+```
+[[ path.to.value ]]
+```
+
+- **Path** – A simple “path” to the value, like `item.name` or `ef-cart.total`.
+- **Where it works** – Inside template blocks (e.g. cart item rows, totals). The system replaces `[[ ... ]]` with the current value when it renders or updates.
+
+<Note>
+Use **`[[ ]]`** for values that are filled in on the frontend (e.g. cart data). Use **`{{ }}`** only for server-side variables (e.g. `{{ var.site_name }}`). They can both appear on the same page.
+</Note>
+
+### Examples
+
+| You write        | Meaning                    | Example result   |
+|------------------|----------------------------|------------------|
+| `[[ item.name ]]`  | Current item’s name        | "1 Bottle"       |
+| `[[ item.price ]]` | Unit price (formatted)     | "$69.00"         |
+| `[[ item.total ]]` | Line total (price × qty)   | "$552.00"        |
+| `[[ item.quantity ]]` | Quantity for this item | "8"           |
+| `[[ ef-cart.total ]]` | Cart total (formatted)  | "$552.00"        |
+
+You can use these in text, labels, or attributes (e.g. on buttons) inside the right template blocks.
+
+## Repeating content: the loop
+
+When you need **one block of layout repeated per item** (e.g. one row per cart item), use a **Foreach** template:
+
+1. Add a **Foreach** block from the Template Engine (or use a **Cart** block, which already includes a loop for items).
+2. Set the loop in the form **`item in ef-cart.items`** (or another path your template provides).
+3. Inside the block, use **`[[ item.name ]]`**, **`[[ item.price ]]`**, **`[[ item.total ]]`**, **`[[ item.quantity ]]`**, etc., for each row.
+
+The block is rendered once per item; `item` is the current row’s data.
+
+## Summary
+
+- Use **frontend templates** for content that updates in the browser (e.g. cart).
+- Use **`[[ path ]]`** for values filled in on the frontend.
+- Use a **loop** (e.g. Foreach / Cart) to repeat one layout per item and **`[[ item.xxx ]]`** inside it.
+- Keep **`{{ }}`** for server-side variables only; you can mix both on the same page.

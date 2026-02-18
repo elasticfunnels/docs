@@ -18,6 +18,9 @@ The **`window.ef`** object is available on every funnel page. Use it in **Client
   <Card title="Timing" icon="clock" href="#timing">
     Delay execution with <code>ef.wait()</code>.
   </Card>
+  <Card title="Video" icon="video" href="#video">
+    Check video progress (seconds or %) and run a callback when the CTA is shown.
+  </Card>
 </CardGroup>
 
 ---
@@ -164,6 +167,48 @@ var cancel = ef.wait(5000, function() {
 
 ---
 
+## Video
+
+These helpers use the same video state as the **Video progress check** and **On CTA** nodes (Vidalytics, TrackPlay, SmartPlayer, or main page video).
+
+### ef.videoProgressCheck(opts)
+
+Returns `true` if the video has reached the given position, `false` otherwise. **opts** is an object with either **`seconds`** or **`percent`** (or both).
+
+- **seconds** — Target playback time in seconds (e.g. `30` = 30 seconds).
+- **percent** — Target percentage of video length (e.g. `50` = 50%).
+
+```javascript
+if (ef.videoProgressCheck({ percent: 50 })) {
+  // Video is at or past 50%
+}
+if (ef.videoProgressCheck({ seconds: 30 })) {
+  // Video is at or past 30 seconds
+}
+```
+
+### ef.onCta(callback)
+
+Runs your **callback** when the video CTA is shown (when `video-cta-shown` fires, e.g. from `getStarted()`). The callback receives the event detail (e.g. `{ focus_on_cta, timestamp }`). Returns an **unsubscribe** function.
+
+```javascript
+ef.onCta(function(detail) {
+  ef.nextNode();
+});
+var unsubscribe = ef.onCta(function() { /* ... */ });
+// unsubscribe();
+```
+
+### ef.getVideoProgress()
+
+Returns **`{ currentTime, duration, percent }`** for the main video. Same sources as the funnel video nodes.
+
+```javascript
+var progress = ef.getVideoProgress();
+```
+
+---
+
 ## Client script examples
 
 **Wait for an element, then continue:**
@@ -225,3 +270,6 @@ Add `data-ef-add-tag="tagname"` to a link or button (or to a parent component wi
 | `ef.isVisible(selectorOrElement)` | Returns true if the element is visible. |
 | `ef.waitForVisible(selector, callback)` | Run callback when the element is visible; returns cancel. |
 | `ef.wait(ms, callback)` | Run callback after ms milliseconds; returns cancel. |
+| `ef.videoProgressCheck(opts)` | Returns true if video reached `opts.seconds` and/or `opts.percent`. |
+| `ef.onCta(callback)` | Run callback when video CTA is shown; returns unsubscribe. |
+| `ef.getVideoProgress()` | Returns `{ currentTime, duration, percent }` for the main video. |

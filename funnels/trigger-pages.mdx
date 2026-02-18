@@ -1,0 +1,53 @@
+---
+title: "Trigger Pages"
+description: "Define which pages can start a funnel — the first step after entry in the funnel builder."
+---
+
+**Trigger pages** are the pages that can **start** a funnel. They correspond to the first page (or page group) right after the **entry** node in the funnel builder. Only visits that land on one of these pages are considered to be "in" this funnel from the start.
+
+## Why trigger pages matter
+
+- They define the **entry points** for the funnel (e.g. which VSL or landing page URLs count as the start of this funnel).
+- They stay in sync with the funnel flow: when you change the flow in the builder (e.g. connect entry to different pages), trigger pages are updated automatically when you save the builder.
+- When you edit them in the funnel form (**Trigger pages** tab), saving updates both the stored list and the flow so the builder and the form always match.
+
+## Where to set them
+
+When creating or editing a funnel, open the funnel form (e.g. from the Funnels list). The form has three tabs:
+
+1. **General** — Title, status, domains.
+2. **Trigger pages** — List of pages that can start this funnel.
+3. **Trigger Rules** — When to use this funnel (e.g. by country, affiliate, or query). See [Trigger Rules](/funnels/trigger-rules).
+
+In the **Trigger pages** tab you can:
+
+- See the currently selected trigger pages as removable tags.
+- Click **Add Page** to open a searchable dropdown and add one or more pages.
+- Remove a page by clicking the × on its tag.
+- Save the funnel — the flow (the node connected to entry in the builder) is updated to match.
+
+If the funnel has any trigger pages (or trigger rules), the tab shows an **orange badge** with the count so you can see at a glance that they're configured.
+
+## How they relate to the funnel builder
+
+In the **funnel builder**, the **entry** node is the start of the flow. The node(s) connected directly from entry are either:
+
+- A single **page** node — that page is the only trigger page.
+- A **page group** node — the pages in that group are the trigger pages.
+
+When you:
+
+- **Save the funnel form** with changes to trigger pages — the app updates the flow so the entry connects to a page group (or single page) with exactly those pages.
+- **Save the funnel builder** after changing which pages follow entry — the app updates the stored trigger pages list to match the flow.
+
+So the **Trigger pages** tab and the **builder** always reflect the same set of entry pages once you save from either place.
+
+## Summary
+
+| What you do | What happens |
+|-------------|---------------|
+| Add/remove pages in the **Trigger pages** tab and save the funnel | Stored trigger pages and the flow (entry → page group) are updated. |
+| Change the flow in the builder (e.g. connect entry to different pages) and save | Stored trigger pages are updated to match the flow. |
+| Open a funnel that was created before trigger pages existed | Trigger pages are derived from the current flow; you can edit them in the tab and save to store them. |
+
+For rule-based behavior (when to show this funnel by country, affiliate, or URL), see [Trigger Rules](/funnels/trigger-rules).

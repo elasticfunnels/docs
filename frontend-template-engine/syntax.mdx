@@ -1,0 +1,219 @@
+---
+title: 'Syntax'
+description: 'template-if, template-else-if, template-else, template-foreach, template-set, template-vars, and [[ expression ]] in the frontend template engine.'
+---
+
+This page describes the **directives** and **expression syntax** of the frontend template engine.
+
+<Info>
+Use **`[[ ]]`** for frontend expressions. **`{{ }}`** is reserved for the backend Template Engine. Both can appear on the same page.
+</Info>
+
+## Conditionals: `template-if`, `template-else-if`, `template-else`
+
+Show one block among several based on a JavaScript expression evaluated in the current scope.
+
+### `template-if`
+
+- **Attribute:** `data-condition="expression"`
+- **Behavior:** When the expression is **truthy**, the element’s inner HTML is rendered; otherwise it is not. The `<template-if>` element itself is replaced by that content.
+
+```html
+<template-if data-condition="cartItems.length > 0">
+  <p>You have [[ cartCount(cartItems) ]] items.</p>
+</template-if>
+```
+
+### Sibling `template-else`
+
+A **`<template-else>`** immediately after a `<template-if>` (or after a chain of `template-else-if`) is the fallback when no condition matches. It has **no** `data-condition`.
+
+```html
+<template-if data-condition="cartItems.length > 0">
+  <p>You have items in your cart.</p>
+</template-if>
+<template-else>
+  <p class="muted">Your cart is empty.</p>
+</template-else>
+```
+
+### `template-else-if`
+
+Chain multiple conditions. The **first** matching branch is shown; if none match, the optional `template-else` is shown.
+
+```html
+<template-if data-condition="cartItems.length > 1">
+  <div class="card">Cart has multiple items.</div>
+</template-if>
+<template-else-if data-condition="cartItems.length === 1">
+  <div class="card">You have one item.</div>
+</template-else-if>
+<template-else>
+  <div class="card muted">No items.</div>
+</template-else>
+```
+
+<Warning>
+**`template-else` always needs a preceding `template-if`.** There is no standalone “else only” block. Use `template-else-if` for the middle branches, not a tag like `template-if-else`.
+</Warning>
+
+### What you can use in `data-condition`
+
+- **Dot paths:** `checkout.coupon.applied`, `query.coupon`, `items.length`
+- **Comparisons:** `cartItems.length > 0`, `item.quantity === 1`
+- **Functions:** `cartCount(cartItems) > 0`, `checkout.selectedBumpLines && checkout.selectedBumpLines.length > 0`
+- **Literals:** `data-condition="true"` or `data-condition="false"` are supported
+
+In HTML attributes, **escape** characters that would break the attribute: use **`&gt;`** for `>`, **`&amp;`** for `&`, **`&lt;`** for `<` (e.g. **`data-condition="cartItems.length &gt; 1"`**).
+
+Expressions run in a context that includes `window.efScope` and any loop variable (e.g. `item` inside a `template-foreach`).
+
+---
+
+## Loops: `template-foreach`
+
+Repeat a block once per element in an array (or iterable). The element is replaced by the repeated content.
+
+### Preferred form: `data-each`
+
+```html
+<template-foreach data-each="item in cartItems">
+  <div class="cart-line">
+    <span>[[ item.name ]]</span>
+    <span>[[ item.quantity ]]</span>
+    <span>[[ item.total ]]</span>
+  </div>
+</template-foreach>
+```
+
+- **`item`** — Variable name for the current element (you can choose any name).
+- **`cartItems`** — Expression that must evaluate to an array (or iterable) in scope.
+
+### Optional index
+
+Use **`(item, i) in array`** or **`item, i in array`** to get a zero-based index:
+
+```html
+<template-foreach data-each="(item, i) in cartItems">
+  <div class="cart-line">
+    <span>[[ i + 1 ]]. [[ item.name ]]</span>
+  </div>
+</template-foreach>
+```
+
+### Aliases and fallbacks
+
+- **`data-for`** — Alias for `data-each` (same meaning).
+- **Legacy:** You can use **`data-item`**, **`data-index`**, and **`data-array`** instead of `data-each` if needed. **`data-item`** and **`data-array`** can also be used **together with** `data-each` when the engine expects them (e.g. for internal loop variable names), as in some production checkout templates.
+
+### Empty arrays
+
+When the array is empty, the loop renders nothing. Some integrations support an optional **empty content** (e.g. “Your cart is empty”) via configuration; the default behavior is to output no nodes.
+
+### Scope inside the loop
+
+Inside the block, **`item`** (and `i` if you declared it) are in scope. You can also access parent scope (e.g. `checkout.currency`, `cartItems`). Nested **`<template-if>`** and **`<template-foreach>`** are supported.
+
+---
+
+## Variables: `template-set` and `template-vars`
+
+### `template-set`
+
+Define a **local variable** for the template. The element is **removed** after processing; only the variable is set in the current context.
+
+- **`data-variable="name"`** — Variable name (single segment, e.g. `total` or `label`).
+- **`data-value="expression"`** — Expression to evaluate; result is stored in `name`.
+
+```html
+<template-set data-variable="lineTotal" data-value="item.price * item.quantity"></template-set>
+<p>Line total: [[ lineTotal ]]</p>
+```
+
+Use when you need to reuse a computed value or keep markup readable.
+
+### `template-vars` / `<template data-ef-vars>`
+
+Enables **`[[ var.name ]]`** and other expressions in the **content** of the element without requiring a wrapping `template-if` or `template-foreach`. The element is **replaced** by its inner content; that content is then processed (conditions, loops, and variable replacement run on it).
+
+Use **`<template-vars>`** or **`<template data-ef-vars>`** when you have a block where the only dynamic part is `[[ ... ]]` and you want to avoid an extra conditional.
+
+---
+
+## Expressions: `[[ ... ]]`
+
+**`[[ expression ]]`** is replaced by the result of the expression, evaluated in the current scope (global scope + loop/block context).
+
+### Where it works
+
+- **Text nodes:** `Price: [[ item.price ]]`
+- **Attribute values:** `src="[[ item.image ]]"`, `data-code="[[ item.code ]]"`, `required="[[ f.required ? 'required' : '' ]]"`
+- **Anywhere** inside processed template content (e.g. inside `template-if` or `template-foreach`)
+
+For cart/checkout control attributes, use **`data-code="[[ item.code ]]"`** so the plugin receives the actual product code string. Unquoted **`data-code="item.code"`** may still be supported by the engine in some contexts.
+
+### What you can write inside `[[ ]]`
+
+- **Dot paths:** `item.name`, `checkout.total`, `checkout.customer.email`
+- **Expressions:** `item.price * item.quantity`, `item.open ? 'Hide' : 'Show'`
+- **Function calls:** `formatPrice(item.price, currency)`, `upper(item.name)`, `cartCount(cartItems)`
+
+Functions available in expressions include [built-in helpers](/frontend-template-engine/built-in-functions) and any registered via `registerTemplateFunction`.
+
+### Examples
+
+| You write | Meaning | Example result |
+|-----------|---------|-----------------|
+| `[[ item.name ]]` | Current item’s name | "1 Bottle" |
+| `[[ item.price ]]` | Unit price (often pre-formatted) | "$69.00" |
+| `[[ item.total ]]` | Line total (price × qty) | "$552.00" |
+| `[[ checkout.total ]]` | Checkout total (formatted) | "$99.00" |
+| `[[ formatPrice(amount, currency) ]]` | Format a number as currency | "$49.99" |
+| `[[ item.open ? 'Hide details' : 'Show details' ]]` | Ternary | "Show details" |
+
+<Warning>
+**Checkout and cart display values** (e.g. `checkout.total`, `item.total`, `item.price`, `bump.price`) are usually **already formatted** as currency strings. Use them as-is (e.g. `[[ checkout.total ]]`). Do **not** pass them to `formatPrice()` again. Use **`formatPrice`** only for **raw** values (e.g. `checkout.total_raw`, `bump.price_raw`) when you need to display a number. See [Built-in functions](/frontend-template-engine/built-in-functions) and [Limitations and pitfalls](/frontend-template-engine/limitations-pitfalls).
+</Warning>
+
+---
+
+## Attribute binding shortcuts (`ef-*`)
+
+For many UI components, attribute bindings are easier to maintain than inline token strings:
+
+```html
+<span ef-text="checkout.product_title">Product Title</span>
+<img ef-src="checkout.product_image" ef-alt="checkout.product_title" />
+<a ef-href="links.checkout" ef-title="checkout.product_title">Continue</a>
+<input ef-placeholder="checkout.customer.email_placeholder" />
+```
+
+Supported aliases include `ef-text`, `ef-html`, `ef-src`, `ef-href`, `ef-title`, `ef-alt`, `ef-placeholder`, and `ef-value` (plus `data-` forms).
+
+These can be added from the page builder **Data Attributes** panel (right sidebar) when an element is selected.
+
+---
+
+## Cloaking
+
+To avoid a flash of raw **`[[ ... ]]`** or the wrong branch before the template engine runs:
+
+- **`[data-ef-cloak]`** — Add this attribute to elements that should be hidden until processed. The engine may remove it after processing. Include CSS: **`[data-ef-cloak] { display: none !important; }`**.
+- **Template tags** — Include CSS that hides the custom elements until processed: **`template-foreach`**, **`template-if`**, **`template-else`**, **`template-set`** with **`display: none !important`**.
+- In some deployments, **`data-frontend-template="true"`** is used on **`template-if`**, **`template-else`**, and **`template-foreach`** to mark frontend-processed blocks.
+
+---
+
+## Processing order
+
+The engine runs directives in a fixed order:
+
+1. **templateVars** — Unwrap `<template-vars>` / `<template data-ef-vars>` so inner `[[ ]]` can be processed.
+2. **set** — Process `<template-set>` (set variables, remove elements).
+3. **foreach** — Expand `<template-foreach>` (in a one-shot process path) or re-render mounted foreach on update.
+4. **if** — Expand `<template-if>` (and sibling else-if/else) or re-render mounted if on update.
+5. **vars** — Replace remaining `[[ ... ]]` in text and attributes.
+
+On **initial load**, `template-if` and `template-foreach` are **mounted**: the original tags are replaced by comment anchors and an update function is registered. When reactive scope changes happen, those functions re-evaluate and only affected parts of the DOM update.
+
+Next: [Scope & Data](/frontend-template-engine/scope-and-data).

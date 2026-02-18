@@ -1,0 +1,171 @@
+---
+title: 'Scope & Data'
+description: 'window.efScope, checkout.*, cartItems, query.*, and how the template engine resolves expressions.'
+---
+
+All expressions in the frontend template engine are evaluated against a **merged context**: the global scope (`window.efScope`) plus any local context (e.g. loop variables). This page describes what data lives where and how to use it safely.
+
+## Global scope: `window.efScope`
+
+The single source of truth for reactive data is **`window.efScope`**. The application and plugins (cart, checkout, bumps) populate and update it.
+
+- **Initialization:** The template engine ensures `window.efScope` exists when `initTemplateScope()` runs (e.g. from main.js). Cart and checkout plugins then set `cartItems`, `checkout`, etc.
+- **Updates:** `efScope` is reactive. After code changes `efScope`, the DOM updates automatically.
+
+### Typical top-level keys
+
+| Key | Description |
+|-----|-------------|
+| **`cartItems`** (or **`items`**) | Array of cart line items. Prefer **`cartItems`** in new templates. |
+| **`checkout`** | Checkout data: totals, customer fields, bump products, coupon, etc. Only set on checkout pages. |
+| **`query`** | URL query parameters as an object (e.g. `query.coupon`, `query.p`, `query.bumps`). Must be populated at init (e.g. via `syncQueryToScope()`). |
+| **`currency`** | Default currency (e.g. `USD`) when not overridden by `checkout.currency`. |
+| **`is_cart`** / **`is_single_product`** | Booleans set by the app to distinguish multi-item checkout vs single-product checkout. |
+| **`errors`** | Object keyed by field id: `{ [fieldId]: message }`. Used for checkout validation messages. |
+| **`mode`** | Helper object with e.g. `item_count`, `has_query_product`, `is_cart`, `is_single_product`. |
+
+<Warning>
+**`checkout`** is only defined on checkout pages. On other pages, `checkout` may be `undefined`. Guard with `<template-if data-condition="checkout">` if you use `checkout.*` in shared templates.
+</Warning>
+
+---
+
+## Cart: `cartItems` / `items`
+
+- **`cartItems`** — Preferred name for the array of cart line items (used on checkout and cart UI).
+- **`items`** — Alias; same data in many contexts.
+- On checkout pages the same list is also exposed as **`checkout.cart`** and **`checkout.items`**.
+
+Each **item** typically has:
+
+| Property | Description |
+|----------|-------------|
+| **`code`** | Product/cart line code (used for qty +/- and remove). |
+| **`name`** | Product name. |
+| **`image`** | Product image URL (for thumbnails). |
+| **`quantity`** | Quantity. |
+| **`price`** | Unit price — **already formatted** (e.g. "$29.00"). Use as-is in `[[ item.price ]]`. |
+| **`total`** | Line total — **already formatted**. Use `[[ item.total ]]`; do not call `formatPrice(lineTotal(item), ...)`. |
+| **`currency`** | Currency code for the line. |
+
+Cart plugin (e.g. cart.js) builds this structure and provides formatted `price` and `total`; the template engine does not re-format them.
+
+---
+
+## Checkout: `checkout.*`
+
+On **checkout pages**, `efScope.checkout` holds everything needed for the order summary, form, and payment. For full checkout-specific docs (totals, fields, coupon, bumps, payment panel), see [Checkout](/frontend-template-engine/checkout).
+
+### Totals (formatted + raw, mode-agnostic)
+
+The same totals schema is available in both checkout modes (`is_single_product` and `is_cart`), so templates can reuse one price-summary layout.
+
+Formatted keys (display):
+
+- **`checkout.product_price`**, **`checkout.retail_price`**
+- **`checkout.bump_total`**
+- **`checkout.subtotal_before_discount`**
+- **`checkout.discount_total`**
+- **`checkout.subtotal_after_discount`**
+- **`checkout.subtotal`** (legacy alias of `subtotal_after_discount`)
+- **`checkout.shipping`**, **`checkout.tax`**, **`checkout.total`**
+
+Raw keys (conditions/math):
+
+- **`checkout.product_price_raw`**, **`checkout.retail_price_raw`**
+- **`checkout.bump_total_raw`**
+- **`checkout.subtotal_before_discount_raw`**
+- **`checkout.discount_total_raw`**
+- **`checkout.subtotal_after_discount_raw`**
+- **`checkout.subtotal_raw`** (legacy alias of `subtotal_after_discount_raw`)
+- **`checkout.shipping_raw`**, **`checkout.tax_raw`**, **`checkout.total_raw`**
+
+Use formatted keys directly in templates; use raw keys for conditions like `checkout.tax_raw > 0`.
+
+### Single-product vs cart layout
+
+- **`is_single_product`** — One product; show hero image + title block. Use **`checkout.product_image`**, **`checkout.product_title`**, **`checkout.product_price`**, **`checkout.retail_price`** (and optionally **`product_code`**, **`product_description`**). Do **not** use `cartItems[0]` in that block.
+- **`is_cart`** — Multiple items; show list with `<template-foreach data-each="item in cartItems">` and **`[[ item.image ]]`**, **`[[ item.name ]]`**, **`[[ item.total ]]`**, etc.
+
+### Bumps
+
+- **`checkout.bump_products`** — Full list of bump products (each has **`code`**, **`name`**, **`description`**, **`price`** formatted, **`price_raw`** numeric, **`image`** URL, **`added`** boolean).
+- **`checkout.selectedBumpLines`** — Array of selected bumps: **`code`**, **`name`**, **`price`** (formatted), **`price_raw`**.
+
+Use **`[[ bump.price ]]`** and **`[[ line.price ]]`** for display; do not pass them to `formatPrice`. Use **`price_raw`** only for conditions or when you explicitly format a raw number. Use **`bump.added`** for conditional blocks and for **@click** add/remove patterns (e.g. **`<button @click="bump.added = true">`** / **`<button @click="bump.added = false">`**); use **`ef-src="bump.image"`** for the bump image (with a placeholder **`src`**).
+
+### Coupon
+
+- **`checkout.coupon`** — When applied: **`applied`**, **`code`**, **`name`**, **`value_formatted`**, **`fixed_value`**, **`pct_value`**, **`discount`**.
+- **`checkout.coupon_message`** — Error message from validation (e.g. invalid code). Show with `<template-if data-condition="checkout.coupon_message">` and `[[ checkout.coupon_message ]]`.
+- **URL coupon:** Use **`query.coupon`** to detect a coupon from the URL; use **`checkout.coupon`** for the applied details after the app auto-applies.
+
+### Customer and form fields
+
+- **`checkout.customer.*`** — Paths used with **`data-template-value`** for two-way binding: e.g. **`checkout.customer.email`**, **`checkout.customer.shipping_first_name`**, **`checkout.customer.billing_first_name`**.
+- **`checkout.shipping_same_as_billing`** — Boolean; when true, shipping address block can be hidden and a short message shown instead.
+- **`checkout.countries`**, **`checkout.usStates`** — Arrays of **`{ value, label }`** for country/state `<select>` options.
+
+---
+
+## URL parameters: `query.*`
+
+**`query`** should be an object built from `window.location.search` (e.g. via `syncQueryToScope()` at init). Each query parameter is a key; e.g. **`query.coupon`**, **`query.p`**, **`query.bumps`**.
+
+Use **`query.*`** for URL-driven visibility:
+
+```html
+<template-if data-condition="query.coupon">
+  <p>Automatically applied coupon: [[ checkout.coupon.code ]]</p>
+</template-if>
+```
+
+If the app does not set `efScope.query`, conditions like `query.coupon` will be undefined and the block will not show.
+
+---
+
+## Effective context and `mode`
+
+The engine merges **caller context** (e.g. from a loop) with **`window.efScope`** to form the **effective context** for each expression. It also adds:
+
+- **`mode`** — Object with **`item_count`**, **`has_query_product`**, **`is_cart`**, **`is_single_product`**.
+- **`is_cart`**, **`is_single_product`** — Convenience booleans on the root of the merged context.
+
+So you can write **`<template-if data-condition="is_single_product">`** and **`<template-if data-condition="is_cart">`** without touching `checkout` directly.
+
+---
+
+## Runtime API: watch and computed
+
+The frontend API also exposes Vue-like helpers at `window.ef.template`:
+
+```javascript
+const stop = window.ef.template.watch('checkout.total', (newValue, oldValue) => {
+  console.log('total changed', oldValue, '->', newValue);
+}, { immediate: true });
+
+const searchUrl = window.ef.template.computed('links.googleSearch', (ctx) => {
+  const q = ctx?.search ?? '';
+  return `https://google.com/?s=${encodeURIComponent(q)}`;
+});
+
+// use in template:
+// <a ef-href="links.googleSearch">Search</a>
+
+// cleanup:
+stop();
+searchUrl.stop();
+```
+
+---
+
+## Summary
+
+- **Data lives in `window.efScope`**; expressions see global scope + loop/block context.
+- **Reactivity is automatic** when `efScope` values change.
+- **Cart:** Use **`cartItems`** (or **`items`**); each **item** has **`price`**, **`total`** (formatted), **`code`**, **`name`**, **`image`**, **`quantity`**.
+- **Checkout:** Use **`checkout.*`** for totals, bumps, coupon, customer; use **formatted** keys for display and **`_raw`** only when you need numbers or `formatPrice`.
+- **URL:** Use **`query.*`** after the app has set **`efScope.query`** (e.g. via `syncQueryToScope()`).
+- **Layout:** Use **`is_single_product`** and **`is_cart`** to choose between single-product summary and cart list.
+
+Next: [Bindings & Events](/frontend-template-engine/bindings-forms-events).

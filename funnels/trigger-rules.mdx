@@ -1,0 +1,54 @@
+---
+title: "Trigger Rules"
+description: "Show different funnels by country, affiliate, or URL parameters — when to use this funnel."
+---
+
+You can have **multiple funnels on the same domain**. One funnel is the **default** (fallback when no rules apply). Other funnels can be assigned to the same domain **with trigger rules** — they are used only when their conditions match (e.g. visitor country, affiliate, or URL parameters).
+
+## How it works
+
+- **One default per domain** — One funnel is the default when no rules apply (e.g. "main funnel" for everyone else). Default funnels don't use trigger rules.
+- **Rule-based assignments** — Other funnels can be assigned to the same domain **without** being the default; add **Trigger rules** so they're used only when conditions match.
+- **First match wins** — When a visitor lands on the domain, the system checks funnels that have trigger rules. The first funnel whose rules match is used. If none match, the default funnel is used.
+
+<Info>
+The **Trigger Rules** tab is only available when the funnel is **not** set as the default for any domain. If this funnel is the default for at least one domain, you can't add rules (the default is the fallback).
+</Info>
+
+## When to use trigger rules
+
+- **Different funnels by country or region** — e.g. US vs EU, or specific states/regions.
+- **Different funnels per affiliate** — e.g. funnel A for affiliate 123, funnel B for affiliate 456.
+- **URL parameters** — e.g. when `?affiliate_id=123` or another query parameter is present.
+- **Combinations** — e.g. "US and affiliate X" or "country A OR country B" using AND/OR in the rule builder.
+
+## Setting up trigger rules
+
+1. Go to **Funnels** and edit the funnel (or create one).
+2. In the **General** tab, under **Domains**, assign the domain. Do **not** turn on **Default Funnel for Domain** for this funnel if you want to use rules (or use rules only on other domain assignments).
+3. Open the **Trigger Rules** tab. Use the rule builder to add conditions:
+   - **Country** — Match by visitor country (e.g. US, GB).
+   - **Region / State** — Match by region or state when available.
+   - **Affiliate** — Choose an affiliate from your list (internal ID).
+   - **Query parameter** — Enter any parameter name (e.g. `affiliate_id`, `pid`); the rule checks the URL query string.
+4. Add multiple conditions and use **AND** / **OR** (and optional **groups**) to combine them.
+5. Save. The funnel list will show **Default** (fallback) or **Default (with rules)** for each domain.
+
+If the funnel has any trigger rules, the **Trigger Rules** tab shows an **orange badge** with the number of conditions.
+
+## Default vs rule-based
+
+| Type | Meaning |
+|------|--------|
+| **Default** (no rules) | This funnel is used when no rule-based funnel matches. Only one such default per domain. |
+| **Default (with rules)** | This funnel is used only when its trigger rules match (e.g. country, affiliate, or query param). You can have many of these per domain. |
+
+The system always tries rule-based funnels first; if none match, it uses the single default for that domain. You can also force a specific funnel with the URL: `?f=[funnel code]`.
+
+## Tips
+
+- Keep the default funnel simple (e.g. your main offer). Use trigger rules for geo, affiliate, or campaign-specific flows.
+- Use **Affiliate** when you want to match by a known affiliate from your list. Use **Query parameter** when you want to match on any URL parameter (e.g. `?affiliate_id=123` or `?pid=abc`).
+- In the funnel list, the **Default (with rules)** badge shows which domain assignments use trigger rules.
+
+For which pages can *start* a funnel (entry points), see [Trigger Pages](/funnels/trigger-pages).

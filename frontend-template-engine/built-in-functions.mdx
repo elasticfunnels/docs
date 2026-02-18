@@ -1,0 +1,110 @@
+---
+title: 'Functions'
+description: 'formatPrice, cartCount, cartSubtotal, lineTotal, and string helpers. When to use formatPrice vs pre-formatted values.'
+---
+
+Expressions in **`[[ ... ]]`**, **`data-condition`**, **`data-ef-text`**, and similar attributes can call **built-in functions**. You can also **register** custom functions with **`registerTemplateFunction(name, fn)`** or **`registerTemplateFunctions({ name: fn, ... })`**.
+
+---
+
+## Price display: when to use `formatPrice` vs as-is
+
+Most **checkout** and **cart** values are **already formatted** (e.g. `"$29.00"`). Use them directly in **`[[ ... ]]`**. Use **`formatPrice()`** only when you need to display a **raw number** (e.g. **`*_raw`** keys or a computed number).
+
+<Tabs>
+  <Tab title="Use as-is (no formatPrice)">
+These are **pre-formatted**. Use **`[[ variable ]]`** only.
+
+| Variable | Example |
+|----------|--------|
+| **Checkout totals** | `checkout.product_price`, `checkout.retail_price`, `checkout.bump_total`, `checkout.subtotal_before_discount`, `checkout.discount_total`, `checkout.subtotal_after_discount`, `checkout.subtotal` (alias), `checkout.shipping`, `checkout.tax`, `checkout.total` |
+| **Cart item** | `item.price`, `item.total`, `item.retail_price`, `item.discount_total` |
+| **Bump / line** | `bump.price`, `line.price` |
+
+**In template:** `[[ checkout.total ]]`, `[[ item.price ]]`, `[[ bump.price ]]`
+  </Tab>
+  <Tab title="Use formatPrice (raw numbers)">
+Use **`formatPrice(value, currency?)`** when displaying a **numeric** value that has no formatted key, or when you explicitly use a **`_raw`** key.
+
+| When | Example |
+|------|--------|
+| **Checkout _raw keys** | `formatPrice(checkout.total_raw, checkout.currency)` — only if you must show a raw number; normally use formatted keys (`checkout.total`, etc.). Raw keys include `product_price_raw`, `retail_price_raw`, `bump_total_raw`, `subtotal_before_discount_raw`, `discount_total_raw`, `subtotal_after_discount_raw`, `subtotal_raw` (alias), `shipping_raw`, `tax_raw`, `total_raw`. |
+| **Bump/line raw** | `formatPrice(bump.price_raw, checkout.currency)` — for display of raw; normal display use `[[ bump.price ]]`. |
+| **Computed value** | `formatPrice(lineTotal(item), currency)` — when `item.total` is not provided. |
+
+  </Tab>
+</Tabs>
+
+<Warning>
+Do **not** pass an already-formatted string into **formatPrice** (e.g. `formatPrice(checkout.total, ...)` or `formatPrice(item.price, ...)`). That can produce wrong or duplicated currency symbols.
+</Warning>
+
+---
+
+## `formatPrice(value, currency?, locale?)` / `money` / `formatCurrency`
+
+Formats a **numeric** value as currency.
+
+| Parameter | Description |
+|-----------|--------------|
+| **value** | Number (or parseable to number) |
+| **currency** | Optional. Code (e.g. `USD`) or symbol. If omitted, uses `checkout.currency` or `scope.currency` or `USD`. |
+| **locale** | Optional. For `Intl.NumberFormat`. |
+
+---
+
+## Cart helpers
+
+| Function | Returns | Example |
+|----------|---------|--------|
+| **`lineTotal(item, quantityKey?, priceKey?)`** | quantity × price for one item (default keys: `quantity`, `price`) | `[[ formatPrice(lineTotal(item), currency) ]]` when `item.total` is not in scope |
+| **`cartCount(items)`** / **`cart_count(items)`** | Sum of item quantities | `[[ cartCount(cartItems) ]]` |
+| **`cartSubtotal(items, quantityKey?, priceKey?)`** / **`cart_subtotal(...)`** | Numeric sum of line totals | `[[ formatPrice(cartSubtotal(cartItems), checkout.currency) ]]` |
+
+---
+
+## String helpers
+
+All coerce to string; `null`/`undefined` become empty string.
+
+| Function | Description | Example result |
+|----------|-------------|----------------|
+| **`upper`** / **`uppercase`** | Uppercase | "ALPHA" |
+| **`lower`** / **`lowercase`** | Lowercase | "alpha" |
+| **`capitalize`** | First character uppercase | "Alpha" |
+| **`titleCase`** / **`title`** | Title case | "Product Alpha" |
+| **`camelCase`** / **`camel`** | camelCase | "someLabel" |
+| **`snakeCase`** / **`snake`** | snake_case | "some_label" |
+| **`kebabCase`** / **`kebab`** | kebab-case | "some-label" |
+
+---
+
+## Custom functions
+
+Register from application or plugin code:
+
+```javascript
+import { registerTemplateFunction, registerTemplateFunctions } from './utils/templateProcessor.js';
+
+registerTemplateFunction('myFormat', (value) => {
+  return value != null ? String(value).toUpperCase() : '';
+});
+
+registerTemplateFunctions({
+  double: (n) => Number(n) * 2,
+  greet: (name) => `Hello, ${name || 'Guest'}!`
+});
+```
+
+Then in templates: **`[[ myFormat(item.name) ]]`**, **`[[ double(item.quantity) ]]`**, **`[[ greet(checkout.customer.first_name) ]]`**.
+
+---
+
+## Summary
+
+- **Price display:** Use the [table above](#price-display-when-to-use-formatprice-vs-as-is): pre-formatted keys as-is; **formatPrice** only for **raw** values or computed numbers.
+- **Cart:** **`cartCount`**, **`cartSubtotal`**, **`lineTotal`**; combine with **formatPrice** when you need a formatted string from a number.
+- **Strings:** **`upper`**, **`lower`**, **`capitalize`**, **`titleCase`**, **`camelCase`**, **`snakeCase`**, **`kebabCase`** (and aliases).
+- **Custom:** **`registerTemplateFunction`** / **`registerTemplateFunctions`**.
+
+Next: [Cart](/frontend-template-engine/cart) and [Checkout](/frontend-template-engine/checkout).

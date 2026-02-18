@@ -37,6 +37,26 @@ The Debug Window loads asynchronously. Open it with **Ctrl + Shift + F12** (Wind
 
 The debug window automatically starts monitoring your page and capturing relevant debugging information.
 
+### How to use the Debug Window
+
+1. **Open it** — **Ctrl + Shift + F12** (Windows/Linux) or **Command + Shift + F12** (Mac) on any ElasticFunnels page, or click **Debugger** in the top bar on a builder/code editor page.
+2. **Choose a tab** — Click one of the tab buttons (Overview, Events, Page Events, Funnel, Interactions, Components, Builders, **Templates**, Console) to switch views.
+3. **Use the panel**:
+   - **Overview** — Quick snapshot of device, viewport, and app state (FID, Page ID, etc.).
+   - **Events** — Funnel event hierarchy and flow.
+   - **Page Events** — Backend page events and Script Rule results (Refresh/Clear/Export). Expand events for full context.
+   - **Funnel** — How the page maps to the funnel; links to funnel builder and node.
+   - **Interactions** — Tracked interactions; use focus/highlight to find elements.
+   - **Components** — List of components; focus or highlight to inspect on the page; links to builders.
+   - **Builders** — Shortcuts to Page Builder, Events Builder, Component Builder.
+   - **Templates** — Frontend template engine: **Events** (New/Previous) for template-if results; **Pick element** then click a node to see its template bindings and child tree. See [Frontend Template Engine — Debugging](/frontend-template-engine/debugging).
+   - **Console** — Captured console logs; filter by type; export.
+4. **Resize** — Drag the handle at the top edge of the panel to change height. Close with the header button or press the hotkey again.
+
+<Tip>
+From the **Page Builder** or **Page Events** UI, click **Debugger** to open the page in a new tab with the Debug Window already active—useful for testing Script Rules and page events.
+</Tip>
+
 ## Debug Window Tabs
 
 ### Overview
@@ -176,6 +196,15 @@ Quick access to ElasticFunnels builder interfaces:
 - **Events Builder**: Configure page events and funnels
 - **Component Builder**: Edit specific components
 - **Page Information**: Brand ID, Page ID, and FID details
+
+### Templates
+
+Debug the **frontend template engine** (template-if, template-foreach, bindings):
+
+- **Events**: "New" shows template-if results from the last scope update (which condition was chosen, or "unchanged"); "Previous" shows earlier runs. Errors from invalid conditions appear here.
+- **Inspect element**: Click **Pick element**, then click any node on the page to see its template bindings (**data-condition**, **data-each**, **data-ef-text**, **data-template-value**, etc.) and a tree of its children. The panel refreshes when scope updates.
+
+When the Templates tab is open, the template processor sends debug events to the window (no URL flag needed). For full details, see [Frontend Template Engine — Debugging](/frontend-template-engine/debugging).
 
 ### Console
 

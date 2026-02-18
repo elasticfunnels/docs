@@ -1,0 +1,71 @@
+---
+title: 'Cart'
+description: 'Add a cart to your page so visitors see their items, quantities, and total—and can change quantity or go to checkout'
+---
+
+The cart shows what the visitor has added to their order: each item, quantity, price, and the total. It updates live when they add items or change quantities, without reloading the page.
+
+## Adding a cart to your page
+
+In the page builder you can add:
+
+- **Cart** – A single cart block (list of items + total + checkout).
+- **Cart Dropdown** – A “Cart” trigger (e.g. with item count) that opens a dropdown panel with the same cart inside. Handy in headers or sidebars.
+
+Both use the same cart data; only the placement and layout differ.
+
+### Where to find them
+
+1. Open the **Elements** or **Blocks** panel.
+2. In the **Cart** category, choose **Cart** or **Cart Dropdown**.
+3. Drag the block onto your page where you want it (e.g. below the fold for Cart, in the top bar for Cart Dropdown).
+
+The default Cart block already includes:
+
+- A row per item (name, quantity controls, unit price, line total).
+- A footer with **Total** and a **Checkout** link.
+
+You can keep this layout or edit it (e.g. change labels, order of fields, or styling).
+
+## What visitors see
+
+- **Item name** – From your product/offer (e.g. “1 Bottle”).
+- **Quantity** – Current quantity with **−** and **+** to decrease or increase.
+- **Unit price** – Price per unit (e.g. “$69.00”).
+- **Line total** – Price × quantity for that item (e.g. “$552.00”).
+- **Cart total** – Sum of all line totals, shown in the footer (e.g. “Total: $552.00”).
+- **Checkout** – Link to continue to checkout.
+
+All of this updates automatically when they add to cart or change quantity.
+
+## Customizing the cart layout
+
+The cart is built from a **template**: you can change text, order of fields, and styling in the builder.
+
+- **Totals** – The main total in the footer uses the variable **`[[ ef-cart.total ]]`**. You can move it or add labels; keep that variable where you want the total to appear.
+- **Per-item row** – Each row can show:
+  - **`[[ item.name ]]`** – Item name  
+  - **`[[ item.quantity ]]`** – Quantity  
+  - **`[[ item.price ]]`** – Unit price  
+  - **`[[ item.total ]]`** – Line total (price × quantity)
+
+If you add or reorder these, the cart will still update correctly as long as you keep the **`[[ ... ]]`** placeholders. For more on this syntax, see [Frontend templates](/pages/frontend-templates).
+
+## Cart dropdown
+
+The **Cart Dropdown** block gives you:
+
+- A **trigger** (e.g. “Cart” plus the number of items) that visitors click to open the cart.
+- A **panel** that opens below (or in a suitable position) with the full cart inside: same items, quantities, totals, and checkout link.
+
+Use it when you want the cart in a fixed spot (e.g. header) without taking space until the visitor opens it.
+
+## Checkout link
+
+The default **Checkout** button in the cart is a link (e.g. to `#checkout`). Configure its URL in the builder so it points to your actual checkout step or page. The cart only displays the link; checkout behavior is controlled by your funnel and checkout setup.
+
+## Tips
+
+- **Placement** – Put the cart or cart dropdown where visitors expect it (e.g. top-right for dropdown, above the fold for a full cart block).
+- **Sticky / mobile** – You can place the cart in a sticky bar or in a mobile menu; the same block works anywhere.
+- **Multiple carts** – You can add more than one cart or dropdown on a page; they all show the same cart data and stay in sync when the visitor changes quantity or adds items.

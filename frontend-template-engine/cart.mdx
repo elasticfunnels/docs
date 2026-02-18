@@ -1,0 +1,82 @@
+---
+title: 'Cart'
+description: 'Cart items, quantity controls, and data attributes for the template engine and cart plugin.'
+---
+
+This page covers **cart** usage: **`cartItems`**, item properties, and **data attributes** for quantity and remove. For checkout-only topics (totals, form fields, coupon, payment), see [Checkout](/frontend-template-engine/checkout).
+
+---
+
+## Scope: `cartItems` / `items`
+
+**`cartItems`** (or **`items`**) is an array of line items. The cart plugin fills it; UI updates are reactive when cart scope changes.
+
+| Item property | Description | In template |
+|---------------|--------------|-------------|
+| **`code`** | Product/cart line code | Use with qty/remove data attributes |
+| **`name`** | Product name | `[[ item.name ]]` |
+| **`image`** | Product image URL | `[[ item.image ]]` |
+| **`quantity`** | Quantity | `[[ item.quantity ]]` |
+| **`price`** | Unit price (formatted) | `[[ item.price ]]` — do not use formatPrice |
+| **`total`** | Line total (formatted) | `[[ item.total ]]` — do not use formatPrice |
+
+<Info>
+**`price`** and **`total`** are already formatted. Use **`[[ item.price ]]`** and **`[[ item.total ]]`** as-is. See [Functions](/frontend-template-engine/built-in-functions#price-display-table) for when to use **formatPrice**.
+</Info>
+
+---
+
+## Quantity and remove (data attributes)
+
+Use these so the **cart plugin** handles +/- and remove without custom script:
+
+| Attribute | Element | Purpose |
+|-----------|---------|---------|
+| **`data-cart-qty-minus`** | Button | Decrease quantity |
+| **`data-cart-qty-plus`** | Button | Increase quantity |
+| **`data-cart-qty-remove`** | Button/link | Remove line (set qty to 0) |
+| **`data-code="[[ item.code ]]"`** | Same element or parent | So the plugin receives the actual product code |
+| **`data-disable-when-one`** | Minus button (optional) | Disable when `item.quantity <= 1` |
+
+Example:
+
+```html
+<template-foreach data-each="item in cartItems">
+  <div class="cart-line">
+    <img alt="[[ item.name ]]" src="[[ item.image ]]" />
+    <span>[[ item.name ]]</span>
+    <button type="button" data-cart-qty-minus data-code="[[ item.code ]]" data-disable-when-one aria-label="Decrease">−</button>
+    <span>[[ item.quantity ]]</span>
+    <button type="button" data-cart-qty-plus data-code="[[ item.code ]]" aria-label="Increase">+</button>
+    <span>[[ item.total ]]</span>
+    <button type="button" data-cart-qty-remove data-code="[[ item.code ]]" aria-label="Remove">Remove</button>
+  </div>
+</template-foreach>
+```
+
+You can wrap the Remove button in **`<template-if data-condition="cartItems.length > 1">`** so it only shows when there is more than one item (use **`&gt;`** for `>` in **`data-condition`**).
+
+For custom behavior, use **`@click`** with **`window.ef.addToCart(code, options?, quantity?)`**, **`window.ef.setCartQuantity(code, quantity)`**, or **`window.ef.removeFromCart(code, allowClear?)`** if the app exposes **`window.ef`**.
+
+---
+
+## Order bumps (on checkout)
+
+On checkout pages, bump cards use these **data attributes** so the bump-products plugin can toggle and style:
+
+| Attribute | Where | Purpose |
+|-----------|--------|---------|
+| **`data-bump-code="[[ bump.code ]]"`** | Card/container | Plugin adds `.selected` / `.bump-selected` when selected |
+| **`data-bump-checkbox="[[ bump.code ]]"`** | Checkbox | Links checkbox to bump code |
+| **`data-bump-toggle="[[ bump.code ]]"`** | Label or clickable wrapper | Click toggles the checkbox |
+| **`name="bump"`** or **`name="bump[]"`**, **`value="[[ bump.code ]]"`** | Checkbox | Form submit and plugin read selected codes |
+
+For **scope** (**`checkout.bump_products`**, **`checkout.selectedBumpLines`**) and full **offer vs added** template pattern, see [Checkout — Order bumps](/frontend-template-engine/checkout#order-bumps).
+
+---
+
+## Summary
+
+- Use **`cartItems`** and **`[[ item.* ]]`**; **`item.price`** and **`item.total`** are already formatted.
+- Use **data-cart-qty-minus/plus/remove** and **data-code** for qty and remove.
+- Bumps: use **data-bump-*** attributes; scope and patterns are in [Checkout](/frontend-template-engine/checkout).

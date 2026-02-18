@@ -1,0 +1,174 @@
+---
+title: 'Bindings & Events'
+description: 'ef-text/ef-html, ef-* attribute bindings, ef-value/data-template-value, @events, and Vue-style :bindings.'
+---
+
+The frontend template engine supports **one-way** and **two-way** bindings and **event handlers**. All expressions are evaluated in the current scope (global + loop/block context).
+
+## Text and HTML bindings
+
+### `ef-text="expression"` (or `data-ef-text`)
+
+Sets the element’s **`textContent`** from the expression (HTML is escaped). Updates automatically when scope changes.
+
+```html
+<span ef-text="checkout.total"></span>
+<p ef-text="item.name">Product Title</p>
+```
+
+Use for simple single-expression text. This is often easier to preview in the page builder than inline tokens.
+
+Example equivalent:
+
+```html
+<h2>[[ checkout.product_title ]]</h2>
+<h2><span ef-text="checkout.product_title">Product Title</span></h2>
+```
+
+### `ef-html="expression"` (or `data-ef-html`)
+
+Sets the element’s **`innerHTML`** from the expression. **Use only with trusted content** — no automatic escaping. Risk of XSS if the value comes from user input.
+
+```html
+<div ef-html="checkout.product_description"></div>
+```
+
+Prefer **`data-ef-text`** or **`[[ ... ]]`** when the value is not fully trusted.
+
+---
+
+## One-way attribute bindings: `ef-href`, `ef-title`, `ef-alt`, `ef-placeholder`
+
+Use these when you want scope-driven attributes without writing full `[[ ... ]]` strings in markup.
+
+```html
+<a ef-href="links.checkout" ef-title="checkout.product_title">Continue</a>
+<img ef-alt="checkout.product_title" ef-src="checkout.product_image" />
+<input type="text" ef-placeholder="checkout.customer.email_placeholder" />
+```
+
+Supported aliases:
+
+- `ef-href` / `data-ef-href`
+- `ef-title` / `data-ef-title`
+- `ef-alt` / `data-ef-alt`
+- `ef-placeholder` / `data-ef-placeholder`
+
+These are great for page builder workflows: add them in **Data Attributes** (right sidebar) when the component is selected.
+
+---
+
+## Two-way form binding: `ef-value` / `data-ef-value` / `data-template-value`
+
+**`ef-value="path"`** (or `data-ef-value` / `data-template-value`) on **`input`**, **`select`**, or **`textarea`** binds the control to a **dot path** in scope (e.g. **`checkout.customer.email`**, **`billing.name`**).
+
+- **Scope → element:** Engine sets value/checked from scope automatically on updates.
+- **Element → scope:** On **`input`** or **`change`**, the engine writes the control’s value back to the path (creating nested objects as needed), then updates dependent UI.
+
+### Supported controls
+
+| Control | Path type | Behavior |
+|--------|------------|----------|
+| **`input` text, email, tel, etc.** | String | `value` ↔ scope path |
+| **`input type="checkbox"`** | Boolean | `checked` ↔ scope path |
+| **`input type="radio"`** | Selected value (string) | One `ef-value`/`data-ef-value`/`data-template-value` on a radio (or each); path holds selected value; same `name` = one group. |
+| **`textarea`** | String | `value` ↔ scope path |
+| **`select`** | String (single) or array (multiple) | Single: path is string; multiple: path is array of selected option values |
+
+### Example: checkout fields
+
+```html
+<input type="email" id="email" name="email"
+       ef-value="checkout.customer.email"
+       required />
+
+<select id="shipping_country" name="shipping_country"
+        ef-value="checkout.customer.shipping_country" required>
+  <option value="">Select Country</option>
+  <template-foreach data-each="opt in checkout.countries">
+    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+  </template-foreach>
+</select>
+
+<label>
+  <input type="checkbox" ef-value="checkout.shipping_same_as_billing" />
+  Shipping same as billing
+</label>
+```
+
+When the user toggles the checkbox, **`checkout.shipping_same_as_billing`** updates and dependent blocks (like `<template-if data-condition="!checkout.shipping_same_as_billing">`) react automatically.
+
+### `data-set-onload`
+
+When present, **if the scope path is undefined on the first run**, the element’s current value/checked is **written to scope**. Useful so HTML defaults (e.g. **`checked`** on a checkbox) drive template logic on load.
+
+```html
+<input type="checkbox" ef-value="billing.agree" data-set-onload checked />
+```
+
+---
+
+## One-way bindings: `:checked`, `:disabled`, `:value`
+
+Vue-style **one-way** bindings: the expression is evaluated and the **DOM property** is set on each update. The attribute is removed after first apply and the expression is stored in memory so the DOM stays clean.
+
+- **`:checked="expression"`** — Sets **`element.checked`** (e.g. **`:checked="bumpSelected"`**).
+- **`:disabled="expression"`** — Sets **`element.disabled`**.
+- **`:value="expression"`** — Sets **`element.value`**.
+
+Use when the value is **derived from scope** and the user does not edit it back (e.g. a disabled state, or a display-only value). For user-editable form fields, use **`ef-value`** (or aliases) for two-way binding.
+
+```html
+<button :disabled="submitting">Submit</button>
+<input type="checkbox" :checked="bumpSelected" />
+```
+
+---
+
+## Event handlers: `@click` and others
+
+**`@click="expression"`** runs the expression when the element (or a child) is clicked. The expression is evaluated in a context that includes **`$event`** / **`event`** (the DOM event) and **`$el`** / **`$target`** (element). Assignments in the expression (e.g. **`items = []`**, **`item.open = !item.open`**) mutate scope and the UI re-renders automatically.
+
+### Aliases
+
+- **`@click`** — Short form.
+- **`data-ef-on:click`**, **`data-ef-on-click`**, **`data-ef-click`** — Attribute forms.
+
+Same pattern for other events: **`@submit`**, **`@change`**, **`@input`**, **`@blur`**, **`@focus`**, etc. The engine discovers used event names from the DOM and binds them once.
+
+### Examples
+
+```html
+<button @click="items.push({ code: 'X', name: 'New', price: 9.99, quantity: 1 })">
+  Add item
+</button>
+
+<button @click="items = []">Clear cart</button>
+
+<button @click="faq.open = !faq.open">
+  [[ faq.open ? 'Hide' : 'Show' ]]
+</button>
+```
+
+Returning **`false`** from the expression calls **`preventDefault()`** on the event.
+
+### Cart and bumps
+
+For **cart quantity** and **remove**, prefer the cart plugin’s **data attributes** so behavior is consistent without custom script:
+
+- **Decrease qty:** **`data-cart-qty-minus`** and **`data-code="[[ item.code ]]"`** (so the plugin gets the actual code); optional **`data-disable-when-one`** to disable when `item.quantity <= 1`.
+- **Increase qty:** **`data-cart-qty-plus`** and **`data-code="[[ item.code ]]"`**.
+- **Remove:** **`data-cart-qty-remove`** and **`data-code="[[ item.code ]]"`**.
+
+When you need **custom @click** logic, you can use **`window.ef.addToCart(code, options?, quantity?)`**, **`ef.setCartQuantity(code, quantity)`**, **`ef.removeFromCart(code, allowClear?)`** if the app exposes **`window.ef`**.
+
+---
+
+## Reactivity summary
+
+- **`[[ expression ]]`** — Re-evaluated automatically after relevant scope changes.
+- **Mounted `template-if` and `template-foreach`** — Re-render automatically when dependencies change.
+- **`ef-value` / aliases** — Scope → element on updates; element → scope on **input** / **change**.
+- **`ef-text` / `ef-html` / `ef-src` / `ef-href` / `ef-title` / `ef-alt` / `ef-placeholder` / `:checked` / `:disabled` / `:value`** — Applied on reactive updates.
+
+Next: [Functions](/frontend-template-engine/built-in-functions).

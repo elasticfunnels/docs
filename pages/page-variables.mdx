@@ -7,12 +7,11 @@ Page variables and placeholders allow you to dynamically insert content into you
 
 ## Variable Formats
 
-ElasticFunnels supports two variable formats:
+Use **double curly braces** for variables:
 
-- **Percent Format**: `%VARIABLE_NAME%` - Used for simple replacements
-- **Brace Format**: `{variable_name}` - Used for more complex data structures
+- **Template format**: `{{ variable.path }}` — Use a path to the value (e.g. `{{ query.campaign }}`, `{{ customer.name }}`).
 
-Both formats work in HTML content. The brace format also works in JavaScript code.
+This format works in HTML content and in JavaScript code. Date and time placeholders use the percent format (e.g. `%DAY_NAME%`, `%YEAR%`) as shown in the Date Variables section below.
 
 ## Date Variables
 
@@ -120,82 +119,82 @@ Customer's first name with a trailing comma. The comma is removed if no first na
 <!-- Without name: Welcome to our store! -->
 ```
 
-### `{customer_name}`
+### `{{ customer_name }}`
 Customer's full name. Works in both HTML and JavaScript.
 
 ```html
-<h1>Welcome, {customer_name}!</h1>
+<h1>Welcome, {{ customer_name }}!</h1>
 
 <script>
-  console.log('Customer: {customer_name}');
+  console.log('Customer: {{ customer_name }}');
 </script>
 ```
 
 **Note**: This variable is populated from order data. If no orders exist, it will be empty.
 
-### `{customer.*}` Variables
+### `{{ customer.* }}` Variables
 
-Access detailed customer information using the `{customer.*}` format. These variables are populated from the customer's most recent conversion/purchase.
+Access detailed customer information using the `{{ customer.* }}` format. These variables are populated from the customer's most recent conversion/purchase.
 
 **Personal Information:**
-- `{customer.email}` - Customer email address
-- `{customer.name}` - Full name
-- `{customer.first_name}` - First name
-- `{customer.last_name}` - Last name
-- `{customer.phone}` - Phone number
-- `{customer.country}` - Country
+- `{{ customer.email }}` - Customer email address
+- `{{ customer.name }}` - Full name
+- `{{ customer.first_name }}` - First name
+- `{{ customer.last_name }}` - Last name
+- `{{ customer.phone }}` - Phone number
+- `{{ customer.country }}` - Country
 
 **Address Information:**
-- `{customer.address}` - Street address
-- `{customer.city}` - City
-- `{customer.state}` - State/Province
-- `{customer.zip}` - ZIP/Postal code
+- `{{ customer.address }}` - Street address
+- `{{ customer.city }}` - City
+- `{{ customer.state }}` - State/Province
+- `{{ customer.zip }}` - ZIP/Postal code
 
 **Billing Information:**
-- `{customer.billing_address}` - Billing street address
-- `{customer.billing_city}` - Billing city
-- `{customer.billing_state}` - Billing state
-- `{customer.billing_zip}` - Billing ZIP code
-- `{customer.billing_country}` - Billing country
+- `{{ customer.billing_address }}` - Billing street address
+- `{{ customer.billing_city }}` - Billing city
+- `{{ customer.billing_state }}` - Billing state
+- `{{ customer.billing_zip }}` - Billing ZIP code
+- `{{ customer.billing_country }}` - Billing country
 
 **Shipping Information:**
-- `{customer.shipping_address}` - Shipping street address
-- `{customer.shipping_city}` - Shipping city
-- `{customer.shipping_state}` - Shipping state
-- `{customer.shipping_zip}` - Shipping ZIP code
-- `{customer.shipping_country}` - Shipping country
+- `{{ customer.shipping_address }}` - Shipping street address
+- `{{ customer.shipping_city }}` - Shipping city
+- `{{ customer.shipping_state }}` - Shipping state
+- `{{ customer.shipping_zip }}` - Shipping ZIP code
+- `{{ customer.shipping_country }}` - Shipping country
 
 **Order History:**
-- `{customer.total_orders}` - Total number of orders
-- `{customer.last_order_date}` - Date of most recent order
-- `{customer.last_order_total}` - Total amount of most recent order
-- `{customer.last_order_currency}` - Currency of most recent order
-- `{customer.order_ids}` - Comma-separated list of order IDs
+- `{{ customer.total_orders }}` - Total number of orders
+- `{{ customer.last_order_date }}` - Date of most recent order
+- `{{ customer.last_order_total }}` - Total amount of most recent order
+- `{{ customer.last_order_currency }}` - Currency of most recent order
+- `{{ customer.order_ids }}` - Comma-separated list of order IDs
 
 **Special Variables:**
-- `{customer.email_hashed}` - SHA-256 hashed email (for privacy/analytics)
+- `{{ customer.email_hashed }}` - SHA-256 hashed email (for privacy/analytics)
 
 ### Customer Variable Examples
 
 ```html
 <!-- Personalization -->
-<h1>Welcome back, {customer.first_name}!</h1>
-<p>Your email: {customer.email}</p>
+<h1>Welcome back, {{ customer.first_name }}!</h1>
+<p>Your email: {{ customer.email }}</p>
 
 <!-- Address display -->
 <div class="shipping-info">
-  <p>{customer.shipping_address}</p>
-  <p>{customer.shipping_city}, {customer.shipping_state} {customer.shipping_zip}</p>
+  <p>{{ customer.shipping_address }}</p>
+  <p>{{ customer.shipping_city }}, {{ customer.shipping_state }} {{ customer.shipping_zip }}</p>
 </div>
 
 <!-- Order history -->
-<p>You have {customer.total_orders} order(s)</p>
-<p>Last order: {customer.last_order_date}</p>
+<p>You have {{ customer.total_orders }} order(s)</p>
+<p>Last order: {{ customer.last_order_date }}</p>
 
 <!-- In JavaScript -->
 <script>
-  const customerEmail = '{customer.email}';
-  const orderCount = '{customer.total_orders}';
+  const customerEmail = '{{ customer.email }}';
+  const orderCount = '{{ customer.total_orders }}';
 </script>
 ```
 
@@ -209,101 +208,92 @@ Access detailed customer information using the `{customer.*}` format. These vari
 
 Display brand information and system-level data that's available on all pages.
 
-### `brand_name`
+### `{{ brand_name }}`
 Your brand/company name.
 
-**Formats**: `[brand_name]`, `%brand_name%`, `{brand_name}`
-
 ```html
-<h1>Welcome to [brand_name]</h1>
+<h1>Welcome to {{ brand_name }}</h1>
 <!-- Output: Welcome to My Company -->
 
-<p>© %brand_name% %YEAR%</p>
-<!-- Output: © My Company 2024 -->
-
 <footer>
-  <p>{brand_name} - All rights reserved</p>
+  <p>{{ brand_name }} - All rights reserved</p>
 </footer>
 ```
 
-### `domain`
+### `{{ domain }}`
 Current domain name.
 
-**Formats**: `{domain}`, `%domain%`
-
 ```html
-<p>Visit us at {domain}</p>
+<p>Visit us at {{ domain }}</p>
 <!-- Output: Visit us at example.com -->
 
-<a href="https://%domain%">Home</a>
+<a href="https://{{ domain }}">Home</a>
 <!-- Output: <a href="https://example.com">Home</a> -->
 ```
 
-### `click_id`
+### `{{ click_id }}`
 Click tracking ID for the current session.
-
-**Formats**: `{click_id}`, `[click_id]`
 
 ```html
 <!-- Pass click ID to tracking -->
 <script>
-  const clickId = '{click_id}';
+  const clickId = '{{ click_id }}';
   // Use for analytics or tracking
 </script>
 
 <!-- In URLs -->
-<a href="/checkout?c=[click_id]">Buy Now</a>
+<a href="/checkout?c={{ click_id }}">Buy Now</a>
 ```
 
 ### IP & Location Variables
 
 Access visitor IP address and location information (when available).
 
-#### `{ip_whois.ip}`
+#### `{{ ip_whois.ip }}`
 Visitor's IP address.
 
 ```html
 <!-- Display IP (usually for debugging) -->
-<p>Your IP: {ip_whois.ip}</p>
+<p>Your IP: {{ ip_whois.ip }}</p>
 ```
 
-#### `{ip_whois.country}`
+#### `{{ ip_whois.country }}`
 Visitor's country based on IP geolocation.
 
 ```html
-<p>Country: {ip_whois.country}</p>
+<p>Country: {{ ip_whois.country }}</p>
 <!-- Output: Country: United States -->
 ```
 
-#### `{ip_whois.city}`
+#### `{{ ip_whois.city }}`
 Visitor's city based on IP geolocation.
 
 ```html
-<p>City: {ip_whois.city}</p>
+<p>City: {{ ip_whois.city }}</p>
 <!-- Output: City: New York -->
 ```
 
-#### `{ip_whois.region}`
+#### `{{ ip_whois.region }}`
 Visitor's region/state based on IP geolocation.
 
 ```html
-<p>Region: {ip_whois.region}</p>
+<p>Region: {{ ip_whois.region }}</p>
 <!-- Output: Region: New York -->
 ```
 
 **Important Notes:**
 - IP geolocation data is approximate and may not be 100% accurate
-- Location data is only available when `{ip_whois.*}` variables are used in the page
+- Location data is only available when `{{ ip_whois.* }}` variables are used in the page
 - IP address is always available, but country/city/region require geolocation lookup
 - Use these variables responsibly and in compliance with privacy regulations
 
-### Custom Brand Variables (`{var.*}`)
+### Custom Brand Variables (`{{ var.* }}`)
 
 Access custom variables defined in your brand settings using dot notation.
 
-**Format**: `{var.path.to.variable}`
+**Format**: `{{ var.path.to.variable }}`
 
-**Default Values**: `{var.path.to.variable=default_value}`
+**Default Values**: `{{ var.path.to.variable=default_value }}`
 
 Custom brand variables are defined in your brand settings as JSON. You can access nested values using dot notation.
 
@@ -330,16 +320,16 @@ Custom brand variables are defined in your brand settings as JSON. You can acces
 
 ```html
 <!-- Access nested values -->
-<p>Company: {var.company.name}</p>
+<p>Company: {{ var.company.name }}</p>
 <!-- Output: Company: My Company -->
 
-<p>Phone: {var.company.phone}</p>
+<p>Phone: {{ var.company.phone }}</p>
 <!-- Output: Phone: 1-800-123-4567 -->
 
-<a href="{var.social.facebook}">Facebook</a>
+<a href="{{ var.social.facebook }}">Facebook</a>
 <!-- Output: <a href="https://facebook.com/mycompany">Facebook</a> -->
 
-<p>Shipping: {var.settings.shipping_days} days</p>
+<p>Shipping: {{ var.settings.shipping_days }} days</p>
 <!-- Output: Shipping: 5 days -->
 ```
 
@@ -349,11 +339,11 @@ If a variable doesn't exist, you can provide a default value:
 
 ```html
 <!-- Use default if variable doesn't exist -->
-<p>Phone: {var.company.phone=Not available}</p>
+<p>Phone: {{ var.company.phone=Not available }}</p>
 <!-- If var.company.phone exists: Phone: 1-800-123-4567 -->
 <!-- If it doesn't exist: Phone: Not available -->
 
-<p>Support: {var.support.email=support@example.com}</p>
+<p>Support: {{ var.support.email=support@example.com }}</p>
 ```
 
 **Important Notes:**
@@ -369,27 +359,27 @@ If a variable doesn't exist, you can provide a default value:
 <!-- Footer with brand info -->
 <footer>
   <div class="company-info">
-    <h3>{brand_name}</h3>
-    <p>Domain: {domain}</p>
-    <p>Phone: {var.company.phone}</p>
-    <p>Email: {var.company.email}</p>
+    <h3>{{ brand_name }}</h3>
+    <p>Domain: {{ domain }}</p>
+    <p>Phone: {{ var.company.phone }}</p>
+    <p>Email: {{ var.company.email }}</p>
   </div>
   
   <div class="social-links">
-    <a href="{var.social.facebook}">Facebook</a>
-    <a href="{var.social.twitter}">Twitter</a>
+    <a href="{{ var.social.facebook }}">Facebook</a>
+    <a href="{{ var.social.twitter }}">Twitter</a>
   </div>
   
-  <p>© {brand_name} %YEAR%</p>
+  <p>© {{ brand_name }} %YEAR%</p>
 </footer>
 
 <!-- Tracking with click ID -->
 <script>
   // Track page view
   gtag('event', 'page_view', {
-    'click_id': '{click_id}',
-    'domain': '{domain}',
-    'brand': '{brand_name}'
+    'click_id': '{{ click_id }}',
+    'domain': '{{ domain }}',
+    'brand': '{{ brand_name }}'
   });
 </script>
 ```
@@ -398,37 +388,26 @@ If a variable doesn't exist, you can provide a default value:
 
 Access URL query parameters to personalize content based on traffic source, campaigns, or other URL data.
 
-### `%query.*%`
+### `{{ query.* }}`
 Access any query parameter from the URL.
 
-**Format**: `%query.parameter_name%`
+**Format**: `{{ query.parameter_name }}`
 
 **Example URL**: `https://yoursite.com/page?aff_id=123&source=facebook`
 
 ```html
-<p>Affiliate ID: %query.aff_id%</p>
+<p>Affiliate ID: {{ query.aff_id }}</p>
 <!-- Output: Affiliate ID: 123 -->
 
-<p>Source: %query.source%</p>
+<p>Source: {{ query.source }}</p>
 <!-- Output: Source: facebook -->
 ```
 
-### `{query.*}`
-Alternative format for query parameters (works in HTML and JavaScript).
-
-```html
-<p>Campaign: {query.campaign}</p>
-
-<script>
-  const campaign = '{query.campaign}';
-</script>
-```
-
-### `{queryparams}`
+### `{{ queryparams }}`
 Get the complete query string for use in URLs.
 
 ```html
-<a href="/checkout?{queryparams}">Checkout</a>
+<a href="/checkout?{{ queryparams }}">Checkout</a>
 <!-- Output: <a href="/checkout?aff_id=123&source=facebook">Checkout</a> -->
 ```
 
@@ -436,19 +415,19 @@ Get the complete query string for use in URLs.
 
 ```html
 <!-- Track affiliate -->
-<p>Referred by: %query.aff_id%</p>
+<p>Referred by: {{ query.aff_id }}</p>
 
 <!-- Campaign tracking -->
-<div data-campaign="%query.utm_campaign%">
+<div data-campaign="{{ query.utm_campaign }}">
   Campaign content
 </div>
 
 <!-- Pass parameters to checkout -->
-<a href="/checkout?{queryparams}">Buy Now</a>
+<a href="/checkout?{{ queryparams }}">Buy Now</a>
 
 <!-- Conditional content based on parameter -->
 <script>
-  const source = '{query.source}';
+  const source = '{{ query.source }}';
   if (source === 'email') {
     // Show email-specific content
   }
@@ -460,6 +439,66 @@ Get the complete query string for use in URLs.
 - If a parameter doesn't exist, the variable is replaced with an empty string
 - All query parameter values are automatically escaped for security
 - Unused query parameter variables are cleaned up automatically
+
+## Request & device context
+
+Request and device fields are available in the **backend template engine** (server-side). They use the same data as [Script Rule](/funnels/script-rule), so you can show or hide content by device, customer status, referrer, and merchant.
+
+Use **`request.*`** in conditions and output, or **`is_mobile`** / **`is_tablet`** at the top level (same names as in script rules).
+
+### In template conditionals (`@if`)
+
+```html
+@if(request.is_mobile)
+  <p>You're on mobile — tap here to buy.</p>
+@endif
+
+@if(request.is_mobile)
+  <!-- mobile -->
+  <div class="mobile-cta">Tap to buy</div>
+@else
+  <!-- desktop -->
+  <div class="desktop-cta">Click to buy</div>
+@endif
+
+@if(is_mobile && !is_tablet)
+  <p>Phone-only offer.</p>
+@endif
+
+@if(request.is_customer)
+  <p>Welcome back!</p>
+@endif
+```
+
+### In output (`{{ }}`)
+
+```html
+<p>Device: {{ request.device.type }}</p>
+<p>Mobile: {{ request.is_mobile }}</p>
+<p>Referrer: {{ request.referrer }}</p>
+```
+
+### Available request fields
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `request.is_mobile` | Boolean | Visitor is on a mobile device |
+| `request.is_tablet` | Boolean | Visitor is on a tablet |
+| `request.device` | Object | Device info: `type`, `user_agent`, `vendor`, `model`, `os`, `browser` (name/version) |
+| `request.query` | Object | URL query parameters (same as `{{ query.* }}`) |
+| `request.is_customer` | Boolean | Visitor has made a purchase |
+| `request.referer` / `request.referrer` | String | Referrer URL |
+| `request.merchant_code` | String | Active payment processor code (e.g. `buygoods`, `stripe`) |
+
+### Top-level parity with script rules
+
+For the same naming as in [Script Rule](/funnels/script-rule), **`is_mobile`** and **`is_tablet`** are also available at the top level (no `request.` prefix):
+
+```html
+@if(is_mobile)
+  <div class="mobile-cta">...</div>
+@endif
+```
 
 ## Variable Usage Tips
 
@@ -478,13 +517,13 @@ Use variables with CSS or JavaScript for conditional display:
 
 ```html
 <!-- Hide if no customer name -->
-<div id="welcome" style="display: {customer.name ? 'block' : 'none'}">
-  Welcome, {customer.name}!
+<div id="welcome" style="display: {{ customer.name ? 'block' : 'none' }}">
+  Welcome, {{ customer.name }}!
 </div>
 
 <!-- JavaScript conditional -->
 <script>
-  if ('{customer.email}') {
+  if ('{{ customer.email }}') {
     console.log('Customer logged in');
   }
 </script>
@@ -511,12 +550,12 @@ Use variables with CSS or JavaScript for conditional display:
 
 **Solutions:**
 - Check spelling and case sensitivity
-- Ensure you're using the correct format (`%` vs `{}`)
+- Ensure you're using double curly braces: `{{ variable.path }}`
 - Verify the variable name matches exactly
 
 ### Customer Variables Empty
 
-**Issue**: `{customer.*}` variables are empty or removed
+**Issue**: `{{ customer.* }}` variables are empty or removed
 
 **Solutions:**
 - Ensure visitor has a customer session (email or `is_customer` flag)
@@ -525,7 +564,7 @@ Use variables with CSS or JavaScript for conditional display:
 
 ### Query Parameters Not Working
 
-**Issue**: `%query.*%` variables are empty
+**Issue**: `{{ query.* }}` variables are empty
 
 **Solutions:**
 - Verify the parameter exists in the URL

@@ -40,6 +40,8 @@
             "pages": [
               "funnels/create-funnel",
               "funnels/checkout-redirect-behavior",
+              "funnels/trigger-pages",
+              "funnels/trigger-rules",
               "funnels/funnel-split-testing"
             ]
           },
@@ -69,7 +71,9 @@
               "pages/order-tag",
               "pages/product-item-tag",
               "pages/collection-item-tag",
-              "pages/page-variables"
+              "pages/page-variables",
+              "pages/frontend-templates",
+              "pages/cart"
             ]
           },
           {
@@ -131,6 +135,20 @@
             "pages": [
               "debugging/overview",
               "debugging/debug-window"
+            ]
+          },
+          {
+            "group": "Frontend Template Engine",
+            "pages": [
+              "frontend-template-engine/overview",
+              "frontend-template-engine/syntax",
+              "frontend-template-engine/scope-and-data",
+              "frontend-template-engine/bindings-forms-events",
+              "frontend-template-engine/built-in-functions",
+              "frontend-template-engine/cart",
+              "frontend-template-engine/checkout",
+              "frontend-template-engine/limitations-pitfalls",
+              "frontend-template-engine/debugging"
             ]
           }
         ]

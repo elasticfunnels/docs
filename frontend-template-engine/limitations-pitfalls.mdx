@@ -1,0 +1,126 @@
+---
+title: 'Limitations'
+description: 'What the frontend template engine does not do, common mistakes, and how to avoid them.'
+---
+
+This page covers **limitations** of the frontend template engine (compared to full frameworks like Vue or Alpine) and **common pitfalls** with fixes.
+
+## Quick reference: common pitfalls
+
+| Symptom | Cause | Fix |
+|--------|--------|-----|
+| Wrong or double currency | Using **formatPrice** on already-formatted values | Use **`[[ checkout.total ]]`**, **`[[ item.price ]]`** as-is; see [Functions](/frontend-template-engine/built-in-functions#price-display-when-to-use-formatprice-vs-as-is) |
+| **`{{ x }}`** not replaced | Frontend engine uses **`[[ ]]`** only | Use **`[[ expression ]]`** for frontend; **`{{ }}`** is backend |
+| UI doesn't update after changing data | Path/expression mismatch or data shape issue | Verify the changed `efScope` path matches your binding expression and item/object shape |
+| Single-product block wrong/missing | Using **cartItems[0]** | Use **checkout.product_title**, **checkout.product_image**, etc.; see [Checkout](/frontend-template-engine/checkout) |
+| Flash of raw **`[[ ... ]]`** | Content visible before engine runs | Add **data-ef-cloak** to elements; use CSS to hide **`[data-ef-cloak]`** |
+| **template-else** not working | Else not a sibling of **template-if** | Put **template-else** / **template-else-if** as immediate siblings after **template-if** |
+| Checkout validation not showing | Missing error container or wrong id | Use **data-checkout-error="&lt;id&gt;"** and **data-template-value** per [Checkout](/frontend-template-engine/checkout#form-fields-and-validation) |
+| Bump toggle/style not working | Missing data attributes | Use **data-bump-code**, **data-bump-checkbox**, **data-bump-toggle**; see [Cart](/frontend-template-engine/cart#order-bumps-on-checkout) |
+
+---
+
+## Limitations
+
+### Not a full framework
+
+- **No virtual DOM** — Updates are reactive and path-scoped, but this is not a component framework with diffed virtual DOM.
+- **No built-in lifecycle hooks** — No “mounted”, “updated”, or “destroyed” callbacks. You can listen for **`ef-scope-updated`** or use normal DOM/script logic.
+- **Limited framework-style API** — You now have `window.ef.template.watch(...)` and `window.ef.template.computed(...)`, but not full component lifecycle/composition APIs.
+- **No standalone template-else** — A **`<template-else>`** must be a **sibling** of a **`<template-if>`** (or follow **template-else-if**). You cannot have “else only” without an if.
+
+### Reactivity model
+
+- **`window.efScope` is reactive** — changing nested keys/arrays updates bound UI automatically.
+- **Path-scoped updates still exist** — internals and advanced callers can use path-scoped updates for high-frequency flows; most custom code does not need manual notify calls.
+
+### Expression evaluation
+
+- Expressions run in a **merged context** (scope + loop vars) using **`with(scope) { return (expression); }`**. Very complex expressions or ones that rely on strict mode / undeclared variables can be fragile. Prefer simple paths and small expressions.
+- **Reserved names** in event handlers: **`$event`**, **`event`**, **`$el`**, **`$target`** are injected; avoid using them as scope keys if you need to read them from global scope.
+
+### Checkout and cart data
+
+- **`checkout`** is only set on **checkout pages**. Any template that uses **`checkout.*`** on a non-checkout page may see **undefined**. Guard with **`<template-if data-condition="checkout">`** in shared components.
+- **`query`** (URL params) is only available if the app sets **`efScope.query`** at init (e.g. via **`syncQueryToScope()`**). Conditions like **`query.coupon`** will not work otherwise.
+
+---
+
+## Common pitfalls
+
+### 1. Using `formatPrice` on already-formatted values
+
+**Mistake:** **`[[ formatPrice(checkout.total, checkout.currency) ]]`** or **`[[ formatPrice(item.price, item.currency) ]]`**.
+
+**Why it’s wrong:** **`checkout.total`**, **`item.price`**, **`item.total`**, **`bump.price`**, **`line.price`** are already **formatted** currency strings. Passing them to **formatPrice** can produce wrong or duplicated symbols.
+
+**Fix:** Use **`[[ checkout.total ]]`**, **`[[ item.price ]]`**, **`[[ item.total ]]`**, **`[[ bump.price ]]`**, **`[[ line.price ]]`** as-is. Use **formatPrice** only for **raw** values (e.g. **`checkout.total_raw`**, **`bump.price_raw`**) when you need to display a number.
+
+---
+
+### 2. Using `{{ }}` in frontend templates
+
+**Mistake:** Writing **`{{ variable }}`** in HTML that is processed by the **frontend** engine.
+
+**Why it’s wrong:** **`{{ }}`** is reserved for the **backend** Template Engine. The frontend engine only replaces **`[[ ]]`**.
+
+**Fix:** Use **`[[ expression ]]`** for frontend token interpolation. For attribute bindings, prefer `ef-*`/`data-ef-*` (e.g. `ef-text="checkout.total"`).
+
+<Warning title="Expecting the wrong path to update UI">
+
+**Mistake:** Changing one path but binding to another (for example mutating `checkout.items` while template reads `cartItems`, or expecting `item.quantity` aliases outside foreach context).
+
+**Why it breaks:** Reactivity runs, but your binding expression may not reference the changed path or expected data shape.
+
+**Fix:** Keep data keys and template expressions aligned (e.g. `cartItems` with `item in cartItems` and `item.*` inside that loop). Inspect `window.efScope` and Pick Element bindings in the Templates debug tab.
+</Warning>
+
+<Warning title="Using cartItems[0] in single-product block">
+
+**Mistake:** In the **single-product** layout (one product, big image + title), using **`cartItems[0].name`** or **`cartItems[0].image`**.
+
+**Why it’s fragile:** The app may not guarantee **cartItems[0]** on single-product checkout; the canonical data for that view is **checkout.product_title**, **checkout.product_image**, etc.
+
+**Fix:** Use **`<template-if data-condition="is_single_product">`** and **checkout.product_*** keys; use **cartItems** only in the **cart** block. See [Checkout — Order summary](/frontend-template-engine/checkout#order-summary-single-product-vs-cart).
+</Warning>
+
+<Warning title="Missing data-ef-cloak">
+
+**Mistake:** No **data-ef-cloak** on blocks that contain **`[[ ... ]]`** or **template-if** content, so users see raw brackets or the wrong branch until the processor runs.
+
+**Fix:** Add **`data-ef-cloak`** to elements that should be hidden until the template engine has run. The engine removes this attribute after processing. Pair with CSS that hides **`[data-ef-cloak]`** to avoid a flash. The page may also need CSS that hides **template-foreach**, **template-if**, **template-else**, **template-set** so raw custom tags are not visible before processing.
+</Warning>
+
+<Warning title="Wrong template-else structure">
+**Mistake:** Putting **`<template-else>`** inside **`<template-if>`**, or using a tag like **`<template-if-else>`**.
+
+**Fix:** **template-else** and **template-else-if** must be **siblings** of **template-if**, immediately after it. Structure:
+
+```html
+<template-if data-condition="...">...</template-if>
+<template-else-if data-condition="...">...</template-else-if>
+<template-else>...</template-else>
+```
+</Warning>
+
+<Warning title="Checkout fields without error container">
+
+**Mistake:** Checkout inputs without **`data-checkout-error="fieldId"`** container, or **id** / **data-template-value** not matching the field list the backend expects.
+
+**Fix:** Each checkout field needs **id**, **name**, **data-template-value**, and **`<div class="form-error" data-checkout-error="<id>"></div>`**. Use exact ids and paths from the spec. See [Checkout — Form fields](/frontend-template-engine/checkout#form-fields-and-validation).
+</Warning>
+
+<Warning title="Bump checkboxes without data attributes">
+
+**Mistake:** Bump checkboxes/labels without **data-bump-checkbox**, **data-bump-toggle**, or **data-bump-code**, so the bump-products plugin cannot toggle or style them.
+
+**Fix:** Use **`data-bump-code="[[ bump.code ]]"`** on the card, **`data-bump-checkbox="[[ bump.code ]]"`** and **`value="[[ bump.code ]]"`** on the checkbox, and **`data-bump-toggle="[[ bump.code ]]"`** on the label. Same code on both “add” and “remove” states.
+
+---
+
+## Summary
+
+- **Limitations:** No virtual DOM/component lifecycle; **template-else** needs a sibling **template-if**; **checkout** and **query** are context-specific.
+- **Pitfalls:** Don’t use **formatPrice** on formatted values; use **[[ ]]** not **{{ }}** for frontend; keep data paths aligned with bindings; use **checkout.*** for single-product summary; use **data-ef-cloak** where needed; keep **template-if/else** structure and checkout/bump attributes as specified.
+
+Next: [Debugging](/frontend-template-engine/debugging).

@@ -1,0 +1,158 @@
+---
+title: 'Debugging'
+description: 'Debug Window Templates tab, console debug flags, inspecting efScope, and verifying updates.'
+---
+
+This page describes how to **debug** the frontend template engine: the **Debug Window Templates tab**, console debug flags, inspecting scope, and verifying updates.
+
+---
+
+## Debug Window — Templates tab
+
+The easiest way to inspect template behavior is the **Templates** tab in the [Debug Window](/debugging/debug-window). It shows **template-if** results and lets you **inspect any element** for its template bindings and child tree.
+
+<Info>
+**Open the Debug Window** with **Ctrl + Shift + F12** (Windows/Linux) or **Command + Shift + F12** (Mac) on an ElasticFunnels page, then click the **Templates** tab.
+</Info>
+
+When the **Templates** tab is active, the template processor sends **debug events** to the window (no URL or sessionStorage flag needed). There is no performance cost when the tab is closed.
+
+### Events (New vs Previous)
+
+The **Events** section shows:
+
+| Section | Meaning |
+|--------|--------|
+| **New** | Template-if results from the **last action** (e.g. last scope update). Each entry shows condition(s), which branch was chosen (or "else"), and whether the run was skipped because the branch didn't change. |
+| **Previous** | Earlier template-if runs from the same session. |
+
+Each **template-if** event shows:
+
+- The **condition** (or "(else)") and the **result** (e.g. `true`, `false`, branch index).
+- **(unchanged)** when the engine skipped re-rendering because the selected branch was the same.
+
+**template-if-error** events show the failing **condition** and the **error** message (e.g. from an invalid expression).
+
+Use this when:
+
+- A **template-if** branch never shows — check which condition is chosen and the result.
+- You want to see whether template-if runs are being skipped (unchanged) after an action.
+
+### Inspect element (Pick element)
+
+**Inspect element** lets you click a node on the page and see its **template bindings** and **child tree**.
+
+1. Click **Pick element**.
+2. Click any element on the page (outside the debug window).
+3. The panel shows:
+   - **Template bindings** on that node: **data-condition**, **data-each**, **ef-text/data-ef-text**, **ef-value/data-ef-value/data-template-value**, **ef-src/ef-href/...**, **data-ef-var-path**, **data-ef-var-template**, **data-ef-cloak**, **data-ef-debug-if-condition**, **data-ef-debug-if-result**, and event bindings (**@click**, **data-ef-on:click**, etc.).
+   - A **tree** of child nodes (tag, id, classes, and any template attributes).
+
+When **scope updates** (e.g. after cart or form changes), the picked element’s panel **refreshes** so you see updated bindings and tree. Use **Clear pick** to deselect.
+
+**data-ef-debug-if-condition** and **data-ef-debug-if-result** are set by the template engine when the Templates tab is open: they show which **template-if** condition and result produced that element. They appear in the bindings list and in the tree for nodes that are the first element of a rendered template-if branch.
+
+---
+
+## Console debug flags
+
+The template processor (templateProcessor.js) also supports **console-only** debug flags. When set, it logs to the **browser console** with a **`[ef-template]`** prefix. These are independent of the Debug Window.
+
+### 1. `efTemplateDebug`
+
+Enables **general template debug** logs (e.g. directive runs, condition evaluation, var updates).
+
+**How to enable:**
+
+- **URL:** Add **`?efTemplateDebug`** to the page URL (e.g. `https://yoursite.com/checkout?efTemplateDebug`).
+- **Session storage:** In the console or a script:
+  ```javascript
+  sessionStorage.setItem('efTemplateDebug', '1');
+  ```
+  Reload. To disable: **`sessionStorage.removeItem('efTemplateDebug');`**
+
+**What you’ll see:** Messages such as **getEffectiveContext**, **template-if evaluate**, **template-if: skip (branch unchanged)**, **template-foreach: skip (unchanged)**, **update: var-path** / **var-template** / **data-ef-text**, **runAllUpdates: start/done**, **updateElementsForPath**.
+
+Use this when you need **console** output (e.g. in CI or without the Debug Window).
+
+### 2. `efTemplateTraceContext`
+
+Enables **stack traces** when **getEffectiveContext** is called (throttled to avoid flooding).
+
+**How to enable:** Add **`?efTemplateTraceContext`** to the URL or set **`sessionStorage.setItem('efTemplateTraceContext', '1');`** and reload.
+
+Use this when you need to see the **call stack** for context resolution.
+
+---
+
+## Inspecting scope
+
+### Read `window.efScope`
+
+In the browser console:
+
+```javascript
+console.log(window.efScope);
+```
+
+Check that **cartItems**, **checkout**, **query**, **errors**, etc. are present and have the shape you expect. After an action (e.g. add to cart, apply coupon), inspect again and confirm the data changed.
+
+### After an update
+
+After something that should update the UI:
+
+1. Confirm **efScope** has the new data.
+2. If the UI did not update, verify the expected **efScope path actually changed** and that your template expressions reference that path (or a parent path).
+
+---
+
+## Verifying updates
+
+### Manual trigger
+
+To force a full re-run of the template engine (e.g. after editing **efScope** in the console):
+
+```javascript
+if (typeof window.notifyScopeUpdated === 'function') {
+  window.notifyScopeUpdated();
+} else {
+  window.dispatchEvent(new CustomEvent('ef-scope-updated'));
+}
+```
+
+If the UI updates after this, the data was already correct and you likely had a path/expression mismatch.
+
+### Path-scoped update
+
+If you know the exact scope path that changed (e.g. **checkout.shipping_same_as_billing**):
+
+```javascript
+if (typeof window.notifyScopePathsUpdated === 'function') {
+  window.notifyScopePathsUpdated(['checkout.shipping_same_as_billing']);
+}
+```
+
+Then check that only the relevant part of the UI updates.
+
+---
+
+## Common issues
+
+| Symptom | What to check |
+|--------|----------------|
+| **`[[ ... ]]` stays as text** | Engine may not have run. Ensure **initTemplateScope()** runs (e.g. from main.js when template tags or bindings exist). Check for JS errors before init. Use **data-ef-cloak** and the Templates tab or **efTemplateDebug** to see if **runAllUpdates** runs. |
+| **Wrong branch of template-if** | Open **Templates** tab and check **Events → New** for the condition and result. Or enable **efTemplateDebug** and look at **template-if evaluate**. Fix the condition or the data in **efScope**. |
+| **Loop empty or wrong items** | Inspect **efScope.cartItems** (or the array in **data-each**). Ensure it’s an array and items contain the expected keys used in expressions. |
+| **Form value not in scope** | Ensure the input has **ef-value/data-ef-value/data-template-value="path"** and that **path** is a dot path into **efScope**. Use **Pick element** to confirm the binding; after typing, confirm that path value changed in `window.efScope`. |
+| **Bump/cart UI not updating** | Confirm the bump or cart plugin updates **efScope** values used by the template. Check **Templates → Events** or **efTemplateDebug** for **runAllUpdates** / **updateElementsForPath**. |
+
+---
+
+## Summary
+
+- **Debug Window → Templates tab** — **Events** (New/Previous) show template-if results and errors; **Pick element** shows bindings and tree for any node. Refreshes on scope update. No URL flag needed when the tab is open.
+- **Console flags** — **efTemplateDebug** (URL or sessionStorage) for `[ef-template]` logs; **efTemplateTraceContext** for getEffectiveContext stack traces.
+- **Inspect** **window.efScope** before and after actions to confirm data.
+- **Optionally trigger** **notifyScopeUpdated()** or **notifyScopePathsUpdated([path])** manually during troubleshooting.
+
+For full syntax and behavior, see [Overview](/frontend-template-engine/overview), [Syntax](/frontend-template-engine/syntax), [Cart](/frontend-template-engine/cart), and [Checkout](/frontend-template-engine/checkout).

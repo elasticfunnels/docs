@@ -151,6 +151,8 @@ return device.browser !== 'Internet Explorer';
 return device.os === 'Android' && parseInt(device.os_version) >= 10;
 ```
 
+**Page templates:** The same device and request fields (`is_mobile`, `is_tablet`, `device`, `query`, `is_customer`, etc.) are available in page content. Use `@if(request.is_mobile)` or `@if(is_mobile)` and `{{ request.* }}` — see [Page Variables → Request & device context](/pages/page-variables#request--device-context).
+
 ---
 
 ### Customer Data

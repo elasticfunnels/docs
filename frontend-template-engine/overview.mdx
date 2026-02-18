@@ -1,0 +1,114 @@
+---
+title: 'Overview'
+description: 'Introduction to the Elastic Funnels frontend template processor: Alpine-like scope, custom tags, and reactive UI.'
+---
+
+The **Frontend Template Engine** is a client-side processor that runs in the visitor’s browser. It lets you build HTML that reacts to data (cart items, checkout totals, URL parameters, etc.) and updates when that data changes—without a full page reload.
+
+<Note>
+This documentation covers the **frontend** template system only. A separate **backend** Template Engine (server-side) uses different syntax (e.g. `{{ }}`, `@if`, `@foreach`). You can use both on the same page: backend for initial render, frontend for live updates.
+</Note>
+
+## When to use it
+
+Use the frontend template engine when:
+
+- **Content depends on the visitor** — Cart items, item count, order total, selected bumps, coupon status.
+- **You want live updates** — Adding to cart, changing quantity, applying a coupon, or toggling bumps should update the UI immediately.
+- **You control the layout** — You design the structure (rows, labels, buttons) in the page builder; only the data is dynamic.
+
+If the content is the same for everyone and does not change after load (e.g. a fixed headline), use normal content or [page variables](/pages/page-variables) instead.
+
+## How it works
+
+1. **Data lives in `window.efScope`** — The app (and cart/checkout plugins) put data here: `cartItems`, `checkout`, `query`, etc.
+2. **You use custom tags and expressions** — `<template-if>`, `<template-foreach>`, `[[ path ]]`, `ef-text`, `@click`, and similar.
+3. **Scope changes update automatically** — `window.efScope` is reactive. Changing values (including nested values and arrays) re-evaluates conditions, re-renders loops, and refreshes bindings.
+
+There is no virtual DOM; reactivity is **scope- and event-driven** with automatic change detection.
+
+## Quick start
+
+### 1. Put reactive data in `window.efScope`
+
+```html
+<script>
+  window.efScope = window.efScope || {};
+  window.efScope.items = [
+    { code: 'A1', name: 'Product Alpha', price: 29.99, quantity: 2 },
+    { code: 'B2', name: 'Product Beta', price: 14.50, quantity: 1 }
+  ];
+  window.efScope.currency = 'USD';
+</script>
+```
+
+### 2. Use custom tags and expressions in your HTML
+
+```html
+<h2 data-ef-cloak>Cart</h2>
+
+<template-if data-condition="items.length > 0">
+  <p data-ef-cloak>You have [[ items.length ]] items.</p>
+</template-if>
+<template-else>
+  <p class="muted" data-ef-cloak>Your cart is empty.</p>
+</template-else>
+
+<template-foreach data-each="item in items">
+  <div class="cart-line" data-ef-cloak>
+    <span>[[ item.name ]]</span>
+    <span>Qty: [[ item.quantity ]]</span>
+    <span>[[ formatPrice(item.price * item.quantity, currency) ]]</span>
+  </div>
+</template-foreach>
+```
+
+### 3. Change scope directly (auto reactive)
+
+```javascript
+window.efScope.items.push({ code: 'C3', name: 'New Item', price: 9.99, quantity: 1 });
+window.efScope.currency = 'USD';
+```
+
+- **`data-ef-cloak`** — Hides the element until the template processor has run (removes the attribute when done). Use it to avoid a flash of raw `[[ ... ]]` or wrong branch. The app should include CSS that hides **`[data-ef-cloak]`** (e.g. `[data-ef-cloak] { display: none !important; }`) and optionally the template custom elements (**template-foreach**, **template-if**, **template-else**, **template-set**) until processed.
+
+On offer/checkout pages, the application and plugins (cart, checkout, bumps) usually manage `efScope` for you.
+
+## What the engine provides
+
+| Feature | Purpose |
+|--------|--------|
+| **`[[ expression ]]`** | Insert a value (or expression) in text or attributes. |
+| **`<template-if>` / `<template-else-if>` / `<template-else>`** | Show one block based on a condition. |
+| **`<template-foreach>`** | Repeat a block once per item in an array. |
+| **`ef-text` / `ef-html`** | Bind an element’s text or HTML to an expression (`data-` aliases also supported). |
+| **`ef-href` / `ef-title` / `ef-alt` / `ef-placeholder`** | One-way attribute bindings from scope to DOM attributes. |
+| **`ef-value` / `data-template-value`** | Two-way form binding (Vue v-model style) for inputs, selects, textareas. |
+| **`@click` (and other events)** | Run an expression when the user clicks (or triggers another event). |
+| **`:checked` / `:disabled` / `:value`** | One-way bindings from scope to DOM properties. |
+| **Built-in functions** | `formatPrice`, `cartCount`, `cartSubtotal`, `upper`, `lower`, `titleCase`, etc. |
+| **`ef.template.watch/computed`** | Runtime API for watchers and computed values via `window.ef.template`. |
+
+## Builder-friendly bindings
+
+For page-builder work, attribute bindings are often easier to preview and edit than mixed text tokens:
+
+```html
+<!-- token style -->
+<h2>[[ checkout.product_title ]]</h2>
+
+<!-- binding style -->
+<h2><span ef-text="checkout.product_title">Product Title</span></h2>
+```
+
+You can add these directly from the **Data Attributes** panel (right sidebar) when a component is selected.
+
+Details and examples are in [Syntax](/frontend-template-engine/syntax), [Scope & Data](/frontend-template-engine/scope-and-data), [Bindings & Events](/frontend-template-engine/bindings-forms-events), [Functions](/frontend-template-engine/built-in-functions), [Cart](/frontend-template-engine/cart), and [Checkout](/frontend-template-engine/checkout).
+
+## Relation to other docs
+
+- **[Frontend Templates](/pages/frontend-templates)** — High-level guide for using templates in the page builder (variables, loops).
+- **Frontend Template Engine** (this section) — Full reference: syntax, scope, bindings, cart, checkout, limitations, debugging.
+- **Backend Template Engine** — Documented separately (server-side `{{ }}` and tags).
+
+Next: [Syntax](/frontend-template-engine/syntax).

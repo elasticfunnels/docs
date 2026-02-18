@@ -1,0 +1,169 @@
+---
+title: 'Checkout'
+description: 'Checkout-specific template engine usage: totals, form fields, coupon, order bumps, payment panel, and validation.'
+---
+
+This page covers **checkout-only** usage of the frontend template engine: order summary, totals, form fields, coupon, order bumps, and payment. For cart items and quantity controls, see [Cart](/frontend-template-engine/cart).
+
+<Info>
+**`checkout`** exists only on checkout pages. Guard shared templates with `<template-if data-condition="checkout">` when using `checkout.*`.
+</Info>
+
+---
+
+## Order summary: single-product vs cart
+
+Checkout can show either a **single-product** block (one product, hero image + title) or a **cart** block (list of items with thumbnails and qty). Use the scope flags to choose.
+
+| Condition | When it's true | Use in template |
+|-----------|----------------|------------------|
+| **`is_single_product`** | One product in cart | `checkout.product_image`, `checkout.product_title`, `checkout.product_price`, `checkout.retail_price` |
+| **`is_cart`** | Multiple items | `<template-foreach data-each="item in cartItems">` with `[[ item.image ]]`, `[[ item.name ]]`, `[[ item.total ]]` |
+
+<Warning>
+Do **not** use `cartItems[0]` in the single-product block. Use **`checkout.product_*`** keys only.
+</Warning>
+
+```html
+<template-if data-condition="is_single_product">
+  <div class="order-summary-single">
+    <img src="[[ checkout.product_image ]]" alt="[[ checkout.product_title ]]" />
+    <h2>[[ checkout.product_title ]]</h2>
+    <span>[[ checkout.product_price ]]</span>
+    <span>[[ checkout.retail_price ]]</span>
+  </div>
+</template-if>
+<template-else-if data-condition="is_cart">
+  <template-foreach data-each="item in cartItems">
+    <div class="order-summary-line">
+      <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+      <span>[[ item.name ]]</span>
+      <span>[[ item.total ]]</span>
+    </div>
+  </template-foreach>
+</template-else-if>
+```
+
+Equivalent binding-style variant (often easier to preview/edit in the page builder):
+
+```html
+<template-if data-condition="is_single_product">
+  <div class="order-summary-single">
+    <img ef-src="checkout.product_image" ef-alt="checkout.product_title" />
+    <h2><span ef-text="checkout.product_title">Product Title</span></h2>
+    <span ef-text="checkout.product_price">$0.00</span>
+    <span ef-text="checkout.retail_price">$0.00</span>
+  </div>
+</template-if>
+```
+
+You can add `ef-*` attributes from the **Data Attributes** section (right sidebar) when a component is selected.
+
+---
+
+## Totals (display + raw)
+
+Checkout exposes the same totals keys in **both** modes (`is_single_product` and `is_cart`) so one layout can be reused for either flow.
+
+Use formatted keys for display (`[[ checkout.total ]]`). Use `*_raw` only for conditions/math.
+
+| Formatted key | Raw key | Meaning |
+|---------------|---------|---------|
+| **`checkout.product_price`** | **`checkout.product_price_raw`** | Main products amount (excludes bumps). |
+| **`checkout.retail_price`** | **`checkout.retail_price_raw`** | Retail/original amount for main products. |
+| **`checkout.bump_total`** | **`checkout.bump_total_raw`** | Selected order bumps total. |
+| **`checkout.subtotal_before_discount`** | **`checkout.subtotal_before_discount_raw`** | Product + bumps before coupon discount. |
+| **`checkout.discount_total`** | **`checkout.discount_total_raw`** | Coupon discount amount. |
+| **`checkout.subtotal_after_discount`** | **`checkout.subtotal_after_discount_raw`** | Subtotal after coupon discount, before shipping/tax. |
+| **`checkout.subtotal`** | **`checkout.subtotal_raw`** | Backward-compatible alias of `subtotal_after_discount`. |
+| **`checkout.shipping`** | **`checkout.shipping_raw`** | Shipping amount. |
+| **`checkout.tax`** | **`checkout.tax_raw`** | Tax amount. |
+| **`checkout.total`** | **`checkout.total_raw`** | Final grand total. |
+
+Recommended template bindings:
+
+- Subtotal row: `[[ checkout.subtotal_after_discount ]]`
+- Total row: `[[ checkout.total ]]`
+- Conditions: `checkout.bump_total_raw > 0`, `checkout.tax_raw > 0`, `checkout.shipping_raw > 0`
+
+---
+
+## Form fields and validation
+
+### Binding fields
+
+Use **`data-template-value="checkout.customer.<field>"`** on each input/select. Paths follow the checkout field spec (e.g. `checkout.customer.email`, `checkout.customer.shipping_first_name`).
+
+- Wrap each field in a container (e.g. **`.floating-label-group`**).
+- Add **`<div class="form-error" data-checkout-error="<id>"></div>`** so the form errors adapter can show validation messages.
+- Use **`checkout.countries`** and **`checkout.usStates`** for select options (each **`{ value, label }`**).
+
+### Shipping same as billing
+
+- Bind the checkbox with **`data-template-value="checkout.shipping_same_as_billing"`**.
+- Wrap the **shipping address block** in **`<template-if data-condition="!checkout.shipping_same_as_billing">`**.
+- Use **`<template-else>`** to show a short message when shipping equals billing.
+
+### Billing section visibility
+
+The **entire billing info section** can be wrapped in **`<template-if data-condition="checkout.shipping_same_as_billing == false">`** so the billing block is hidden when “same as billing” is checked. Inside that section, use **`<template-if data-condition="!checkout.shipping_same_as_billing">`** for the visible billing form and **`<template-else>`** for a short message plus hidden billing inputs so the backend still receives billing data.
+
+### Validation errors
+
+- **`errors`** is an object keyed by field id: **`errors['email']`**, **`errors['shipping_city']`**, etc.
+- The form errors adapter looks for **`[data-checkout-error="<id>"]`** and sets the message; it also adds **`.error`** to the input and **`.has-error`** to the wrapper.
+- You can show the message in the template: **`[[ errors[f.id] ]]`** or **`data-ef-text="errors['email']"`**.
+
+---
+
+## Coupon
+
+| Scope | Purpose |
+|-------|--------|
+| **`query.coupon`** | URL has `?coupon=...` — use for *showing* the “automatically applied” block. |
+| **`checkout.coupon`** | Applied coupon: **`applied`**, **`code`**, **`name`**, **`value_formatted`**. |
+| **`checkout.coupon_message`** | Validation error message (e.g. invalid code). |
+
+- **Apply button:** **`data-apply-coupon`** (plugin binds to validate + refresh).
+- **Clear button:** **`data-clear-coupon`**; show when **`checkout.coupon.applied`**.
+- **Error block:** **`<template-if data-condition="checkout.coupon_message">`** with **`[[ checkout.coupon_message ]]`**.
+
+---
+
+## Order bumps
+
+| Scope | Purpose |
+|-------|--------|
+| **`checkout.bump_products`** | All available bumps (each: **`code`**, **`name`**, **`description`**, **`price`** formatted, **`price_raw`**, **`image`**, **`added`**). |
+| **`checkout.selectedBumpLines`** | Selected bumps (each: **`code`**, **`name`**, **`price`**, **`price_raw`**). |
+
+- Display **`[[ bump.price ]]`** and **`[[ line.price ]]`** as-is (already formatted).
+- **Checkbox pattern:** Use **`data-bump-code`**, **`data-bump-checkbox`**, **`data-bump-toggle`** and **`name="bump"`**, **`value="[[ bump.code ]]"`** so the bump plugin can toggle and style. See [Cart](/frontend-template-engine/cart#order-bumps) for the full offer vs added pattern.
+- **Button + @click pattern:** Alternatively, use **`<button @click="bump.added = true">…</button>`** for “Add to order” and **`<button @click="bump.added = false">…</button>`** for “Remove”. Mutating **`bump.added`** triggers re-render. Both checkbox + **data-bump-*** and button + **@click** are valid.
+
+---
+
+## Payment panel
+
+**Pattern A (generic):** Replace the payment block with **only**:
+
+```html
+<checkout-cc-panel></checkout-cc-panel>
+```
+
+The app injects the full payment UI (method choice, card inputs, etc.). Do not keep duplicate payment method pickers or card sections in the template.
+
+**Pattern B (explicit gateway):** When the source already has an explicit gateway structure (e.g. NMI), preserve it. Use a wrapper **`<div class="checkout-cc-panel" data-gateway="nmi">`** (or other gateway). Inside: (1) optional cardholder name in **`<template-if data-condition="!(checkout && checkout.customer && checkout.customer.first_name)">`** with **`data-template-value="checkout.customer.cardholder_name"`** and **`<div class="form-error" id="cc-name-error"></div>`**; (2) a **secure-card-element** div with **`data-brand-id`**, **`data-domain-id`**, **`data-merchant-code`**, **`data-accepted-cards`**, plus a sibling **`<div class="form-error" id="nmi-card-errors"></div>`** for card errors.
+
+---
+
+## Summary
+
+- Use **`is_single_product`** / **`is_cart`** and **`checkout.product_*`** vs **cartItems** for order summary.
+- Prefer explicit subtotal keys: **`checkout.subtotal_before_discount`** / **`checkout.subtotal_after_discount`**.
+- `checkout.subtotal` remains as a backward-compatible alias of `checkout.subtotal_after_discount`.
+- Use **`_raw`** keys only for conditions/math or explicit formatting with `formatPrice`.
+- Bind fields with **data-template-value**, use **data-checkout-error** and **errors** for validation.
+- Coupon: **query.coupon**, **checkout.coupon**, **checkout.coupon_message**; **data-apply-coupon**, **data-clear-coupon**.
+- Bumps: **checkout.bump_products**, **checkout.selectedBumpLines**; **data-bump-*** attributes.
+- Payment: **Pattern A** — **`<checkout-cc-panel></checkout-cc-panel>`** only; **Pattern B** — explicit gateway div with **`data-gateway`**, optional cardholder, **secure-card-element**.
