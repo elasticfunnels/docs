@@ -138,6 +138,15 @@ Enables **`[[ var.name ]]`** and other expressions in the **content** of the ele
 
 Use **`<template-vars>`** or **`<template data-ef-vars>`** when you have a block where the only dynamic part is `[[ ... ]]` and you want to avoid an extra conditional.
 
+### `template-component`
+
+Include a reusable component by name. The element is replaced by the component’s output.
+
+- **`data-component-name="name"`** — Component name (slug).
+- **`data-args`** — Optional JSON object of arguments passed to the component.
+
+Use when you have a shared fragment (e.g. a card or header) defined as a component and want to embed it with different data.
+
 ---
 
 ## Expressions: `[[ ... ]]`

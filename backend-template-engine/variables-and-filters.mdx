@@ -1,0 +1,114 @@
+---
+title: 'Variables and filters'
+description: 'Backend template variables {{ path }} and filters: default, slice, raw, upper, lower, truncate, replace.'
+---
+
+Backend templates insert values with **`{{ path }}`** and can transform them with **filters** using the pipe character: **`{{ path | filter }}`** or **`{{ path | filter:arg }}`**.
+
+## Variables: `{{ path }}`
+
+Values are resolved from the current context (e.g. page data, article, posts, featured).
+
+| You write | Meaning |
+|-----------|---------|
+| `{{ article.title }}` | Property of the current article |
+| `{{ post.details_url }}` | URL for a post (e.g. in a loop) |
+| `{{ featured[0].title }}` | First featured item’s title |
+| `{{ blog_base_url \| default:'/blog' }}` | URL with fallback |
+
+Paths can use dot notation and array indexing. If a value is missing, it usually renders as empty unless you use the **`default`** filter.
+
+---
+
+## Filters
+
+Filters are applied left to right. You can chain several: **`{{ value | filter1 | filter2:arg }}`**.
+
+### `default` — fallback when value is empty
+
+If the value is empty (null, undefined, or empty string), the filter returns the argument instead. The argument can be **another variable** or a **quoted string**.
+
+```html
+{{ article.date_short | default:article.published_at | default:article.created_at }}
+```
+
+This shows `date_short` if present; otherwise `published_at`; otherwise `created_at`. So you can chain multiple fallbacks.
+
+Literal fallback:
+
+```html
+{{ article.author_name | default:'Author' }}
+{{ article.reading_time | default:'5' }} min read
+```
+
+### `slice` — substring or first character
+
+Use **`slice:start:length`** (e.g. `slice:0:1` for the first character). Helpful for things like avatar initials.
+
+```html
+{{ (article.author_name | default:'A') | slice:0:1 }}
+```
+
+Parentheses ensure the whole expression `article.author_name | default:'A'` is evaluated first, then `slice:0:1` is applied to the result.
+
+### `raw` — output HTML unescaped
+
+By default, output is escaped for safety. Use **`raw`** only when the value is trusted HTML (e.g. stored rich content like article body or excerpt).
+
+```html
+{{ article.body | raw }}
+{{ (post.excerpt | default:post.summary | default:'') | raw }}
+```
+
+### Other common filters
+
+| Filter | Purpose | Example |
+|--------|---------|---------|
+| **`upper`** | Uppercase | `{{ title \| upper }}` |
+| **`lower`** | Lowercase | `{{ title \| lower }}` |
+| **`truncate`** | Limit length | `{{ text \| truncate:100 }}` |
+| **`replace`** | Replace text | `{{ text \| replace:"old","new" }}` |
+
+---
+
+## Patterns from real templates
+
+These patterns are used in built-in blog and content templates.
+
+**Date with fallbacks:**
+
+```html
+<span>{{ article.date_short | default:article.published_at | default:article.created_at }}</span>
+```
+
+**Avatar initial when no image:**
+
+```html
+{{ (article.author_name | default:'A') | slice:0:1 }}
+```
+
+**Excerpt or summary, then output as HTML:**
+
+```html
+{{ (featured[0].excerpt | default:featured[0].summary | default:'') | raw }}
+```
+
+**Optional category:**
+
+```html
+@if(post.category)
+  <span>{{ post.category.name }}</span>
+@endif
+```
+
+---
+
+## Summary
+
+- Use **`{{ path }}`** to output a value; use **`| filter`** or **`| filter:arg`** to transform it.
+- **Chained `default`** — `a | default:b | default:c` gives the first non-empty value.
+- **`slice:0:1`** — First character; combine with `(expression | default:'X')` for safe initials.
+- **`raw`** — Use only for trusted HTML (e.g. article body, excerpt).
+- **Parentheses** — `{{ (expression) | filter }}` so the filter applies to the whole expression.
+
+For conditionals and loops, see [Directives](/backend-template-engine/directives). For client-side templates, see [Frontend Template Engine](/frontend-template-engine/overview).

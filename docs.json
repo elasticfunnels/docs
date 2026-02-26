@@ -72,7 +72,6 @@
               "pages/product-item-tag",
               "pages/collection-item-tag",
               "pages/page-variables",
-              "pages/frontend-templates",
               "pages/cart"
             ]
           },
@@ -149,6 +148,14 @@
               "frontend-template-engine/checkout",
               "frontend-template-engine/limitations-pitfalls",
               "frontend-template-engine/debugging"
+            ]
+          },
+          {
+            "group": "Backend Template Engine",
+            "pages": [
+              "backend-template-engine/overview",
+              "backend-template-engine/directives",
+              "backend-template-engine/variables-and-filters"
             ]
           }
         ]

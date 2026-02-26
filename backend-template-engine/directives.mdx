@@ -1,0 +1,147 @@
+---
+title: 'Directives'
+description: 'Backend template directives: @if, @else, @foreach, @set, @component, @extends, @block.'
+---
+
+This page describes the **directives** the backend template engine understands. Use them in the page builder via the corresponding **backend** blocks, or write them directly in coded templates.
+
+## Conditionals: `@if`, `@else`, `@elseif`, `@endif`
+
+Show one block when a condition is true, optionally with else branches.
+
+```html
+@if(article)
+  <h1>{{ article.title }}</h1>
+@else
+  <p>Article not found.</p>
+@endif
+```
+
+- **`@if(condition)`** — Renders the following content only when the condition is truthy.
+- **`@else`** — Optional; rendered when the `@if` condition is false.
+- **`@elseif(condition)`** — Optional; additional condition; first matching branch is used.
+- **`@endif`** — Ends the conditional block.
+
+### Conditions
+
+You can use:
+
+- **Word operators** (safe in HTML): `eq`, `neq`, `lt`, `lte`, `gt`, `gte`  
+  Example: `@if(orders.length gt 0)`
+- **Symbols** (where allowed): `===`, `!==`, `==`, `!=`, `<=`, `>=`, `<`, `>`
+- **Logic:** `and`, `or`, unary `!`
+- **Property checks:** `@if(article.author_avatar)`, `@if(related_articles && related_articles.length)`
+
+Example with `@elseif` and array length:
+
+```html
+@if(posts && posts.length)
+  @foreach(post in posts)
+    <article>…</article>
+  @endforeach
+@else
+  <p>No posts yet.</p>
+@endif
+```
+
+---
+
+## Loops: `@foreach` … `@endforeach`
+
+Repeat a block once per element in an array.
+
+```html
+@foreach(post in posts)
+  <article>
+    <h3><a href="{{ post.details_url }}">{{ post.title }}</a></h3>
+    <p>{{ post.excerpt | default:post.summary | default:'' | raw }}</p>
+  </article>
+@endforeach
+```
+
+- **`@foreach(item in array)`** — `item` is the variable name for the current element; `array` is an expression that must evaluate to an array (e.g. `posts`, `related_articles`).
+- **`@endforeach`** — Required; ends the loop.
+
+Inside the block you can use `{{ item.property }}`, `@if`, nested `@foreach`, and filters.
+
+---
+
+## Variables: `@set`
+
+Define a variable for use later in the template.
+
+```html
+@set(greeting = "Hello")
+<p>{{ greeting }}, {{ name }}!</p>
+```
+
+Use when you need a reusable value or a clearer expression.
+
+---
+
+## Components: `@component`
+
+Include a reusable component by name, with optional arguments.
+
+```html
+@component("header", { title: "Home" })
+```
+
+The engine looks up the component by name and renders it with the given arguments in context.
+
+---
+
+## Inheritance: `@extends` and `@block`
+
+Use a **base template** and override only certain regions.
+
+### Base template (e.g. layout)
+
+The base defines named **blocks** that child templates can override:
+
+```html
+<!DOCTYPE html>
+<html>
+<head><title>Site</title></head>
+<body>
+  @block("content")
+    Default content here.
+  @endblock
+</body>
+</html>
+```
+
+### Child template
+
+The child declares which base it extends and redefines one or more blocks:
+
+```html
+@extends("layout")
+@block("content")
+<main>
+  <h1>{{ article.title }}</h1>
+  {{ article.body | raw }}
+</main>
+@endblock
+```
+
+- **`@extends("pageSlug")`** — Must be at the top; use the base page’s slug.
+- **`@block("name")` … `@endblock`** — Replaces the same-named block in the base. Only the blocks you define are overridden; the rest of the base layout is used as-is.
+
+In the **page builder**, inheritance is supported with a read-only base layer: only the block regions are editable, and on save only the child source (extends + blocks) is stored.
+
+---
+
+## Summary
+
+| Directive | Purpose |
+|-----------|---------|
+| `@if(condition)` … `@endif` | Conditional block |
+| `@else` / `@elseif(condition)` | Else branches |
+| `@foreach(item in array)` … `@endforeach` | Loop |
+| `@set(variable = expression)` | Set variable |
+| `@component("name", args)` | Include component |
+| `@extends("pageSlug")` | Extend base template |
+| `@block("name")` … `@endblock` | Define/override block |
+
+Next: [Variables and filters](/backend-template-engine/variables-and-filters).

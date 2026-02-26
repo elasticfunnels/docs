@@ -1,0 +1,55 @@
+---
+title: 'Overview'
+description: 'Introduction to the backend template engine: server-side directives and variable interpolation.'
+---
+
+The **Backend Template Engine** renders templates on the server (or in preview) using directives like `@if`, `@foreach`, and `{{ variable }}`. The output is plain HTML sent to the visitor. Use it for content that is the same for everyone at request time—product lists, blog posts, conditional sections—or for layout structure that does not change after the page loads.
+
+<Note>
+Use **`{{ }}`** for backend (server-side) variables. Use **`[[ ]]`** for frontend (client-side) values that update in the browser. Both can appear on the same page. For live-updating content (cart, totals, conditional UI), see [Frontend Template Engine](/frontend-template-engine/overview).
+</Note>
+
+## When to use it
+
+Use the backend template engine when:
+
+- **Content is fixed at request time** — Blog posts, product details, category lists, or any data that does not change while the visitor is on the page.
+- **You need conditionals or loops in the HTML** — Show or hide blocks with `@if` / `@else`, or repeat a block per item with `@foreach`.
+- **You use layout inheritance** — A base layout with `@extends` and `@block` so child pages only define the changing regions.
+
+If the content depends on the visitor and must update without reloading (e.g. cart items, totals, coupon status), use the [Frontend Template Engine](/frontend-template-engine/overview) instead.
+
+## Page builder vs coded templates
+
+| Context | How you work | What gets saved / rendered |
+|--------|----------------|-----------------------------|
+| **Page builder (GrapeJS)** | Drag **backend** blocks from the Template Engine category: “If (Backend)”, “Else (Backend)”, “Foreach (Backend)”, “Extends (Backend)”, “Block (Backend)”, etc. | The builder saves `@if(...)`, `@else`, `@foreach(...)`, `@extends(...)`, `@block(...)` in the page HTML. The backend engine renders these when the page is built or previewed. |
+| **Coded / hand-written templates** | Write the same directives directly in the template source. | No extra tags; the engine reads `@if`, `@foreach`, `{{ ... }}`, and so on. |
+
+So:
+
+- **In the page builder:** Use the **backend** blocks (If, Else, Foreach, Set, Component, Extends, Block) so the correct `@…` directives are emitted.
+- **In coded templates:** Use **`@if`**, **`@else`**, **`@foreach`**, **`{{ }}`**, **`@set`**, **`@component`**, **`@extends`**, **`@block`** directly.
+
+## What the engine provides
+
+| Feature | Purpose |
+|--------|---------|
+| **`{{ path }}`** | Insert a value from the current context (variables, properties). |
+| **`{{ path \| filter }}`** | Apply a filter (e.g. `default`, `upper`, `slice`, `raw`). |
+| **`@if(condition)` … `@endif`** | Show a block only when the condition is true. |
+| **`@else`** / **`@elseif(condition)`** | Optional branches inside an `@if`. |
+| **`@foreach(item in array)` … `@endforeach`** | Repeat a block once per item. |
+| **`@set(name = value)`** | Set a variable for the rest of the template. |
+| **`@component("name", args)`** | Include a reusable component. |
+| **`@extends("pageSlug")`** | Use a base template; override with `@block`. |
+| **`@block("name")` … `@endblock`** | Define or override a named region in the layout. |
+
+Details and examples are in [Directives](/backend-template-engine/directives) and [Variables and filters](/backend-template-engine/variables-and-filters).
+
+## Relation to other docs
+
+- **Frontend Template Engine** — [Overview](/frontend-template-engine/overview), [Syntax](/frontend-template-engine/syntax): client-side `[[ ]]`, `<template-if>`, `<template-foreach>`, etc.
+- **Backend Template Engine** (this section) — Server-side `{{ }}`, `@if`, `@foreach`, filters, inheritance.
+
+Next: [Directives](/backend-template-engine/directives).
