@@ -83,7 +83,8 @@
               "merchants/buygoods",
               "merchants/digistore24",
               "merchants/shopify-checkout",
-              "merchants/shop-pay"
+              "merchants/shop-pay",
+              "merchants/apple-pay-google-pay"
             ]
           },
           {
