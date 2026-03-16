@@ -1,0 +1,295 @@
+---
+title: 'Examples'
+description: 'Common patterns and real-world examples for backend scripts.'
+---
+
+## Access control — require login
+
+Redirect visitors who haven't purchased to a sales page:
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/sales-page');
+  }
+</script>
+
+<h1>Welcome to your dashboard, {{ customer.name }}</h1>
+```
+
+## Promo code from URL
+
+Check for a promo query parameter and set discount variables:
+
+```html
+<script scope="backend">
+  var promo = request.query.promo;
+
+  if (promo === 'VIP50') {
+    setVariable('discount', '50%');
+    setVariable('show_promo_banner', true);
+    session.set('applied_promo', promo);
+  } else if (promo === 'WELCOME20') {
+    setVariable('discount', '20%');
+    setVariable('show_promo_banner', true);
+    session.set('applied_promo', promo);
+  } else {
+    setVariable('discount', '0%');
+    setVariable('show_promo_banner', false);
+  }
+</script>
+
+@if(var.show_promo_banner)
+  <div class="promo-banner">
+    Use code for {{ var.discount }} off!
+  </div>
+@endif
+```
+
+## Geo-based redirect
+
+Redirect mobile visitors to a mobile-optimized page:
+
+```html
+<script scope="backend">
+  if (request.is_mobile && request.path === '/sales') {
+    redirect('/sales-mobile');
+  }
+</script>
+```
+
+## Product-aware logic
+
+Check if a product exists and set variables based on its properties:
+
+```html
+<script scope="backend">
+  var product = getProduct('premium-plan');
+
+  if (!product) {
+    response.status(404);
+    response.send('<h1>Product not found</h1>');
+  }
+
+  setVariable('product_name', product.name);
+  setVariable('product_price', product.price);
+  setVariable('is_subscription', product.is_subscription ? true : false);
+</script>
+
+<h1>{{ var.product_name }}</h1>
+<p>Price: ${{ var.product_price }}</p>
+
+@if(var.is_subscription)
+  <p>This is a recurring subscription.</p>
+@endif
+```
+
+## Returning customer detection
+
+Check order history and personalize the page:
+
+```html
+<script scope="backend">
+  if (is_customer && customer.email) {
+    var orders = getOrders('newest', 1);
+
+    if (orders.length > 0) {
+      setVariable('returning', true);
+      setVariable('last_order_date', orders[0].created_at);
+    }
+  }
+</script>
+
+@if(var.returning)
+  <div class="welcome-back">
+    Welcome back! Your last order was on {{ var.last_order_date }}.
+  </div>
+@else
+  <div class="new-visitor">
+    Welcome! Check out our products.
+  </div>
+@endif
+```
+
+## Course access gate
+
+Only allow access if the visitor has purchased the course product:
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/courses/pricing');
+  }
+
+  var orders = getOrders('newest', 100);
+  var hasCourseAccess = false;
+
+  for (var i = 0; i < orders.length; i++) {
+    var products = orders[i].products;
+    for (var j = 0; j < products.length; j++) {
+      if (products[j].name === 'Course Access Pass') {
+        hasCourseAccess = true;
+      }
+    }
+  }
+
+  if (!hasCourseAccess) {
+    redirect('/courses/pricing');
+  }
+
+  var course = getCourseBySlug('javascript-basics');
+  if (course) {
+    setVariable('course_title', course.title);
+    setVariable('total_lessons', course.total_lesson_count);
+  }
+</script>
+
+<h1>{{ var.course_title }}</h1>
+<p>{{ var.total_lessons }} lessons</p>
+```
+
+## JSON API endpoint
+
+Use a page as a lightweight JSON API:
+
+```html
+<script scope="backend">
+  if (request.method !== 'GET') {
+    response.status(405);
+    response.json({ error: 'Method not allowed' });
+  }
+
+  var products = getAllProducts();
+  var catalog = [];
+
+  for (var i = 0; i < products.length; i++) {
+    catalog.push({
+      name: products[i].name,
+      price: products[i].price,
+      code: products[i].code
+    });
+  }
+
+  response.json({ products: catalog });
+</script>
+```
+
+## Blog listing with backend logic
+
+Fetch blog articles and inject them as template variables:
+
+```html
+<script scope="backend">
+  var blog = getBlog();
+  if (!blog) {
+    response.status(404);
+    response.send('<h1>Blog not found</h1>');
+  }
+
+  var page = parseInt(request.query.page) || 1;
+  var articles = getBlogArticles(blog.id, page, 12);
+  var categories = getBlogCategories(blog.id);
+
+  setVariable('blog_name', blog.name);
+  setVariable('articles', articles);
+  setVariable('categories', categories);
+  setVariable('current_page', page);
+</script>
+
+<h1>{{ var.blog_name }}</h1>
+```
+
+## Product catalog with savings badges
+
+```html
+<script scope="backend">
+  var products = getProducts({ type: 'physical' });
+  var catalog = [];
+
+  for (var i = 0; i < products.length; i++) {
+    var p = products[i];
+    var savings = productSavings(p);
+
+    catalog.push({
+      name: p.name,
+      price: formatPrice(p.price, p.currency),
+      badge: savings.percent > 0 ? 'Save ' + savings.percentFormatted : '',
+      buy_url: buy(p.code),
+      subscription_info: subscriptionSummary(p)
+    });
+  }
+
+  setVariable('catalog', catalog);
+</script>
+```
+
+## Course access with session items
+
+Share state between backend scripts and template-engine expressions:
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/courses/pricing');
+  }
+
+  var slug = request.query.course || 'default-course';
+  var course = getCourseBySlug(slug);
+
+  if (course) {
+    setVariable('course', course);
+    setSessionItem('last_viewed_course', slug);
+  }
+
+  var categories = getCategoriesWithCourses();
+  setVariable('categories', categories);
+</script>
+```
+
+## Whitelist admin visitors
+
+```html
+<script scope="backend">
+  var customer = getCustomer();
+
+  if (customer && customer.email === 'admin@mybrand.com') {
+    whitelistVisitor();
+    setVariable('is_admin', true);
+  }
+</script>
+```
+
+## External API with proxy
+
+Verify a token with an external service (requires HTTP proxy to be configured):
+
+```html
+<script scope="backend">
+  if (typeof http === 'undefined') {
+    console.error('HTTP proxy not configured');
+    redirect('/error');
+  }
+
+  var token = request.query.auth;
+  if (!token) {
+    redirect('/login');
+  }
+
+  var result = http.get(
+    'https://api.myservice.com/verify?token=' + token,
+    { 'Authorization': 'Bearer my-api-key' }
+  );
+
+  if (result.status === 200) {
+    var user = JSON.parse(result.body);
+    session.set('external_user_id', user.id);
+    session.set('external_user_name', user.name);
+    setVariable('user_name', user.name);
+  } else {
+    response.status(403);
+    response.send('<h1>Authentication failed</h1>');
+  }
+</script>
+
+<h1>Hello, {{ var.user_name }}</h1>
+```

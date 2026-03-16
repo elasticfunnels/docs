@@ -1,0 +1,111 @@
+---
+title: 'HTTP Requests'
+description: 'Make HTTP GET and POST requests to external APIs from backend scripts.'
+---
+
+Backend scripts can make HTTP requests to external APIs using `http.get()` and `http.post()`. All requests are routed through a secure proxy to prevent direct access to internal infrastructure.
+
+<Warning>
+HTTP functions are only available when the HTTP proxy is configured. If the proxy is not set up, `http` will be `undefined`. Contact your administrator to enable this feature.
+</Warning>
+
+## `http.get(url, headers?)`
+
+Make an HTTP GET request.
+
+```javascript
+var result = http.get('https://api.example.com/user/123');
+
+if (result.status === 200) {
+  var data = JSON.parse(result.body);
+  setVariable('user_name', data.name);
+}
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `url` | string | Full URL to request |
+| `headers` | object | Optional request headers |
+
+## `http.post(url, body, headers?)`
+
+Make an HTTP POST request.
+
+```javascript
+var result = http.post(
+  'https://api.example.com/verify',
+  JSON.stringify({ token: request.query.token }),
+  { 'Content-Type': 'application/json' }
+);
+
+if (result.status !== 200) {
+  redirect('/unauthorized');
+}
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `url` | string | Full URL to request |
+| `body` | string | Request body (typically JSON stringified) |
+| `headers` | object | Optional request headers |
+
+## Response object
+
+Both `http.get` and `http.post` return an object:
+
+```javascript
+{
+  status: 200,          // HTTP status code (0 if request failed entirely)
+  headers: {},          // Response headers
+  body: '...'           // Response body as a string
+}
+```
+
+To work with JSON APIs, parse the body:
+
+```javascript
+var result = http.get('https://api.example.com/data');
+var data = JSON.parse(result.body);
+```
+
+## Limits
+
+| Constraint | Value |
+|-----------|-------|
+| Max requests per script execution | 5 |
+| Request timeout | 10 seconds |
+| Max response body size | 1 MB |
+
+## Security
+
+- All requests are routed through an authenticated proxy — they never originate from the application server directly
+- Private/internal IPs are blocked (localhost, 10.x.x.x, 172.16-31.x.x, 192.168.x.x, 169.254.x.x, AWS metadata endpoint)
+- Only `http://` and `https://` protocols are allowed
+
+## Example: external auth check
+
+```html
+<script scope="backend">
+  var token = request.query.token;
+
+  if (!token) {
+    redirect('/login');
+  }
+
+  var auth = http.post('https://auth.myservice.com/validate',
+    JSON.stringify({ token: token }),
+    { 'Content-Type': 'application/json' }
+  );
+
+  if (auth.status === 200) {
+    var user = JSON.parse(auth.body);
+    session.set('verified_user', user.email);
+    setVariable('user_name', user.name);
+  } else {
+    response.status(403);
+    response.send('<h1>Invalid token</h1>');
+  }
+</script>
+
+<h1>Welcome, {{ var.user_name }}</h1>
+```

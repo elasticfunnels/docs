@@ -1,0 +1,78 @@
+---
+title: 'Apple Pay and Google Pay'
+description: 'Enable and configure Apple Pay and Google Pay on your NMI checkout'
+---
+
+Apple Pay and Google Pay are payment options on your existing NMI checkout. They use the same NMI merchant and credentials — no separate merchant is required. Card checkout remains available if a wallet is not shown or the customer cancels.
+
+## Overview
+
+- **Google Pay** — No configuration required. It appears automatically when your domain uses an NMI merchant with tokenization (Collect.js) and the customer’s browser supports it.
+- **Apple Pay** — Requires enabling in the NMI Merchant Portal, registering your checkout domain(s) with NMI, and completing Apple’s domain verification.
+- Both options appear on the **checkout page** only, in the same payment area where customers choose Card or PayPal. If the wallet is not supported or the customer cancels, they can still pay with card (and PayPal or Klarna if configured).
+
+## How to configure / enable
+
+### Google Pay
+
+No configuration is required.
+
+1. Ensure the domain uses an **NMI** merchant (not Stripe, PayPal, or another gateway).
+2. Ensure that merchant uses **tokenization** (Collect.js): in the merchant settings, tokenization mode should be **Collect.js** and the **public / tokenization key** should be set.
+3. Assign that NMI merchant to your checkout domain under **Settings** → **Domains** → **Edit Domain** → **Merchant**.
+
+Google Pay will then appear automatically on checkout when the customer’s browser or device supports it. If it is not supported, the option is hidden and the customer can pay with card.
+
+### Apple Pay
+
+**Prerequisites:** NMI merchant with tokenization (Collect.js), and the checkout domain linked to that merchant (as above).
+
+**Step 1: Enable Apple Pay in NMI**
+
+1. Log in to the [NMI Merchant Portal](https://secure.nmi.com/merchants/).
+2. Go to **Settings** → **Apple Pay**.
+3. Enable Apple Pay for your account (if your processor supports it).
+
+**Step 2: Register your checkout domain(s) with NMI**
+
+NMI must have a list of domains that are allowed to show Apple Pay. Use the same domain(s) that serve your checkout in ElasticFunnels (e.g. the domain you set under **Settings** → **Domains**).
+
+- In the NMI Merchant Portal, add your checkout domain(s) to the Apple Pay allowed list (see NMI’s Apple Pay / domain registration section).
+- If ElasticFunnels later adds an in-app “Register domains” action for your NMI merchant, you can use that to sync your linked domains; otherwise configure the list in NMI’s portal.
+
+**Step 3: Apple domain verification**
+
+Apple requires a verification file on your checkout domain.
+
+1. Download the **domain verification file** from NMI (or from Apple’s developer resources, depending on how NMI guides you).
+2. Host it at:  
+   `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`  
+   Replace `<your-checkout-domain>` with the exact domain customers use at checkout (e.g. `checkout.yourstore.com`).
+3. Ensure the file is publicly accessible over HTTPS. **Recommended:** In the app, go to **Domains** → edit the checkout domain → **Apple Pay** tab, and paste the exact contents of the verification file. The offer site will then serve it at `/.well-known/apple-developer-merchantid-domain-association` for that domain. Alternatively, you can set the env var **`APPLE_PAY_DOMAIN_VERIFICATION_CONTENT`** on the offer server as a fallback (same content for all domains on that server). If neither is set, the path returns 404 and you must host the file elsewhere.
+
+After all three steps, Apple Pay can appear on checkout when the customer’s browser or device supports it and the domain is correctly registered and verified.
+
+## Where the options appear
+
+- **Page:** The **checkout page** only. Apple Pay and Google Pay do not appear on the cart, product, or other pages unless we add them there in a future update.
+- **Position:** In the **same payment method area** where customers choose Card or PayPal (e.g. above the card form, or in a row with other payment options). They are visible only when:
+  1. The checkout domain uses an **NMI** merchant with **tokenization (Collect.js)** (public key set), and  
+  2. The customer’s browser or device supports the wallet (e.g. Safari/Apple device for Apple Pay, Chrome or supported Android for Google Pay, over HTTPS).
+
+If the wallet is not supported or the customer cancels the wallet flow, they can still complete the order with a card (and with PayPal or Klarna if you have those configured).
+
+## Troubleshooting
+
+- **Apple Pay or Google Pay buttons do not show**  
+  - Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.  
+  - Check that the customer is on **HTTPS** and that the browser or device supports the wallet (e.g. Safari for Apple Pay).  
+  - For **Apple Pay** only: confirm the domain is registered with NMI for Apple Pay and that the Apple verification file is reachable at `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`.
+
+- **Verification file not found (Apple Pay)**  
+  - Ensure the file is at the exact path above and that the domain matches the one used at checkout.  
+  - If you use a subdomain for checkout, that subdomain must be the one registered with NMI and Apple and must serve the verification file.
+
+- **Wallet payment cancelled or failed**  
+  - The customer can pay with card instead; the card form remains available. No page reload is required.
+
+For more on NMI and Apple Pay, see [NMI’s documentation](https://docs.nmi.com/docs/collectjs) and [Adding Apple Pay](https://docs.nmi.com/reference/adding-apple-pay).

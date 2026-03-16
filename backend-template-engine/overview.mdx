@@ -41,6 +41,7 @@ So:
 | **`@else`** / **`@elseif(condition)`** | Optional branches inside an `@if`. |
 | **`@foreach(item in array)` … `@endforeach`** | Repeat a block once per item. |
 | **`@set(name = value)`** | Set a variable for the rest of the template. |
+| **`@setSessionItem('key', value)`** / **`getSessionItem('key')`** / **`@clearSessionItem('key')`** | Store, read, or clear a value in the visitor’s session. |
 | **`@component("name", args)`** | Include a reusable component. |
 | **`@extends("pageSlug")`** | Use a base template; override with `@block`. |
 | **`@block("name")` … `@endblock`** | Define or override a named region in the layout. |

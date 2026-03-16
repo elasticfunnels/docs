@@ -1,0 +1,451 @@
+---
+title: 'Data Functions'
+description: 'Query customers, orders, products, courses, blog, and more from your backend scripts.'
+---
+
+Backend scripts expose the same data functions available in the template engine, so you can query your brand data and use the results for logic, not just display.
+
+All data functions that hit the database are **asynchronous** under the hood, but they look synchronous in your code — just call them and use the return value directly. Pure-computation helpers (like `formatPrice`, `productSavings`) are truly synchronous.
+
+## Customer
+
+### `getCustomer()`
+
+Returns the full current customer object from the session (same as the `customer` global).
+
+```javascript
+var c = getCustomer();
+if (c && c.email) {
+  console.log('Customer:', c.email);
+}
+```
+
+### `getUser()`
+
+Returns a lightweight `{ name, email }` object for the current session customer.
+
+```javascript
+var user = getUser();
+if (user.email) {
+  setVariable('greeting', 'Welcome, ' + user.name);
+}
+```
+
+## Orders
+
+### `getOrders(sortBy?, limit?)`
+
+Fetch the current customer's orders from the database.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sortBy` | string | `'newest'` | `'newest'` or `'oldest'` |
+| `limit` | number | `50` | Max orders to return (max 1000) |
+
+```javascript
+var orders = getOrders('newest', 10);
+
+if (orders.length > 0) {
+  setVariable('has_orders', true);
+  setVariable('latest_order', orders[0].order_number);
+
+  console.log('Found', orders.length, 'orders');
+}
+```
+
+Each order object contains:
+
+```javascript
+{
+  order_number: 'ORD-12345',
+  created_at: '2025-01-15T10:30:00Z',
+  billing_address: '...',
+  billing_city: '...',
+  billing_state: '...',
+  billing_zip: '...',
+  billing_country: 'US',
+  shipping_address: '...',
+  shipping_city: '...',
+  shipping_state: '...',
+  shipping_zip: '...',
+  shipping_country: 'US',
+  currency: 'USD',
+  customer_name: 'John Doe',
+  customer_email: 'john@example.com',
+  products: [
+    { name: 'Premium Plan', price: 49.99, quantity: 1, image_url: '...', currency_code: 'USD' }
+  ],
+  tracking: [
+    { tracking_number: '1Z999AA10123456784', tracking_url: '...', carrier: 'UPS' }
+  ]
+}
+```
+
+## Conversions
+
+### `getConversions(email)`
+
+Look up conversions (purchases) by email address.
+
+```javascript
+var conversions = getConversions('john@example.com');
+
+if (conversions.length > 0) {
+  setVariable('returning_customer', true);
+}
+```
+
+Returns an array of conversion records with fields like `public_order_id`, `created_at`, `customer_email`, `product_name`, `total`, `currency_code`, `status`.
+
+## Products
+
+### `getProduct(code)`
+
+Fetch a single product by its product code.
+
+```javascript
+var product = getProduct('premium-plan');
+
+if (product) {
+  setVariable('product_name', product.name);
+  setVariable('product_price', product.price);
+}
+```
+
+### `getProducts(filters?)`
+
+Fetch products with optional filters.
+
+```javascript
+// All products
+var all = getProducts();
+
+// Filtered
+var physical = getProducts({ type: 'physical' });
+var subscriptions = getProducts({ classification: 'subscription' });
+var specific = getProducts({ codes: 'plan-a,plan-b,plan-c' });
+```
+
+| Filter | Type | Description |
+|--------|------|-------------|
+| `type` | string | `'physical'`, `'digital'`, or `'any'` |
+| `classification` | string | `'subscription'`, `'one-time'`, or `'any'` |
+| `codes` | string | Comma-separated product codes |
+
+### `getAllProducts()`
+
+Fetch all products for the brand (no filtering).
+
+```javascript
+var products = getAllProducts();
+console.log('Total products:', products.length);
+```
+
+### `getProductByCode(merchantCode, productCode)`
+
+Look up a product by merchant gateway code and the merchant-specific product code.
+
+```javascript
+var product = getProductByCode('stripe', 'price_1234');
+```
+
+### `productSavings(product)`
+
+Compute savings info from a product's `price` and `retail_price`. Returns an object:
+
+```javascript
+var product = getProduct('premium-plan');
+var savings = productSavings(product);
+
+// savings = {
+//   amount: 20,
+//   percent: 25,
+//   amountFormatted: '$20.00',
+//   percentFormatted: '25%'
+// }
+
+if (savings.percent > 0) {
+  setVariable('discount_badge', 'Save ' + savings.percentFormatted);
+}
+```
+
+Returns `{ amount: 0, percent: 0, amountFormatted: '', percentFormatted: '' }` when there is no discount.
+
+### `subscriptionSummary(product)`
+
+Returns a human-readable subscription description string.
+
+```javascript
+var product = getProduct('monthly-plan');
+var label = subscriptionSummary(product);
+// e.g. "7-day free trial · Every 1 month"
+
+setVariable('subscription_label', label);
+```
+
+Returns an empty string for non-subscription products.
+
+### `formatPrice(value, currency?)`
+
+Format a numeric price with the given currency code.
+
+```javascript
+var formatted = formatPrice(49.99, 'USD');
+// "$49.99"
+setVariable('display_price', formatted);
+```
+
+## Courses
+
+### `getCourse(courseId)`
+
+Fetch a course by ID, including modules and contents.
+
+```javascript
+var course = getCourse(42);
+if (course) {
+  setVariable('course_title', course.title);
+  setVariable('lesson_count', course.total_lesson_count);
+}
+```
+
+### `getCourseBySlug(slug)`
+
+Fetch a course by its URL slug.
+
+```javascript
+var course = getCourseBySlug('javascript-basics');
+```
+
+### `getModuleBySlug(courseSlug, moduleSlug)`
+
+Fetch a single module with its contents.
+
+```javascript
+var module = getModuleBySlug('javascript-basics', 'variables');
+if (module) {
+  setVariable('module_title', module.title);
+}
+```
+
+### `getCourses()`
+
+Fetch all courses for the brand with lesson and module counts.
+
+```javascript
+var courses = getCourses();
+setVariable('course_count', courses.length);
+```
+
+### `getCoursesByCategorySlug(categorySlug)`
+
+Filter courses by category slug.
+
+```javascript
+var marketingCourses = getCoursesByCategorySlug('marketing');
+setVariable('marketing_course_count', marketingCourses.length);
+```
+
+### `getCategoriesWithCourses()`
+
+Get all course categories with their courses grouped together.
+
+```javascript
+var categories = getCategoriesWithCourses();
+// [
+//   { category_slug: 'marketing', category_name: 'Marketing', courses: [...] },
+//   { category_slug: 'design', category_name: 'Design', courses: [...] },
+// ]
+
+setVariable('category_count', categories.length);
+```
+
+## Blog
+
+### `getBlog(blogId?)`
+
+Fetch a blog by ID. If no ID is provided, returns the default blog for the current domain.
+
+```javascript
+var blog = getBlog();
+if (blog) {
+  setVariable('blog_name', blog.name);
+}
+
+// Or by specific ID
+var specific = getBlog(5);
+```
+
+### `getBlogArticles(blogId, page?, perPage?)`
+
+Fetch published blog articles with pagination.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `blogId` | number | — | Blog ID (required) |
+| `page` | number | `1` | Page number |
+| `perPage` | number | `12` | Articles per page (max 100) |
+
+```javascript
+var blog = getBlog();
+if (blog) {
+  var articles = getBlogArticles(blog.id, 1, 10);
+  setVariable('article_count', articles.length);
+  setVariable('articles', articles);
+}
+```
+
+Each article includes a `body` field with the article content.
+
+### `getBlogArticle(blogId, slug)`
+
+Fetch a single published article by blog ID and slug.
+
+```javascript
+var article = getBlogArticle(1, 'getting-started');
+if (article) {
+  setVariable('article_title', article.title);
+  setVariable('article_body', article.body);
+}
+```
+
+### `getBlogCategories(blogId)`
+
+Get category summaries for a blog's published articles.
+
+```javascript
+var categories = getBlogCategories(1);
+setVariable('blog_categories', categories);
+```
+
+### `getRelatedArticles(blogId, articleId, limit?)`
+
+Fetch related articles for a given article.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `blogId` | number | — | Blog ID |
+| `articleId` | number | — | Article to find related content for |
+| `limit` | number | `4` | Max related articles (1–24) |
+
+```javascript
+var related = getRelatedArticles(1, 42, 3);
+setVariable('related_articles', related);
+```
+
+## Purchase Links
+
+These functions generate URLs for the payment flow. They are synchronous.
+
+### `buy(productCode)`
+
+Generate a purchase link for a product.
+
+```javascript
+var link = buy('premium-plan');
+setVariable('buy_url', link);
+```
+
+### `upsell(productCode)`
+
+Generate an upsell link (one-click purchase for existing customers).
+
+```javascript
+var link = upsell('vip-addon');
+setVariable('upsell_url', link);
+```
+
+### `downsell(productCode)`
+
+Generate a downsell link (same mechanics as upsell).
+
+```javascript
+var link = downsell('basic-addon');
+setVariable('downsell_url', link);
+```
+
+### `decline(productCode)`
+
+Generate a decline link (skip the upsell offer and proceed).
+
+```javascript
+var link = decline('vip-addon');
+setVariable('decline_url', link);
+```
+
+## Assets
+
+### `asset(path)`
+
+Generate a full CDN URL for a brand asset.
+
+```javascript
+var cssUrl = asset('/main.css');
+var imgUrl = asset('/images/hero.jpg');
+
+setVariable('css_url', cssUrl);
+```
+
+Automatically appends a cache-busting parameter when `?nc`, `?no_cache`, or `?preview_key` is present in the request.
+
+## Visitor Control
+
+### `whitelistVisitor()`
+
+Whitelist the current visitor by setting an encrypted cookie. Whitelisted visitors bypass access restrictions.
+
+```javascript
+var customer = getCustomer();
+if (customer.email === 'admin@example.com') {
+  whitelistVisitor();
+}
+```
+
+### `blacklistVisitor()`
+
+Blacklist the current visitor by setting an encrypted cookie.
+
+```javascript
+if (request.query.block === 'true') {
+  blacklistVisitor();
+  redirect('/blocked');
+}
+```
+
+## Session Items
+
+These functions read and write custom session items that are **compatible with the template engine's `setSessionItem` / `getSessionItem`** functions. Values are stored with a `custom_` prefix and base64-encoded.
+
+Use these when you need to share data between backend scripts and template-engine expressions on the same page or across pages within the same session.
+
+### `setSessionItem(key, value)`
+
+Store a custom value in the session. Keys are sanitized to `[a-zA-Z0-9_]`. Values over 64KB are silently dropped. Pass `null` to delete.
+
+```javascript
+setSessionItem('preferred_plan', 'premium');
+setSessionItem('quiz_score', '85');
+```
+
+### `getSessionItem(key)`
+
+Retrieve a custom session item. Returns an empty string if not found.
+
+```javascript
+var plan = getSessionItem('preferred_plan');
+if (plan === 'premium') {
+  setVariable('show_premium_banner', true);
+}
+```
+
+### `clearSessionItem(key)`
+
+Remove a custom session item.
+
+```javascript
+clearSessionItem('preferred_plan');
+```
+
+<Note>
+For raw session access (without the `custom_` prefix and base64 encoding), use `session.get(key)` and `session.set(key, value)` from the [Actions](/backend-scripts/actions) page.
+</Note>

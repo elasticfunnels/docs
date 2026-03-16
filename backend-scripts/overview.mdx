@@ -1,0 +1,63 @@
+---
+title: 'Backend Scripts'
+description: 'Run custom server-side JavaScript on any page — access control, session logic, API calls, and dynamic variables — fully sandboxed.'
+---
+
+Backend Scripts let you run custom JavaScript **on the server** before a page is rendered. The code executes in a secure, sandboxed environment (QuickJS/WASM) with no access to the file system, Node.js APIs, or internal infrastructure.
+
+Use them for logic that must happen **before** the visitor sees the page — access control, custom redirects, session manipulation, calling external APIs, or injecting dynamic template variables.
+
+## How it works
+
+Add a `<script scope="backend">` tag anywhere in your page HTML. The server extracts and runs the code **before** funnel events and template rendering. The tag is always stripped from the final HTML — it never reaches the browser.
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/login');
+  }
+
+  setVariable('greeting', 'Welcome back, ' + customer.name);
+</script>
+
+<div class="hero">
+  <h1>{{ var.greeting }}</h1>
+</div>
+```
+
+## Execution order
+
+Backend scripts run early in the page lifecycle, before funnel events:
+
+1. Page resolved and loaded
+2. Access control checked
+3. **Backend script extracted, stripped from HTML, and executed**
+4. Funnel events processed (script rules, splits, etc.)
+5. Template engine renders the page
+6. HTML sent to visitor
+
+Because backend scripts run before funnel events, session values you set are visible to script rules and other funnel nodes downstream.
+
+## Sandboxing & security
+
+Backend scripts run inside a **QuickJS WebAssembly sandbox**. This means:
+
+- No access to `process`, `require`, `fs`, `net`, or any Node.js APIs
+- No access to the file system or internal network
+- **8 MB memory limit** per execution
+- **10 second CPU timeout** — the QuickJS VM is interrupted if pure-JS execution exceeds this
+- **30 second wall-clock timeout** — the entire execution (including database queries and HTTP calls) is killed if it exceeds this
+- The `<script scope="backend">` tag is **always** removed from the HTML, even if execution fails
+- Session and cookie writes are restricted so app-internal state cannot be overwritten
+- Redirects are limited to relative paths and `http://` / `https://` URLs
+- Response headers and cookie access are restricted for security
+
+The sandbox provides a controlled set of host functions (documented below) that bridge back to the server safely. User code cannot escape the sandbox or access anything beyond these APIs.
+
+## When a script throws or times out
+
+If your backend script throws an error or hits a timeout, the **visitor does not see the error message**. The page continues to render as normal. Any variables or actions your script applied before the error are still used; anything after the error is skipped. Errors are logged on the server and may be reported to administrators for debugging. For development, use `console.log()` and check your backend or event logs.
+
+## Multiple script blocks
+
+You can have multiple `<script scope="backend">` tags on a page. They are concatenated in document order and executed as a single script.

@@ -1,0 +1,79 @@
+---
+title: 'Request Context'
+description: 'Read-only globals available inside backend scripts: request data, customer info, and visitor details.'
+---
+
+These globals are injected automatically into every backend script execution. They are **read-only** — you cannot modify them directly.
+
+## `request`
+
+Information about the current HTTP request.
+
+```javascript
+request.query          // { foo: 'bar', utm_source: 'google' }
+request.headers        // see below
+request.method         // 'GET' or 'POST'
+request.ip             // IPv4 address, e.g. '1.2.3.4'
+request.ip6            // IPv6 address (if available)
+request.path           // '/my-page'
+request.cookies        // { cookie_name: 'value' }
+request.is_mobile      // true/false
+request.is_tablet      // true/false
+```
+
+### `request.headers`
+
+A subset of request headers is exposed:
+
+| Key | Description |
+|-----|-------------|
+| `user-agent` | Browser/device user-agent string |
+| `referer` | Referring URL |
+| `accept-language` | Visitor's language preferences |
+| `host` | Domain the request was made to |
+
+<Warning>
+Full request headers are not exposed to prevent leaking internal infrastructure details (e.g. proxy headers, auth tokens).
+</Warning>
+
+## `customer`
+
+The current customer object from the session, or `null` if no customer is set. Populated after checkout or check-order login.
+
+```javascript
+customer.name
+customer.email
+customer.first_name
+customer.last_name
+customer.phone
+customer.order_id
+customer.order_ids           // array of order objects
+customer.order_item
+customer.order_item_name
+customer.conversion_code
+customer.payment_provider
+customer.billing_first_name
+customer.billing_last_name
+customer.billing_address
+customer.billing_city
+customer.billing_state
+customer.billing_zip
+customer.billing_country
+customer.shipping_first_name
+customer.shipping_last_name
+customer.shipping_address
+customer.shipping_city
+customer.shipping_state
+customer.shipping_zip
+customer.shipping_country
+```
+
+## `is_customer`
+
+Boolean. `true` if the visitor has an active customer session (completed a purchase or logged in via check-order).
+
+```javascript
+if (!is_customer) {
+  redirect('/sales-page');
+}
+```

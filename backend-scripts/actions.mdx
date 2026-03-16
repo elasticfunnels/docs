@@ -1,0 +1,145 @@
+---
+title: 'Actions'
+description: 'Side-effect functions: session, cookies, redirects, response control, headers, and template variables.'
+---
+
+Action functions let your backend script perform side-effects — set session data, cookies, redirect the visitor, inject template variables, or send custom responses.
+
+## Session
+
+Read and write values in the visitor's server-side session.
+
+```javascript
+session.set('my_key', 'my_value');
+session.set('visit_count', 5);
+
+var count = session.get('visit_count');  // 5
+var missing = session.get('nonexistent'); // null
+```
+
+Session values set here are immediately available to funnel script rules that run after the backend script.
+
+<Warning>
+Session keys and values should be simple types (strings, numbers, booleans). Complex objects are serialized as JSON internally.
+</Warning>
+
+<Note>
+For security, some session keys are reserved and cannot be read or written via `session.get()` / `session.set()`. Use your own key names (e.g. `my_key`, `visit_count`) for custom data.
+</Note>
+
+## Cookies
+
+Set or delete cookies on the visitor's browser.
+
+```javascript
+cookie.set('promo_seen', 'true', { maxAge: 3600, path: '/' });
+cookie.delete('old_cookie');
+```
+
+### `cookie.set(name, value, options?)`
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `maxAge` | number | Cookie lifetime in **seconds** |
+| `path` | string | Cookie path (default: `'/'`) |
+
+### `cookie.delete(name)`
+
+Clears the cookie by name.
+
+<Note>
+Some cookie names are reserved and cannot be set or deleted. Use your own cookie names for custom data.
+</Note>
+
+## Redirect
+
+Redirect the visitor to a different URL. This **stops** page rendering — the visitor is immediately sent to the new URL.
+
+```javascript
+redirect('/login');           // 302 temporary redirect
+redirect('/new-page', 301);   // 301 permanent redirect
+redirect('https://example.com/page'); // external redirect
+```
+
+<Note>
+When `redirect()` is called, the entire funnel flow and page rendering are skipped. The visitor receives only the redirect response.
+</Note>
+
+<Warning>
+Only relative paths (`/path`) and `http://` / `https://` URLs are allowed. Other schemes (e.g., `javascript:`, `data:`) are blocked for security.
+</Warning>
+
+## Template Variables
+
+Inject values into the template engine. These become available as `{{ var.key }}` in page HTML.
+
+```javascript
+setVariable('discount', '50%');
+setVariable('show_banner', true);
+setVariable('user_tier', 'premium');
+```
+
+In your page HTML:
+
+```html
+<h1>Get {{ var.discount }} off!</h1>
+
+@if(var.show_banner)
+  <div class="banner">Premium member</div>
+@endif
+```
+
+Variables set with `setVariable` take precedence over brand variables with the same key.
+
+## Response Headers
+
+Set custom HTTP response headers.
+
+```javascript
+setHeader('X-Custom-Header', 'my-value');
+setHeader('Cache-Control', 'no-store');
+```
+
+<Note>
+For security, certain response headers cannot be set (e.g. those that control cookies, CORS, or connection). Header values are sanitized.
+</Note>
+
+## Custom Response
+
+Send a custom response instead of the rendered page. These **stop** page rendering.
+
+### `response.status(code)`
+
+Set the HTTP status code (used with `response.send()` or `response.json()`, or with the normal page render).
+
+```javascript
+response.status(403);
+response.send('<h1>Access Denied</h1>');
+```
+
+### `response.json(data)`
+
+Send a JSON response. Skips page rendering.
+
+```javascript
+response.json({ error: false, user: customer.email });
+```
+
+### `response.send(html)`
+
+Send raw HTML. Skips page rendering.
+
+```javascript
+response.send('<html><body><h1>Maintenance</h1></body></html>');
+```
+
+## Logging and errors
+
+`console.log`, `console.info`, `console.warn`, and `console.error` are captured and stored in execution logs. Use them for debugging.
+
+```javascript
+console.log('Visitor IP:', request.ip);
+console.log('Customer:', customer);
+```
+
+Logs and errors are visible in the [Debug Window](/debugging/debug-window) (Page Events tab) for the page request. If your script throws an error or times out, the visitor still receives the normal page (no error message is shown); the error is logged there and may be reported to admins.

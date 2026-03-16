@@ -158,6 +158,17 @@
               "backend-template-engine/directives",
               "backend-template-engine/variables-and-filters"
             ]
+          },
+          {
+            "group": "Backend Scripts",
+            "pages": [
+              "backend-scripts/overview",
+              "backend-scripts/context",
+              "backend-scripts/actions",
+              "backend-scripts/data-functions",
+              "backend-scripts/http",
+              "backend-scripts/examples"
+            ]
           }
         ]
       },

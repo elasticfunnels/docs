@@ -1,6 +1,6 @@
 ---
 title: 'Directives'
-description: 'Backend template directives: @if, @else, @foreach, @set, @component, @extends, @block.'
+description: 'Backend template directives: @if, @else, @foreach, @set, session storage, @component, @extends, @block.'
 ---
 
 This page describes the **directives** the backend template engine understands. Use them in the page builder via the corresponding **backend** blocks, or write them directly in coded templates.
@@ -132,6 +132,54 @@ In the **page builder**, inheritance is supported with a read-only base layer: o
 
 ---
 
+## Session storage
+
+You can store and read simple values in the visitor’s session from templates. Use this for things like remembering a choice across requests (e.g. a selected option, a flag) without using the frontend.
+
+| Call | Purpose |
+|------|---------|
+| **`@setSessionItem('key', value)`** | Store a value in the session. Use **`@setSessionItem('key', null)`** to clear that key. |
+| **`{{ getSessionItem('key') }}`** | Output the stored value, or empty if not set. |
+| **`@clearSessionItem('key')`** | Remove the key from the session (same as setting it to null). |
+
+**Rules:**
+
+- **Keys** may only use letters, numbers, and underscores (`a–z`, `A–Z`, `0–9`, `_`). Other characters are stripped.
+- **Values** are stored safely (encoded). You can pass strings or numbers; other types are JSON-serialized. There is a size limit per value (~64 KB).
+- **Clearing:** Passing `null` (or nothing) to `setSessionItem` removes the key, as does `@clearSessionItem('key')`.
+
+**Session length and when it resets**
+
+- **Lifetime:** Session data (including values you store with `setSessionItem`) lasts **3 hours** from when the session was first created. The timer does **not** reset on each page load—so after 3 hours the session expires and all stored values are gone.
+- **When it resets:** The session is tied to the visitor’s session cookie. It is cleared when:
+  - the 3-hour lifetime has passed,
+  - the visitor clears their cookies,
+  - or they use a different browser or device (new session).
+- Use session storage for short-lived, per-visit state (e.g. “has seen this step”, “selected option for this visit”). For long-lived or cross-device data, use a different mechanism (e.g. customer account, database).
+
+**Examples:**
+
+```html
+@setSessionItem('selected_plan', 'premium')
+<p>You chose: {{ getSessionItem('selected_plan') }}</p>
+```
+
+```html
+@if(getSessionItem('seen_intro'))
+  <p>Welcome back.</p>
+@else
+  @setSessionItem('seen_intro', '1')
+  <p>First time here? Read this…</p>
+@endif
+```
+
+```html
+@clearSessionItem('cart_note')
+@setSessionItem('cart_note', null)
+```
+
+---
+
 ## Summary
 
 | Directive | Purpose |
@@ -140,6 +188,9 @@ In the **page builder**, inheritance is supported with a read-only base layer: o
 | `@else` / `@elseif(condition)` | Else branches |
 | `@foreach(item in array)` … `@endforeach` | Loop |
 | `@set(variable = expression)` | Set variable |
+| `@setSessionItem('key', value)` | Store (or clear with null) session value |
+| `{{ getSessionItem('key') }}` | Output session value |
+| `@clearSessionItem('key')` | Remove session value |
 | `@component("name", args)` | Include component |
 | `@extends("pageSlug")` | Extend base template |
 | `@block("name")` … `@endblock` | Define/override block |
