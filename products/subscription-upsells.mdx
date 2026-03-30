@@ -1,0 +1,341 @@
+---
+title: 'Subscription Upsells'
+description: 'Upgrade, downgrade, or cancel existing subscriptions mid-funnel and transition customers to new offers without a second checkout'
+---
+
+Subscription upsells let you modify an existing subscription **inside your funnel flow** — upgrade it, cancel it, or swap it for a different offer — all without sending the customer through another checkout page. This is different from a standard [one-click upsell](/products/upsells), which charges the customer for an additional product. A subscription upsell changes the product the customer is *already* paying for.
+
+## How It Works
+
+A typical subscription upsell flow looks like this:
+
+1. **Customer purchases a recurring product** (e.g. monthly supplement subscription)
+2. **Upsell page offers an upgrade** — "Switch to the 6-bottle plan and save 40%"
+3. **Customer accepts** → The existing subscription is changed to the new SKU via API. No new charge, no checkout redirect.
+4. **Next page offers a lifetime deal** — "Cancel your subscription and get lifetime access for a one-time payment"
+5. **Customer accepts** → Subscription is cancelled via API, then a standard `[UPSELL=lifetime_product]` one-click purchase processes the new charge.
+
+The key difference from a traditional upsell: **steps 3 and 5 modify the existing subscription first**, then optionally navigate to a purchase step. The modification is an API call (1–3 seconds), not a checkout redirect.
+
+```
+Standard Upsell:       [UPSELL=product] → one-click charge → next page
+Subscription Upsell:   ef.sub.upgrade()  → API modifies subscription → then navigate
+```
+
+## Tags
+
+Two new bracket tags handle subscription modifications. They work with any supported gateway (ClickBank, NMI).
+
+### Upgrade Subscription
+
+```
+[UPSELL_UPGRADE=old_sku, new_sku]
+```
+
+Generates a JavaScript call that upgrades the customer's subscription from `old_sku` to `new_sku`. Use this in a link `href` — when clicked, it calls the server API to change the subscription product.
+
+- **old_sku** — The product code the customer is currently subscribed to
+- **new_sku** — The product code to switch them to
+
+Spaces around the comma are allowed: `[UPSELL_UPGRADE=15, 16]` and `[UPSELL_UPGRADE=15,16]` both work.
+
+### Cancel Subscription
+
+```
+[UPSELL_CANCEL]
+```
+
+Generates a JavaScript call that cancels the customer's current subscription. Typically used before offering a lifetime/one-time purchase as an alternative.
+
+### Usage in Links
+
+```html
+<!-- Upgrade button -->
+<a href="[UPSELL_UPGRADE=monthly_basic, monthly_premium]">
+  Upgrade to Premium
+</a>
+
+<!-- Cancel button (usually paired with a lifetime offer on the next screen) -->
+<a href="[UPSELL_CANCEL]">
+  Switch to Lifetime Access
+</a>
+
+<!-- Standard decline — skip this offer entirely -->
+<a href="[UPSELL_DECLINE]">
+  No thanks
+</a>
+```
+
+<Note>
+These tags do **not** redirect to a checkout page like `[BUY=]` or `[UPSELL=]`. They execute an API call in the background to modify the existing subscription. If you need to charge for a new product after cancelling, combine `[UPSELL_CANCEL]` with a subsequent `[UPSELL=lifetime_product]` step.
+</Note>
+
+## Template Functions
+
+If you use the Backend Template Engine, you can generate subscription action URLs with template functions instead of bracket tags:
+
+```html
+<a href="{{ upsell_upgrade('monthly_basic', 'monthly_premium') }}">
+  Upgrade to Premium
+</a>
+
+<a href="{{ upsell_cancel() }}">
+  Cancel Subscription
+</a>
+```
+
+These produce the same output as the bracket tags. You can also use them as filters:
+
+```html
+<a href="{{ 'monthly_basic' | upsell_upgrade('monthly_premium') }}">
+  Upgrade to Premium
+</a>
+```
+
+## JavaScript API (`ef.sub`)
+
+For full control, use the `ef.sub` namespace on `window.ef`. This is available on any page where the merchant supports subscriptions (ClickBank or NMI). The script is loaded automatically.
+
+### ef.sub.upgrade(oldSku, newSku)
+
+Calls the server API to upgrade the subscription. Returns a Promise that resolves on success or rejects on error. No UI is shown — use this when you want to handle the result yourself.
+
+```javascript
+ef.sub.upgrade('15', '16').then(function() {
+  // subscription upgraded
+}).catch(function(err) {
+  alert('Upgrade failed: ' + err.message);
+});
+```
+
+### ef.sub.cancel()
+
+Calls the server API to cancel the subscription. Returns a Promise.
+
+```javascript
+ef.sub.cancel().then(function() {
+  // subscription cancelled
+}).catch(function(err) {
+  alert('Cancel failed: ' + err.message);
+});
+```
+
+### ef.sub.upgradeThenNavigate(oldSku, newSku, url)
+
+Upgrades the subscription, shows a loading overlay while the API call is in progress, then navigates to `url` on success. On error, the overlay is dismissed and an error message is shown.
+
+```javascript
+ef.sub.upgradeThenNavigate('15', '16', '/b?product=premium_annual');
+```
+
+### ef.sub.cancelThenNavigate(url)
+
+Cancels the subscription, shows a loading overlay, then navigates to `url` on success.
+
+```javascript
+ef.sub.cancelThenNavigate('/b?product=lifetime_access');
+```
+
+<Tip>
+The `*ThenNavigate` methods include a built-in loading overlay with a spinner and status message ("Upgrading your subscription..." / "Processing..."). You don't need to build your own loading UI. The raw methods (`upgrade`, `cancel`) have no UI for cases where you want full control.
+</Tip>
+
+## Subscription Containers
+
+Three page builder containers let you show different content based on the result of a subscription API call. Drag them from the **Offer** category in the block palette.
+
+| Container | Default state | Shown when |
+|-----------|--------------|------------|
+| **Sub Pending** | Visible | Hidden when any `ef.sub.*` call completes |
+| **Sub Success** | Hidden | Shown when the API call succeeds |
+| **Sub Error** | Hidden | Shown when the API call fails |
+
+These containers auto-toggle when `ef.sub.upgrade()` or `ef.sub.cancel()` completes. If they're not on the page, the toggle is a no-op — you can always handle state manually with your own JavaScript.
+
+### Multi-Screen Example
+
+A common pattern is to show the upgrade offer first, then reveal the lifetime offer after the upgrade succeeds:
+
+```html
+<sub-pending>
+  <h2>Upgrade to the 6-Bottle Plan and Save 40%</h2>
+  <p>Your current monthly subscription will be switched immediately.</p>
+  <a href="javascript:void(0)" onclick="ef.sub.upgrade('15','16')">
+    Yes, Upgrade My Plan
+  </a>
+  <a href="[UPSELL_DECLINE]">No thanks, keep my current plan</a>
+</sub-pending>
+
+<sub-success>
+  <h2>You're upgraded! Now unlock lifetime access.</h2>
+  <p>Cancel your subscription and get lifetime access for one payment of $197.</p>
+  <a href="javascript:void(0)"
+     onclick="ef.sub.cancelThenNavigate('[UPSELL=lifetime_access]')">
+    Get Lifetime Access
+  </a>
+  <a href="[UPSELL_DECLINE]">No thanks, keep my upgraded subscription</a>
+</sub-success>
+
+<sub-error>
+  <p>Something went wrong. Please try again.</p>
+  <a href="javascript:void(0)" onclick="ef.sub.upgrade('15','16')">
+    Retry Upgrade
+  </a>
+</sub-error>
+```
+
+**Flow:**
+```
+Page loads → <sub-pending> visible (upgrade offer)
+   ↓ customer clicks "Yes, Upgrade"
+ef.sub.upgrade('15','16') fires → loading overlay → API call
+   ↓ success
+<sub-pending> hides, <sub-success> shows (lifetime offer)
+   ↓ customer clicks "Get Lifetime Access"
+ef.sub.cancelThenNavigate() → cancels subscription → navigates to [UPSELL=lifetime_access]
+   ↓
+Standard one-click upsell processes the lifetime purchase
+```
+
+<Note>
+You can also build this flow entirely without containers — use the `ef.sub.*` API with your own JavaScript to show/hide elements, or use the `*ThenNavigate` methods to handle the full sequence in one click.
+</Note>
+
+## Session Variables
+
+After a subscription modification succeeds, session variables are set so the **next page load** (e.g. thank-you page) can display relevant information:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `session.subscription_upgraded` | boolean | `true` if an upgrade happened during this session |
+| `session.subscription_cancelled` | boolean | `true` if a cancellation happened during this session |
+| `session.subscription_old_sku` | string | The product code before the change |
+| `session.subscription_new_sku` | string | The new product code (upgrade only) |
+
+Use these in Backend Template Engine directives on your thank-you page:
+
+```html
+@if(session.subscription_upgraded)
+  <p>Your subscription has been upgraded to {{ session.subscription_new_sku }}.</p>
+@endif
+
+@if(session.subscription_cancelled)
+  <p>Your previous subscription has been cancelled.</p>
+@endif
+```
+
+The order display (`<order>` tags and `getOrders()` template data) also reflects the updated product after a subscription change — the session order data is updated when the API call succeeds.
+
+## ClickBank Configuration
+
+ClickBank subscription modifications use the ClickBank REST API (Orders API for upgrades, Tickets API for cancellations). This requires a **Developer API Key** in addition to the standard merchant setup.
+
+### Step 1: Get Your ClickBank Developer API Key
+
+1. Log into your ClickBank account
+2. Go to **Settings** → **API Keys** (or **Account Settings** → **Developer Keys**)
+3. Create or copy your **Developer API Key** (also called Clerk API Key)
+
+<Warning>
+The Developer API Key is different from the Encryption Key you already configured. The encryption key secures postback data; the Developer API Key authenticates REST API calls for subscription management.
+</Warning>
+
+### Step 2: Add the API Key to Your Merchant
+
+1. In ElasticFunnels, go to **Settings** → **Merchants**
+2. Edit your ClickBank merchant
+3. Enter the **ClickBank API Key (Developer/Clerk Key)** in the credentials section
+4. Save
+
+### Step 3: Configure Your Products
+
+Ensure both the old and new subscription products exist in your ClickBank pitch flow and in your ElasticFunnels product list. The product codes used in `[UPSELL_UPGRADE=old, new]` must match the ClickBank item numbers exactly.
+
+### How It Works with ClickBank
+
+- **Upgrade** (`ef.sub.upgrade`): Calls the ClickBank Orders API `changeProduct` endpoint to switch the customer's recurring billing from one item to another. The customer's billing cycle and payment method stay the same.
+- **Cancel** (`ef.sub.cancel`): Creates a cancellation ticket via the ClickBank Tickets API. The subscription stops at the end of the current billing period.
+- **Receipt resolution**: The system automatically uses the customer's ClickBank receipt from the active session — you don't need to pass it manually.
+
+### ClickBank Postback Events
+
+After a subscription change, ClickBank sends Instant Notification Service (INS) events that ElasticFunnels processes automatically:
+
+| ClickBank Event | What Happens |
+|-----------------|-------------|
+| `SUBSCRIPTION-CHG` | Conversion updated with new product code |
+| `CANCEL-REBILL` | Conversion marked as subscription cancelled |
+| `UNCANCEL-REBILL` | Conversion updated — subscription reactivated |
+
+## NMI Configuration
+
+For NMI merchants, subscription management is handled internally by ElasticFunnels — no additional API keys are needed beyond the standard NMI merchant setup.
+
+- **Upgrade**: Updates the internal subscription record (BrandTransaction) to reflect the new product. The next billing cycle uses the new product's price and terms.
+- **Cancel**: Marks the internal subscription record as cancelled. No further billing cycles are processed.
+
+## Complete Flow Example
+
+Here's a full subscription upsell funnel for a supplement business:
+
+```
+Main Sales Page
+  └── [BUY=monthly_3_bottles] → Customer purchases 3-bottle monthly subscription
+        ↓ On Purchase
+Subscription Upsell Page
+  ├── <sub-pending>: "Upgrade to 6-bottle plan, save 40%"
+  │     ├── ef.sub.upgrade('monthly_3_bottles', 'monthly_6_bottles') → Accept
+  │     └── [UPSELL_DECLINE] → Decline
+  │
+  ├── <sub-success>: "Now get lifetime access for $197"
+  │     ├── ef.sub.cancelThenNavigate('[UPSELL=lifetime_access]') → Accept lifetime
+  │     └── [UPSELL_DECLINE] → Keep upgraded subscription
+  │
+  └── <sub-error>: "Something went wrong" + Retry button
+        ↓
+Thank You Page
+  └── Shows order with updated product info via session variables
+```
+
+**Three possible outcomes:**
+1. **Upgrade + Lifetime**: Customer upgrades subscription, then cancels it for lifetime access (best outcome)
+2. **Upgrade only**: Customer upgrades subscription but declines lifetime (good outcome)
+3. **Decline all**: Customer keeps original subscription unchanged
+
+## Troubleshooting
+
+### Upgrade/Cancel Not Working
+
+- Verify the product codes match exactly (case-sensitive)
+- For ClickBank: ensure the Developer API Key is configured in merchant settings
+- Check that the customer has an active purchase session (subscription upsells require a prior purchase)
+- Open the browser console — `ef.sub.*` methods log errors to the console
+
+### Containers Not Toggling
+
+- Ensure the subscription script is loaded (check for `ef-subscription.js` in page source)
+- The script only loads for ClickBank and NMI merchants — other gateways don't support subscription modification
+- Verify containers are using the correct custom tags: `<sub-pending>`, `<sub-success>`, `<sub-error>`
+
+### Order Display Not Updating
+
+- Session variables are set after the API call succeeds — they're available on the **next page load**, not the current page
+- If the order still shows the old product, the customer may have navigated directly to the thank-you page without going through the subscription modification step
+- ClickBank postback events update the conversion in the database asynchronously — there may be a short delay
+
+### ClickBank API Errors
+
+- **401 Unauthorized**: Developer API Key is missing or incorrect
+- **403 Forbidden**: API key doesn't have permission for the requested operation
+- **404 Not Found**: Receipt or transaction not found — verify the customer has an active subscription
+- **409 Conflict**: Product change not allowed — check that both SKUs are valid in the pitch flow
+
+## Related Documentation
+
+- [Upsells](/products/upsells) — Standard one-click upsell setup
+- [Buy Links](/products/buy-links) — Purchase button configuration
+- [Advanced Purchase Links](/products/advanced-purchase-links) — Dropdown product insertion
+- [ClickBank Merchant](/merchants/clickbank) — ClickBank pitch flow and postback setup
+- [EF API (window.ef)](/funnels/window-api) — Client-side JavaScript API reference
+- [Containers](/pages/containers) — All container types and patterns
+- [Variables and Filters](/backend-template-engine/variables-and-filters) — Backend template engine reference

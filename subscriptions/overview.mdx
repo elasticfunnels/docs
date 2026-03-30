@@ -1,0 +1,136 @@
+---
+title: 'Subscriptions Overview'
+description: 'Manage recurring subscriptions, view billing history, and take admin actions from the CRM'
+---
+
+ElasticFunnels includes a full subscription management system. Products marked as recurring are automatically billed on schedule. The CRM gives you tools to view, manage, and optimize those subscriptions.
+
+## Subscription Statuses
+
+| Status | Meaning |
+|--------|---------|
+| **Active** | Subscription is being billed on schedule |
+| **Trial** | Customer is in a free trial period before their first charge |
+| **Paused** | Billing is temporarily stopped; resumes later |
+| **Past Due** | A renewal charge failed; retries are in progress |
+| **Canceled** | Subscription has been terminated |
+
+## Viewing Subscriptions
+
+Go to **Reports** → **Subscriptions** in the sidebar.
+
+### Quick Access Tabs
+
+Use the tabs at the top to filter by status: **All**, **Active**, **Trial**, **Paused**, **Past Due**, **Canceled**. Each tab shows the count of matching subscriptions.
+
+### Columns
+
+- **Status** — Color-coded badge
+- **Customer** — Name and email
+- **Product** — Subscription product name
+- **Amount** — Recurring charge amount
+- **Frequency** — Billing interval (Monthly, Weekly, Daily, Yearly)
+- **Cycle #** — How many successful charges have occurred
+- **Next Charge** — Date of the next scheduled billing
+- **Started** — Original purchase date
+- **Gateway** — Payment gateway used
+
+### Filters
+
+Narrow the list using the filter bar: **Email**, **Merchant**, **Product Code**, and **Date Range**.
+
+## Subscription Detail Drawer
+
+Click any subscription row to open the detail drawer.
+
+### Tabs
+
+<Tabs>
+  <Tab title="Overview">
+    Product name, frequency, status, gateway, and customer address. If the subscription has a trial period, trial details are shown here.
+  </Tab>
+  <Tab title="Billing History">
+    Timeline of all charges — successful and failed — with amounts, dates, and gateway responses.
+  </Tab>
+  <Tab title="Changes">
+    Audit log of modifications: upgrades, pauses, resumes, and amount changes.
+  </Tab>
+  <Tab title="Emails">
+    Log of subscription-related emails sent to this customer.
+  </Tab>
+</Tabs>
+
+### Admin Actions
+
+Action buttons appear at the bottom of the drawer:
+
+- **Cancel** — Terminate the subscription
+- **Pause** — Temporarily stop billing
+- **Resume** — Restart a paused subscription
+- **Skip Next Charge** — Move the next scheduled billing forward by one cycle without charging now
+- **Force Bill** — Trigger an immediate charge attempt
+- **Change Date** — Set a new next billing date (opens a date picker)
+- **Reactivate** — Restart a canceled or past-due subscription
+
+<Note>
+Actions are context-aware. For example, **Resume** only appears for paused subscriptions, and **Reactivate** only appears for canceled or past-due subscriptions.
+</Note>
+
+### Bulk Actions
+
+On the **Subscriptions** list, select multiple rows with the checkboxes, then use the bulk action menu:
+
+- **Cancel Selected** — Cancel all selected subscriptions
+- **Pause Selected** — Pause billing for all selected subscriptions
+- **Force Bill Selected** — Run an immediate billing attempt for each selected subscription
+
+## Subscription Events in Conversions
+
+Subscription lifecycle events also appear in the main conversions list at **Reports** → **Conversions**. Three additional quick access tabs are available:
+
+- **Sub Cancel** — Subscription cancellations
+- **Renewal** — Successful subscription renewals
+- **Renewal Failed** — Failed renewal attempts
+
+Purchase conversions that are subscription renewals display a small purple **Recurring** badge. You can also use the **Subscription Only** checkbox filter to show only subscription-related conversions.
+
+## Automation Triggers
+
+Subscription events can trigger automations (email sequences, webhooks) through the funnel automation builder:
+
+- **Subscription Cancel** — Fires on cancellation
+- **Subscription Change** — Fires on product or amount changes
+- **Subscription Renewal** — Fires on successful renewals
+- **Subscription Renewal Failed** — Fires on failed renewals
+- **Subscription Reactivate** — Fires on reactivation
+
+## Setting Up Subscription Products
+
+To make a product recurring:
+
+1. Go to **Settings** → **Products**
+2. Open a product and enable **Is Subscription**
+3. Set the **Frequency** and **Frequency Unit** (e.g., every 1 month)
+4. Optionally configure a **Trial Period** (in days) and **First Charge Free**
+
+#### Subscription tiers (optional)
+
+Products can expose **multiple subscription tiers** (different intervals and prices—for example good / better / best):
+
+1. On the same product, enable **Is Subscription** and set the base frequency as usual.
+2. In the **Subscription tiers** section, turn on **Enable subscription tiers**.
+3. Click **Add tier** for each option. For each tier, set:
+   - **Tier ID** — Stable identifier (for example `monthly`, `quarterly`)
+   - **Interval** and **Interval count** — How often this tier bills
+   - **Price** — Recurring amount for that tier
+   - **Label** — Customer-facing name for checkout
+4. Save the product.
+
+#### Subscribe & Save (optional)
+
+Subscription products can show a **Subscribe & Save** discount so the recurring price is lower than the one-time purchase price:
+
+1. Open the product under **Settings** → **Products**.
+2. Ensure **Is Subscription** is enabled.
+3. Set **Subscribe & save discount (%)** to the percentage off the one-time price you want for subscribers (for example `10` for 10% off).
+4. Save the product. Checkout can display the savings versus the one-time price based on this field.

@@ -1,0 +1,67 @@
+---
+title: 'Subscription Analytics'
+description: 'Monitor MRR, churn, cohort LTV, and dunning recovery from the subscription analytics dashboard'
+---
+
+The subscription analytics dashboard gives you a real-time view of your recurring revenue health. Navigate to **Reports** → **Subscription Analytics** in the sidebar.
+
+## Summary Cards
+
+The top of the dashboard shows four key metrics:
+
+<CardGroup cols={2}>
+  <Card title="MRR" icon="chart-line">
+    Monthly Recurring Revenue — the total of all active subscription amounts, normalized to a monthly value.
+  </Card>
+  <Card title="Active Subscribers" icon="users">
+    The current count of subscriptions with an active status.
+  </Card>
+  <Card title="Churn Rate" icon="arrow-trend-down">
+    The percentage of subscriptions that canceled in the last 30 days relative to the active base.
+  </Card>
+  <Card title="Avg Customer LTV" icon="money-bill-trend-up">
+    Average lifetime revenue per subscriber across all subscription customers.
+  </Card>
+</CardGroup>
+
+## MRR Trend
+
+A line chart showing Monthly Recurring Revenue over time. Each data point represents the total subscription revenue for that month. Use this to track growth trends and spot seasonal patterns.
+
+## Churn Trend
+
+A dual-series chart with two lines:
+
+- **New Subscriptions** — Count of new subscription purchases per month
+- **Cancellations** — Count of subscription cancellations per month
+
+When cancellations consistently exceed new subscriptions, your subscriber base is shrinking.
+
+## Cohort LTV
+
+A heatmap table showing cumulative revenue by acquisition month over a 12-month horizon. Each row is a cohort (customers who first subscribed that month), and each column shows their cumulative revenue at month 1, 2, 3, and so on.
+
+<Tip>
+Cohort analysis reveals retention problems 3–4 months earlier than aggregate churn metrics. If you see a cohort's revenue flatten early compared to others, investigate what changed in your offer or onboarding during that period.
+</Tip>
+
+## Dunning Recovery
+
+Recovery metrics for the failed payment retry system:
+
+- **Recovered** — Subscriptions that were in dunning and successfully re-charged
+- **Lost** — Subscriptions that exhausted all retry attempts and were canceled
+- **Recovery Rate** — Recovered ÷ (Recovered + Lost) as a percentage
+
+<Info>
+A recovery rate below 50% usually means your dunning emails need work or your retry timing should be adjusted. See [Subscription Emails & Dunning](/subscriptions/emails-and-dunning) for configuration.
+</Info>
+
+## Filters
+
+All charts and metrics can be filtered by:
+
+- **Date range** — Analyze a specific time period
+- **Merchant** — Focus on a single merchant
+- **Product** — Filter by product code
+- **Show test** — Include or exclude test transactions

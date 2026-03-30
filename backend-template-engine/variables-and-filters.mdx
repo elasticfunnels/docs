@@ -111,4 +111,19 @@ These patterns are used in built-in blog and content templates.
 - **`raw`** — Use only for trusted HTML (e.g. article body, excerpt).
 - **Parentheses** — `{{ (expression) | filter }}` so the filter applies to the whole expression.
 
+## Purchase Link Functions
+
+These functions generate URLs for purchase and subscription actions. Use them in link `href` attributes.
+
+| Function | Output | Description |
+|----------|--------|-------------|
+| `{{ upsell_upgrade('old_sku', 'new_sku') }}` | JS action URL | Upgrade subscription from one product to another |
+| `{{ upsell_cancel() }}` | JS action URL | Cancel the current subscription |
+
+These can also be used as filters: `{{ 'old_sku' | upsell_upgrade('new_sku') }}`.
+
+See [Subscription Upsells](/products/subscription-upsells) for usage details and examples.
+
+---
+
 For conditionals and loops, see [Directives](/backend-template-engine/directives). For client-side templates, see [Frontend Template Engine](/frontend-template-engine/overview).

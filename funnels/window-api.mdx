@@ -273,3 +273,7 @@ Add `data-ef-add-tag="tagname"` to a link or button (or to a parent component wi
 | `ef.videoProgressCheck(opts)` | Returns true if video reached `opts.seconds` and/or `opts.percent`. |
 | `ef.onCta(callback)` | Run callback when video CTA is shown; returns unsubscribe. |
 | `ef.getVideoProgress()` | Returns `{ currentTime, duration, percent }` for the main video. |
+| `ef.sub.upgrade(old, new)` | Upgrade subscription from one SKU to another. Returns Promise. See [Subscription Upsells](/products/subscription-upsells). |
+| `ef.sub.cancel()` | Cancel the current subscription. Returns Promise. See [Subscription Upsells](/products/subscription-upsells). |
+| `ef.sub.upgradeThenNavigate(old, new, url)` | Upgrade subscription then navigate, with loading overlay. |
+| `ef.sub.cancelThenNavigate(url)` | Cancel subscription then navigate, with loading overlay. |

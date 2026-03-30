@@ -20,6 +20,7 @@ Complete API documentation for the ElasticFunnels platform.
 
 #### E-commerce & Support
 - **Conversions** - Order management, refunds, and conversion tracking
+- **Subscriptions** - Subscription lifecycle, analytics, retention offers, and billing actions
 - **Tickets** - Support ticket management with AI-powered replies
 
 #### Analytics

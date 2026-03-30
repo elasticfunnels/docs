@@ -373,6 +373,24 @@ var link = decline('vip-addon');
 setVariable('decline_url', link);
 ```
 
+### `upsellUpgrade(oldSku, newSku)`
+
+Generate a subscription upgrade link. Produces a JavaScript action URL that calls the server API to change the customer's subscription product. See [Subscription Upsells](/products/subscription-upsells).
+
+```javascript
+var link = upsellUpgrade('monthly_basic', 'monthly_premium');
+setVariable('upgrade_url', link);
+```
+
+### `upsellCancel()`
+
+Generate a subscription cancellation link. Produces a JavaScript action URL that calls the server API to cancel the customer's subscription.
+
+```javascript
+var link = upsellCancel();
+setVariable('cancel_url', link);
+```
+
 ## Assets
 
 ### `asset(path)`

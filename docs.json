@@ -49,13 +49,23 @@
             "group": "Page Events",
             "pages": [
               "funnels/page-events",
-              "funnels/script-rule",
-              "funnels/window-api",
-              "funnels/dynamic-content",
-              "funnels/split-testing",
-              "funnels/exit-popups",
-              "funnels/query-parameters",
-              "funnels/sequence-nodes"
+              {
+                "group": "Event Types",
+                "pages": [
+                  "funnels/script-rule",
+                  "funnels/window-api",
+                  "funnels/dynamic-content",
+                  "funnels/exit-popups"
+                ]
+              },
+              {
+                "group": "Routing & Testing",
+                "pages": [
+                  "funnels/split-testing",
+                  "funnels/query-parameters",
+                  "funnels/sequence-nodes"
+                ]
+              }
             ]
           },
           {
@@ -63,45 +73,85 @@
             "pages": [
               "pages/overview",
               "pages/create-landing-page",
-              "pages/page-variants",
-              "pages/page-revisions",
-              "pages/visitor-based-content",
-              "pages/interactions-panel",
-              "pages/containers",
-              "pages/order-tag",
-              "pages/product-item-tag",
-              "pages/collection-item-tag",
-              "pages/page-variables",
-              "pages/cart"
+              {
+                "group": "Variants & Testing",
+                "pages": [
+                  "pages/page-variants",
+                  "pages/page-revisions",
+                  "pages/visitor-based-content"
+                ]
+              },
+              {
+                "group": "Page Elements",
+                "pages": [
+                  "pages/interactions-panel",
+                  "pages/containers",
+                  "pages/page-variables"
+                ]
+              },
+              {
+                "group": "eCommerce Tags",
+                "pages": [
+                  "pages/order-tag",
+                  "pages/product-item-tag",
+                  "pages/collection-item-tag",
+                  "pages/cart"
+                ]
+              }
             ]
           },
           {
             "group": "Merchants",
             "pages": [
               "guides/how-to-set-up-a-new-merchant",
-              "merchants/clickbank",
-              "merchants/buygoods",
-              "merchants/digistore24",
-              "merchants/shopify-checkout",
-              "merchants/shop-pay",
-              "merchants/apple-pay-google-pay"
+              {
+                "group": "Payment Processors",
+                "pages": [
+                  "merchants/clickbank",
+                  "merchants/buygoods",
+                  "merchants/digistore24",
+                  "merchants/shopify-checkout"
+                ]
+              },
+              {
+                "group": "Express Checkout",
+                "pages": [
+                  "merchants/shop-pay",
+                  "merchants/apple-pay-google-pay"
+                ]
+              }
             ]
           },
           {
             "group": "Integrations",
             "pages": [
-              "integrations/meta-ads",
-              "integrations/campaigns-management",
-              "integrations/google-ads",
-              "integrations/google-analytics",
-              "integrations/shopify-order-sync",
-              "integrations/fulfillment",
-              "integrations/callcenters",
-              "integrations/buygoods",
-              "integrations/clickbank",
-              "integrations/everflow",
-              "integrations/taboola",
-              "integrations/affiliate-tracking"
+              {
+                "group": "Ad Platforms",
+                "pages": [
+                  "integrations/meta-ads",
+                  "integrations/campaigns-management",
+                  "integrations/google-ads",
+                  "integrations/taboola"
+                ]
+              },
+              {
+                "group": "Analytics & Tracking",
+                "pages": [
+                  "integrations/google-analytics",
+                  "integrations/everflow",
+                  "integrations/affiliate-tracking"
+                ]
+              },
+              {
+                "group": "eCommerce",
+                "pages": [
+                  "integrations/shopify-order-sync",
+                  "integrations/fulfillment",
+                  "integrations/buygoods",
+                  "integrations/clickbank"
+                ]
+              },
+              "integrations/callcenters"
             ]
           },
           {
@@ -113,10 +163,20 @@
             ]
           },
           {
+            "group": "Subscriptions",
+            "pages": [
+              "subscriptions/overview",
+              "subscriptions/emails-and-dunning",
+              "subscriptions/analytics",
+              "subscriptions/retention-offers"
+            ]
+          },
+          {
             "group": "Products & Sales",
             "pages": [
               "products/buy-links",
               "products/upsells",
+              "products/subscription-upsells",
               "products/custom-attributes",
               "products/advanced-purchase-links"
             ]
@@ -142,13 +202,28 @@
             "pages": [
               "frontend-template-engine/overview",
               "frontend-template-engine/syntax",
-              "frontend-template-engine/scope-and-data",
-              "frontend-template-engine/bindings-forms-events",
-              "frontend-template-engine/built-in-functions",
-              "frontend-template-engine/cart",
-              "frontend-template-engine/checkout",
-              "frontend-template-engine/limitations-pitfalls",
-              "frontend-template-engine/debugging"
+              {
+                "group": "Data & Bindings",
+                "pages": [
+                  "frontend-template-engine/scope-and-data",
+                  "frontend-template-engine/bindings-forms-events",
+                  "frontend-template-engine/built-in-functions"
+                ]
+              },
+              {
+                "group": "eCommerce",
+                "pages": [
+                  "frontend-template-engine/cart",
+                  "frontend-template-engine/checkout"
+                ]
+              },
+              {
+                "group": "Advanced",
+                "pages": [
+                  "frontend-template-engine/limitations-pitfalls",
+                  "frontend-template-engine/debugging"
+                ]
+              }
             ]
           },
           {
@@ -163,10 +238,15 @@
             "group": "Backend Scripts",
             "pages": [
               "backend-scripts/overview",
-              "backend-scripts/context",
-              "backend-scripts/actions",
-              "backend-scripts/data-functions",
-              "backend-scripts/http",
+              {
+                "group": "Reference",
+                "pages": [
+                  "backend-scripts/context",
+                  "backend-scripts/actions",
+                  "backend-scripts/data-functions",
+                  "backend-scripts/http"
+                ]
+              },
               "backend-scripts/examples"
             ]
           }
@@ -192,6 +272,7 @@
               "api-reference/endpoints/products",
               "api-reference/endpoints/funnels",
               "api-reference/endpoints/conversions",
+              "api-reference/endpoints/subscriptions",
               "api-reference/endpoints/analytics",
               "api-reference/endpoints/tickets"
             ]
@@ -225,6 +306,15 @@
       "label": "Dashboard",
       "href": "https://app.elasticfunnels.io"
     }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "cursor"
+    ]
   },
   "footer": {
     "socials": {

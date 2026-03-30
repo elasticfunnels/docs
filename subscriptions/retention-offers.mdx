@@ -1,0 +1,96 @@
+---
+title: 'Retention Offers'
+description: 'Reduce voluntary churn with exit surveys and reason-specific save offers like discounts, pauses, and downgrades'
+---
+
+Retention offers intercept cancellation requests with reason-specific save offers. Well-configured retention flows typically save 15–40% of cancellation attempts.
+
+## How It Works
+
+<Steps>
+  <Step title="Customer requests cancellation">
+    Through the self-service portal or via a call center agent.
+  </Step>
+  <Step title="Exit survey">
+    The customer is asked why they want to cancel, choosing from your configured reasons.
+  </Step>
+  <Step title="Save offer">
+    Based on the reason, the system presents a targeted offer — a discount, a pause, or a downgrade.
+  </Step>
+  <Step title="Accept or decline">
+    If accepted, the offer is applied automatically. If declined, the cancellation proceeds.
+  </Step>
+</Steps>
+
+## Configuring Retention Offers
+
+Retention offers are configured per merchant:
+
+1. Go to **Settings** → **Merchants** and edit your merchant
+2. Find the **Retention Offers** section
+3. Toggle **Enable Retention Offers** on
+4. Add your **Exit Survey Reasons** (the list of cancellation reasons customers can choose from)
+5. For each reason, configure a **Save Offer**
+
+### Exit Survey Reasons
+
+Common examples:
+
+- Too expensive
+- Not using it enough
+- Found a better alternative
+- Product quality issues
+- Technical problems
+
+### Offer Types
+
+<CardGroup cols={3}>
+  <Card title="Discount" icon="percent">
+    Applies a percentage discount for a set number of billing cycles. After the discount period, full pricing resumes.
+  </Card>
+  <Card title="Pause" icon="circle-pause">
+    Pauses billing for a set number of days. The customer isn't charged during the pause, and billing resumes automatically.
+  </Card>
+  <Card title="Downgrade" icon="arrow-down">
+    Switches the subscription to a lower-tier product.
+  </Card>
+</CardGroup>
+
+### Offer Settings
+
+For each exit survey reason, you can configure:
+
+| Setting | Description | Example |
+|---------|-------------|---------|
+| **Offer Type** | Discount, pause, or downgrade | Discount |
+| **Offer Value** | Discount percentage or pause days | 20 |
+| **Offer Label** | Customer-facing message | "Stay and get 20% off for 3 months" |
+| **Duration (cycles)** | How many billing cycles the offer lasts | 3 |
+| **Product** | For downgrades: the product to switch to | Basic Plan |
+
+### Example Configuration
+
+For the reason "Too expensive":
+
+- **Type**: Discount
+- **Value**: 20%
+- **Label**: "Stay and get 20% off your next 3 months"
+- **Duration**: 3 cycles
+
+For "Not using it enough":
+
+- **Type**: Pause
+- **Value**: 30 days
+- **Label**: "Take a 30-day break instead of canceling"
+
+## Agent-Assisted Retention
+
+The same retention offers are available to call center agents in the **Customer Service** interface. Agents see the same offers and can apply them on the customer's behalf during a call.
+
+<Info>
+See [Customer Service](/callcenter/customer-service) for how agents use retention offers during calls.
+</Info>
+
+## Callcenter Escalation
+
+If you have an external call center integration configured, you can automatically route cancellation requests to your call center team for a retention attempt before confirming. Enable **Send to Callcenter on Cancel** in the merchant's [dunning configuration](/subscriptions/emails-and-dunning#dunning-configuration).
