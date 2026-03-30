@@ -13,6 +13,7 @@ Information about the current HTTP request.
 request.query          // { foo: 'bar', utm_source: 'google' }
 request.headers        // see below
 request.method         // 'GET' or 'POST'
+request.body           // parsed JSON body (POST only, null for GET, max 64 KB)
 request.ip             // IPv4 address, e.g. '1.2.3.4'
 request.ip6            // IPv6 address (if available)
 request.path           // '/my-page'
@@ -20,6 +21,21 @@ request.cookies        // { cookie_name: 'value' }
 request.is_mobile      // true/false
 request.is_tablet      // true/false
 ```
+
+### `request.body`
+
+When a page receives a `POST` request with a JSON body, it is parsed and available as `request.body`. Pages accept both GET and POST requests — the same backend script runs for both. Use `request.method` to distinguish.
+
+```javascript
+if (request.method === 'POST' && request.body) {
+  var data = request.body;
+  console.log('Received:', data.name);
+}
+```
+
+<Note>
+The body is capped at **64 KB**. Larger payloads are silently dropped (`request.body` will be `null`). Only JSON content types are parsed — form-urlencoded and multipart are not supported.
+</Note>
 
 ### `request.headers`
 

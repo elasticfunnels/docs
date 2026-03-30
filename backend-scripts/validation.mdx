@@ -1,0 +1,266 @@
+---
+title: 'Schema Validator'
+description: 'Built-in Joi-like Schema API for validating data in backend scripts — type-safe, sandbox-native, zero dependencies.'
+---
+
+A `Schema` validation library is available globally in every backend script. It provides a **Joi-like fluent API** to validate, coerce, and sanitize incoming data — especially `request.body` from POST requests, but usable with any object.
+
+The library is pure JavaScript and runs directly in the sandbox. No imports needed — `Schema` is a global.
+
+## Quick start
+
+```javascript
+var schema = Schema.object({
+  name:   Schema.string().required().min(1).max(255),
+  email:  Schema.string().required().email(),
+  weight: Schema.number().min(50).max(500),
+});
+
+var result = schema.validate(request.body);
+
+if (!result.valid) {
+  response.json({ ok: false, errors: result.errors });
+}
+
+// result.value is a sanitised deep copy — safe to use
+// null, null = store on the current session customer
+setCrmField(null, null, 'name', result.value.name);
+setCrmField(null, null, 'current_weight', result.value.weight);
+```
+
+## How it works
+
+1. Define a schema using `Schema.string()`, `Schema.number()`, etc.
+2. Chain validators: `.required()`, `.min(5)`, `.email()`, etc.
+3. Call `schema.validate(data)` — returns `{ valid, value, errors }`
+4. If `valid` is `true`, `value` contains a **deep-cloned, type-coerced** copy of the input
+5. If `valid` is `false`, `errors` is an array of human-readable error messages
+
+<Note>
+`validate()` returns a **deep clone** of the input. The original `request.body` is never mutated. Unknown keys in objects are silently dropped — only keys defined in the schema are kept.
+</Note>
+
+## Types
+
+### `Schema.string()`
+
+Validates that the value is a string.
+
+```javascript
+Schema.string()                        // any string
+Schema.string().required()             // non-empty required
+Schema.string().min(3).max(100)        // length constraints
+Schema.string().email()                // email format
+Schema.string().url()                  // http/https URL
+Schema.string().pattern(/^[A-Z]+$/)   // regex match
+Schema.string().lowercase()            // must be lowercase
+Schema.string().valid('a', 'b', 'c')   // enum — must be one of these
+```
+
+### `Schema.number()`
+
+Validates that the value is a number. Strings like `"42"` are auto-coerced.
+
+```javascript
+Schema.number()                        // any finite number
+Schema.number().integer()              // no decimals
+Schema.number().min(0)                 // >= 0
+Schema.number().max(100)               // <= 100
+Schema.number().positive()             // > 0
+Schema.number().negative()             // < 0
+```
+
+### `Schema.boolean()`
+
+Validates that the value is a boolean. Strings `"true"`, `"1"`, `"false"`, `"0"` are auto-coerced.
+
+```javascript
+Schema.boolean()
+Schema.boolean().required()
+```
+
+### `Schema.array()`
+
+Validates arrays. Use `.items()` to validate each element.
+
+```javascript
+Schema.array()                                          // any array
+Schema.array().min(1).max(10)                           // length constraints
+Schema.array().items(Schema.string().max(50))           // typed elements
+Schema.array().items(Schema.number().min(0)).max(100)   // numbers array, max 100 items
+```
+
+### `Schema.object()`
+
+Validates objects. Pass a key map to define the shape.
+
+```javascript
+Schema.object({
+  name:    Schema.string().required(),
+  score:   Schema.number().min(0).max(100),
+  tags:    Schema.array().items(Schema.string()),
+  address: Schema.object({
+    city:    Schema.string().required(),
+    zip:     Schema.string().pattern(/^\d{5}$/),
+  }),
+})
+```
+
+Unknown keys are **automatically stripped** — only keys in the schema are kept in `result.value`. This prevents users from injecting unexpected fields.
+
+#### Dynamic keys
+
+For objects where keys are not known ahead of time, use `.pattern_values()`:
+
+```javascript
+Schema.object({}).pattern_values(Schema.string().max(500))
+```
+
+This validates that every value in the object (regardless of key name) matches the rule.
+
+### `Schema.any()`
+
+Accepts any type. Useful with `.required()` or `.valid()`.
+
+```javascript
+Schema.any().required()
+Schema.any().valid('draft', 'published', 42, true)
+```
+
+## Modifiers
+
+| Method | Applies to | Description |
+|--------|-----------|-------------|
+| `.required()` | all | Value must be present (not `null`, `undefined`, or `""`) |
+| `.optional()` | all | Value can be absent (this is the default) |
+| `.default(val)` | all | Use this value when input is missing |
+| `.label(name)` | all | Custom name in error messages |
+| `.valid(a, b, …)` | all | Must be one of the listed values |
+| `.min(n)` | string, number, array | Minimum length / value / item count |
+| `.max(n)` | string, number, array | Maximum length / value / item count |
+| `.email()` | string | Must be a valid email address |
+| `.url()` | string | Must be an http/https URL |
+| `.pattern(regex)` | string | Must match the regex |
+| `.lowercase()` | string | Must be all lowercase |
+| `.integer()` | number | Must be a whole number |
+| `.positive()` | number | Must be > 0 |
+| `.negative()` | number | Must be < 0 |
+| `.items(rule)` | array | Validate each array element |
+| `.pattern_values(rule)` | object | Validate values of unknown keys |
+| `.strip()` | all | Include in validation but exclude from output |
+| `.custom(fn)` | all | Custom validator function (return error string or nothing) |
+
+## Type coercion
+
+The validator automatically coerces compatible types:
+
+| Input | Schema | Result |
+|-------|--------|--------|
+| `"42"` | `Schema.number()` | `42` |
+| `"3.14"` | `Schema.number()` | `3.14` |
+| `"true"` | `Schema.boolean()` | `true` |
+| `"false"` | `Schema.boolean()` | `false` |
+| `"1"` | `Schema.boolean()` | `true` |
+| `"0"` | `Schema.boolean()` | `false` |
+
+Non-coercible values fail validation (e.g. `"hello"` for `Schema.number()`).
+
+## Custom validators
+
+Use `.custom()` for logic that built-in methods don't cover:
+
+```javascript
+var schema = Schema.object({
+  start_date: Schema.string().required().custom(function (v, label) {
+    if (isNaN(Date.parse(v))) return label + ' must be a valid date';
+  }),
+  password: Schema.string().required().min(8).custom(function (v, label) {
+    if (!/[A-Z]/.test(v)) return label + ' must contain an uppercase letter';
+    if (!/[0-9]/.test(v)) return label + ' must contain a digit';
+  }),
+});
+```
+
+The function receives `(value, label)` and should return an error string if validation fails, or nothing/undefined if it passes.
+
+## Full POST example
+
+A page at `/api/submit-checkin` that validates and stores data:
+
+```html
+<script scope="backend">
+if (request.method === 'POST') {
+  var schema = Schema.object({
+    weight:  Schema.number().required().min(50).max(500),
+    unit:    Schema.string().valid('lbs', 'kg').default('lbs'),
+    meal:    Schema.string().valid('breakfast', 'lunch', 'dinner', 'snack').required(),
+    notes:   Schema.string().max(500).default(''),
+  });
+
+  var result = schema.validate(request.body);
+
+  if (!result.valid) {
+    response.status(400);
+    response.json({ ok: false, errors: result.errors });
+  }
+
+  if (!is_customer) {
+    response.status(401);
+    response.json({ ok: false, errors: ['Not authenticated'] });
+  }
+
+  var data = result.value;
+
+  // null, null = store on the current customer
+  setCrmField(null, null, 'current_weight', data.weight);
+  setCrmField(null, null, 'last_meal', data.meal);
+  setCrmField(null, null, 'last_checkin', new Date().toISOString());
+
+  response.json({ ok: true, data: data });
+}
+</script>
+```
+
+Frontend:
+
+```javascript
+var res = await fetch('/api/submit-checkin', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    weight: 182.5,
+    unit: 'lbs',
+    meal: 'lunch',
+  }),
+});
+var json = await res.json();
+if (!json.ok) {
+  console.error('Validation errors:', json.errors);
+}
+```
+
+## Nested object example
+
+```javascript
+var schema = Schema.object({
+  user: Schema.object({
+    first_name: Schema.string().required().max(100),
+    last_name:  Schema.string().required().max(100),
+    email:      Schema.string().required().email(),
+  }).required(),
+  preferences: Schema.object({
+    notifications: Schema.boolean().default(true),
+    theme:         Schema.string().valid('light', 'dark').default('light'),
+  }).default({}),
+  tags: Schema.array().items(Schema.string().max(50)).max(20).default([]),
+});
+
+var result = schema.validate(request.body);
+// result.value.user.email is guaranteed to be a valid email string
+// result.value.preferences.theme is guaranteed to be 'light' or 'dark'
+// Any extra keys not in the schema are stripped
+```
+
+<Warning>
+**Always validate before storing.** Even though the Schema library strips unknown keys and enforces types, it's a good practice to apply `.max()` constraints on strings and arrays to prevent large payloads from consuming CRM storage.
+</Warning>

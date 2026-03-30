@@ -81,6 +81,40 @@ Each order object contains:
 }
 ```
 
+## Bonus Products
+
+### `getBonusProducts()`
+
+Fetch the current customer's bonus products — digital downloads and extras they received as part of a purchase. Returns a deduplicated list of bonus items from all the customer's orders.
+
+```javascript
+var bonuses = getBonusProducts();
+
+if (bonuses.length > 0) {
+  setVariable('bonuses', bonuses);
+  setVariable('has_bonuses', true);
+}
+```
+
+Each bonus object contains:
+
+```javascript
+{
+  id: 123,                        // product ID (from brand_products)
+  code: 'bonus-ebook',            // product code
+  name: 'Free Bonus eBook',       // product title
+  description: 'A bonus guide…',  // product description
+  image_url: 'https://…/img.jpg', // product image
+  bonus_url: 'https://…/file',    // download URL from the conversion
+  bonus_file: 'https://…/file',   // download file from the product record
+  price: 0,                       // price (typically 0 for bonuses)
+  type: 'digital',                // product type
+  classification: 'bonus'         // product classification
+}
+```
+
+Bonus products are identified by conversion line items where `is_bonus = true`. The function enriches each item with full product details from the catalog. If the same bonus was granted across multiple purchases, it appears only once.
+
 ## Conversions
 
 ### `getConversions(email)`
@@ -466,4 +500,106 @@ clearSessionItem('preferred_plan');
 
 <Note>
 For raw session access (without the `custom_` prefix and base64 encoding), use `session.get(key)` and `session.set(key, value)` from the [Actions](/backend-scripts/actions) page.
+</Note>
+
+## CRM Data
+
+CRM functions let you read and write structured data stored in CRM entries. Entries are linked to any record via `reference_type` and `reference_id` — most commonly customers.
+
+Pass `null` for the first two parameters to use the defaults — this is the most common pattern:
+
+- **`referenceType`** = `null` → defaults to `'customer'`
+- **`referenceId`** = `null` → defaults to the current session's `customer_id`
+
+So `setCrmField(null, null, 'score', 85)` stores `score = 85` on the current customer.
+
+### `GetCrmEntries(referenceType?, referenceId?, limit?)`
+
+Fetch CRM entries linked to a reference record. Defaults to the current customer if no reference is given.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `referenceType` | string | `'customer'` | Type of the linked record |
+| `referenceId` | string | session customer_id | ID of the linked record |
+| `limit` | number | `50` | Max entries to return (max 200) |
+
+```javascript
+// Get all CRM entries for the current customer (null = use session customer)
+var entries = getCrmEntries(null, null, 50);
+
+for (var i = 0; i < entries.length; i++) {
+  console.log(entries[i].title, entries[i].values_flat);
+}
+
+// Get entries for a specific reference type and ID
+var orderEntries = getCrmEntries('order', '12345');
+```
+
+Each entry object contains:
+
+```javascript
+{
+  id: 'abc123',
+  title: 'Weight Tracker',
+  crm_entity_id: 1,
+  pipeline_id: 1,
+  stage_id: 2,
+  reference_type: 'customer',
+  reference_id: 'xyz789',
+  values_flat: {
+    current_weight: 185,
+    goal_weight: 165,
+    last_checkin: '2026-03-15'
+  },
+  created_at: '2026-03-15T10:00:00Z',
+  updated_at: '2026-03-20T14:30:00Z'
+}
+```
+
+### `GetCrmField(referenceType?, referenceId?, fieldKey)`
+
+Get a single field value from the first matching CRM entry. Searches across all entries for the reference.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `referenceType` | string | `'customer'` | Type of the linked record |
+| `referenceId` | string | session customer_id | ID of the linked record |
+| `fieldKey` | string | **required** | The field key to look up |
+
+```javascript
+// Get a field for the current customer
+// null, null = use 'customer' type + session customer_id
+var weight = getCrmField(null, null, 'current_weight');
+
+if (weight && Number(weight) <= 165) {
+  setVariable('show_goal_reached', true);
+}
+
+// Explicit reference type — still uses session customer_id
+var goal = getCrmField('customer', null, 'goal_weight');
+```
+
+### `SetCrmField(referenceType?, referenceId?, fieldKey, value)`
+
+Set a field value on a CRM entry. If the field exists on an entry, it is updated in place. If no entry has that field, a new entry is created.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `referenceType` | string | `'customer'` | Type of the linked record |
+| `referenceId` | string | session customer_id | ID of the linked record |
+| `fieldKey` | string | **required** | The field key to set |
+| `value` | any | **required** | The value (string, number, boolean, or object) |
+
+```javascript
+// Store weight data for the current customer
+// null, null = use 'customer' type + session customer_id
+setCrmField(null, null, 'current_weight', 182);
+setCrmField(null, null, 'last_checkin', new Date().toISOString());
+
+// Set a field on a different reference type (explicit ID)
+setCrmField('order', '12345', 'followup_status', 'contacted');
+```
+
+<Note>
+`SetCrmField` creates a generic CRM entry (with `crm_entity_id: 0`) if no matching entry exists. For structured data with pipelines and stages, create entries through the CRM management UI and use `SetCrmField` to update individual fields.
 </Note>
