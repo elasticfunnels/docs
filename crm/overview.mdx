@@ -1,0 +1,114 @@
+---
+title: 'CRM Overview'
+description: 'Build custom data applications on top of ElasticFunnels with the CRM module.'
+---
+
+The CRM module lets you define custom entity types, fields, pipelines, and stages — then store structured data entries linked to any record in the system. The most common use case is storing custom data per customer, but entries can reference any record type (orders, leads, etc.).
+
+## Architecture
+
+All CRM data lives in the `crm_entries` Elasticsearch index. Each entry is linked to an external record via two fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `reference_type` | keyword | The type of record (e.g. `customer`, `order`, `lead`) |
+| `reference_id` | keyword | The ID of the referenced record |
+
+This generic linking means you can build any kind of structured data on top of the CRM module without being locked to customers.
+
+## Concepts
+
+### Entities
+
+An **entity** defines a type of CRM record (e.g. "Deals", "Contacts", "Tracker"). Each entity has:
+
+- A **name** and **slug** (machine-readable identifier)
+- **Fields** that define the data structure
+- **Pipelines** with **stages** for workflow tracking
+
+### Fields
+
+Fields define what data can be stored on entries. Each field has:
+
+| Property | Description |
+|----------|-------------|
+| `label` | Human-readable label |
+| `key` | Machine-readable key (used in API and templates) |
+| `type` | `text`, `number`, `date`, `boolean`, or `select` |
+
+### Pipelines & Stages
+
+Pipelines represent workflows. Each pipeline contains ordered stages with optional colors and semantic statuses (e.g. `won`, `lost`, `active`). Entries move through stages as they progress.
+
+## Customer CRM Data
+
+The most common pattern is linking CRM entries to customers. When a customer visits a page, the template engine automatically resolves their `customer_id` from Elasticsearch (creating the customer record if needed).
+
+### Example: Weight Loss Tracker
+
+1. Create a CRM entity called "Weight Tracker" with fields like `current_weight`, `goal_weight`, `last_checkin`
+2. Create a pipeline "Progress" with stages "Starting", "In Progress", "Goal Reached"
+3. Store data via backend scripts or the template engine:
+
+```javascript
+// Store weight data for the current customer
+// null, null = defaults to 'customer' type + session customer_id
+setCrmField(null, null, 'current_weight', 185);
+setCrmField(null, null, 'goal_weight', 165);
+setCrmField(null, null, 'last_checkin', '2026-03-15');
+```
+
+<Tip>
+The second parameter (`null`) means "use the current customer's ID from the session". You only need to pass an explicit ID when referencing a different record — e.g. `setCrmField('order', '12345', 'status', 'shipped')`.
+</Tip>
+
+4. Read it back on any page:
+
+```javascript
+var weight = getCrmField('customer', null, 'current_weight');
+var goal = getCrmField('customer', null, 'goal_weight');
+if (weight && goal && Number(weight) <= Number(goal)) {
+  setVariable('show_congrats', true);
+}
+```
+
+### Viewing Customer CRM Data
+
+Customer CRM entries are visible in the **Customer Details** page under the **CRM** tab. This shows all CRM entries linked to that customer across all entity types.
+
+## Template Engine Functions
+
+The CRM adapter exposes three functions in the template engine:
+
+| Function | Description |
+|----------|-------------|
+| `getCrmEntries(refType, refId, limit)` | Fetch all CRM entries for a reference |
+| `getCrmField(refType, refId, fieldKey)` | Get a single field value |
+| `setCrmField(refType, refId, fieldKey, value)` | Set a field value |
+
+Pass `null` for `refType` and `refId` to use the defaults: `'customer'` and the current session's `customer_id`. This is the most common pattern:
+
+```javascript
+setCrmField(null, null, 'score', 85);        // same as setCrmField('customer', '<session customer_id>', 'score', 85)
+var score = getCrmField(null, null, 'score'); // reads from current customer
+```
+
+See [Data Functions](/backend-scripts/data-functions#crm-data) for full parameter details and examples.
+
+## API Endpoints
+
+CRM entries are managed through the standard CRM API:
+
+```
+GET    /brands/{brand}/crm/entities/{entity}/entries
+POST   /brands/{brand}/crm/entities/{entity}/entries
+GET    /brands/{brand}/crm/entries/{entry}
+PUT    /brands/{brand}/crm/entries/{entry}
+DELETE /brands/{brand}/crm/entries/{entry}
+```
+
+Filter by reference:
+
+```
+GET /brands/{brand}/crm/entities/{entity}/entries?reference_type=customer&reference_id={customer_id}
+```

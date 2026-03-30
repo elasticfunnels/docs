@@ -1,0 +1,216 @@
+---
+title: 'Building Custom Workflows'
+description: 'Use pages as API endpoints — accept POST data, validate it, and store CRM entries from frontend to backend.'
+---
+
+Pages accept both `GET` and `POST` requests. Combined with [backend scripts](/backend-scripts/overview), this lets you build data-collection endpoints, custom forms, and mini-apps using regular ElasticFunnels pages — no external server needed.
+
+## The pattern
+
+1. Create a page (e.g. `/weight/checkin`)
+2. Add a `<script scope="backend">` that checks for `POST`, validates `request.body` with the [Schema validator](/backend-scripts/validation), and stores the data
+3. Your frontend uses `fetch()` to POST JSON data to that page
+4. The backend script responds with JSON — the page HTML is skipped when `response.json()` is called
+
+For reusable validation logic across multiple pages, use [shared backend script modules](/backend-scripts/imports) — create a module with exported functions and import them anywhere.
+
+## Full example: Weight check-in
+
+### 1. Create a shared validation module
+
+Create a backend script module (code: `validators`) with shared schemas:
+
+```html
+<script scope="backend">
+  export var WeightCheckinSchema = Schema.object({
+    weight:  Schema.number().required().min(50).max(500),
+    unit:    Schema.string().valid('lbs', 'kg').default('lbs'),
+    notes:   Schema.string().max(500).default(''),
+  });
+
+  export function requireCustomer() {
+    if (!is_customer) {
+      response.status(401);
+      response.json({ ok: false, error: 'not authenticated' });
+    }
+  }
+</script>
+```
+
+### 2. Create the page `/weight/checkin`
+
+```html
+<script scope="backend">
+  import { WeightCheckinSchema, requireCustomer } from "validators";
+
+  if (request.method === 'POST') {
+    requireCustomer();
+
+    var result = WeightCheckinSchema.validate(request.body);
+
+    if (!result.valid) {
+      response.status(400);
+      response.json({ ok: false, errors: result.errors });
+    }
+
+    var data = result.value;
+
+    // null, null = store on the current customer
+    setCrmField(null, null, 'current_weight', data.weight);
+    setCrmField(null, null, 'weight_unit', data.unit);
+    setCrmField(null, null, 'last_checkin', new Date().toISOString());
+    if (data.notes) {
+      setCrmField(null, null, 'checkin_notes', data.notes);
+    }
+
+    response.json({ ok: true, data: data });
+  }
+
+  setVariable('page_title', 'Weight Check-in');
+</script>
+
+<div>
+  <h1>{{ var.page_title }}</h1>
+  <form id="checkin-form">
+    <input type="number" id="weight" placeholder="Current weight" step="0.1" required />
+    <select id="unit">
+      <option value="lbs">lbs</option>
+      <option value="kg">kg</option>
+    </select>
+    <textarea id="notes" placeholder="Notes (optional)"></textarea>
+    <button type="submit">Log Weight</button>
+  </form>
+  <div id="result"></div>
+</div>
+
+<script>
+document.getElementById('checkin-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  var res = await fetch('/weight/checkin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      weight: parseFloat(document.getElementById('weight').value),
+      unit: document.getElementById('unit').value,
+      notes: document.getElementById('notes').value
+    })
+  });
+
+  var data = await res.json();
+  document.getElementById('result').textContent = data.ok
+    ? 'Logged: ' + data.data.weight + ' ' + data.data.unit
+    : 'Error: ' + (data.errors || [data.error]).join(', ');
+});
+</script>
+```
+
+### 3. Read the data back on another page
+
+On any page (e.g. `/dashboard`), read the CRM data:
+
+```html
+<script scope="backend">
+  import { requireCustomer } from "validators";
+  requireCustomer();
+
+  // null, null = read from the current customer
+  var weight = getCrmField(null, null, 'current_weight');
+  var goal   = getCrmField(null, null, 'goal_weight');
+  setVariable('current_weight', weight || 'Not logged yet');
+  setVariable('goal_weight', goal || 'Not set');
+  setVariable('on_track', weight && goal && Number(weight) <= Number(goal));
+</script>
+
+<h2>Current weight: {{ var.current_weight }}</h2>
+<h2>Goal: {{ var.goal_weight }}</h2>
+<p v-if="var.on_track">You've reached your goal!</p>
+```
+
+## How it fits together
+
+```
+Frontend (browser)             Backend (sandbox)
+─────────────────              ─────────────────
+fetch('/weight/checkin', {     → request.method = 'POST'
+  method: 'POST',               request.body = { weight: 182, ... }
+  body: JSON.stringify(data)
+})                             → Schema.validate(request.body)
+                               → setCrmField(null, null, 'current_weight', 182)
+← { ok: true, data: {...} }   ← response.json({ ok: true, data })
+```
+
+## CRM functions reference
+
+| Function | Description |
+|----------|-------------|
+| `getCrmEntries(refType, refId, limit)` | Fetch all CRM entries for a reference |
+| `getCrmField(refType, refId, fieldKey)` | Get a single field value |
+| `setCrmField(refType, refId, fieldKey, value)` | Set a field value |
+
+### What does `null` mean?
+
+The first two parameters control **which record** the data is linked to. Pass `null` to use defaults:
+
+| Parameter | Pass `null` to use | Explicit example |
+|-----------|-------------------|-----------------|
+| `refType` | `'customer'` (most common) | `'order'`, `'lead'` |
+| `refId` | current session's `customer_id` | `'12345'` (a specific record ID) |
+
+```javascript
+// These two calls are equivalent:
+setCrmField(null, null, 'score', 85);
+setCrmField('customer', '<session customer_id>', 'score', 85);
+
+// To reference a different record, pass explicit values:
+setCrmField('order', '12345', 'followup', 'done');
+```
+
+### Parameter types
+
+| Parameter | Allowed types |
+|-----------|--------------|
+| `refType` | string (alphanumeric, `-`, `_`) or `null` |
+| `refId` | string (max 512 chars) or `null` |
+| `fieldKey` | string (alphanumeric, `_`, `.`, `-`) — **required** |
+| `value` | string, number, boolean, or JSON object — **required** for set |
+
+### Input validation
+
+All inputs are strictly validated before reaching Elasticsearch:
+
+- **`fieldKey`** must match `/^[a-zA-Z0-9_.-]+$/` — no spaces, special characters, or injection attempts
+- **`refType`** must match `/^[a-zA-Z0-9_-]+$/`
+- **`refId`** rejects `{}[]"\` characters
+- **String values** are capped at 10,000 characters
+- **Numbers** must be finite (no `NaN`, `Infinity`)
+- **Objects** are JSON-serialized and capped at 10 KB
+- Invalid inputs cause the function to return `false` / `null` silently — no exceptions thrown
+
+## Security checklist
+
+<Warning>
+**Always validate `request.body` in your backend script.** The body comes from the visitor's browser and can contain anything.
+</Warning>
+
+1. **Validate with Schema** — use the built-in [Schema validator](/backend-scripts/validation) to enforce types, lengths, and allowed values
+2. **Check authentication** — verify `is_customer` before storing data
+3. **Use `response.json()`** — this stops page rendering and returns JSON directly
+4. **Use `response.status()`** — set proper HTTP status codes (400 for validation errors, 401 for auth)
+5. **Share validation logic** — create a [backend script module](/backend-scripts/imports) for reusable schemas and auth checks
+
+## POST body limits
+
+| Constraint | Value |
+|-----------|-------|
+| Max body size | 64 KB (larger payloads are dropped) |
+| Content type | `application/json` only |
+| Body available as | `request.body` (parsed object or `null`) |
+
+## Related
+
+- [Backend Scripts Overview](/backend-scripts/overview) — how backend scripts work, sandboxing, execution order
+- [Schema Validator](/backend-scripts/validation) — full reference for the `Schema` validation API
+- [Shared Modules](/backend-scripts/imports) — import/export reusable code between pages
+- [Request Context](/backend-scripts/context) — `request.body`, `request.method`, and other globals
+- [CRM Overview](/crm/overview) — entities, fields, pipelines, and the CRM data model
