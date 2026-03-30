@@ -246,6 +246,7 @@
             "group": "Backend Scripts",
             "pages": [
               "backend-scripts/overview",
+              "backend-scripts/imports",
               {
                 "group": "Reference",
                 "pages": [

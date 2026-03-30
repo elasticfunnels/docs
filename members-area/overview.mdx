@@ -67,18 +67,41 @@ The session stores the following customer data automatically:
 
 ## Protecting Pages with Login
 
-Any page can be set to require login. When a visitor without a valid session tries to access a protected page:
+There are two ways to restrict a page to logged-in customers only.
 
-- If a **redirect URL** is configured (e.g., `/members-login`), they are redirected there
-- If no redirect is configured, a 404 page is shown
-
-To set up a protected page:
+### Option 1: Page setting (recommended)
 
 1. Open the page settings in the editor
 2. Enable **Requires Login**
 3. Set the **Redirect URL** to your login page (e.g., `/members-login`)
 
-When a customer has a valid session (either from a purchase or from the login form), they can access the protected page normally.
+When a visitor without a valid session tries to access the page they are automatically redirected to that URL. If no redirect is configured, a 404 page is shown.
+
+### Option 2: Backend scope script
+
+Add a `<script scope="backend">` block at the top of the page. This gives you more control — for example, redirecting to different pages based on the customer's order history or preserving a `?next=` query parameter.
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login');
+  }
+</script>
+```
+
+You can pass the current path as a query parameter so the login page can redirect back after a successful login:
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login?next=' + encodeURIComponent(request.path));
+  }
+</script>
+```
+
+`is_customer` is `true` when the visitor has an active session from a purchase or from the email login form. See [Request Context](/backend-scripts/context) for all available globals and [Actions](/backend-scripts/actions) for the full `redirect()` reference.
+
+When a customer has a valid session (either from a purchase or from the login form), the script does nothing and the page renders normally.
 
 ## Template Variables
 
