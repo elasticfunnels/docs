@@ -113,19 +113,12 @@ Check order history and personalize the page:
 
 ## Course access gate
 
-Only allow access if the visitor has purchased a product that grants course access. The `getCourseBySlug()` function looks up the course, and you gate by matching a product name (or product code) in the customer's order history.
+Only allow access if the visitor has purchased the course product:
 
 ```html
 <script scope="backend">
   if (!is_customer) {
-    redirect('/members-login');
-  }
-
-  var slug = request.query.course || 'my-course';
-  var course = getCourseBySlug(slug);
-
-  if (!course) {
-    redirect('/members/courses');
+    redirect('/courses/pricing');
   }
 
   var orders = getOrders('newest', 100);
@@ -144,50 +137,16 @@ Only allow access if the visitor has purchased a product that grants course acce
     redirect('/courses/pricing');
   }
 
-  setVariable('course', course);
-  var categories = getCategoriesWithCourses();
-  setVariable('categories', categories);
+  var course = getCourseBySlug('javascript-basics');
+  if (course) {
+    setVariable('course_title', course.title);
+    setVariable('total_lessons', course.total_lesson_count);
+  }
 </script>
 
-<h1>{{ course.title }}</h1>
-<p>{{ course.total_lesson_count }} lessons</p>
+<h1>{{ var.course_title }}</h1>
+<p>{{ var.total_lessons }} lessons</p>
 ```
-
-The full course player and dashboard templates (used by the built-in course templates) use the same pattern via `@extends("members-layout")`. The course dashboard uses `<backend-foreach data-each="course in courses">` to render a card grid with progress bars, resume links, and filter/search — all driven by the `categories` variable. The course player exposes `currentLesson`, `currentModule`, `modules`, and `stats` so the sidebar, video player, notes, and comments all work without custom JavaScript.
-
-## Displaying bonuses
-
-Bonus products (items marked as bonuses at order time) are exposed via the `<order>` HTML tag using `<order-bonus-product>`. They are separate from regular `products` and are not returned by `getOrders()`.
-
-```html
-<order sort-by="newest" limit="10">
-  <h3>Order #{{ order_number }}</h3>
-
-  <order-product>
-    <div class="product-row">
-      <img src="{{ product_image_url }}" alt="{{ product_name }}" />
-      <p>{{ product_name }} — {{ price }}</p>
-    </div>
-  </order-product>
-
-  <order-bonus-product>
-    <div class="bonus-row">
-      <p><strong>Bonus:</strong> {{ bonus_product_name }}</p>
-      <a href="{{ bonus_download }}" target="_blank">Download</a>
-    </div>
-  </order-bonus-product>
-</order>
-```
-
-Each `<order-bonus-product>` block has access to:
-
-| Placeholder | Description |
-|-------------|-------------|
-| `{bonus_product_name}` | Name of the bonus product |
-| `{bonus_download}` | Download URL for the bonus |
-| `{bonus_product_image_url}` | Image URL for the bonus |
-
-See the full [Order Tag reference](/pages/order-tag) for all available placeholders.
 
 ## JSON API endpoint
 
@@ -291,12 +250,83 @@ Share state between backend scripts and template-engine expressions:
 
 ```html
 <script scope="backend">
+  var customer = getCustomer();
+
   if (customer && customer.email === 'admin@mybrand.com') {
     whitelistVisitor();
     setVariable('is_admin', true);
   }
 </script>
 ```
+
+## Shared auth guard with imports
+
+Create a backend script module (code: `auth`) with reusable access-control helpers:
+
+```javascript
+export function requireCustomer() {
+  if (!is_customer) {
+    redirect('/login');
+  }
+}
+
+export function requireAdmin(email) {
+  var admins = ['admin@mybrand.com', 'support@mybrand.com'];
+  for (var i = 0; i < admins.length; i++) {
+    if (admins[i] === email) return true;
+  }
+  redirect('/unauthorized');
+}
+```
+
+Then use it on any page — no need to duplicate the logic:
+
+```html
+<script scope="backend">
+  import { requireCustomer, requireAdmin } from "auth";
+
+  requireCustomer();
+  requireAdmin(customer.email);
+
+  setVariable('admin_name', customer.name);
+</script>
+
+<h1>Admin Dashboard — {{ var.admin_name }}</h1>
+```
+
+You can also build a shared utility module (code: `utils`):
+
+```javascript
+export function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+export function truncate(str, len) {
+  if (str.length <= len) return str;
+  return str.substring(0, len) + '...';
+}
+```
+
+```html
+<script scope="backend">
+  import { slugify, truncate } from "utils";
+
+  var articles = getBlogArticles(1, 1, 10);
+  var items = [];
+
+  for (var i = 0; i < articles.length; i++) {
+    items.push({
+      title: articles[i].title,
+      excerpt: truncate(articles[i].body, 120),
+      url: '/blog/' + slugify(articles[i].title)
+    });
+  }
+
+  setVariable('articles', items);
+</script>
+```
+
+See [Imports](/backend-scripts/imports) for the full reference on `import` / `export` syntax and resolution rules.
 
 ## External API with proxy
 

@@ -61,3 +61,19 @@ If your backend script throws an error or hits a timeout, the **visitor does not
 ## Multiple script blocks
 
 You can have multiple `<script scope="backend">` tags on a page. They are concatenated in document order and executed as a single script.
+
+## Importing shared modules
+
+You can share reusable functions and constants across pages using backend script modules. Create a module in your brand's **Backend Scripts** section (with a code like `app` or `utils`), then import from it:
+
+```html
+<script scope="backend">
+  import { isAdmin, getGreeting } from "app";
+
+  if (is_customer && isAdmin(customer.email)) {
+    setVariable('greeting', getGreeting(customer.name));
+  }
+</script>
+```
+
+Modules are standalone JavaScript with `export` statements, managed separately from pages. See [Imports](/backend-scripts/imports) for the full reference.

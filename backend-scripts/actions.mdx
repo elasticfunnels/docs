@@ -77,6 +77,11 @@ Inject values into the template engine. These become available as `{{ var.key }}
 setVariable('discount', '50%');
 setVariable('show_banner', true);
 setVariable('user_tier', 'premium');
+setVariable('user', { name: 'Sam', email: 'sam@example.com' });
+setVariable('categories', [
+  { slug: 'marketing', name: 'Marketing', courses: [...] },
+  { slug: 'design', name: 'Design', courses: [...] },
+]);
 ```
 
 In your page HTML:
@@ -87,7 +92,37 @@ In your page HTML:
 @if(var.show_banner)
   <div class="banner">Premium member</div>
 @endif
+
+<!-- Objects work too -->
+<p>Welcome, {{ var.user.name }}</p>
+
+<!-- Debug: dump the full object as JSON -->
+<pre>{{ dump(var.user) }}</pre>
 ```
+
+<Warning>
+`setVariable('name', value)` stores the value under the `var` namespace. Always access it as **`var.name`** in templates — e.g. `{{ var.name }}`, `{{ dump(var.name) }}`, `@if(var.name)`. Using `{{ name }}` or `{{ dump(name) }}` without the `var.` prefix will **not** find the variable.
+</Warning>
+
+### Scoping inside `@foreach`
+
+When you iterate over a variable with `@foreach`, the **loop variable** is its own scope — it does **not** use the `var.` prefix:
+
+```html
+<!-- var.categories needs the var. prefix (it came from setVariable) -->
+@foreach(cat in var.categories)
+  <!-- cat is a loop variable — access its properties directly, no var. prefix -->
+  <h2>{{ cat.name }}</h2>
+  <p>{{ cat.slug }}</p>
+
+  <!-- nested arrays on the loop variable also work directly -->
+  @foreach(course in cat.courses)
+    <div>{{ course.title }}</div>
+  @endforeach
+@endforeach
+```
+
+In short: `var.` is only for the **top-level** reference to variables set by `setVariable`. Once a value is assigned to a loop variable (`cat`, `course`, etc.), you access its properties directly.
 
 Variables set with `setVariable` take precedence over brand variables with the same key.
 
