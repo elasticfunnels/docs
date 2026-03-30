@@ -147,7 +147,9 @@ If your orders have physical shipments, tracking information is automatically ex
 
 Carriers are auto-detected from tracking number patterns (USPS, FedEx, UPS, DHL, UniUni). If no tracking URL is provided, a universal tracking link via 17track.net is generated.
 
-### Example: Order with Tracking
+`order.tracking` is always an array. When the order has not yet been fulfilled it is empty (`[]`). Use `order.shipping_address` as the signal that the order contains a physical product — if there is a shipping address but no tracking yet, show a "being processed" message.
+
+### Example: Physical order with processing/tracking states
 
 ```html
 @set(orders = getOrders('newest', 5))
@@ -155,18 +157,7 @@ Carriers are auto-detected from tracking number patterns (USPS, FedEx, UPS, DHL,
 @foreach(order in orders)
 <div class="order">
   <h3>Order #{{ order.order_number }}</h3>
-
-  @if(order.tracking.length gt 0)
-  <div class="tracking-info">
-    <h4>Shipment Tracking</h4>
-    @foreach(t in order.tracking)
-    <p>
-      {{ t.carrier }}: 
-      <a href="{{ t.tracking_url }}" target="_blank">{{ t.tracking_number }}</a>
-    </p>
-    @endforeach
-  </div>
-  @endif
+  <p>{{ order.created_at | date:'dd MMM yyyy' }}</p>
 
   @if(order.shipping_address)
   <div class="shipping-address">
@@ -175,10 +166,36 @@ Carriers are auto-detected from tracking number patterns (USPS, FedEx, UPS, DHL,
     <p>{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
     <p>{{ order.shipping_country }}</p>
   </div>
+
+  @if(order.tracking.length gt 0)
+  <div class="tracking-info">
+    <h4>Shipment Tracking</h4>
+    @foreach(t in order.tracking)
+    <div class="tracking-row">
+      <span>{{ t.carrier }}</span>
+      <a href="{{ t.tracking_url }}" target="_blank">{{ t.tracking_number }}</a>
+    </div>
+    @endforeach
+  </div>
+  @else
+  <div class="tracking-pending">
+    <p>Your order is being processed. Tracking information will appear here once your order ships.</p>
+  </div>
+  @endif
+
   @endif
 </div>
 @endforeach
 ```
+
+The key pattern:
+- `order.shipping_address` is present → physical product → show the shipping address block.
+- Inside that block, `order.tracking.length gt 0` → shipment is on the way → show carrier + tracking link.
+- Otherwise → show "Your order is being processed."
+
+<Tip>
+Tracking numbers are auto-linked to [17track.net](https://17track.net) when no carrier URL is provided. The carrier is auto-detected from the number pattern (USPS, UPS, FedEx, DHL, UniUni). You do not need to map carriers yourself.
+</Tip>
 
 ## Thank You Pages
 
@@ -228,18 +245,7 @@ You can also display customer information directly using the `customer` template
 <p>Email: {{ customer.email }}</p>
 ```
 
-Or using the `GetCustomer()` function in backend scripts:
-
-```html
-<script scope="backend">
-var cust = GetCustomer();
-setVariable('cust', cust);
-</script>
-
-<p>Hello, {{ cust.first_name }}!</p>
-```
-
-The `customer` / `GetCustomer()` object includes: `name`, `email`, `first_name`, `last_name`, `phone`, `order_id`, `order_ids`, and full billing/shipping address fields.
+The `customer` object includes: `name`, `email`, `first_name`, `last_name`, `phone`, `order_id`, `order_ids`, and full billing/shipping address fields. It is automatically available in every backend script and template — no function call needed.
 
 ## Order Grouping
 

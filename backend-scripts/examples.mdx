@@ -113,12 +113,19 @@ Check order history and personalize the page:
 
 ## Course access gate
 
-Only allow access if the visitor has purchased the course product:
+Only allow access if the visitor has purchased a product that grants course access. The `getCourseBySlug()` function looks up the course, and you gate by matching a product name (or product code) in the customer's order history.
 
 ```html
 <script scope="backend">
   if (!is_customer) {
-    redirect('/courses/pricing');
+    redirect('/members-login');
+  }
+
+  var slug = request.query.course || 'my-course';
+  var course = getCourseBySlug(slug);
+
+  if (!course) {
+    redirect('/members/courses');
   }
 
   var orders = getOrders('newest', 100);
@@ -137,16 +144,50 @@ Only allow access if the visitor has purchased the course product:
     redirect('/courses/pricing');
   }
 
-  var course = getCourseBySlug('javascript-basics');
-  if (course) {
-    setVariable('course_title', course.title);
-    setVariable('total_lessons', course.total_lesson_count);
-  }
+  setVariable('course', course);
+  var categories = getCategoriesWithCourses();
+  setVariable('categories', categories);
 </script>
 
-<h1>{{ var.course_title }}</h1>
-<p>{{ var.total_lessons }} lessons</p>
+<h1>{{ course.title }}</h1>
+<p>{{ course.total_lesson_count }} lessons</p>
 ```
+
+The full course player and dashboard templates (used by the built-in course templates) use the same pattern via `@extends("members-layout")`. The course dashboard uses `<backend-foreach data-each="course in courses">` to render a card grid with progress bars, resume links, and filter/search — all driven by the `categories` variable. The course player exposes `currentLesson`, `currentModule`, `modules`, and `stats` so the sidebar, video player, notes, and comments all work without custom JavaScript.
+
+## Displaying bonuses
+
+Bonus products (items marked as bonuses at order time) are exposed via the `<order>` HTML tag using `<order-bonus-product>`. They are separate from regular `products` and are not returned by `getOrders()`.
+
+```html
+<order sort-by="newest" limit="10">
+  <h3>Order #{{ order_number }}</h3>
+
+  <order-product>
+    <div class="product-row">
+      <img src="{{ product_image_url }}" alt="{{ product_name }}" />
+      <p>{{ product_name }} — {{ price }}</p>
+    </div>
+  </order-product>
+
+  <order-bonus-product>
+    <div class="bonus-row">
+      <p><strong>Bonus:</strong> {{ bonus_product_name }}</p>
+      <a href="{{ bonus_download }}" target="_blank">Download</a>
+    </div>
+  </order-bonus-product>
+</order>
+```
+
+Each `<order-bonus-product>` block has access to:
+
+| Placeholder | Description |
+|-------------|-------------|
+| `{bonus_product_name}` | Name of the bonus product |
+| `{bonus_download}` | Download URL for the bonus |
+| `{bonus_product_image_url}` | Image URL for the bonus |
+
+See the full [Order Tag reference](/pages/order-tag) for all available placeholders.
 
 ## JSON API endpoint
 
@@ -250,8 +291,6 @@ Share state between backend scripts and template-engine expressions:
 
 ```html
 <script scope="backend">
-  var customer = getCustomer();
-
   if (customer && customer.email === 'admin@mybrand.com') {
     whitelistVisitor();
     setVariable('is_admin', true);

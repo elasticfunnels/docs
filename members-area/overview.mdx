@@ -103,6 +103,92 @@ You can pass the current path as a query parameter so the login page can redirec
 
 When a customer has a valid session (either from a purchase or from the login form), the script does nothing and the page renders normally.
 
+## Auth Wrapper Pattern (recommended)
+
+When your members area has more than one page — dashboard, order history, bonuses, course access, account settings — the recommended approach is an **auth wrapper**: a shared layout or script block that handles the authentication check and loads common data in one place. Every members page extends or includes the wrapper, so you never repeat the login redirect logic.
+
+### For `.ef` template files — `@extends`
+
+Create a `members-layout.ef` that handles auth and prefetches common data:
+
+```html
+{{-- members-layout.ef --}}
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login');
+  }
+  var orders = getOrders('newest', 20);
+  setVariable('orders', orders);
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>@block("title") Members Area @endblock</title>
+</head>
+<body>
+  <header>
+    <span>Welcome, {{ customer.first_name | default:"Member" }}</span>
+    <nav>
+      <a href="/members">Dashboard</a>
+      <a href="/members/orders">Orders</a>
+      <a href="/members/bonuses">Bonuses</a>
+    </nav>
+  </header>
+  @block("content") @endblock
+</body>
+</html>
+```
+
+Every members page extends it — no auth logic needed per page:
+
+```html
+{{-- members-dashboard.ef --}}
+@extends("members-layout")
+@block("title") Dashboard @endblock
+@block("content")
+<h1>Your Orders</h1>
+@foreach(order in orders)
+  <p>#{{ order.order_number }} — {{ order.created_at | date:'dd MMM yyyy' }}</p>
+@endforeach
+@endblock
+```
+
+```html
+{{-- members-bonuses.ef --}}
+@extends("members-layout")
+@block("title") Bonuses @endblock
+@block("content")
+<h1>Your Bonuses</h1>
+<order sort-by="newest" limit="5">
+  <order-bonus-product>
+    <p>{{ bonus_product_name }}</p>
+    <a href="{{ bonus_download }}">Download</a>
+  </order-bonus-product>
+</order>
+@endblock
+```
+
+### For page builder pages — shared script block
+
+Paste the same backend script at the top of every protected page. Because it always does the same work, any change only needs to happen in one shared spot (consider using a page component for the header/nav):
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login');
+  }
+  var orders = getOrders('newest', 20);
+  setVariable('orders', orders);
+</script>
+
+<h1>Welcome, {{ customer.first_name | default:"Member" }}</h1>
+```
+
+<Tip>
+Load only what each page needs. The dashboard might call `getOrders('newest', 5)`, while the full order-history page calls `getOrders('newest', 100)`. The wrapper sets a sensible default; individual pages can override `orders` by calling `setVariable` again after the wrapper runs.
+</Tip>
+
 ## Template Variables
 
 Inside members-only pages, you can use the `customer` object to personalize content:

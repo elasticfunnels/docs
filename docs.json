@@ -97,6 +97,13 @@
                   "pages/collection-item-tag",
                   "pages/cart"
                 ]
+              },
+              {
+                "group": "Courses",
+                "pages": [
+                  "courses/overview",
+                  "courses/template"
+                ]
               }
             ]
           },
@@ -246,7 +253,6 @@
             "group": "Backend Scripts",
             "pages": [
               "backend-scripts/overview",
-              "backend-scripts/imports",
               {
                 "group": "Reference",
                 "pages": [

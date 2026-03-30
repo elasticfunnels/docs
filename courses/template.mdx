@@ -1,0 +1,372 @@
+---
+title: 'Courses — Template Reference'
+description: 'Backend functions and template patterns for course list pages, course detail pages, and access gating'
+---
+
+This page covers all backend functions for courses and shows how to use them in `.ef` page templates. See [Courses — Overview](/courses/overview) for setup and enrollment.
+
+---
+
+## Backend functions
+
+All functions are available in `<script scope="backend">` blocks and in `.ef` files.
+
+### `getCourses(assignedOnly?)`
+
+Returns all courses for the brand, each with `is_assigned` and `started` for the current customer.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `assignedOnly` | boolean | `false` | `false` — all courses (use `is_assigned` to show "Get access" vs content). `true` — only courses the customer is enrolled in. |
+
+```javascript
+var allCourses    = getCourses(false);   // all, with is_assigned per course
+var myCourses     = getCourses(true);    // enrolled only
+```
+
+### `getCategoriesWithCourses(assignedOnly?)`
+
+Same as `getCourses` but grouped by category. Returns an array of `{ category_slug, category_name, courses[] }`.
+
+```javascript
+var categories = getCategoriesWithCourses(false);
+// categories[0].category_name  → "Daily Practices"
+// categories[0].courses        → [ { title, slug, is_assigned, ... } ]
+```
+
+### `getCoursesByCategorySlug(categorySlug, assignedOnly?)`
+
+Returns courses in a single category. Useful for "Daily practices" or "Advanced" sections on a dashboard.
+
+```javascript
+var daily = getCoursesByCategorySlug('daily-practices', false);
+```
+
+### `getCoursesForCustomer()`
+
+Returns only courses the current customer is enrolled in (same as `getCourses(true)`). Returns `[]` if no session or no enrollments.
+
+### `getCourseForCustomer(slug)`
+
+Returns a single course **with** enrollment check — `is_assigned` and `started` are set for the current customer. Also returns the full `modules[]` and `contents[]` tree, plus `progress_percent` and `completed_content_ids`. Use this on the course detail page.
+
+```javascript
+var course = getCourseForCustomer('tinnitus-recovery');
+// course.is_assigned  → true / false
+// course.modules      → full module/lesson tree
+// course.progress_percent → 0–100
+```
+
+Returns `null` if no course with that slug exists.
+
+### `getCourseBySlug(slug)`
+
+Returns a single course **without** enrollment check. `is_assigned` and `started` will not be set. Use when you only need course metadata and don't need to gate content.
+
+```javascript
+var course = getCourseBySlug('tinnitus-recovery');
+```
+
+### `request.route_params`
+
+For dynamic slug pages (e.g. `guided-course/{course}.ef`), the slug is available via `request.route_params.course`.
+
+---
+
+## Course list page
+
+Show all courses, sorted so enrolled courses appear first. Use `is_assigned` and `started` to drive the CTA label.
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login');
+  }
+
+  var allCourses = getCourses(false);
+
+  // Sort: enrolled first, then among enrolled put started (Continue) before not started
+  allCourses = allCourses.slice().sort(function(a, b) {
+    if (a.is_assigned !== b.is_assigned) return b.is_assigned - a.is_assigned;
+    return b.started - a.started;
+  });
+
+  setVariable('courses', allCourses);
+  setVariable('courseCount', allCourses.length);
+</script>
+
+@if(var.courseCount gt 0)
+<div class="course-grid">
+  @foreach(c in var.courses)
+  <div class="course-card">
+    @if(c.image_url)
+    <img src="{{ c.image_url }}" alt="{{ c.title }}" />
+    @endif
+
+    <h3>{{ c.title }}</h3>
+    <p>{{ c.description }}</p>
+    <p>{{ c.module_count }} modules · {{ c.lesson_count }} lessons</p>
+
+    @if(c.is_assigned eq false)
+    <a href="/buy/{{ c.slug }}-access" class="btn-secondary">Get access</a>
+    @elseif(c.started)
+    <a href="/course/{{ c.slug }}" class="btn-primary">Continue</a>
+    @else
+    <a href="/course/{{ c.slug }}" class="btn-primary">Start Course</a>
+    @endif
+  </div>
+  @endforeach
+</div>
+@else
+<p>No courses available yet.</p>
+@endif
+```
+
+### With category tabs
+
+```html
+<script scope="backend">
+  if (!is_customer) { redirect('/members-login'); }
+
+  var categories = getCategoriesWithCourses(false);
+
+  // Sort courses within each category: assigned first
+  categories = categories.map(function(cat) {
+    var sorted = (cat.courses || []).slice().sort(function(a, b) {
+      if (a.is_assigned !== b.is_assigned) return b.is_assigned - a.is_assigned;
+      return b.started - a.started;
+    });
+    return { category_slug: cat.category_slug, category_name: cat.category_name, courses: sorted };
+  });
+
+  setVariable('categories', categories);
+</script>
+
+@foreach(cat in var.categories)
+<section data-category="{{ cat.category_slug }}">
+  <h2>{{ cat.category_name }}</h2>
+  <div class="course-grid">
+    @foreach(c in cat.courses)
+    <div class="course-card">
+      <h3><a href="/course/{{ c.slug }}">{{ c.title }}</a></h3>
+      <span>
+        @if(c.is_assigned eq false)
+          Get access
+        @elseif(c.started)
+          Continue
+        @else
+          Start Course
+        @endif
+      </span>
+    </div>
+    @endforeach
+  </div>
+</section>
+@endforeach
+```
+
+---
+
+## Course detail page
+
+Resolve the slug from the URL, check enrollment with `getCourseForCustomer`, and gate content.
+
+```html
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login');
+  }
+
+  // For a dynamic page named guided-course/{course}.ef:
+  var slug = request.route_params.course;
+
+  // For a fixed page reading slug from query string:
+  // var slug = request.query.course;
+
+  var course = getCourseForCustomer(slug);
+
+  if (!course) {
+    redirect('/courses');
+  }
+
+  setVariable('course',       course);
+  setVariable('isAssigned',   course.is_assigned || false);
+  setVariable('courseStarted', course.started || false);
+
+  if (course.is_assigned) {
+    // Track that the customer has visited this course (optional)
+    setSessionItem('course_visited_' + slug, '1');
+  }
+</script>
+
+@if(var.course)
+
+  <!-- Hero -->
+  <div class="course-hero">
+    @if(var.course.cover)
+    <img src="{{ var.course.cover }}" alt="{{ var.course.title }}" />
+    @endif
+    <h1>{{ var.course.title }}</h1>
+    @if(var.course.instructor_name)
+    <p>by {{ var.course.instructor_name }}</p>
+    @endif
+  </div>
+
+  <!-- Stats -->
+  <div class="course-stats">
+    <span>{{ var.course.module_count }} modules</span>
+    <span>{{ var.course.total_lesson_count }} lessons</span>
+  </div>
+
+  @if(var.isAssigned)
+
+  <!-- Progress -->
+  <div class="progress-bar" style="width: {{ var.course.progress_percent }}%"></div>
+  <p>{{ var.course.progress_percent }}% complete</p>
+
+  <!-- Modules and lessons -->
+  @foreach(mod in var.course.modules)
+  <div class="module" id="module-{{ mod.id }}">
+    <h2>{{ mod.order }}. {{ mod.title }}</h2>
+    <div class="lessons">
+      @foreach(lesson in mod.contents)
+      <div class="lesson-row"
+           data-content-id="{{ lesson.id }}"
+           data-content-url="{{ lesson.content_url }}">
+        <span class="lesson-title">{{ lesson.title }}</span>
+        @if(lesson.type == 'video')
+        <span class="badge">Video</span>
+        @elseif(lesson.type == 'audio')
+        <span class="badge">Audio</span>
+        @endif
+      </div>
+      @endforeach
+    </div>
+  </div>
+  @endforeach
+
+  @else
+
+  <!-- Not enrolled — show CTA -->
+  <div class="access-gate">
+    <p>You don't have access to this course yet.</p>
+    <a href="/courses" class="btn">Browse all courses</a>
+  </div>
+
+  @endif
+
+@else
+<p>Course not found. <a href="/courses">Back to courses</a></p>
+@endif
+```
+
+---
+
+## Auth wrapper for course pages
+
+Use the [auth wrapper pattern](/members-area/overview#auth-wrapper-pattern-recommended) (`@extends`) so the login check and common data load happen once across all course pages:
+
+```html
+{{-- members-courses-layout.ef --}}
+<script scope="backend">
+  if (!is_customer) {
+    redirect('/members-login?next=' + encodeURIComponent(request.path));
+  }
+</script>
+@block("content") @endblock
+```
+
+Then each course page:
+
+```html
+{{-- course-list.ef --}}
+@extends("members-courses-layout")
+@block("content")
+
+<script scope="backend">
+  var courses = getCourses(false);
+  setVariable('courses', courses);
+</script>
+
+@foreach(c in var.courses)
+  <p>{{ c.title }} — @if(c.is_assigned)Enrolled @else Get access @endif</p>
+@endforeach
+
+@endblock
+```
+
+---
+
+## Checking access to a specific product
+
+If you want to gate course access by checking whether the customer bought a specific product (rather than relying on enrollment), you can cross-reference with `getOrders()`:
+
+```html
+<script scope="backend">
+  if (!is_customer) { redirect('/members-login'); }
+
+  var course = getCourseForCustomer(request.route_params.course);
+  if (!course) { redirect('/courses'); }
+
+  // Fallback: check order history for a product by name
+  if (!course.is_assigned) {
+    var orders = getOrders('newest', 100);
+    for (var i = 0; i < orders.length; i++) {
+      for (var j = 0; j < orders[i].products.length; j++) {
+        if (orders[i].products[j].name === 'Course Access Pass') {
+          course.is_assigned = true;
+        }
+      }
+    }
+  }
+
+  setVariable('course', course);
+  setVariable('isAssigned', course.is_assigned);
+</script>
+```
+
+<Note>
+Prefer the enrollment-based check (`getCourseForCustomer`) — it is more reliable and does not require iterating order history. Use the order-history fallback only if enrollment is not being set up via product linking.
+</Note>
+
+---
+
+## Lesson types and content
+
+Each lesson in `mod.contents` has a `type` field:
+
+| `type` | Content fields |
+|--------|---------------|
+| `'video'` | `content_url` (direct video URL) or `content_embed` (iframe HTML) |
+| `'audio'` | `content_url` (audio file URL) |
+| `'text'` | `content` (HTML body) |
+
+Additional fields on each lesson:
+
+| Field | Description |
+|-------|-------------|
+| `title` | Lesson title |
+| `description` | Short description shown below the player |
+| `content_under` | Additional text shown under video/audio (e.g. transcript excerpt) |
+| `materials` | Array of `{ name, url }` — downloadable files |
+| `key_takeaways` | Array of strings — bullet-point summary |
+
+---
+
+## Progress API
+
+Mark a lesson complete from the browser:
+
+```javascript
+fetch('/api/course/progress', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    course_id: courseId,
+    content_id: lessonId,
+    completed: true
+  })
+});
+```
+
+The page receives the initial completed IDs via `course.completed_content_ids`. Use this array to mark lessons visually on load, then update the UI optimistically when the API call succeeds.
