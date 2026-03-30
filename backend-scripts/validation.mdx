@@ -23,9 +23,8 @@ if (!result.valid) {
 }
 
 // result.value is a sanitised deep copy — safe to use
-// null, null = store on the current session customer
-setCrmField(null, null, 'name', result.value.name);
-setCrmField(null, null, 'current_weight', result.value.weight);
+setCrmField({ slug: 'my-entity-slug', fieldKey: 'name', value: result.value.name });
+setCrmField({ slug: 'my-entity-slug', fieldKey: 'current_weight', value: result.value.weight });
 ```
 
 ## How it works
@@ -211,10 +210,9 @@ if (request.method === 'POST') {
 
   var data = result.value;
 
-  // null, null = store on the current customer
-  setCrmField(null, null, 'current_weight', data.weight);
-  setCrmField(null, null, 'last_meal', data.meal);
-  setCrmField(null, null, 'last_checkin', new Date().toISOString());
+  setCrmField({ slug: 'my-entity-slug', fieldKey: 'current_weight', value: data.weight });
+  setCrmField({ slug: 'my-entity-slug', fieldKey: 'last_meal', value: data.meal });
+  setCrmField({ slug: 'my-entity-slug', fieldKey: 'last_checkin', value: new Date().toISOString() });
 
   response.json({ ok: true, data: data });
 }

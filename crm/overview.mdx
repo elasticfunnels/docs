@@ -51,22 +51,21 @@ The most common pattern is linking CRM entries to customers. When a customer vis
 3. Store data via backend scripts or the template engine:
 
 ```javascript
-// Store weight data for the current customer
-// null, null = defaults to 'customer' type + session customer_id
-setCrmField(null, null, 'current_weight', 185);
-setCrmField(null, null, 'goal_weight', 165);
-setCrmField(null, null, 'last_checkin', '2026-03-15');
+// `slug` = CRM entity machine name from entity settings (e.g. pattern-tracker), required on every call
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'current_weight', value: 185 });
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'goal_weight', value: 165 });
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'last_checkin', value: '2026-03-15' });
 ```
 
 <Tip>
-The second parameter (`null`) means "use the current customer's ID from the session". You only need to pass an explicit ID when referencing a different record — e.g. `setCrmField('order', '12345', 'status', 'shipped')`.
+`slug` identifies the **CRM entity** (board/type). `referenceType` / `referenceId` default to the current **customer** when omitted. For another record: `setCrmField({ slug: 'pattern-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' })`. See [Data Functions](/backend-scripts/data-functions#crm-data).
 </Tip>
 
 4. Read it back on any page:
 
 ```javascript
-var weight = getCrmField('customer', null, 'current_weight');
-var goal = getCrmField('customer', null, 'goal_weight');
+var weight = getCrmField({ slug: 'pattern-tracker', fieldKey: 'current_weight' });
+var goal = getCrmField({ slug: 'pattern-tracker', fieldKey: 'goal_weight' });
 if (weight && goal && Number(weight) <= Number(goal)) {
   setVariable('show_congrats', true);
 }
@@ -82,15 +81,15 @@ The CRM adapter exposes three functions in the template engine:
 
 | Function | Description |
 |----------|-------------|
-| `getCrmEntries(refType, refId, limit)` | Fetch all CRM entries for a reference |
-| `getCrmField(refType, refId, fieldKey)` | Get a single field value |
-| `setCrmField(refType, refId, fieldKey, value)` | Set a field value |
+| `getCrmEntries({ slug, ... })` | Fetch entries for one entity **slug** + reference |
+| `getCrmField({ slug, fieldKey, ... })` | Get one field (`slug` + `fieldKey` required) |
+| `setCrmField({ slug, fieldKey, value, ... })` | Set one field (`slug`, `fieldKey`, `value` required) |
 
-Pass `null` for `refType` and `refId` to use the defaults: `'customer'` and the current session's `customer_id`. This is the most common pattern:
+`slug` is always required (the entity’s slug from CRM settings). Reference defaults: `customer` + session customer id.
 
 ```javascript
-setCrmField(null, null, 'score', 85);        // same as setCrmField('customer', '<session customer_id>', 'score', 85)
-var score = getCrmField(null, null, 'score'); // reads from current customer
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'score', value: 85 });
+var score = getCrmField({ slug: 'pattern-tracker', fieldKey: 'score' });
 ```
 
 See [Data Functions](/backend-scripts/data-functions#crm-data) for full parameter details and examples.

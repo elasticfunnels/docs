@@ -504,35 +504,45 @@ For raw session access (without the `custom_` prefix and base64 encoding), use `
 
 ## CRM Data
 
-CRM functions let you read and write structured data stored in CRM entries. Entries are linked to any record via `reference_type` and `reference_id` — most commonly customers.
+CRM entries are stored in Elasticsearch. Every read/write is scoped by:
 
-Pass `null` for the first two parameters to use the defaults — this is the most common pattern:
+- **`brand_id`** — from the session (always applied server-side)
+- **`slug`** — the CRM **entity** machine name from entity settings (e.g. `pattern-tracker`), **required** on every call. This is **not** the same as `referenceType` (`customer`, `order`, …).
+- **`reference_type` + `reference_id`** — which record the entry is attached to. Defaults: `referenceType` → `'customer'`, `referenceId` → current session **`customer_id`** when omitted or `null`.
 
-- **`referenceType`** = `null` → defaults to `'customer'`
-- **`referenceId`** = `null` → defaults to the current session's `customer_id`
+Pass a **single options object** only (positional arguments are not supported). Missing `slug` or other required keys throws `TypeError`. Unknown `slug` for the brand also throws. Invalid field values still return `false` / `null` / `[]` after sanitization where applicable.
 
-So `setCrmField(null, null, 'score', 85)` stores `score = 85` on the current customer.
-
-### `GetCrmEntries(referenceType?, referenceId?, limit?)`
-
-Fetch CRM entries linked to a reference record. Defaults to the current customer if no reference is given.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `referenceType` | string | `'customer'` | Type of the linked record |
-| `referenceId` | string | session customer_id | ID of the linked record |
-| `limit` | number | `50` | Max entries to return (max 200) |
+Slug aliases: `crmEntitySlug`, `crm_entity_slug`. Reference aliases: `reference_type`, `reference_id`. Field key: `fieldKey` or `field_key`.
 
 ```javascript
-// Get all CRM entries for the current customer (null = use session customer)
-var entries = getCrmEntries(null, null, 50);
+// Current session customer + entity slug "pattern-tracker" (from CRM entity JSON)
+getCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight' });
+
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182 });
+
+// Another record type / id (still need entity slug)
+setCrmField({ slug: 'pattern-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' });
+```
+
+### `GetCrmEntries({ slug, referenceType?, referenceId?, limit? })`
+
+Fetch CRM entries for one entity slug and one reference. Elasticsearch query always includes `brand_id`, `reference_type`, `reference_id`, and `crm_entity_id` (resolved from `slug`).
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug from entity settings |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `limit` | number | `50` | Max entries (max 200) |
+
+```javascript
+var entries = getCrmEntries({ slug: 'pattern-tracker', limit: 50 });
 
 for (var i = 0; i < entries.length; i++) {
   console.log(entries[i].title, entries[i].values_flat);
 }
 
-// Get entries for a specific reference type and ID
-var orderEntries = getCrmEntries('order', '12345');
+var orderEntries = getCrmEntries({ slug: 'deals', referenceType: 'order', referenceId: '12345' });
 ```
 
 Each entry object contains:
@@ -556,50 +566,43 @@ Each entry object contains:
 }
 ```
 
-### `GetCrmField(referenceType?, referenceId?, fieldKey)`
+### `GetCrmField({ slug, fieldKey, referenceType?, referenceId? })`
 
-Get a single field value from the first matching CRM entry. Searches across all entries for the reference.
+Reads one field from the first matching entry for that **slug** + reference. Query always includes `brand_id` and resolved `crm_entity_id`.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `referenceType` | string | `'customer'` | Type of the linked record |
-| `referenceId` | string | session customer_id | ID of the linked record |
-| `fieldKey` | string | **required** | The field key to look up |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKey` | string | **required** | Field key (e.g. `current-weight`, `user_id`) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
 
 ```javascript
-// Get a field for the current customer
-// null, null = use 'customer' type + session customer_id
-var weight = getCrmField(null, null, 'current_weight');
+var weight = getCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight' });
 
 if (weight && Number(weight) <= 165) {
   setVariable('show_goal_reached', true);
 }
-
-// Explicit reference type — still uses session customer_id
-var goal = getCrmField('customer', null, 'goal_weight');
 ```
 
-### `SetCrmField(referenceType?, referenceId?, fieldKey, value)`
+### `SetCrmField({ slug, fieldKey, value, referenceType?, referenceId? })`
 
-Set a field value on a CRM entry. If the field exists on an entry, it is updated in place. If no entry has that field, a new entry is created.
+Updates an existing entry’s field or creates a new entry under that entity slug and reference. New documents use the resolved `crm_entity_id` for `slug`.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `referenceType` | string | `'customer'` | Type of the linked record |
-| `referenceId` | string | session customer_id | ID of the linked record |
-| `fieldKey` | string | **required** | The field key to set |
-| `value` | any | **required** | The value (string, number, boolean, or object) |
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKey` | string | **required** | Field key to set |
+| `value` | any | **required** | Must be present (`value: 0` / `false` allowed) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
 
 ```javascript
-// Store weight data for the current customer
-// null, null = use 'customer' type + session customer_id
-setCrmField(null, null, 'current_weight', 182);
-setCrmField(null, null, 'last_checkin', new Date().toISOString());
-
-// Set a field on a different reference type (explicit ID)
-setCrmField('order', '12345', 'followup_status', 'contacted');
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182 });
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'last_checkin', value: new Date().toISOString() });
+setCrmField({ slug: 'deals', referenceType: 'order', referenceId: '12345', fieldKey: 'followup_status', value: 'contacted' });
 ```
 
 <Note>
-`SetCrmField` creates a generic CRM entry (with `crm_entity_id: 0`) if no matching entry exists. For structured data with pipelines and stages, create entries through the CRM management UI and use `SetCrmField` to update individual fields.
+`slug` is resolved against MySQL (`brand_crm_entities`) on the app database. The offer runtime must use the same database as the CRM module for resolution to work.
 </Note>

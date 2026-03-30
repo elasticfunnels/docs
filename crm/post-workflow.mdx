@@ -55,12 +55,12 @@ Create a backend script module (code: `validators`) with shared schemas:
 
     var data = result.value;
 
-    // null, null = store on the current customer
-    setCrmField(null, null, 'current_weight', data.weight);
-    setCrmField(null, null, 'weight_unit', data.unit);
-    setCrmField(null, null, 'last_checkin', new Date().toISOString());
+    var entitySlug = 'pattern-tracker'; // your CRM entity slug from settings
+    setCrmField({ slug: entitySlug, fieldKey: 'current_weight', value: data.weight });
+    setCrmField({ slug: entitySlug, fieldKey: 'weight_unit', value: data.unit });
+    setCrmField({ slug: entitySlug, fieldKey: 'last_checkin', value: new Date().toISOString() });
     if (data.notes) {
-      setCrmField(null, null, 'checkin_notes', data.notes);
+      setCrmField({ slug: entitySlug, fieldKey: 'checkin_notes', value: data.notes });
     }
 
     response.json({ ok: true, data: data });
@@ -114,9 +114,9 @@ On any page (e.g. `/dashboard`), read the CRM data:
   import { requireCustomer } from "validators";
   requireCustomer();
 
-  // null, null = read from the current customer
-  var weight = getCrmField(null, null, 'current_weight');
-  var goal   = getCrmField(null, null, 'goal_weight');
+  var entitySlug = 'pattern-tracker';
+  var weight = getCrmField({ slug: entitySlug, fieldKey: 'current_weight' });
+  var goal   = getCrmField({ slug: entitySlug, fieldKey: 'goal_weight' });
   setVariable('current_weight', weight || 'Not logged yet');
   setVariable('goal_weight', goal || 'Not set');
   setVariable('on_track', weight && goal && Number(weight) <= Number(goal));
@@ -136,7 +136,7 @@ fetch('/weight/checkin', {     → request.method = 'POST'
   method: 'POST',               request.body = { weight: 182, ... }
   body: JSON.stringify(data)
 })                             → Schema.validate(request.body)
-                               → setCrmField(null, null, 'current_weight', 182)
+                               → setCrmField({ slug: 'pattern-tracker', fieldKey: 'current_weight', value: 182 })
 ← { ok: true, data: {...} }   ← response.json({ ok: true, data })
 ```
 
@@ -144,48 +144,53 @@ fetch('/weight/checkin', {     → request.method = 'POST'
 
 | Function | Description |
 |----------|-------------|
-| `getCrmEntries(refType, refId, limit)` | Fetch all CRM entries for a reference |
-| `getCrmField(refType, refId, fieldKey)` | Get a single field value |
-| `setCrmField(refType, refId, fieldKey, value)` | Set a field value |
+| `getCrmEntries({ slug, ... })` | Fetch entries — **`slug` required** ([Data Functions](/backend-scripts/data-functions#crm-data)) |
+| `getCrmField({ slug, fieldKey, ... })` | Get one field |
+| `setCrmField({ slug, fieldKey, value, ... })` | Set one field |
 
-### What does `null` mean?
+### `slug` (CRM entity) vs reference
 
-The first two parameters control **which record** the data is linked to. Pass `null` to use defaults:
+**`slug`** — required on every call. This is the CRM **entity** slug from entity settings (e.g. `pattern-tracker`). It is **not** the same as `referenceType` (`customer`, `order`, …).
 
-| Parameter | Pass `null` to use | Explicit example |
-|-----------|-------------------|-----------------|
-| `refType` | `'customer'` (most common) | `'order'`, `'lead'` |
-| `refId` | current session's `customer_id` | `'12345'` (a specific record ID) |
+**`referenceType` / `referenceId`** — which record entries attach to. Omit or `null` for **`'customer'`** and the session **`customer_id`**.
 
 ```javascript
-// These two calls are equivalent:
-setCrmField(null, null, 'score', 85);
-setCrmField('customer', '<session customer_id>', 'score', 85);
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'score', value: 85 });
 
-// To reference a different record, pass explicit values:
-setCrmField('order', '12345', 'followup', 'done');
+setCrmField({
+  slug: 'pattern-tracker',
+  referenceType: 'order',
+  referenceId: '12345',
+  fieldKey: 'followup',
+  value: 'done',
+});
 ```
+
+Calls must use a **single options object** (no positional lists).
 
 ### Parameter types
 
-| Parameter | Allowed types |
-|-----------|--------------|
-| `refType` | string (alphanumeric, `-`, `_`) or `null` |
-| `refId` | string (max 512 chars) or `null` |
+| Property | Allowed types / notes |
+|----------|----------------------|
+| `slug` | entity slug string — **required**; must exist for the brand |
+| `referenceType` | string (alphanumeric, `-`, `_`) or omit / `null` |
+| `referenceId` | string (max 512 chars) or omit / `null` |
 | `fieldKey` | string (alphanumeric, `_`, `.`, `-`) — **required** |
-| `value` | string, number, boolean, or JSON object — **required** for set |
+| `value` | string, number, boolean, or JSON object — **required** for set (`0` / `false` valid) |
 
 ### Input validation
 
 All inputs are strictly validated before reaching Elasticsearch:
 
-- **`fieldKey`** must match `/^[a-zA-Z0-9_.-]+$/` — no spaces, special characters, or injection attempts
-- **`refType`** must match `/^[a-zA-Z0-9_-]+$/`
-- **`refId`** rejects `{}[]"\` characters
+- **`slug`** is validated and resolved in MySQL; unknown slug → **`TypeError`**
+- **`fieldKey`** must match `/^[a-zA-Z0-9_.-]+$/`
+- **`referenceType`** must match `/^[a-zA-Z0-9_-]+$/`
+- **`referenceId`** rejects `{}[]"\` characters
 - **String values** are capped at 10,000 characters
 - **Numbers** must be finite (no `NaN`, `Infinity`)
 - **Objects** are JSON-serialized and capped at 10 KB
-- Invalid inputs cause the function to return `false` / `null` silently — no exceptions thrown
+- Missing **`slug`**, **`fieldKey`**, or **`value`** (set) throws **`TypeError`**
+- Other invalid inputs still cause `false` / `null` / `[]` where applicable
 
 ## Security checklist
 

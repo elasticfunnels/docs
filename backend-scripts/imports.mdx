@@ -1,114 +1,85 @@
 ---
 title: 'Imports'
-description: 'Share and reuse code between pages by importing from backend script modules.'
+description: 'Share and reuse code between backend scripts by importing from other pages.'
 ---
 
-Backend scripts support `import` / `export` syntax to share functions, constants, and objects across pages. Create a **backend script module** in your brand's Backend Scripts section, then import from it in any page's `<script scope="backend">` block.
+Backend scripts support `import` / `export` syntax to share functions, constants, and objects between pages. Create a "module" page with exported code, then import what you need in any other page's backend script.
 
 ## Quick example
 
-Create a backend script with code `app` in your dashboard (Backend Scripts section):
+Create a page (e.g. slug `app`) with shared functions:
 
-```javascript
-export const getGreeting = function (name) {
-  return 'Hello, ' + name + '!';
-};
+```html
+<script scope="backend">
+  export const getGreeting = function (name) {
+    return 'Hello, ' + name + '!';
+  };
 
-export function isAdmin(email) {
-  return email === 'admin@mybrand.com';
-}
+  export function isAdmin(email) {
+    return email === 'admin@mybrand.com';
+  }
+</script>
 ```
 
-Import and use it in any page:
+Import and use them in another page:
 
 ```html
 <script scope="backend">
   import { getGreeting, isAdmin } from "app";
 
-  var user = getCustomer();
-
-  if (user && user.email) {
-    setVariable('greeting', getGreeting(user.name));
-    setVariable('is_admin', isAdmin(user.email));
-    setVariable('user', user);
+  if (customer && customer.email) {
+    setVariable('greeting', getGreeting(customer.name));
+    setVariable('is_admin', isAdmin(customer.email));
   }
 </script>
 
 <h1>{{ var.greeting }}</h1>
-
-<!-- Debug: dump the full object -->
-{{ dump(var.user) }}
 ```
-
-<Warning>
-`setVariable('name', value)` stores the value under the `var` namespace. Always use **`var.name`** when referencing the variable — e.g. `{{ var.user }}`, `{{ dump(var.user) }}`, `@if(var.user)`.
-
-Writing `{{ user }}` or `{{ dump(user) }}` without the `var.` prefix will **not** find the variable.
-
-Inside `@foreach` loops, the loop variable is its own scope and does **not** need `var.`:
-
-```
-@foreach(cat in var.categories)
-  {{ cat.name }}          ← correct (loop variable, no var. prefix)
-  {{ var.cat.name }}      ← wrong
-@endforeach
-```
-
-See [Template Variables](/backend-scripts/actions#template-variables) for full details.
-</Warning>
-
-## What are backend script modules?
-
-Backend script modules are standalone JavaScript files managed in your brand's **Backend Scripts** section. Each module has:
-
-- **Code** — a slug-like identifier (e.g. `app`, `utils`, `auth-helpers`). This is what you use in `import` statements.
-- **Content** — the JavaScript source code with `export` statements.
-- **Status** — only `active` scripts can be imported.
-
-Modules are brand-scoped — a page can only import scripts belonging to the same brand.
 
 ## Import specifier formats
 
-All of these resolve to the same script code `app`:
+All of these resolve to the same page slug `app`:
 
 ```javascript
-import { test } from "app";        // bare code
+import { test } from "app";        // bare name
 import { test } from "app.js";     // with .js extension
-import { test } from "../app.js";  // relative path prefix
-import { test } from "./app";      // relative path prefix
+import { test } from "../app.js";  // relative path
+import { test } from "./app";      // relative path
 ```
 
 The resolution rules:
 1. The `.js` extension is stripped
 2. Leading `./` or `../` prefixes are stripped
-3. The remaining string is matched against the script's `code` field
+3. The remaining string is used as the page slug to look up
+
+For nested pages, the slug path is preserved:
+
+```javascript
+import { helper } from "utils/helpers";  // resolves to page slug "utils/helpers"
+```
 
 ## Named imports
 
 Import specific exports by name:
 
 ```javascript
-// Backend script module (code: "utils")
+// Module page (slug: "utils")
 export const TAX_RATE = 0.08;
-
 export function calculateTax(amount) {
   return amount * TAX_RATE;
 }
-
 export function formatCurrency(val) {
   return '$' + val.toFixed(2);
 }
 ```
 
-```html
-<!-- Page backend script -->
-<script scope="backend">
-  import { calculateTax, formatCurrency } from "utils";
+```javascript
+// Importing page
+import { calculateTax, formatCurrency } from "utils";
 
-  var price = 49.99;
-  var tax = calculateTax(price);
-  setVariable('total', formatCurrency(price + tax));
-</script>
+var price = 49.99;
+var tax = calculateTax(price);
+setVariable('total', formatCurrency(price + tax));
 ```
 
 ## Default imports
@@ -116,7 +87,7 @@ export function formatCurrency(val) {
 Use `export default` for a module's primary export:
 
 ```javascript
-// Backend script module (code: "config")
+// Module page (slug: "config")
 export default {
   siteName: 'My Store',
   supportEmail: 'help@mystore.com',
@@ -124,18 +95,17 @@ export default {
 };
 ```
 
-```html
-<script scope="backend">
-  import config from "config";
+```javascript
+// Importing page
+import config from "config";
 
-  setVariable('site_name', config.siteName);
-  setVariable('support_email', config.supportEmail);
-</script>
+setVariable('site_name', config.siteName);
+setVariable('support_email', config.supportEmail);
 ```
 
 ## Multiple modules
 
-Import from several scripts in the same page:
+Import from several pages in the same script:
 
 ```html
 <script scope="backend">
@@ -143,14 +113,32 @@ Import from several scripts in the same page:
   import { getGreeting } from "helpers";
   import config from "config";
 
-  var user = getCustomer();
-
-  if (user && isAdmin(user.email)) {
-    setVariable('greeting', getGreeting(user.name));
+  if (customer && isAdmin(customer.email)) {
+    setVariable('greeting', getGreeting(customer.name));
     setVariable('site', config.siteName);
   }
 </script>
 ```
+
+## Module pages work on their own
+
+A page with `export` statements still works when visited directly — the `export` keywords are silently stripped before execution. This means you can add `setVariable` calls alongside exports for the module page's own rendering:
+
+```html
+<script scope="backend">
+  export function getPlans() {
+    return getAllProducts({ classification: 'subscription' });
+  }
+
+  // This runs when the module page is visited directly
+  var plans = getPlans();
+  setVariable('plan_count', plans.length);
+</script>
+
+<p>We offer {{ var.plan_count }} subscription plans.</p>
+```
+
+When another page imports `getPlans`, only the function is used — the `setVariable` call in the module runs inside the importing page's context too (both scripts share the same sandbox).
 
 ## Supported export syntax
 
@@ -171,17 +159,41 @@ Import from several scripts in the same page:
 |-----------|-------|
 | Max imports per script | 10 |
 | Import depth | 1 level (nested imports inside modules are not resolved) |
-| Script status | Only `active` scripts can be imported |
+
+### Supported import shapes
+
+Each `import` line must be **either** a default import **or** a named import — not both on the same line:
+
+```javascript
+import { Greeter, wrap } from "app";   // named — OK
+import config from "config";           // default only — OK
+// import Greeter, { wrap } from "app";  // not supported — use named exports only, or split across modules
+```
+
+You can combine **classes and functions** from the same module with named imports, or import a class from one module and helpers from another.
+
+Exported functions may return **nested objects**, **arrays of objects**, or build structures from parameters — this is fully supported after inlining:
+
+```javascript
+// Module
+export function getPayload() {
+  return { user: { name: 'Pat' }, items: [{ id: 1 }] };
+}
+export const config = { api: { version: 2 } };
+export function merge(input) {
+  return { out: { a: input.a || 0 } };
+}
+```
 
 ## How it works internally
 
-When a page's backend script contains `import` statements:
+When a backend script contains `import` statements:
 
 1. Import statements are parsed and removed from the script
-2. Each specifier is normalized to a script code (strip `.js`, `./`, `../`)
-3. The `brand_backend_scripts` table is queried for an active script with that code
+2. Each module specifier is normalized to a page slug
+3. The module page's `<script scope="backend">` code is fetched
 4. `export` keywords are stripped from the module code, turning exports into regular declarations
-5. The module code is prepended to the page's script
-6. The combined code runs as a single script in the QuickJS sandbox
+5. The module code is prepended to the importing script
+6. The combined code runs as a single script in the sandbox
 
-This is a **compile-time inline** — not a runtime module loader. The imported code becomes part of the same function scope as the page's script, with full access to all sandbox globals (`setVariable`, `session`, `request`, `getCustomer`, etc.).
+This is a **compile-time inline** — not a runtime module loader. The imported code becomes part of the same function scope as the importing script, with full access to all sandbox globals (`setVariable`, `session`, `request`, etc.).
