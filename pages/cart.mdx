@@ -10,7 +10,7 @@ The cart shows what the visitor has added to their order: each item, quantity, p
 In the page builder you can add:
 
 - **Cart** – A single cart block (list of items + total + checkout).
-- **Cart Dropdown** – A “Cart” trigger (e.g. with item count) that opens a dropdown panel with the same cart inside. Handy in headers or sidebars.
+- **Cart Dropdown** – A "Cart" trigger (e.g. with item count) that opens a dropdown panel with the same cart inside. Handy in headers or sidebars.
 
 Both use the same cart data; only the placement and layout differ.
 
@@ -29,11 +29,12 @@ You can keep this layout or edit it (e.g. change labels, order of fields, or sty
 
 ## What visitors see
 
-- **Item name** – From your product/offer (e.g. “1 Bottle”).
+- **Item name** – From your product/offer (e.g. "1 Bottle").
+- **Item image** – Product thumbnail (if the product has one).
 - **Quantity** – Current quantity with **−** and **+** to decrease or increase.
-- **Unit price** – Price per unit (e.g. “$69.00”).
-- **Line total** – Price × quantity for that item (e.g. “$552.00”).
-- **Cart total** – Sum of all line totals, shown in the footer (e.g. “Total: $552.00”).
+- **Unit price** – Price per unit (e.g. "$69.00").
+- **Line total** – Price × quantity for that item (e.g. "$552.00").
+- **Cart total** – Sum of all line totals, shown in the footer (e.g. "Total: $552.00").
 - **Checkout** – Link to continue to checkout.
 
 All of this updates automatically when they add to cart or change quantity.
@@ -42,30 +43,156 @@ All of this updates automatically when they add to cart or change quantity.
 
 The cart is built from a **template**: you can change text, order of fields, and styling in the builder.
 
-- **Totals** – The main total in the footer uses the variable **`[[ ef-cart.total ]]`**. You can move it or add labels; keep that variable where you want the total to appear.
-- **Per-item row** – Each row can show:
-  - **`[[ item.name ]]`** – Item name  
-  - **`[[ item.quantity ]]`** – Quantity  
-  - **`[[ item.price ]]`** – Unit price  
-  - **`[[ item.total ]]`** – Line total (price × quantity)
+### Cart-level variables
 
-If you add or reorder these, the cart will still update correctly as long as you keep the **`[[ ... ]]`** placeholders. For more on this syntax, see [Frontend Template Engine — Syntax](/frontend-template-engine/syntax).
+These apply to the cart as a whole:
+
+| Variable | Description |
+|----------|-------------|
+| **`[[ ef-cart.total ]]`** | Grand total of all items (formatted, e.g. "$138.00") |
+| **`[[ ef-cart.subtotal ]]`** | Same as `ef-cart.total` (alias) |
+| **`[[ ef-cart.count ]]`** | Total quantity across all items (sum of quantities, e.g. "2") — use for an item count badge |
+| **`[[ ef-cart.item_count ]]`** | Number of distinct product lines in the cart |
+| **`[[ ef-cart.discount_total ]]`** | Total savings across all items (formatted) |
+| **`[[ ef-cart.currency ]]`** | Currency code (e.g. "USD") |
+
+### Per-item row variables
+
+Inside a `template-foreach` loop, each item exposes:
+
+| Variable | Description |
+|----------|-------------|
+| **`[[ item.name ]]`** | Item name |
+| **`[[ item.image ]]`** | Product image URL |
+| **`[[ item.code ]]`** | Product code (needed for quantity controls) |
+| **`[[ item.quantity ]]`** | Current quantity |
+| **`[[ item.price ]]`** | Unit price (formatted, e.g. "$69.00") — do not apply `formatPrice` |
+| **`[[ item.total ]]`** | Line total (formatted, e.g. "$138.00") — do not apply `formatPrice` |
+| **`[[ item.retail_price ]]`** | Original/retail price (formatted) — shown when there is a discount |
+| **`[[ item.discount_total ]]`** | Per-line savings (formatted) |
+| **`[[ item.currency ]]`** | Currency code for this item |
+
+<Info>
+**`item.price`** and **`item.total`** are already formatted. Use them as-is. See [Frontend Template Engine — Cart](/frontend-template-engine/cart) for the full data attributes reference.
+</Info>
+
+Both the `[[ ]]` placeholder syntax and the **`ef-text`** binding attribute are supported. They are equivalent — use whichever fits your template:
+
+```html
+<!-- placeholder syntax -->
+<span>[[ ef-cart.total ]]</span>
+<span>[[ item.price ]]</span>
+
+<!-- ef-text binding (fallback content shown in builder, replaced at runtime) -->
+<span ef-text="ef-cart.total">$0.00</span>
+<span ef-text="item.price">$0.00</span>
+```
+
+If you add or reorder these, the cart will still update correctly as long as you keep the placeholders or bindings in place. For more on this syntax, see [Frontend Template Engine — Syntax](/frontend-template-engine/syntax).
+
+## Quantity controls
+
+The cart plugin handles **−**, **+**, and **Remove** automatically via data attributes. No custom script is needed.
+
+| Attribute | Element | Purpose |
+|-----------|---------|---------|
+| **`data-cart-qty-minus`** | Button | Decrease quantity by 1 |
+| **`data-cart-qty-plus`** | Button | Increase quantity by 1 |
+| **`data-cart-qty-remove`** | Button/link | Remove line (sets qty to 0) |
+| **`data-code="[[ item.code ]]"`** | Same element | Links the button to the product |
+| **`data-disable-when-one`** | Minus button (optional) | Disables the button when `item.quantity` is 1 (prevents accidentally removing the last unit) |
+
+On checkout pages the minus button is always disabled at quantity 1, regardless of `data-disable-when-one`.
 
 ## Cart dropdown
 
 The **Cart Dropdown** block gives you:
 
-- A **trigger** (e.g. “Cart” plus the number of items) that visitors click to open the cart.
+- A **trigger** (e.g. "Cart" plus the number of items) that visitors click to open the cart.
 - A **panel** that opens below (or in a suitable position) with the full cart inside: same items, quantities, totals, and checkout link.
+
+Show the item count in the trigger with **`[[ ef-cart.count ]]`**.
 
 Use it when you want the cart in a fixed spot (e.g. header) without taking space until the visitor opens it.
 
 ## Checkout link
 
-The default **Checkout** button in the cart is a link (e.g. to `#checkout`). Configure its URL in the builder so it points to your actual checkout step or page. The cart only displays the link; checkout behavior is controlled by your funnel and checkout setup.
+The cart plugin automatically resolves the checkout URL from your merchant settings and wires it to any element with the class **`.ef-cart-checkout`** or the attribute **`data-ef-cart-checkout`**. You do not need to hard-code the checkout URL in the builder.
+
+The resolved URL is built as follows (in priority order):
+
+1. The element's own `href` attribute (if it is a real path, not `#` or `#checkout`).
+2. A `data-ef-cart-checkout-href` attribute on the element.
+3. The checkout page configured in your merchant settings (injected as `window.efScope.checkout_url`).
+4. Falls back to `/checkout` if nothing else resolves.
+
+Current-page query parameters are automatically forwarded to the checkout URL (tracking/UTM parameters, etc.), with internal routing keys stripped.
+
+<Info>
+The default Checkout button added by the builder already has `.ef-cart-checkout`. You only need to set a custom `href` if you want to override the merchant-configured checkout page.
+</Info>
+
+## Cart storage
+
+The cart is stored in a **browser cookie** (`ef_cart_{brandId}`), not localStorage. Cookies persist for **365 days**, so the cart survives navigation and browser restarts within the same browser.
+
+The cart is shared across all pages on the same domain, so the Cart Dropdown in the header and a full Cart block below the fold always show the same contents.
+
+## JavaScript API
+
+The cart plugin exposes a `window.ef` object you can call from custom scripts or `@click` handlers in your templates:
+
+| Method | Description |
+|--------|-------------|
+| **`window.ef.addToCart(code, options?, quantity?)`** | Add a product to the cart. If already in the cart, quantity increases. `options` can include `{ price, name, currency }`. |
+| **`window.ef.setCartQuantity(code, quantity)`** | Set an absolute quantity. Pass `0` to remove the product. |
+| **`window.ef.removeFromCart(code, allowClear?)`** | Decrease quantity by 1. When `allowClear` is `false` (default), does nothing if quantity is already 1 (prevents going to 0). |
+| **`window.ef.getCart()`** | Returns the raw cart array `[{ code, quantity }, ...]` (for debugging or custom UI). |
+| **`window.ef.getCartForSubmit()`** | Same as `getCart()` but excludes zero-quantity lines. |
+
+Example — add to cart on button click:
+
+```html
+<button @click="window.ef.addToCart('BOTTLE-1')">Add to Cart</button>
+```
+
+Example — set quantity from an input:
+
+```html
+<input type="number" @change="window.ef.setCartQuantity('BOTTLE-1', parseInt($event.target.value))" />
+```
+
+## `cart-updated` event
+
+Every time the cart changes (add, remove, set quantity), the plugin dispatches a **`cart-updated`** custom event on `window`. You can listen to it to react to cart mutations in custom scripts:
+
+```js
+window.addEventListener('cart-updated', (e) => {
+  console.log('Cart changed:', e.detail.cart);
+});
+```
+
+The event `detail` contains `{ brandId, cart }` where `cart` is the updated array.
+
+## Add-to-cart buttons
+
+Buttons that add products to the cart use `data-ef-add-to-cart` (or class `.ef-add-to-cart`) together with `data-product-code`. These attributes also let the plugin read the price without an extra API request:
+
+| Attribute | Purpose |
+|-----------|---------|
+| **`data-product-code`** | Product code to add |
+| **`data-ef-product-price`** | Unit price (numeric, e.g. `69.00`) |
+| **`data-ef-product-name`** | Display name |
+| **`data-ef-product-image`** | Image URL |
+| **`data-ef-product-currency`** | Currency code (default `USD`) |
+| **`data-ef-product-retail-price`** | Original/retail price for savings display |
+
+When these attributes are present, adding to cart stores the price locally, so `item.price` and `item.total` are available immediately without waiting for the `/api/cart-products` response.
 
 ## Tips
 
 - **Placement** – Put the cart or cart dropdown where visitors expect it (e.g. top-right for dropdown, above the fold for a full cart block).
 - **Sticky / mobile** – You can place the cart in a sticky bar or in a mobile menu; the same block works anywhere.
 - **Multiple carts** – You can add more than one cart or dropdown on a page; they all show the same cart data and stay in sync when the visitor changes quantity or adds items.
+- **Item count badge** – Use `[[ ef-cart.count ]]` anywhere on the page (e.g. in the header next to "Cart") to show the total number of items in the cart.
+- **Savings display** – Show `[[ ef-cart.discount_total ]]` in the cart footer or `[[ item.retail_price ]]` beside the unit price to highlight discounts when a retail price is set.

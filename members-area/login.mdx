@@ -1,0 +1,145 @@
+---
+title: 'Members Login'
+description: 'Set up an email-based login page for your members area'
+---
+
+The members login page lets returning customers access their purchases by entering the email they used at checkout. No password is needed — the system verifies their email against existing orders.
+
+## How the Login Works
+
+1. Customer enters their purchase email
+2. The form POSTs to `/api/check-order`
+3. The API looks up all purchase conversions for that email
+4. If orders are found, the session is hydrated with customer data and the user is redirected
+5. If no orders are found, an error message is shown
+
+<Note>
+Customers who just completed a purchase are **already logged in** — their session is authenticated automatically at checkout. The login page is only needed for returning visitors whose session has expired.
+</Note>
+
+## Setting Up a Login Page
+
+### Option 1: Use the Built-In Template
+
+ElasticFunnels includes a pre-built **Members Login** page template. When creating a new page, select the "Members Login" template from the template picker. It comes with:
+
+- Email input field
+- Error/success message containers
+- Submit button
+- Styled card layout
+- "Contact us" fallback link
+
+### Option 2: Build a Custom Login Form
+
+Create a form that POSTs to `/api/check-order` with the customer's email. The form needs three things:
+
+1. **`action="/api/check-order"`** — The API endpoint
+2. **`data-redirect-url="/your-members-page"`** — Where to send the customer after successful login
+3. **Error/success message containers** — Elements with `data-form-error-message` and `data-form-success-message` attributes
+
+### Minimal Example
+
+```html
+<form action="/api/check-order" method="post" data-redirect-url="/members">
+  <div hidden data-form-error-message></div>
+  <div hidden data-form-success-message></div>
+
+  <input type="email" name="email" required placeholder="your@email.com" />
+  <button type="submit">Enter members area</button>
+</form>
+```
+
+### Full Styled Example
+
+```html
+<div class="max-w-md mx-auto p-8 bg-white rounded-2xl shadow-xl text-center">
+  <h2 class="text-2xl font-bold mb-2">Members Area</h2>
+  <p class="text-sm text-gray-500 mb-6">
+    Enter the email address you used for purchase to access your order.
+  </p>
+
+  <div class="hidden mb-4 p-4 rounded-lg text-sm bg-red-100 text-red-800"
+       data-form-error-message></div>
+  <div class="hidden mb-4 p-4 rounded-lg text-sm bg-green-100 text-green-800"
+       data-form-success-message></div>
+
+  <form action="/api/check-order" method="post" data-redirect-url="/members">
+    <input
+      type="email"
+      name="email"
+      required
+      placeholder="your@email.com"
+      class="w-full px-4 py-3 rounded-lg border border-gray-300 mb-4"
+    />
+    <button type="submit"
+            class="w-full bg-primary text-white font-bold py-3 rounded-xl">
+      Enter members area
+    </button>
+  </form>
+
+  <p class="text-sm text-gray-500 mt-4">
+    Can't find your order?
+    <a href="/contact" class="text-primary hover:underline">Contact us</a>
+  </p>
+</div>
+```
+
+## How the Form Submission Works
+
+ElasticFunnels automatically intercepts any form whose `action` starts with `/api` and submits it via JavaScript (AJAX). You do not need to write any JavaScript — the built-in form handler:
+
+1. Collects all form fields as JSON
+2. POSTs to the `action` URL (`/api/check-order`)
+3. On **success** (HTTP 200):
+   - If `data-redirect-url` is set, redirects the customer to that URL
+   - Otherwise, shows the `data-form-success-message` element with the server response
+4. On **error** (HTTP 400):
+   - Shows the `data-form-error-message` element with the error text
+   - The submit button is re-enabled so the customer can try again
+
+### Error Messages
+
+The `/api/check-order` endpoint returns these errors:
+
+| Error | Cause |
+|-------|-------|
+| `"Email is required"` | The email field was empty |
+| `"Please enter a valid email address."` | The email format is invalid |
+| `"We didn't find an order with that email address."` | No purchase conversions exist for that email |
+
+## What Happens After Login
+
+When login succeeds, the session is hydrated with data from the customer's most recent order:
+
+- `session.email` — Set to the submitted email
+- `session.customer` — Populated with name, email, phone, billing/shipping addresses, and all order IDs
+
+This means any page that uses `{{ customer.name }}`, `{{ customer.email }}`, or the `<order>` tag / `getOrders()` function will now work correctly.
+
+The customer is then redirected to the URL specified in `data-redirect-url` (typically your members dashboard page, e.g., `/members`).
+
+## Configuring the Members Dashboard Page
+
+Your members dashboard page (the page customers land on after login) should be configured with **Requires Login** enabled in page settings:
+
+1. Open the members dashboard page in the editor
+2. Go to **Page Settings**
+3. Enable **Requires Login**
+4. Set **Redirect URL** to `/members-login` (your login page slug)
+
+This ensures that if someone tries to access the dashboard directly without a valid session, they are sent to the login page first.
+
+## Logout
+
+To let customers sign out, clear the session and redirect back to the login page:
+
+```html
+<button onclick="if(confirm('Sign out?')){
+  sessionStorage.clear();
+  window.location.href='/members-login';
+}">Sign Out</button>
+```
+
+<Tip>
+On thank-you pages, include a direct link to the members area (e.g., `<a href="/members">Access Member Area</a>`). Since the customer's session is already authenticated from checkout, they won't need to log in.
+</Tip>

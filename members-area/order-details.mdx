@@ -1,0 +1,268 @@
+---
+title: 'Showing Order Details'
+description: 'Display order history, products, tracking, and shipping information in your members area'
+---
+
+ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and the `getOrders()` backend function (for code-based pages). Both retrieve the same data from the customer's purchase history.
+
+## Two Approaches
+
+| Approach | Best for | Used in |
+|----------|----------|---------|
+| `<order>` tag | Visual builder pages, simple layouts | Drag-and-drop editor |
+| `getOrders()` function | Code-based pages, complex layouts with full template control | Backend scripts / `.ef` pages |
+
+## Using the `<order>` Tag
+
+The `<order>` tag is processed server-side and automatically loops through the customer's purchase history. See the full [Order Tag](/pages/order-tag) reference for all placeholders and options.
+
+```html
+<order sort-by="newest" limit="5">
+  <h3>Order #{order_number}</h3>
+  <p>Date: {order_date}</p>
+  <p>Shipping: {shipping_address}</p>
+
+  <order-product>
+    <img src="{product_image_url}" alt="{product_name}" />
+    <p>{product_name} — {price}</p>
+  </order-product>
+
+  <order-bonus-product>
+    <p>Bonus: {bonus_product_name}</p>
+    <a href="{bonus_download}">Download</a>
+  </order-bonus-product>
+</order>
+```
+
+## Using `getOrders()` in Backend Scripts
+
+For code-based pages (`.ef` files or pages with backend scripts), `getOrders()` gives you full control over the layout. It returns an array of order objects you can loop through with `@foreach`.
+
+### Basic Usage
+
+```html
+<script scope="backend">
+var orders = getOrders('newest', 10);
+setVariable('orders', orders);
+</script>
+
+@if(orders.length gt 0)
+  @foreach(order in orders)
+  <div class="order-card">
+    <h3>Order #{{ order.order_number }}</h3>
+    <p>{{ order.created_at | date:'dd, MMM yyyy' }}</p>
+
+    @foreach(product in order.products)
+    <div class="product-row">
+      <img src="{{ product.image_url }}" alt="{{ product.name }}" />
+      <span>{{ product.name }}</span>
+      <span>{{ product.price | formatPrice:product.currency_code }}</span>
+    </div>
+    @endforeach
+  </div>
+  @endforeach
+@else
+  <p>No orders found.</p>
+@endif
+```
+
+### Alternative: Inline Call
+
+You can also call `getOrders()` directly in a `@set` directive without a backend script block:
+
+```html
+@set(orders = getOrders('newest', 5))
+
+@foreach(order in orders)
+  <p>#{{ order.order_number }} — {{ order.created_at | date:'dd MMM yyyy' }}</p>
+@endforeach
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sortBy` | `string` | `'newest'` | Sort order: `'newest'` or `'oldest'` |
+| `limit` | `number` | `50` | Maximum number of orders to return (max 1000) |
+
+### Order Object Structure
+
+Each order returned by `getOrders()` contains:
+
+```javascript
+{
+  order_number: "EF-12345",        // Public order ID
+  created_at: "2026-03-15T...",    // ISO date string
+  currency: "USD",                 // Order currency code
+
+  // Billing address
+  billing_address: "123 Main St",
+  billing_city: "New York",
+  billing_state: "NY",
+  billing_zip: "10001",
+  billing_country: "US",
+
+  // Shipping address
+  shipping_address: "123 Main St",
+  shipping_address2: "",
+  shipping_city: "New York",
+  shipping_state: "NY",
+  shipping_zip: "10001",
+  shipping_country: "US",
+
+  // Customer info
+  customer_name: "John Doe",
+  customer_email: "john@example.com",
+
+  // Products array
+  products: [
+    {
+      name: "Premium Course",
+      image_url: "https://...",
+      price: 97.00,
+      quantity: 1,
+      currency_code: "USD",
+      is_bonus: false
+    }
+  ],
+
+  // Tracking array (if fulfilled)
+  tracking: [
+    {
+      tracking_number: "9400111899223456789012",
+      tracking_url: "https://t.17track.net/en#nums=...",
+      carrier: "USPS"
+    }
+  ]
+}
+```
+
+## Displaying Tracking Information
+
+If your orders have physical shipments, tracking information is automatically extracted from fulfillment data. The system checks multiple sources for tracking numbers:
+
+1. Direct conversion fields (`tracking_number`, `tracking_url`)
+2. Fulfillment provider response data
+3. Fulfillment order data
+
+Carriers are auto-detected from tracking number patterns (USPS, FedEx, UPS, DHL, UniUni). If no tracking URL is provided, a universal tracking link via 17track.net is generated.
+
+### Example: Order with Tracking
+
+```html
+@set(orders = getOrders('newest', 5))
+
+@foreach(order in orders)
+<div class="order">
+  <h3>Order #{{ order.order_number }}</h3>
+
+  @if(order.tracking.length gt 0)
+  <div class="tracking-info">
+    <h4>Shipment Tracking</h4>
+    @foreach(t in order.tracking)
+    <p>
+      {{ t.carrier }}: 
+      <a href="{{ t.tracking_url }}" target="_blank">{{ t.tracking_number }}</a>
+    </p>
+    @endforeach
+  </div>
+  @endif
+
+  @if(order.shipping_address)
+  <div class="shipping-address">
+    <h4>Ships to</h4>
+    <p>{{ order.shipping_address }}</p>
+    <p>{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+    <p>{{ order.shipping_country }}</p>
+  </div>
+  @endif
+</div>
+@endforeach
+```
+
+## Thank You Pages
+
+Thank-you pages are a natural place to show order details. Since the customer is auto-authenticated from checkout, order data is available immediately.
+
+### Example: Thank You Page with Order Summary
+
+```html
+@set(orders = getOrders('newest', 1))
+
+<h2>Order Confirmed!</h2>
+<p>Thank you for your purchase.</p>
+
+@if(orders.length gt 0)
+  @foreach(order in orders)
+  <div class="order-summary">
+    <p>Order #{{ order.order_number }}</p>
+    <p>Date: {{ order.created_at | date:'dd, MMM yyyy' }}</p>
+
+    @foreach(product in order.products)
+    <div class="product">
+      <span>{{ product.name }}</span>
+      <span>{{ product.price | formatPrice:product.currency_code }}</span>
+    </div>
+    @endforeach
+  </div>
+  @endforeach
+@else
+  <div class="processing">
+    <p>Your order is still being processed. This page will refresh automatically.</p>
+  </div>
+@endif
+
+<a href="/members">Access Member Area</a>
+```
+
+<Tip>
+If the order hasn't been indexed yet when the thank-you page loads, the `getOrders()` call may return empty. Add a JavaScript auto-refresh timer so the page retries after a few seconds — the order typically appears within 5–10 seconds.
+</Tip>
+
+## Customer Data Outside of Orders
+
+You can also display customer information directly using the `customer` template object (populated from the session):
+
+```html
+<p>Welcome back, {{ customer.name|default:"Member" }}!</p>
+<p>Email: {{ customer.email }}</p>
+```
+
+Or using the `GetCustomer()` function in backend scripts:
+
+```html
+<script scope="backend">
+var cust = GetCustomer();
+setVariable('cust', cust);
+</script>
+
+<p>Hello, {{ cust.first_name }}!</p>
+```
+
+The `customer` / `GetCustomer()` object includes: `name`, `email`, `first_name`, `last_name`, `phone`, `order_id`, `order_ids`, and full billing/shipping address fields.
+
+## Order Grouping
+
+Orders are grouped intelligently — multiple conversions from the same purchase session (e.g., a main product and an upsell bought in the same checkout flow) are combined into a single order. The grouping logic uses:
+
+- **Session ID matching** — Conversions from the same browser session
+- **Time proximity** — Conversions within 6 hours of each other
+
+This means an upsell purchased immediately after the main product shows under the same order, not as a separate entry.
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Order Tag Reference" icon="receipt" href="/pages/order-tag">
+    Full reference for the <order> HTML tag and all placeholders
+  </Card>
+  <Card title="Backend Scripts" icon="terminal" href="/backend-scripts/overview">
+    Learn about backend scripts and available functions
+  </Card>
+  <Card title="Template Engine Syntax" icon="code" href="/frontend-template-engine/syntax">
+    Filters, conditionals, and loops for displaying data
+  </Card>
+  <Card title="Thank You Pages" icon="check-circle" href="/forms/thank-you-pages">
+    Best practices for post-purchase confirmation pages
+  </Card>
+</CardGroup>
