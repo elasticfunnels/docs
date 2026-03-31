@@ -81,6 +81,70 @@ Each order object contains:
 }
 ```
 
+### `getOrder(code)`
+
+Fetch **one** order for the current customer. Same scope as `getOrders`. The `code` argument is required: public order ID (`order_number`), internal `order_id`, or conversion `code`. Returns `null` if not found.
+
+```javascript
+var order = getOrder(request.query.order);
+if (order) {
+  setVariable('order', order);
+}
+```
+
+See [Showing order details](/members-area/order-details) for template examples.
+
+### `getOrderFulfillment(code)`
+
+Returns an **allowlisted** fulfillment **summary** for a single order. Same `code` rules as `getOrder`. Use this for status labels and timestamps shown to customers.
+
+Returns `null` when the order exists but has **no** fulfillment record yet (no integration / not scheduled), or when the order is not found.
+
+**Returned fields** (only these; raw `fulfillment_provider_response` and `fulfillment_order_data` are never exposed):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string \| null | Normalized: `pending`, `scheduled`, `sent`, `failed`, `skipped`, `cancelled`, or `unknown` |
+| `provider_order_id` | string \| null | External reference from the fulfillment provider when stored on the conversion |
+| `integration_name` | string \| null | Display name of the fulfillment integration |
+| `scheduled_at` | string \| null | ISO timestamp when processing was scheduled |
+| `sent_at` | string \| null | ISO timestamp when the order was sent to the provider |
+| `failed_at` | string \| null | ISO timestamp on failure |
+| `cancelled_at` | string \| null | ISO timestamp if cancelled |
+| `error_message` | string \| null | Truncated message safe for display (max 200 chars) |
+
+```javascript
+var f = getOrderFulfillment(request.query.order);
+if (f) {
+  setVariable('fulfillment', f);
+}
+```
+
+### `getOrderFulfillments()`
+
+Takes **no arguments**. Returns **all** tracking-style rows for the **current customer** across their orders (up to the same order cap as `getOrders` with limit 1000, newest first). Each row includes `order_number` so you can link to an order detail page.
+
+Duplicate `(order_number, tracking_number)` pairs are removed.
+
+**Returned fields per row:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `order_number` | string | Public order id for this shipment |
+| `order_date` | string \| null | Order `created_at` (ISO) |
+| `tracking_number` | string | Tracking number |
+| `tracking_url` | string | Tracking link (e.g. 17track when generated) |
+| `carrier` | string | Carrier name |
+
+```javascript
+var shipments = getOrderFulfillments();
+setVariable('shipments', shipments);
+```
+
+<Tip>
+These APIs return **filtered** data only. Full provider API responses and internal fulfillment payloads are not available in backend scripts.
+</Tip>
+
 ## Bonus Products
 
 ### `getBonusProducts()`

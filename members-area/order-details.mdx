@@ -66,6 +66,13 @@ setVariable('orders', orders);
 @endif
 ```
 
+### Parameters (`getOrders`)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sortBy` | `string` | `'newest'` | Sort order: `'newest'` or `'oldest'` |
+| `limit` | `number` | `50` | Maximum number of orders to return (max 1000) |
+
 ### Alternative: Inline Call
 
 You can also call `getOrders()` directly in a `@set` directive without a backend script block:
@@ -126,12 +133,47 @@ setVariable('order', order);
 For an order detail page, prefer `getOrder(request.query.order)` over `getOrders()` plus a manual loop/filter. It is shorter, clearer, and communicates intent directly.
 </Tip>
 
-### Parameters
+## Fulfillment status and shipments
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `sortBy` | `string` | `'newest'` | Sort order: `'newest'` or `'oldest'` |
-| `limit` | `number` | `50` | Maximum number of orders to return (max 1000) |
+Use **`getOrderFulfillment(code)`** on an **order detail** page to show 3PL fulfillment status and timestamps. Responses are **allowlisted** (no raw provider payloads).
+
+Use **`getOrderFulfillments()`** with **no arguments** to list **every** tracking row across **all** of the customer’s orders—each row includes `order_number` so you can link to `/members-order?order=…`.
+
+For a **single** order, `order.tracking` from `getOrder` / `getOrders` is often enough for carrier links. The fulfillment helpers add **lifecycle status** (`getOrderFulfillment`) and a **cross-order shipment list** (`getOrderFulfillments`).
+
+### Example: order detail with fulfillment summary
+
+```html
+<script scope="backend">
+var code = request.query.order;
+setVariable('order', getOrder(code));
+setVariable('fulfillment', getOrderFulfillment(code));
+</script>
+
+@if(fulfillment)
+  <p>Fulfillment: {{ fulfillment.status }}</p>
+  @if(fulfillment.sent_at)
+    <p>Sent: {{ fulfillment.sent_at | date:'dd MMM yyyy' }}</p>
+  @endif
+@endif
+```
+
+### Example: all shipments for the account
+
+```html
+<script scope="backend">
+setVariable('shipments', getOrderFulfillments());
+</script>
+
+@if(shipments.length gt 0)
+  @foreach(row in shipments)
+  <div>
+    <a href="/members-order?order={{ row.order_number }}">Order #{{ row.order_number }}</a>
+    — {{ row.carrier }}: <a href="{{ row.tracking_url }}" target="_blank" rel="noopener">{{ row.tracking_number }}</a>
+  </div>
+  @endforeach
+@endif
+```
 
 ### Order Object Structure
 
