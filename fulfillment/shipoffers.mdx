@@ -1,0 +1,52 @@
+---
+# ShipOffers – End‑User Setup & Usage
+---
+
+Connect ShipOffers to send orders automatically.
+
+## Prerequisites
+- An active ShipOffers account
+- Store ID and API key issued by ShipOffers (ask your ShipOffers account manager)
+- Your product SKUs in ElasticFunnels match the SKUs set up at ShipOffers (or a mapping strategy in place)
+
+## Step 1: Add the integration
+1) Go to Integrations → Fulfillment → ShipOffers Order Management
+2) Click “Add” and fill in:
+   - Store ID: your ShipOffers store identifier
+   - API Key: the key provided by ShipOffers
+   - Default Shipping Service: e.g., Standard or your preferred default
+3) Click Save
+
+Notes:
+- Connection may be validated automatically on save. If credentials are incorrect, you will see a clear error.
+- You can edit the integration later if your credentials change.
+
+## Step 2: Link products to ShipOffers
+1) Go to Products → Edit product → Fulfillment & Warehousing
+2) Set “Fulfillment Provider” to ShipOffers
+3) Choose “Fulfillment Integration” (the instance you created in Step 1)
+4) Ensure the product SKU equals the SKU ShipOffers expects, then Save
+
+Tip: If you have bundles or variants, confirm that the SKU(s) align with the warehouse items.
+
+## Step 3: End‑to‑end flow
+- When a purchase is approved, the order is placed into a short delay window (useful for last‑minute cancellations/edits)
+- After the delay, the order is automatically sent to ShipOffers
+- Status updates and (when available) tracking info appear in your Fulfillment view
+
+### Delay configuration (hours → minutes)
+- In the integration form, set “Delay before sending (hours)”.
+- The system stores this internally as minutes; you only need to think in hours.
+
+## Day‑to‑day actions
+- Cancel: If an order is still pending/scheduled (or failed), you can cancel it from the Fulfillment view
+- Resend: For failed/cancelled orders, you can resend; the system will re‑queue it
+- Monitor: Filter by status to quickly see what needs attention
+
+## Common issues
+- Invalid credentials → Edit your integration and verify the Store ID/API Key
+- Unknown SKU → Ensure your product SKU matches what ShipOffers has on file
+- Address validation → Confirm the shipping address fields are complete and valid
+
+See [Fulfillment Troubleshooting](/fulfillment/troubleshooting) for detailed tips.
+
