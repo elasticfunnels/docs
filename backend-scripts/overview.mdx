@@ -3,7 +3,7 @@ title: 'Backend Scripts'
 description: 'Run custom server-side JavaScript on any page — access control, session logic, API calls, and dynamic variables — fully sandboxed.'
 ---
 
-Backend Scripts let you run custom JavaScript **on the server** before a page is rendered. The code executes in a secure, sandboxed environment (QuickJS/WASM) with no access to the file system, Node.js APIs, or internal infrastructure.
+Backend Scripts let you run custom JavaScript **on the server** before a page is rendered. The code runs in a secure, isolated sandbox with no access to the file system, host runtime APIs, or your infrastructure beyond the documented functions.
 
 Use them for logic that must happen **before** the visitor sees the page — access control, custom redirects, session manipulation, calling external APIs, or injecting dynamic template variables.
 
@@ -40,15 +40,15 @@ Because backend scripts run before funnel events, session values you set are vis
 
 ## Sandboxing & security
 
-Backend scripts run inside a **QuickJS WebAssembly sandbox**. This means:
+Backend scripts run inside a **locked-down sandbox**. This means:
 
-- No access to `process`, `require`, `fs`, `net`, or any Node.js APIs
-- No access to the file system or internal network
+- No access to `process`, `require`, `fs`, `net`, or similar host APIs
+- No access to the file system or private networks
 - **8 MB memory limit** per execution
-- **10 second CPU timeout** — the QuickJS VM is interrupted if pure-JS execution exceeds this
-- **30 second wall-clock timeout** — the entire execution (including database queries and HTTP calls) is killed if it exceeds this
+- **10 second CPU timeout** — pure JavaScript execution stops if it exceeds this
+- **30 second wall-clock timeout** — the entire run (including data loads and HTTP calls) stops if it exceeds this
 - The `<script scope="backend">` tag is **always** removed from the HTML, even if execution fails
-- Session and cookie writes are restricted so app-internal state cannot be overwritten
+- Session and cookie writes are limited to safe, documented keys
 - Redirects are limited to relative paths and `http://` / `https://` URLs
 - Response headers and cookie access are restricted for security
 
@@ -56,7 +56,7 @@ The sandbox provides a controlled set of host functions (documented below) that 
 
 ## When a script throws or times out
 
-If your backend script throws an error or hits a timeout, the **visitor does not see the error message**. The page continues to render as normal. Any variables or actions your script applied before the error are still used; anything after the error is skipped. Errors are logged on the server and may be reported to administrators for debugging. For development, use `console.log()` and check your backend or event logs.
+If your backend script throws an error or hits a timeout, the **visitor does not see the error message**. The page continues to render as normal. Any variables or actions your script applied before the error are still used; anything after the error is skipped. Failures are recorded for your team to review in logs. For development, use `console.log()` and check your backend or event logs.
 
 ## Multiple script blocks
 

@@ -5,16 +5,16 @@ description: 'Build custom data applications on top of ElasticFunnels with the C
 
 The CRM module lets you define custom entity types, fields, pipelines, and stages — then store structured data entries linked to any record in the system. The most common use case is storing custom data per customer, but entries can reference any record type (orders, leads, etc.).
 
-## Architecture
+## How entries attach to records
 
-All CRM data lives in the `crm_entries` Elasticsearch index. Each entry is linked to an external record via two fields:
+Each CRM entry is linked to a record in your funnel or store through two values:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `reference_type` | keyword | The type of record (e.g. `customer`, `order`, `lead`) |
-| `reference_id` | keyword | The ID of the referenced record |
+| Field | Description |
+|-------|-------------|
+| `reference_type` | The type of record (e.g. `customer`, `order`, `lead`) |
+| `reference_id` | The ID of that record |
 
-This generic linking means you can build any kind of structured data on top of the CRM module without being locked to customers.
+This pattern lets you attach structured data to customers, orders, or custom reference types you define.
 
 ## Concepts
 
@@ -42,7 +42,7 @@ Pipelines represent workflows. Each pipeline contains ordered stages with option
 
 ## Customer CRM Data
 
-The most common pattern is linking CRM entries to customers. When a customer visits a page, the template engine automatically resolves their `customer_id` from Elasticsearch (creating the customer record if needed).
+The most common pattern is linking CRM entries to customers. When a customer visits a page, their session supplies the customer context so CRM defaults attach to the right person (creating the customer record when needed).
 
 ### Example: Weight Loss Tracker
 

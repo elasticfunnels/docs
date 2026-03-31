@@ -22,7 +22,10 @@
           {
             "group": "Essentials",
             "pages": [
-              "essentials/brand-actions"
+              "essentials/brand-actions",
+              "essentials/roles-permissions-metrics",
+              "essentials/permission-matrix",
+              "essentials/restricted-role-troubleshooting"
             ]
           },
           {
