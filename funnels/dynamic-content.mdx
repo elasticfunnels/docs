@@ -61,13 +61,13 @@ The page builder inserts dynamic containers automatically when you use **Wrap in
 
 ### `<dynamic-container>` tag
 
-The `<dynamic-container>` tag marks a slot on the page whose content can be swapped at render time by a Page Events **Dynamic Content** node.
+The `<dynamic-container>` tag marks a slot on the page whose content can be swapped at render time. The tag itself is just a placeholder — all behavior (which component to load and under what conditions) is defined entirely in **[Page Events](/funnels/page-events)** using the **Dynamic Content** node. The server reads that configuration at render time and replaces the container's content with the matched component.
 
 **Attributes**
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
-| `id` | Yes | Unique identifier used by the server to match and swap this container's content. Must match the container ID configured in the Page Events "Dynamic Content" node. |
+| `id` | Yes | Unique identifier used by the server to match and swap this container's content. Must match the container ID configured in the Page Events **Dynamic Content** node. |
 | `name` | Yes | Human-readable label shown in the Page Events UI when selecting which container to target. Without this the container will not appear in the Page Events dropdown. |
 
 **Syntax**
@@ -81,7 +81,7 @@ The `<dynamic-container>` tag marks a slot on the page whose content can be swap
 
 **How it renders**
 
-When a matching Page Events Dynamic Content node fires, the server replaces the `<dynamic-container>` with a `<component>` embed that injects the target Custom Component:
+When a matching **Dynamic Content** node fires in Page Events, the server replaces the `<dynamic-container>` content with the target Custom Component:
 
 ```html
 <!-- Server output when a condition matched "promo-banner" component -->
@@ -111,17 +111,17 @@ Visitors arriving with `?aff_id=42` see the affiliate-specific banner; everyone 
 
 ```html
 <!-- Slot 1: controls the headline area -->
-<dynamic-container id="headline-slot">
+<dynamic-container id="headline-slot" name="Headline Slot">
   <h1>Default Headline</h1>
 </dynamic-container>
 
 <!-- Slot 2: controls the footer disclaimer area -->
-<dynamic-container id="footer-disclaimer-slot">
+<dynamic-container id="footer-disclaimer-slot" name="Footer Disclaimer">
   <p>Default disclaimer text</p>
 </dynamic-container>
 ```
 
-Each slot is controlled independently through separate Dynamic Content nodes in Page Events.
+Each slot is controlled independently through separate **Dynamic Content** nodes in Page Events.
 
 ---
 

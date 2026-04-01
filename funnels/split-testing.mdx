@@ -33,13 +33,13 @@ The page builder inserts split test containers automatically, but you can also w
 
 ### `<split-test>` tag
 
-The `<split-test>` tag marks a section of the page as a split test zone. The server replaces it with the winning component variant at render time based on the traffic distribution configured in Page Events.
+The `<split-test>` tag marks a section of the page as a split test zone. The tag itself is just a placeholder on the page — all behavior (which component variant each visitor sees and at what traffic split) is defined entirely in **[Page Events](/funnels/page-events)** using the **Component Split Test** node. The server reads that configuration at render time and replaces the tag with the winning variant.
 
 **Attributes**
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
-| `id` | Yes | Unique identifier used by the server to match and replace this container with the winning variant. Must match the container ID configured in the Page Events "Split Test Component" node. |
+| `id` | Yes | Unique identifier used by the server to match and replace this container with the winning variant. Must match the container ID configured in the Page Events **Component Split Test** node. |
 | `name` | Yes | Human-readable label shown in the Page Events UI when selecting which container to split test. Without this the container will not appear in the Page Events dropdown. |
 
 **Syntax**
@@ -88,7 +88,7 @@ In Page Events:
 2. Set **Container** → `Headline Test` (matched by `name`)
 3. Assign variants: 50% → `headline-variant-a`, 50% → `headline-variant-b`
 
-Each variant is a saved Custom Component containing the alternative headline HTML. The component embedded inside `<split-test>` acts as the control (variant A) and is also the fallback shown when no split test is active.
+Each variant is a saved Custom Component containing the alternative headline HTML. The component embedded inside `<split-test>` acts as the control (variant A) and is also the fallback shown when no Component Split Test node is active in Page Events.
 
 **Example: A/B testing a video section**
 
