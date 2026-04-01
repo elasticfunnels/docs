@@ -249,7 +249,8 @@
             "pages": [
               "backend-template-engine/overview",
               "backend-template-engine/directives",
-              "backend-template-engine/variables-and-filters"
+              "backend-template-engine/variables-and-filters",
+              "backend-template-engine/products-and-shipping"
             ]
           },
           {
