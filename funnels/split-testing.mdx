@@ -56,16 +56,12 @@ The `<split-test>` tag marks a section of the page as a split test zone. The tag
 
 ```html
 <split-test id="my-container-id" name="My Container Name">
-  <!-- Default content shown if no Component Split Test node is active in Page Events.
-       Embed a saved component using either syntax: -->
-  <component type="my-default-component"></component>
-
-  <!-- or using the template engine directive: -->
+  <!-- Default content shown if no Component Split Test node is active in Page Events. -->
   @component('my-default-component')
 </split-test>
 ```
 
-Both `<component type="...">` and `@component('...')` embed a saved Custom Component by its code. See the [`@component` directive reference](https://docs.elasticfunnels.io/backend-template-engine/directives#components-@component) for full details.
+`@component('...')` embeds a saved Custom Component by its code. See the [`@component` directive reference](https://docs.elasticfunnels.io/backend-template-engine/directives#components-@component) for full details.
 
 **How it renders**
 
