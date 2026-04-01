@@ -55,6 +55,126 @@ You can use any logic within the **[Page Events](/funnels/page-events)** system 
 - **Device-specific content**: Show different content for mobile vs desktop users
 - **Time-sensitive offers**: Display content based on time of day or date ranges
 
+## HTML Reference
+
+The page builder inserts dynamic containers automatically when you use **Wrap in → Dynamic Container**, but you can write the HTML directly when editing page source.
+
+### `<dynamic-container>` tag
+
+The `<dynamic-container>` tag marks a slot on the page whose content can be swapped at render time by a Page Events **Dynamic Content** node.
+
+**Attributes**
+
+| Attribute | Required | Description |
+|-----------|----------|-------------|
+| `id` | Yes | Unique identifier used by the server to match and swap this container's content. Must match the container ID configured in the Page Events "Dynamic Content" node. |
+| `name` | Yes | Human-readable label shown in the Page Events UI when selecting which container to target. Without this the container will not appear in the Page Events dropdown. |
+
+**Syntax**
+
+```html
+<dynamic-container id="my-slot-id" name="Hero Banner">
+  <!-- Default content shown when no Page Events condition matches -->
+  <div>Default banner content</div>
+</dynamic-container>
+```
+
+**How it renders**
+
+When a matching Page Events Dynamic Content node fires, the server replaces the `<dynamic-container>` with a `<component>` embed that injects the target Custom Component:
+
+```html
+<!-- Server output when a condition matched "promo-banner" component -->
+<div id="my-slot-id">
+  <!-- HTML of the resolved Custom Component -->
+</div>
+```
+
+If no Page Events condition matches, the container and its default inner content are left unchanged.
+
+**Example: Affiliate-specific banner**
+
+```html
+<dynamic-container id="hero-banner" name="Hero Banner">
+  <div class="banner default-banner">Standard Offer</div>
+</dynamic-container>
+```
+
+In Page Events:
+1. Trigger: **On Page Loaded**
+2. Condition: **Query Parameter** `aff_id = 42`
+3. Action: **Dynamic Content** → Container `hero-banner` → Component `affiliate-42-banner`
+
+Visitors arriving with `?aff_id=42` see the affiliate-specific banner; everyone else sees the default content.
+
+**Example: Two independent slots on one page**
+
+```html
+<!-- Slot 1: controls the headline area -->
+<dynamic-container id="headline-slot">
+  <h1>Default Headline</h1>
+</dynamic-container>
+
+<!-- Slot 2: controls the footer disclaimer area -->
+<dynamic-container id="footer-disclaimer-slot">
+  <p>Default disclaimer text</p>
+</dynamic-container>
+```
+
+Each slot is controlled independently through separate Dynamic Content nodes in Page Events.
+
+---
+
+### `<component>` tag
+
+The `<component>` tag embeds a saved Custom Component directly by its code. You can use it anywhere on a page without going through Page Events.
+
+**Attributes**
+
+| Attribute | Required | Description |
+|-----------|----------|-------------|
+| `type` | Yes | The code (slug) of the Custom Component to embed. |
+
+**Syntax**
+
+```html
+<component type="my-component-code"></component>
+```
+
+**How it renders**
+
+```html
+<!-- Server output -->
+<div data-cid="[component_database_id]">
+  <!-- HTML of the Custom Component -->
+</div>
+```
+
+If the component code is not found, the server renders an inline error:
+
+```html
+<ef-error>Component <u>my-component-code</u> was not found.</ef-error>
+```
+
+**Example: Reusable footer across pages**
+
+```html
+<component type="general-footer"></component>
+```
+
+**Example: Dynamic container resolved to a component (under the hood)**
+
+When a `<dynamic-container>` matches a Page Events rule, the server internally converts it to a `<component>` embed before the final HTML is sent:
+
+```html
+<!-- What the server generates internally before rendering -->
+<div id="hero-banner">
+  <component type="affiliate-42-banner"></component>
+</div>
+```
+
+---
+
 ## Advanced Tips
 
 - Use multiple conditions for more precise targeting

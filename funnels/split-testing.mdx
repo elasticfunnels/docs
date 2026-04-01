@@ -17,13 +17,88 @@ Looking to split test entire pages or branches at the funnel level? See [Funnel 
 ### Step 2: Add Split Test Container
 - Add a "Split Test Container" on the page and name it for reference
 
-### Step 3: Configure in Page Events Builder
-- Click "Add Node" and select "Split Test Component"
-- Select the container for the split test
-- Set the traffic percentage for each variant and choose the components to show
+### Step 3: Configure in Page Events
+- Open **Page Events** for the page
+- Click "Add Node" and select **Component Split Test**
+- Select the container by name and set the traffic percentage for each variant and the component to show for each
 
 ### Step 4: Connect Nodes
-- Connect the split test component node to the "entry node" or "script rule" node if not already connected
+- Connect the Component Split Test node to the "entry node" or "script rule" node if not already connected
+
+---
+
+## HTML Reference
+
+The page builder inserts split test containers automatically, but you can also write the HTML directly when editing page source.
+
+### `<split-test>` tag
+
+The `<split-test>` tag marks a section of the page as a split test zone. The server replaces it with the winning component variant at render time based on the traffic distribution configured in Page Events.
+
+**Attributes**
+
+| Attribute | Required | Description |
+|-----------|----------|-------------|
+| `id` | Yes | Unique identifier used by the server to match and replace this container with the winning variant. Must match the container ID configured in the Page Events "Split Test Component" node. |
+| `name` | Yes | Human-readable label shown in the Page Events UI when selecting which container to split test. Without this the container will not appear in the Page Events dropdown. |
+
+**Syntax**
+
+```html
+<split-test id="my-container-id" name="My Container Name">
+  <!-- Fallback content shown if no split test is configured or no variant is resolved.
+       Embed a saved component as the default using either syntax: -->
+  <component type="my-default-component"></component>
+
+  <!-- or using the template engine directive: -->
+  @component('my-default-component')
+</split-test>
+```
+
+Both `<component type="...">` and `@component('...')` embed a saved Custom Component by its code. See the [`@component` directive reference](https://docs.elasticfunnels.io/backend-template-engine/directives#components-@component) for full details.
+
+**How it renders**
+
+When a matching Page Events split test node is active, the server replaces the entire `<split-test>` block with the resolved component variant:
+
+```html
+<!-- Server output -->
+<div
+  data-sid="[split_test_id]"
+  data-fnid="[funnel_node_id]"
+  data-cid="[component_id]"
+>
+  <!-- HTML of the winning component variant -->
+</div>
+```
+
+If no variant is resolved (e.g. the split test is not yet configured in Page Events), the original `<split-test>` tag is left in place and its inner content is shown as-is.
+
+**Example: A/B testing a headline**
+
+```html
+<!-- On the page -->
+<split-test id="headline-test" name="Headline Test">
+  @component('headline-variant-a')
+</split-test>
+```
+
+In Page Events:
+1. Add a **Split Test Component** node
+2. Set **Container** → `Headline Test` (matched by `name`)
+3. Assign variants: 50% → `headline-variant-a`, 50% → `headline-variant-b`
+
+Each variant is a saved Custom Component containing the alternative headline HTML. The component embedded inside `<split-test>` acts as the control (variant A) and is also the fallback shown when no split test is active.
+
+**Example: A/B testing a video section**
+
+```html
+<split-test id="vsl-test" name="VSL Test">
+  @component('vsl-control')
+</split-test>
+```
+
+---
 
 ## Tips for Effective Split Testing
 
