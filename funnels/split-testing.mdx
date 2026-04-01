@@ -3,51 +3,61 @@ title: 'Split Testing'
 description: 'Test different versions of headlines, videos, and content to optimize conversions'
 ---
 
-Learn how to test different versions (e.g., headlines or video content) within a single funnel step.
+Learn how to test different component variants within a single funnel step. There are two ways to set up a split test container depending on how your page is built.
 
 <Note>
 Looking to split test entire pages or branches at the funnel level? See [Funnel Split Testing](/funnels/funnel-split-testing).
 </Note>
 
-## Setup
+---
+
+## Using the Page Builder
+
+Use this approach if you're building your page visually in the page builder.
 
 ### Step 1: Create Components
-- Right-click an element in the page builder and select "Create a new component," or build one from scratch
 
-### Step 2: Add Split Test Container
-- Add a "Split Test Container" on the page and name it for reference
+Right-click an element in the page builder and select **Create a new component**, or build the component from scratch. Repeat for each variant you want to test.
+
+### Step 2: Add a Split Test Container
+
+Add a **Split Test Container** to your page and give it a descriptive name. The name is what appears in Page Events when you configure the test.
 
 ### Step 3: Configure in Page Events
-- Open **Page Events** for the page
-- Click "Add Node" and select **Component Split Test**
-- Select the container by name and set the traffic percentage for each variant and the component to show for each
 
-### Step 4: Connect Nodes
-- Connect the Component Split Test node to the "entry node" or "script rule" node if not already connected
+Open **Page Events** for the page and connect a **Component Split Test** node:
+
+1. Click **Add Node** → **Component Split Test**
+2. Select the container by name
+3. Set the traffic percentage for each variant and assign a component to each
+
+### Step 4: Connect the Node
+
+Connect the **Component Split Test** node to the **Entry Node** or a **Script Rule** node to activate it.
 
 ---
 
-## HTML Reference
+## Using Coded Pages
 
-The page builder inserts split test containers automatically, but you can also write the HTML directly when editing page source.
+Use this approach if you're writing page HTML directly (coded pages, custom templates).
+
+The `<split-test>` tag marks a section of the page as a split test zone. The tag itself is just a placeholder — all behavior (which component variant each visitor sees and at what traffic split) is defined entirely in **[Page Events](/funnels/page-events)** using the **Component Split Test** node. The server reads that configuration at render time and replaces the tag with the winning variant.
 
 ### `<split-test>` tag
-
-The `<split-test>` tag marks a section of the page as a split test zone. The tag itself is just a placeholder on the page — all behavior (which component variant each visitor sees and at what traffic split) is defined entirely in **[Page Events](/funnels/page-events)** using the **Component Split Test** node. The server reads that configuration at render time and replaces the tag with the winning variant.
 
 **Attributes**
 
 | Attribute | Required | Description |
 |-----------|----------|-------------|
 | `id` | Yes | Unique identifier used by the server to match and replace this container with the winning variant. Must match the container ID configured in the Page Events **Component Split Test** node. |
-| `name` | Yes | Human-readable label shown in the Page Events UI when selecting which container to split test. Without this the container will not appear in the Page Events dropdown. |
+| `name` | Yes | Human-readable label shown in the Page Events UI when selecting which container to target. Without this the container will not appear in the Page Events dropdown. |
 
 **Syntax**
 
 ```html
 <split-test id="my-container-id" name="My Container Name">
-  <!-- Fallback content shown if no split test is configured or no variant is resolved.
-       Embed a saved component as the default using either syntax: -->
+  <!-- Default content shown if no Component Split Test node is active in Page Events.
+       Embed a saved component using either syntax: -->
   <component type="my-default-component"></component>
 
   <!-- or using the template engine directive: -->
@@ -59,7 +69,7 @@ Both `<component type="...">` and `@component('...')` embed a saved Custom Compo
 
 **How it renders**
 
-When a matching Page Events split test node is active, the server replaces the entire `<split-test>` block with the resolved component variant:
+When a matching **Component Split Test** node is active in Page Events, the server replaces the entire `<split-test>` block with the resolved component variant:
 
 ```html
 <!-- Server output -->
@@ -72,23 +82,22 @@ When a matching Page Events split test node is active, the server replaces the e
 </div>
 ```
 
-If no variant is resolved (e.g. the split test is not yet configured in Page Events), the original `<split-test>` tag is left in place and its inner content is shown as-is.
+If no variant is resolved (e.g. no Component Split Test node is configured in Page Events), the tag is left in place and its inner content is shown as-is.
 
 **Example: A/B testing a headline**
 
 ```html
-<!-- On the page -->
 <split-test id="headline-test" name="Headline Test">
   @component('headline-variant-a')
 </split-test>
 ```
 
 In Page Events:
-1. Add a **Split Test Component** node
+1. Add a **Component Split Test** node
 2. Set **Container** → `Headline Test` (matched by `name`)
 3. Assign variants: 50% → `headline-variant-a`, 50% → `headline-variant-b`
 
-Each variant is a saved Custom Component containing the alternative headline HTML. The component embedded inside `<split-test>` acts as the control (variant A) and is also the fallback shown when no Component Split Test node is active in Page Events.
+The component embedded inside `<split-test>` acts as the control (variant A) and is also the fallback shown when no Component Split Test node is active.
 
 **Example: A/B testing a video section**
 
@@ -105,4 +114,4 @@ Each variant is a saved Custom Component containing the alternative headline HTM
 - Test one element at a time for clear results
 - Run tests long enough to get statistical significance
 - Monitor performance metrics closely
-- Document your test results for future reference 
+- Document your test results for future reference
