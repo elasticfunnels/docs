@@ -607,9 +607,9 @@ setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182, fo
 setCrmField({ slug: 'weight-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' });
 ```
 
-### `getCrmEntries({ slug, referenceType?, referenceId?, limit? })`
+### `getCrmEntries({ slug, referenceType?, referenceId?, limit?, fieldKey?, fieldValue?, fieldFilters? })`
 
-Fetch CRM entries for one entity slug and one reference.
+Fetch CRM entries for one entity slug and one reference. Optionally filter so only documents that contain a matching CRM **field row** (same nested `values` structure as `setCrmField`) are returned. Filters use validated field keys and sanitized values (same rules as writes); the server builds Elasticsearch queries from structured objects, not raw query strings.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -617,9 +617,28 @@ Fetch CRM entries for one entity slug and one reference.
 | `referenceType` | string | `'customer'` | Linked record type |
 | `referenceId` | string | session `customer_id` | Linked record id |
 | `limit` | number | `50` | Max entries (max 200) |
+| `fieldKey` | string | — | With `fieldValue`, require this key to equal that value (aliases: `field_key`) |
+| `fieldValue` | any | — | With `fieldKey`, value to match (aliases: `field_value`) |
+| `fieldFilters` | array | — | AND of `{ fieldKey, value }` rows (aliases: `field_filters`). Do not combine with `fieldKey` / `fieldValue`. |
 
 ```javascript
 var entries = getCrmEntries({ slug: 'weight-tracker', limit: 50 });
+
+// Only entries where values_flat.status === 'active' (per ES nested match)
+var active = getCrmEntries({
+  slug: 'weight-tracker',
+  fieldKey: 'status',
+  fieldValue: 'active',
+});
+
+// Multiple conditions (AND)
+var both = getCrmEntries({
+  slug: 'weight-tracker',
+  fieldFilters: [
+    { fieldKey: 'tier', value: 'gold' },
+    { fieldKey: 'region', value: 'US' },
+  ],
+});
 
 for (var i = 0; i < entries.length; i++) {
   console.log(entries[i].title, entries[i].values_flat);

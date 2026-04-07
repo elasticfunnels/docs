@@ -78,7 +78,7 @@ Customer CRM entries are visible in the **Customer Details** page under the **CR
 
 ## Functions
 
-The following functions are available in both the template engine and backend scripts. Write functions (`setCrmField`, `addCrmFieldValue`, `clearCrmEntries`) accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
+The following functions are available in both the template engine and backend scripts. Write functions (`setCrmField`, `addCrmFieldValue`, `clearCrmEntries`, `moveCrmLead`, `moveCrmToStage`, `moveCrmToPipeline`, `moveCrmToEntity`) accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
 
 | Function | Description |
 |----------|-------------|
@@ -87,6 +87,10 @@ The following functions are available in both the template engine and backend sc
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field value — upserts a single value per key |
 | `addCrmFieldValue({ slug, fieldKey, value, ... })` | Append a new entry with a field value — enables multiple values per key |
 | `getCrmFieldValues({ slug, fieldKey, ... })` | Get all values for a field key across entries (returns array) |
+| `moveCrmToStage({ slug, stageId \| stageSlug, ... })` | Move to a specific stage (pipeline inferred from stage) |
+| `moveCrmToPipeline({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug?, ... })` | Move to a pipeline (optionally choose target stage) |
+| `moveCrmToEntity({ fromSlug, toSlug, fieldMap, ... })` | Move mapped fields from one CRM entity to another |
+| `moveCrmLead({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug, ... })` | Lower-level direct pipeline + stage move (kept for compatibility) |
 | `clearCrmEntries({ slug, ... })` | Delete all entries for an entity slug + reference |
 
 `slug` is always required (the entity's slug from CRM settings). Reference defaults: `customer` + session customer id.
@@ -105,6 +109,26 @@ Write functions also accept:
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `async` | boolean | `false` | When `true`, writes run in the background — faster but eventual consistency |
+
+`moveCrmToStage` / `moveCrmToPipeline` / `moveCrmLead` also accept:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `pipelineId` / `pipeline_id` | number | - | Target pipeline id |
+| `pipelineSlug` / `pipeline_slug` | string | - | Target pipeline slug (alternative to id) |
+| `stageId` / `stage_id` | number | - | Target stage id |
+| `stageSlug` / `stage_slug` | string | - | Target stage slug (alternative to id) |
+| `allEntries` / `all_entries` | boolean | `false` | Update only newest entry (`false`) or all matching entries (`true`) |
+
+`moveCrmToEntity` accepts:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `fromSlug` / `from_slug` | string | - | Source CRM entity slug |
+| `toSlug` / `to_slug` | string | - | Target CRM entity slug |
+| `fieldMap` / `field_map` | object | - | Required key mapping (`{ fromKey: toKey }`) |
+| `removeFromOld` / `remove_from_old` | boolean | `false` | Delete source entries after successful transfer |
+| `pipelineId` / `pipelineSlug` / `stageId` / `stageSlug` | number/string | optional | Optional target workflow placement in destination CRM |
 
 ### Single-value fields
 
@@ -145,6 +169,80 @@ Use `clearCrmEntries` to delete all entries for an entity + reference:
 ```javascript
 var result = clearCrmEntries({ slug: 'weight-tracker' });
 // { ok: true, deleted: 3 }
+```
+
+### Moving leads through stages and pipelines
+
+Use `moveCrmToStage` / `moveCrmToPipeline` to change workflow position. This updates `pipeline_id` and `stage_id` on CRM entries for the selected reference.
+
+```javascript
+// Stage-to-stage (same pipeline), using slugs
+moveCrmToStage({
+  slug: 'weight-tracker',
+  stageSlug: 'in-progress'
+});
+```
+
+```javascript
+// Pipeline-to-pipeline move: choose a stage in the target pipeline
+moveCrmToPipeline({
+  slug: 'weight-tracker',
+  pipelineSlug: 'reactivation',
+  stageSlug: 'new'
+});
+```
+
+```javascript
+// ID-based targeting also works
+moveCrmToPipeline({
+  slug: 'weight-tracker',
+  pipelineId: 12,
+  stageId: 44,
+  allEntries: true
+});
+```
+
+```javascript
+// Async move (returns quickly with pending: true)
+moveCrmToStage({
+  slug: 'weight-tracker',
+  stageSlug: 'in-progress',
+  async: true
+});
+```
+
+<Tip>
+`moveCrmToStage` / `moveCrmToPipeline` / `moveCrmLead` are for workflow position only (pipeline/stage). They do not remap field values.
+If you need to copy values between keys (for example `quiz_email -> email`), use `getCrmField` + `setCrmField` explicitly in your script.
+</Tip>
+
+### Moving between CRM entities (with field mapping)
+
+Use `moveCrmToEntity` when data needs to move from one CRM entity to another.
+
+```javascript
+moveCrmToEntity({
+  fromSlug: 'quiz-leads',
+  toSlug: 'sales-leads',
+  fieldMap: {
+    quiz_email: 'email',
+    quiz_phone: 'phone',
+    quiz_score: 'lead_score'
+  },
+  pipelineSlug: 'inbound',
+  stageSlug: 'new',
+  removeFromOld: true
+});
+```
+
+```javascript
+// Async cross-entity move
+moveCrmToEntity({
+  fromSlug: 'quiz-leads',
+  toSlug: 'sales-leads',
+  fieldMap: { quiz_email: 'email' },
+  async: true
+});
 ```
 
 ### Async writes
