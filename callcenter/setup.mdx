@@ -1,0 +1,196 @@
+---
+title: 'Call Center Setup'
+description: 'Create call centers, manage teams, configure dispositions and sales scripts, and connect phone switches'
+---
+
+This page walks through the recommended setup order for the in-house Call Center suite.
+
+## Recommended setup order
+
+1. Open **Call Center** in the main sidebar.
+2. Go to **Setup** first.
+3. Review the setup checklist and use **Apply Defaults** if you want ElasticFunnels to create the starter records for you.
+4. Then finish the manual steps in this order:
+   - Create at least one call center
+   - Create or confirm your organization teams
+   - Add agents
+   - Create dispositions
+   - Connect brands to the center
+   - Configure the phone switch
+   - Add sales scripts
+
+<Info>
+The **Setup** page is the fastest way to see what is still missing. It checks your real configuration state and is the best first stop for a new organization.
+</Info>
+
+## Step 1: Create the call center
+
+1. In the sidebar, click **Call Center** → **Call Centers**.
+2. Click **Add Call Center**.
+3. Fill in:
+   - **Name**: the internal name your agents will see
+   - **Type**: usually `sales`, `cs`, or `retention`
+   - **Status**: leave as `active` unless you are preparing it in advance
+4. Click **Save**.
+
+The list page shows every center in the organization, plus the basic counts for teams, agents, and configuration.
+
+## Step 2: Set up teams
+
+Teams are organization-level records, not center-only records.
+
+1. Go to **Settings** → **Organization** → **Teams**.
+2. Create the teams you want to use in the call center, for example:
+   - Sales
+   - Customer Service
+   - Retention
+3. Return to **Call Center** → **Call Centers**.
+4. Open your call center.
+5. Use the **Teams** tab to link the center to the appropriate organization teams.
+
+<Tip>
+If you used **Apply Defaults** in the setup wizard, you may already have starter teams connected.
+</Tip>
+
+## Step 3: Add agents
+
+1. Go to **Call Center** → **Agents**.
+2. Click **Add Agent**.
+3. Select the existing organization user.
+4. Choose the **Call Center**.
+5. Choose the **Team**.
+6. Enter the agent **Extension** exactly as it exists in your phone switch.
+7. Set the **Status** to `available` for active agents.
+8. Save.
+
+Use **Call Center** → **Agents** when you want to manage agents across all centers from one screen.
+
+<Info>
+Agents also need the correct organization role and permissions. In most setups that means the user has the **Call agent** role, or an org role with the relevant `callcenter.*` permissions.
+</Info>
+
+## Step 4: Create dispositions
+
+Dispositions are the outcomes agents pick when they finish a call.
+
+1. Open **Call Center** → **Call Centers**.
+2. Click a center name.
+3. Open the **Dispositions** tab.
+4. Click **Add Disposition**.
+5. Enter:
+   - **Name**: human-friendly label agents will see
+   - **Code**: stable internal key, such as `sale`, `callback`, `refund_request`
+   - **Category**: reporting bucket such as positive, negative, or neutral
+   - **Active**: leave enabled if agents should be able to select it
+6. Save.
+7. Drag and drop to reorder if needed.
+
+Recommended starter dispositions:
+
+- Sale
+- No Sale
+- Callback
+- Voicemail
+- Wrong Number
+- Refund Request
+- Cancel Request
+- Not Interested
+
+## Step 5: Add scripts
+
+1. Open the call center detail page.
+2. Go to the **Scripts** tab.
+3. Paste or write the base talk track for the center.
+4. Include:
+   - Greeting
+   - Qualification questions
+   - Main pitch
+   - Rebuttals
+   - Upsell transition
+   - Close
+5. Save.
+
+Center-level scripts are the default. You can override them for a specific brand in **Brand Settings**.
+
+## Step 6: Connect brands
+
+If one center serves multiple brands, each brand needs its own configuration row.
+
+1. Open the call center detail page.
+2. Go to **Brand Settings**.
+3. Click **Add Brand Config**.
+4. Choose the brand.
+5. Set:
+   - **Active**: enable the center for that brand
+   - **Phone Switch**: provider and credentials for that brand
+   - **Sales Script**: optional brand-specific script override
+6. Save.
+
+Repeat for every brand the center should handle.
+
+## Step 7: Connect the phone switch
+
+Phone switch setup is done inside each brand config.
+
+1. In **Brand Settings**, open the brand config you want to edit.
+2. In the **Phone Switch** section, select the provider.
+3. Enter the credentials from your provider admin panel.
+4. Save.
+5. Test with a real agent extension and a test call.
+
+Supported providers in the in-house suite:
+
+- ViciDial
+- Five9
+- Ytel
+
+Each provider has different credential requirements. See [Phone Switches](/callcenter/phone-switches) for the full provider-by-provider guide.
+
+<Warning>
+Phone switch credentials are sensitive and should only be edited by users with **Manage Setup** access.
+</Warning>
+
+## Brand settings reference
+
+The **Brand Settings** tab controls three things per brand:
+
+- **Active**: whether that center can handle the brand
+- **Phone Switch**: the brand-specific dialer and CTI credentials
+- **Sales Script**: the brand override for the center script
+
+This is important when one organization shares a single center across multiple brands.
+
+## Exact navigation map
+
+Use this map when onboarding a new organization:
+
+- **Call Center** → **Setup**: progress checklist, default creation
+- **Call Center** → **Call Centers**: create and edit centers
+- **Call Center** → **Agents**: assign users to centers and teams
+- **Call Center** → **Customer Service**: support workflow after setup
+- **Call Center** → **Order Entry**: MOTO order workflow after setup
+- **Call Center** → **Commissions**: review and export commission totals
+- **Settings** → **Organization** → **Teams**: create the shared team records first
+- **Settings** → **Organization** → **Roles**: grant callcenter permissions
+
+## Permissions checklist
+
+Before agents can use the suite, confirm:
+
+- The user can log in normally
+- The user belongs to the correct organization
+- The user has a role with callcenter permissions
+- Agents who place orders have `callcenter.create_orders`
+- Agents who use customer service have `callcenter.view`
+- Admins who edit setup have `callcenter.manage_setup`
+
+## Multiple call centers and external providers
+
+The in-house Call Center suite is separate from the external abandon / callback integrations such as HelpGrid, Logicall, SalesBound, Committed Coaches, and Nuyu.
+
+That means you can do both:
+
+- Run your own agents inside ElasticFunnels
+- Also send selected events to third-party callcenter vendors
+
+Configure those external providers from the merchant / integration side, not from the in-house call center screens.

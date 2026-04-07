@@ -1,0 +1,98 @@
+---
+title: 'Customer Service'
+description: 'Look up customers, manage their subscriptions, apply retention offers, and log support calls'
+---
+
+The Customer Service page gives agents a unified view of a customer's profile, orders, subscriptions, and interaction history. It's the primary tool for handling inbound support calls and outbound retention calls.
+
+Go to **Call Center** → **Customer Service** in the sidebar.
+
+## Finding a Customer
+
+Use the search bar to find customers by:
+
+- Phone number
+- Email address
+- Order ID
+- Name
+
+If the page was opened from a screen pop, the active call log is loaded automatically and the page will prefill the search using the customer email or phone from that call.
+
+## Customer Profile
+
+Once a customer is selected, the profile shows:
+
+<Tabs>
+  <Tab title="Contact Info">
+    Name, email, phone, billing and shipping addresses, total order count, total revenue, and whether a payment method is already on file.
+  </Tab>
+  <Tab title="Orders">
+    All orders placed by this customer — order ID, date, products, amount, payment status, and gateway.
+  </Tab>
+  <Tab title="Subscriptions">
+    Active and past subscriptions with status, product, amount, frequency, cycle count, and next charge date.
+  </Tab>
+  <Tab title="Notes">
+    Call notes from previous interactions, visible to all agents.
+  </Tab>
+</Tabs>
+
+## Managing Subscriptions
+
+Agents can take action on a customer's subscriptions directly from the profile:
+
+| Action | When Available | What It Does |
+|--------|----------------|-------------|
+| **Cancel** | Any non-canceled subscription | Cancels with a reason select |
+| **Pause** | Active subscriptions | Pauses billing with optional resume date |
+| **Resume** | Paused subscriptions | Restarts billing |
+| **Force Bill** | Non-canceled subscriptions | Triggers an immediate charge attempt |
+| **Update Payment** | Any active subscription | Updates the payment method on file |
+
+Subscription actions are executed against the brand that actually owns the customer's subscription, not just the first organization brand.
+
+## Handling Cancellation Requests
+
+When a customer wants to cancel, agents can use the retention flow:
+
+<Steps>
+  <Step title="Ask why">
+    Select the customer's cancellation reason from the configured exit survey reasons.
+  </Step>
+  <Step title="Present the save offer">
+    Based on the reason, the system suggests an offer — a discount, a pause, or a downgrade to a lower-tier product.
+  </Step>
+  <Step title="Apply or proceed">
+    If the customer accepts, apply the offer with one click. If they decline, proceed with the cancellation.
+  </Step>
+</Steps>
+
+<Info>
+The retention offers shown here are the same ones configured in the merchant's [Retention Offers](/subscriptions/retention-offers) settings. This ensures customers get consistent offers whether they cancel through self-service or through an agent.
+</Info>
+
+## Logging Calls
+
+After each interaction, log the call with:
+
+- **Direction** — Inbound or outbound
+- **Disposition** — The call outcome (sale, no sale, callback, refund request, etc.)
+- **Notes** — Free-text notes for context on future calls
+
+Call logs are saved and visible in the customer's interaction history.
+
+If the page is attached to an active inbound or outbound call, saving the log updates that existing call record instead of creating a disconnected note.
+
+## Additional Actions
+
+- **Resend Confirmation** — Re-send the purchase confirmation email for any order
+- **Add Conversion Notes** — Attach internal notes to a specific conversion record
+
+## Payment-on-file behavior
+
+The customer profile now exposes whether the platform already has a reusable payment token on file for the customer.
+
+That token is not shown directly to agents in Customer Service, but it is used by Order Entry so the agent can choose between:
+
+- using the existing payment method
+- collecting a new card

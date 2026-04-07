@@ -77,37 +77,38 @@ Customer CRM entries are visible in the **Customer Details** page under the **CR
 
 ## Template Engine Functions
 
-The CRM adapter exposes three functions in the template engine:
+The CRM adapter exposes CRM helper functions in the template engine:
 
 | Function | Description |
 |----------|-------------|
 | `getCrmEntries({ slug, ... })` | Fetch entries for one entity **slug** + reference |
-| `getCrmField({ slug, fieldKey, ... })` | Get one field (`slug` + `fieldKey` required) |
-| `setCrmField({ slug, fieldKey, value, ... })` | Set one field (`slug`, `fieldKey`, `value` required) |
+| `getCrmField({ slug, fieldKey, ... })` | Get one field value |
+| `getCrmFieldValues({ slug, fieldKey, filters?, ... })` | Return field value list (newest → oldest), with optional filters |
+| `setCrmField({ slug, fieldKey, value, force?, ... })` | Set one canonical field value (safe conflict check unless `force: true`) |
+| `addCrmFieldValue({ slug, fieldKey, value, ... })` | Append a new value for list/history use cases |
+| `clearCrmFieldValues({ slug, fieldKey, ... })` | Remove a field key from all matching entries |
 
 `slug` is always required (the entity’s slug from CRM settings). Reference defaults: `customer` + session customer id.
 
 ```javascript
 setCrmField({ slug: 'pattern-tracker', fieldKey: 'score', value: 85 });
 var score = getCrmField({ slug: 'pattern-tracker', fieldKey: 'score' });
+addCrmFieldValue({ slug: 'pattern-tracker', fieldKey: 'score_history', value: 85 });
+var scoreHistory = getCrmFieldValues({
+  slug: 'pattern-tracker',
+  fieldKey: 'score_history',
+  limit: 20,
+  filters: { notEquals: 0 }
+});
+
+// If historical duplicates exist for a single-value key, opt in to cleanup:
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'score', value: 90, force: true });
 ```
 
 See [Data Functions](/backend-scripts/data-functions#crm-data) for full parameter details and examples.
 
-## API Endpoints
+## Automating CRM data from pages
 
-CRM entries are managed through the standard CRM API:
+CRM read/write for **funnels, pages, and backend scripts** is done with the sandbox helpers documented in [Data Functions](/backend-scripts/data-functions#crm-data) (`getCrmEntries`, `getCrmField`, `setCrmField` with a required entity `slug`). That is the supported surface for builders.
 
-```
-GET    /brands/{brand}/crm/entities/{entity}/entries
-POST   /brands/{brand}/crm/entities/{entity}/entries
-GET    /brands/{brand}/crm/entries/{entry}
-PUT    /brands/{brand}/crm/entries/{entry}
-DELETE /brands/{brand}/crm/entries/{entry}
-```
-
-Filter by reference:
-
-```
-GET /brands/{brand}/crm/entities/{entity}/entries?reference_type=customer&reference_id={customer_id}
-```
+The in-app CRM screens use **internal**, authenticated app routes. Those URLs are not a public or stable integration API for external systems or end users, and they are intentionally omitted from this documentation.

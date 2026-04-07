@@ -585,9 +585,42 @@ if (weight && Number(weight) <= 165) {
 }
 ```
 
-### `SetCrmField({ slug, fieldKey, value, referenceType?, referenceId? })`
+### `GetCrmFieldValues({ slug, fieldKey, referenceType?, referenceId?, limit?, filters? })`
 
-Updates an existing entry’s field or creates a new entry under that entity slug and reference. New documents use the resolved `crm_entity_id` for `slug`.
+Always returns an array of values for the field key, newest → oldest.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKey` | string | **required** | Field key (e.g. `current-weight`, `user_id`) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `limit` | number | `100` | Max entries scanned (max 200) |
+| `filters` | object | none | Optional value filters (`equals`, `notEquals`, `in`, `notIn`, `contains`) |
+
+```javascript
+var outbreakDates = getCrmFieldValues({
+  slug: 'pattern-tracker',
+  fieldKey: 'last_outbreak_date',
+  limit: 50
+});
+
+var mildOnly = getCrmFieldValues({
+  slug: 'pattern-tracker',
+  fieldKey: 'last_outbreak_severity',
+  filters: { equals: 'mild' }
+});
+
+var severeOrModerate = getCrmFieldValues({
+  slug: 'pattern-tracker',
+  fieldKey: 'last_outbreak_severity',
+  filters: { in: ['severe', 'moderate'] }
+});
+```
+
+### `SetCrmField({ slug, fieldKey, value, referenceType?, referenceId?, force? })`
+
+Sets one canonical value for a field key under that entity/reference.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -596,11 +629,59 @@ Updates an existing entry’s field or creates a new entry under that entity slu
 | `value` | any | **required** | Must be present (`value: 0` / `false` allowed) |
 | `referenceType` | string | `'customer'` | Linked record type |
 | `referenceId` | string | session `customer_id` | Linked record id |
+| `force` | boolean | `false` | If duplicates exist for this key, `false` fails safely; `true` collapses duplicates to one value |
 
 ```javascript
 setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182 });
 setCrmField({ slug: 'pattern-tracker', fieldKey: 'last_checkin', value: new Date().toISOString() });
 setCrmField({ slug: 'deals', referenceType: 'order', referenceId: '12345', fieldKey: 'followup_status', value: 'contacted' });
+
+// Explicitly clean duplicates if needed:
+setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182, force: true });
+```
+
+Behavior details:
+
+- No existing value for key -> creates one
+- Exactly one existing value -> updates it
+- Multiple existing values:
+  - `force: false` -> returns `false` (no destructive write)
+  - `force: true` -> removes old duplicates and keeps one canonical value
+
+### `AddCrmFieldValue({ slug, fieldKey, value, referenceType?, referenceId? })`
+
+Appends a value by creating a new CRM entry for that key (history/list style storage).
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKey` | string | **required** | Field key to append |
+| `value` | any | **required** | Value to append (`0` / `false` allowed) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+
+```javascript
+addCrmFieldValue({ slug: 'pattern-tracker', fieldKey: 'last_outbreak_date', value: '2026-03-31' });
+addCrmFieldValue({ slug: 'pattern-tracker', fieldKey: 'last_outbreak_severity', value: 'mild' });
+```
+
+### `ClearCrmFieldValues({ slug, fieldKey, referenceType?, referenceId? })`
+
+Removes a field key from all matching entries for that slug/reference. Returns the number of entries updated.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKey` | string | **required** | Field key to remove |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+
+```javascript
+var removed = clearCrmFieldValues({
+  slug: 'pattern-tracker',
+  fieldKey: 'outbreak_history'
+});
+console.log('Removed from entries:', removed);
 ```
 
 <Note>

@@ -1,0 +1,78 @@
+---
+title: 'Order Entry'
+description: 'Place phone orders for customers during calls with product selection, payment processing, and upsells'
+---
+
+The Order Entry page lets call center agents place orders on behalf of customers during phone calls.
+
+Go to **Call Center** → **Order Entry** in the sidebar.
+
+<Warning>
+Agents need the **Create Orders** permission (included in the Call agent role) to access this page.
+</Warning>
+
+## Exact order-entry flow
+
+1. Open **Call Center** → **Order Entry**.
+2. If the page was opened from a live call, confirm the linked call appears in the **Call timer** box.
+3. Search for the customer by phone or email in the customer lookup field.
+4. If a match is found, review the auto-filled customer details.
+5. Add one or more products.
+6. Confirm the address fields.
+7. Choose the payment method:
+   - **Card on File** if the customer already has a stored token
+   - **New Card** if a fresh card needs to be entered
+8. If the order should create a subscription, enable the subscription section and choose the interval.
+9. Click the order button to submit.
+10. If upsells are returned, present them before closing the call.
+11. Choose the final disposition and save the call outcome.
+
+## Page Layout
+
+### Products
+
+Browse and select products from the active campaign. Each product shows its price, description, and whether it's a subscription.
+
+### Customer Form
+
+Billing and shipping address fields. If the customer has ordered before, their information auto-fills when you search by phone or email.
+
+### Payment
+
+The payment section supports two paths:
+
+- **Card on File**: shown automatically when the customer profile includes a reusable vault token
+- **New Card**: standard card number, expiry, and CVV entry
+
+The stored token is used automatically and is not shown as an editable field.
+
+### Sales Scripts
+
+A sidebar panel shows the campaign's configured sales scripts (main pitch, rebuttal, upsell talking points) for the agent to reference during the call.
+
+### Call Controls
+
+- **Call timer** — Tracks how long the current call has been active
+- **Agent info** — Shows the agent's call center and team
+- **Disposition** — Required before closing the session
+
+## Tax Estimation
+
+Before submitting, agents can click **Estimate Tax** to preview the tax amount based on the customer's address and selected products.
+
+## Returning Customers
+
+When a phone number or email matches an existing customer:
+
+- Contact and address information auto-fills
+- The page checks whether a payment token already exists
+- If a token exists, **Card on File** becomes available automatically
+- The raw token is not exposed to the agent as a form field
+
+If no token exists, the agent enters a new card normally.
+
+## After the Order
+
+On a successful charge, the customer receives the standard purchase confirmation email and the agent's commission is recorded.
+
+If the gateway returns a reusable vault token after the order, Order Entry stores it for the rest of the current flow so upsells and later subscription actions can reuse it.

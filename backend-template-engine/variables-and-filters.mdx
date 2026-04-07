@@ -103,6 +103,47 @@ These patterns are used in built-in blog and content templates.
 
 ---
 
+## String concatenation: `+`
+
+Use the **`+`** operator to join strings, variables, and filtered expressions together.
+
+```html
+{{ "(" + var.guarantee_title + ")" }}
+```
+
+You can combine it with filters by wrapping the filtered part in **parentheses**:
+
+```html
+{{ "(" + (var.guarantee_title | default:"90-Day Money Back Guarantee") + ")" }}
+```
+
+This works everywhere expressions are accepted — in `{{ }}`, in `@set`, and in `@component` arguments:
+
+```html
+@component("purchase-box", {
+  title_suffix: "(" + (var.guarantee_title | default:"90-Day Guarantee") + ")"
+})
+```
+
+```html
+@set(label = "Order #" + order.id)
+{{ label }}
+```
+
+<Warning>
+Strings are **literal** — there is no variable interpolation inside quotes. Writing `"price is: {{ price }}"` outputs the text `price is: {{ price }}` verbatim, it does **not** resolve the variable. To mix text and variables, use concatenation:
+
+```html
+{{-- ✗ wrong — {{ }} inside a string is literal text, not a variable --}}
+{{ "price is: {{ price }}" }}
+
+{{-- ✓ correct — concatenate the string and the variable --}}
+{{ "price is: " + price }}
+```
+</Warning>
+
+---
+
 ## Summary
 
 - Use **`{{ path }}`** to output a value; use **`| filter`** or **`| filter:arg`** to transform it.
@@ -110,6 +151,7 @@ These patterns are used in built-in blog and content templates.
 - **`slice:0:1`** — First character; combine with `(expression | default:'X')` for safe initials.
 - **`raw`** — Use only for trusted HTML (e.g. article body, excerpt).
 - **Parentheses** — `{{ (expression) | filter }}` so the filter applies to the whole expression.
+- **Concatenation** — `"text" + variable + "more text"` joins values. No interpolation inside strings; use `+` instead.
 
 ## Purchase Link Functions
 

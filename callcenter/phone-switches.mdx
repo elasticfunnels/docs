@@ -1,0 +1,156 @@
+---
+title: 'Phone Switches'
+description: 'Provider-specific setup for ViciDial, Five9, and Ytel in the in-house Call Center suite'
+---
+
+Use this page when you are connecting the in-house Call Center suite to your telephony provider.
+
+Phone switch credentials are configured per brand inside a call center:
+
+1. Go to **Call Center** → **Call Centers**
+2. Open the center
+3. Open **Brand Settings**
+4. Add or edit the brand config
+5. Open the **Phone Switch** section
+6. Select the provider
+7. Save the credentials
+
+## What the phone switch powers
+
+Once configured correctly, the phone switch is responsible for:
+
+- Click-to-dial
+- Screen pop / incoming call context
+- Call transfer
+- Hangup requests
+- Recording lookups
+
+## Before you start
+
+Have these ready before opening the ElasticFunnels setup form:
+
+- Provider admin access
+- The correct agent extensions
+- The API or admin credentials for the provider
+- Any required base URL or API endpoint
+- A real test number you can call
+
+## ViciDial
+
+### Where to go in ViciDial
+
+You usually need access to:
+
+- **Admin** → API / integrations area
+- The non-agent API endpoint, usually `non_agent_api.php`
+- The agent API endpoint if your deployment uses a separate URL
+- An API user with permission to place and manage calls
+
+### Fields to collect
+
+| ElasticFunnels field | What to enter |
+|---|---|
+| **API URL** | Full URL to the ViciDial non-agent API endpoint |
+| **Username** | The ViciDial API user |
+| **Password** | The ViciDial API password |
+| **Agent API URL** | Optional if your deployment uses a separate agent endpoint |
+| **Source** | Optional source string required by your ViciDial config |
+| **Phone Code** | Optional default country phone code |
+
+### Setup steps
+
+1. Create or confirm the API user in ViciDial.
+2. Copy the full `non_agent_api.php` URL.
+3. Paste the API URL, username, and password into ElasticFunnels.
+4. Save the brand config.
+5. Make a test outbound call from an agent with a valid extension.
+
+## Five9
+
+### Where to go in Five9
+
+You usually need access to:
+
+- **Administrator** or **Admin Console**
+- API credentials or a middleware account
+- The correct base URL for your tenant
+- Skill / campaign defaults if your team uses them
+
+### Fields to collect
+
+| ElasticFunnels field | What to enter |
+|---|---|
+| **API Base URL** | Your Five9 API base URL |
+| **Username** | The admin or API username |
+| **Password** | The corresponding password |
+| **API Key** | Use if your Five9 environment issues a dedicated key |
+| **Campaign / Skill defaults** | Optional values if your call routing depends on them |
+
+### Setup steps
+
+1. Confirm which Five9 API method your tenant uses.
+2. Copy the tenant-specific base URL.
+3. Enter the credentials into ElasticFunnels.
+4. Save the brand config.
+5. Run a real dial test from an assigned agent.
+
+## Ytel
+
+### Where to go in Ytel
+
+You usually need access to:
+
+- The Ytel dashboard
+- API credentials section
+- Caller ID / from-number settings
+
+### Fields to collect
+
+| ElasticFunnels field | What to enter |
+|---|---|
+| **API Base URL** | Your Ytel API URL, usually the default Ytel API base |
+| **Username** | Account SID |
+| **Password** | Auth token |
+| **From Number** | The caller ID number the center should use |
+
+### Setup steps
+
+1. Open the Ytel API credentials screen.
+2. Copy the Account SID and Auth Token.
+3. Paste them into the ElasticFunnels phone switch form.
+4. Save the brand config.
+5. Confirm the agent extension and from-number are valid.
+6. Run a test call.
+
+## Testing after setup
+
+After you save a provider configuration:
+
+1. Confirm the agent exists in **Call Center** → **Agents**
+2. Confirm the extension matches the provider extension exactly
+3. Open **Call Center** → **Order Entry** or **Customer Service**
+4. Trigger a real test call
+5. Confirm:
+   - the call starts
+   - the correct agent is linked
+   - the screen pop appears for inbound flows
+   - the call log is created
+   - recording can be retrieved when supported
+
+## Screen pop and webhooks
+
+Current screen-pop behavior in the in-house suite is primarily browser-driven and call-log driven. You should validate the actual inbound flow with a real test call after telephony setup.
+
+If you are implementing a provider-specific server-to-server screen-pop callback, use your engineering team. The platform includes webhook verification middleware reserved for CTI integrations, but that is an implementation detail rather than a normal self-serve setup screen.
+
+## Troubleshooting checklist
+
+If calls are not working:
+
+- Check that the brand config is active
+- Check the selected provider type
+- Reconfirm the API URL
+- Reconfirm the username and password or token
+- Confirm the agent extension exists in the provider
+- Confirm the brand and call center belong to the same organization
+- Test with one known-good agent and one known-good phone number first

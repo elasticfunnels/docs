@@ -37,6 +37,7 @@ So:
 |--------|---------|
 | **`{{ path }}`** | Insert a value from the current context (variables, properties). |
 | **`{{ path \| filter }}`** | Apply a filter (e.g. `default`, `upper`, `slice`, `raw`). |
+| **`{{ "text" + path }}`** | Concatenate strings and values with `+`. |
 | **`@if(condition)` … `@endif`** | Show a block only when the condition is true. |
 | **`@else`** / **`@elseif(condition)`** | Optional branches inside an `@if`. |
 | **`@foreach(item in array)` … `@endforeach`** | Repeat a block once per item. |
