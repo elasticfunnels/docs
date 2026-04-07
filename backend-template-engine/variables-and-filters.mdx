@@ -5,6 +5,10 @@ description: 'Backend template variables {{ path }} and filters: default, slice,
 
 Backend templates insert values with **`{{ path }}`** and can transform them with **filters** using the pipe character: **`{{ path | filter }}`** or **`{{ path | filter:arg }}`**.
 
+For `filter:arg`, the argument can be either:
+- a **context path/expression** (for example `product.currency_code`)
+- or a **literal** (recommended as quoted text, for example `'USD'` or `'stripe'`)
+
 ## Variables: `{{ path }}`
 
 Values are resolved from the current context (e.g. page data, article, posts, featured).
@@ -23,6 +27,20 @@ Paths can use dot notation and array indexing. If a value is missing, it usually
 ## Filters
 
 Filters are applied left to right. You can chain several: **`{{ value | filter1 | filter2:arg }}`**.
+
+### Filter arguments (`:arg`)
+
+Use `:arg` when a filter needs one parameter.
+
+```html
+{{ product.price | formatPrice:product.currency_code }}
+{{ product.price | formatPrice:'USD' }}
+```
+
+In the first example, `product.currency_code` is resolved from context (for example, `USD`).  
+In the second example, `'USD'` is a fixed literal.
+
+If you want text to always be treated as literal, quote it.
 
 ### `default` — fallback when value is empty
 

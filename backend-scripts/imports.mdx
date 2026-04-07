@@ -185,7 +185,7 @@ export function merge(input) {
 }
 ```
 
-## How it works internally
+## How imports work
 
 When a backend script contains `import` statements:
 
@@ -196,4 +196,4 @@ When a backend script contains `import` statements:
 5. The module code is prepended to the importing script
 6. The combined code runs as a single script in the sandbox
 
-This is a **compile-time inline** — not a runtime module loader. The imported code becomes part of the same function scope as the importing script, with full access to all sandbox globals (`setVariable`, `session`, `request`, etc.).
+Imported code is **merged into your script before it runs** — it is not loaded separately at runtime. It shares the same scope as the importing script, with access to the same globals (`setVariable`, `session`, `request`, etc.).

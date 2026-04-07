@@ -169,11 +169,11 @@ Every members page extends it — no auth logic needed per page:
 @if(var.bonuses.length > 0)
   @foreach(bonus in var.bonuses)
     <div class="bonus-card">
-      <img src="{{ bonus.image_url }}" alt="{{ bonus.name }}" />
-      <h3>{{ bonus.name }}</h3>
+      <img src="{{ bonus.image_url }}" alt="{{ bonus.title }}" />
+      <h3>{{ bonus.title }}</h3>
       <p>{{ bonus.description }}</p>
-      @if(bonus.bonus_url || bonus.bonus_file)
-        <a href="{{ bonus.bonus_url || bonus.bonus_file }}">Download</a>
+      @if(bonus.bonus_url)
+        <a href="{{ bonus.bonus_url }}">Download</a>
       @endif
     </div>
   @endforeach

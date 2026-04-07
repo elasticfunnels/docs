@@ -147,6 +147,7 @@ fetch('/weight/checkin', {     → request.method = 'POST'
 | `getCrmEntries({ slug, ... })` | Fetch entries — **`slug` required** ([Data Functions](/backend-scripts/data-functions#crm-data)) |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field |
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field |
+| `reassignCrmReference({ slug, fromReferenceType, fromReferenceId, ... })` | Move entries from a visitor reference to the logged-in customer ([Data Functions — CRM](/backend-scripts/data-functions)) |
 
 ### `slug` (CRM entity) vs reference
 
@@ -180,9 +181,9 @@ Calls must use a **single options object** (no positional lists).
 
 ### Input validation
 
-All inputs are strictly validated before reaching Elasticsearch:
+All inputs are strictly validated before data is stored:
 
-- **`slug`** is validated and resolved in MySQL; unknown slug → **`TypeError`**
+- **`slug`** must match a CRM entity configured for your brand; unknown slug → **`TypeError`**
 - **`fieldKey`** must match `/^[a-zA-Z0-9_.-]+$/`
 - **`referenceType`** must match `/^[a-zA-Z0-9_-]+$/`
 - **`referenceId`** rejects `{}[]"\` characters
@@ -191,6 +192,10 @@ All inputs are strictly validated before reaching Elasticsearch:
 - **Objects** are JSON-serialized and capped at 10 KB
 - Missing **`slug`**, **`fieldKey`**, or **`value`** (set) throws **`TypeError`**
 - Other invalid inputs still cause `false` / `null` / `[]` where applicable
+
+## Quiz / anonymous visitor → customer CRM migration
+
+A common pattern: save a quiz or funnel payload with `setCrmField({ referenceType: 'quiz_visitor', referenceId: sessionUuid, ... })` while the visitor is anonymous, then **after members login** call `reassignCrmReference` so the same CRM entries attach to `customer` + `customer_id`. `fromReferenceId` must match `session.get('quiz_visitor_id')` and the target must be the current session customer — see **ReassignCrmReference** on the [Data Functions](/backend-scripts/data-functions) page. Clear `quiz_visitor_id` from the session after a successful migration to keep the flow idempotent.
 
 ## Security checklist
 

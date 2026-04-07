@@ -3,14 +3,14 @@ title: 'Showing Order Details'
 description: 'Display order history, products, tracking, and shipping information in your members area'
 ---
 
-ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and the `getOrders()` backend function (for code-based pages). Both retrieve the same data from the customer's purchase history.
+ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and backend functions like `getOrders()` / `getOrder()` for code-based pages. Both retrieve data from the customer's purchase history.
 
 ## Two Approaches
 
 | Approach | Best for | Used in |
 |----------|----------|---------|
 | `<order>` tag | Visual builder pages, simple layouts | Drag-and-drop editor |
-| `getOrders()` function | Code-based pages, complex layouts with full template control | Backend scripts / `.ef` pages |
+| `getOrders()` / `getOrder()` | Code-based pages, complex layouts with full template control | Backend scripts / `.ef` pages |
 
 ## Using the `<order>` Tag
 
@@ -66,6 +66,13 @@ setVariable('orders', orders);
 @endif
 ```
 
+### Parameters (`getOrders`)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sortBy` | `string` | `'newest'` | Sort order: `'newest'` or `'oldest'` |
+| `limit` | `number` | `50` | Maximum number of orders to return (max 1000) |
+
 ### Alternative: Inline Call
 
 You can also call `getOrders()` directly in a `@set` directive without a backend script block:
@@ -78,16 +85,99 @@ You can also call `getOrders()` directly in a `@set` directive without a backend
 @endforeach
 ```
 
+## Using `getOrder()` for a Single Order Detail Page
+
+When you already know which order to show, use `getOrder(code)` instead of loading the full order list and searching manually. This is ideal for pages like `/members-order?order=EF-12345`.
+
+`getOrder()` uses the same customer/session scope as `getOrders()`, so it only returns orders that belong to the currently logged-in customer for that brand.
+
+### Example: Single order page
+
+```html
+<script scope="backend">
+var code = request.query.order;
+var order = getOrder(code);
+setVariable('order', order);
+</script>
+
+@if(order)
+  <h1>Order #{{ order.order_number }}</h1>
+  <p>{{ order.created_at | date:'dd MMM yyyy' }}</p>
+
+  @foreach(product in order.products)
+  <div>
+    <span>{{ product.name }}</span>
+    <span>{{ product.price | formatPrice:product.currency_code }}</span>
+  </div>
+  @endforeach
+@else
+  <p>Order not found.</p>
+@endif
+```
+
+### What `code` can be
+
+`getOrder(code)` matches any of these values within the current customer's orders:
+
+- `order_number` / public order ID
+- internal `order_id`
+- conversion `code`
+
 ### Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `sortBy` | `string` | `'newest'` | Sort order: `'newest'` or `'oldest'` |
-| `limit` | `number` | `50` | Maximum number of orders to return (max 1000) |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `code` | `string` | Yes | Public order ID, internal order ID, or conversion code to match |
+
+<Tip>
+For an order detail page, prefer `getOrder(request.query.order)` over `getOrders()` plus a manual loop/filter. It is shorter, clearer, and communicates intent directly.
+</Tip>
+
+## Fulfillment status and shipments
+
+Use **`getOrderFulfillment(code)`** on an **order detail** page to show 3PL fulfillment status and timestamps. Responses are **allowlisted** (no raw provider payloads).
+
+Use **`getOrderFulfillments()`** with **no arguments** to list **every** tracking row across **all** of the customer’s orders—each row includes `order_number` so you can link to `/members-order?order=…`.
+
+For a **single** order, `order.tracking` from `getOrder` / `getOrders` is often enough for carrier links. The fulfillment helpers add **lifecycle status** (`getOrderFulfillment`) and a **cross-order shipment list** (`getOrderFulfillments`).
+
+### Example: order detail with fulfillment summary
+
+```html
+<script scope="backend">
+var code = request.query.order;
+setVariable('order', getOrder(code));
+setVariable('fulfillment', getOrderFulfillment(code));
+</script>
+
+@if(fulfillment)
+  <p>Fulfillment: {{ fulfillment.status }}</p>
+  @if(fulfillment.sent_at)
+    <p>Sent: {{ fulfillment.sent_at | date:'dd MMM yyyy' }}</p>
+  @endif
+@endif
+```
+
+### Example: all shipments for the account
+
+```html
+<script scope="backend">
+setVariable('shipments', getOrderFulfillments());
+</script>
+
+@if(shipments.length gt 0)
+  @foreach(row in shipments)
+  <div>
+    <a href="/members-order?order={{ row.order_number }}">Order #{{ row.order_number }}</a>
+    — {{ row.carrier }}: <a href="{{ row.tracking_url }}" target="_blank" rel="noopener">{{ row.tracking_number }}</a>
+  </div>
+  @endforeach
+@endif
+```
 
 ### Order Object Structure
 
-Each order returned by `getOrders()` contains:
+Each order returned by `getOrders()` or `getOrder()` contains:
 
 ```javascript
 {

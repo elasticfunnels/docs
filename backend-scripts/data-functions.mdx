@@ -81,6 +81,70 @@ Each order object contains:
 }
 ```
 
+### `getOrder(code)`
+
+Fetch **one** order for the current customer. Same scope as `getOrders`. The `code` argument is required: public order ID (`order_number`), internal `order_id`, or conversion `code`. Returns `null` if not found.
+
+```javascript
+var order = getOrder(request.query.order);
+if (order) {
+  setVariable('order', order);
+}
+```
+
+See [Showing order details](/members-area/order-details) for template examples.
+
+### `getOrderFulfillment(code)`
+
+Returns an **allowlisted** fulfillment **summary** for a single order. Same `code` rules as `getOrder`. Use this for status labels and timestamps shown to customers.
+
+Returns `null` when the order exists but has **no** fulfillment record yet (no integration / not scheduled), or when the order is not found.
+
+**Returned fields** (only these; raw `fulfillment_provider_response` and `fulfillment_order_data` are never exposed):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string \| null | Normalized: `pending`, `scheduled`, `sent`, `failed`, `skipped`, `cancelled`, or `unknown` |
+| `provider_order_id` | string \| null | External reference from the fulfillment provider when stored on the conversion |
+| `integration_name` | string \| null | Display name of the fulfillment integration |
+| `scheduled_at` | string \| null | ISO timestamp when processing was scheduled |
+| `sent_at` | string \| null | ISO timestamp when the order was sent to the provider |
+| `failed_at` | string \| null | ISO timestamp on failure |
+| `cancelled_at` | string \| null | ISO timestamp if cancelled |
+| `error_message` | string \| null | Truncated message safe for display (max 200 chars) |
+
+```javascript
+var f = getOrderFulfillment(request.query.order);
+if (f) {
+  setVariable('fulfillment', f);
+}
+```
+
+### `getOrderFulfillments()`
+
+Takes **no arguments**. Returns **all** tracking-style rows for the **current customer** across their orders (up to the same order cap as `getOrders` with limit 1000, newest first). Each row includes `order_number` so you can link to an order detail page.
+
+Duplicate `(order_number, tracking_number)` pairs are removed.
+
+**Returned fields per row:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `order_number` | string | Public order id for this shipment |
+| `order_date` | string \| null | Order `created_at` (ISO) |
+| `tracking_number` | string | Tracking number |
+| `tracking_url` | string | Tracking link (e.g. 17track when generated) |
+| `carrier` | string | Carrier name |
+
+```javascript
+var shipments = getOrderFulfillments();
+setVariable('shipments', shipments);
+```
+
+<Tip>
+These APIs return **filtered** data only. Full provider API responses and internal fulfillment payloads are not available in backend scripts.
+</Tip>
+
 ## Bonus Products
 
 ### `getBonusProducts()`
@@ -102,18 +166,36 @@ Each bonus object contains:
 {
   id: 123,                        // product ID (from brand_products)
   code: 'bonus-ebook',            // product code
-  name: 'Free Bonus eBook',       // product title
+  title: 'Free Bonus eBook',      // product title
   description: 'A bonus guide…',  // product description
   image_url: 'https://…/img.jpg', // product image
-  bonus_url: 'https://…/file',    // download URL from the conversion
-  bonus_file: 'https://…/file',   // download file from the product record
+  bonus_url: 'https://…/file',    // download URL
   price: 0,                       // price (typically 0 for bonuses)
   type: 'digital',                // product type
   classification: 'bonus'         // product classification
 }
 ```
 
+`bonus_url` is the public download URL exposed to backend scripts. Internally, it comes from the saved conversion line when available, and otherwise falls back to the current bonus product download URL from the catalog.
+
 Bonus products are identified by conversion line items where `is_bonus = true`. The function enriches each item with full product details from the catalog. If the same bonus was granted across multiple purchases, it appears only once.
+
+Scoped to the **current session** (email and/or session id): if the visitor is not identified, the list is empty.
+
+### `getAllBonusProducts()`
+
+Returns **all** bonus-classified products in the brand **catalog** (`classification: bonus`). This is **not** limited to what the current customer earned; it does not check orders or conversions.
+
+Object shape matches `getBonusProducts()` (including `title`, `bonus_url`, etc.). For catalog-only rows, `bonus_url` is the product's stored download URL.
+
+```javascript
+var catalogBonuses = getAllBonusProducts();
+setVariable('all_bonus_skus', catalogBonuses);
+```
+
+<Tip>
+For the same filter but **raw** product fields (`bonus_file`, merchant fields, etc.), use `getProducts({ classification: 'bonus' })` instead.
+</Tip>
 
 ## Conversions
 
@@ -504,29 +586,30 @@ For raw session access (without the `custom_` prefix and base64 encoding), use `
 
 ## CRM Data
 
-CRM entries are stored in Elasticsearch. Every read/write is scoped by:
+CRM entries are stored per brand. Every read/write is scoped by:
 
 - **`brand_id`** — from the session (always applied server-side)
-- **`slug`** — the CRM **entity** machine name from entity settings (e.g. `pattern-tracker`), **required** on every call. This is **not** the same as `referenceType` (`customer`, `order`, …).
+- **`slug`** — the CRM **entity** machine name from entity settings (e.g. `weight-tracker`), **required** on every call. This is **not** the same as `referenceType` (`customer`, `order`, …).
 - **`reference_type` + `reference_id`** — which record the entry is attached to. Defaults: `referenceType` → `'customer'`, `referenceId` → current session **`customer_id`** when omitted or `null`.
 
 Pass a **single options object** only (positional arguments are not supported). Missing `slug` or other required keys throws `TypeError`. Unknown `slug` for the brand also throws. Invalid field values still return `false` / `null` / `[]` after sanitization where applicable.
 
 Slug aliases: `crmEntitySlug`, `crm_entity_slug`. Reference aliases: `reference_type`, `reference_id`. Field key: `fieldKey` or `field_key`.
 
+Write functions (`setCrmField`, `addCrmFieldValue`, `clearCrmEntries`) accept an optional **`async`** parameter (default `false`). When `true`, the write runs in the background — faster but with eventual consistency. Read functions are always synchronous.
+
 ```javascript
-// Current session customer + entity slug "pattern-tracker" (from CRM entity JSON)
-getCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight' });
+getCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight' });
 
-setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182 });
+setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182, force: true });
 
-// Another record type / id (still need entity slug)
-setCrmField({ slug: 'pattern-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' });
+// Another record type / id
+setCrmField({ slug: 'weight-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' });
 ```
 
-### `GetCrmEntries({ slug, referenceType?, referenceId?, limit? })`
+### `getCrmEntries({ slug, referenceType?, referenceId?, limit? })`
 
-Fetch CRM entries for one entity slug and one reference. Elasticsearch query always includes `brand_id`, `reference_type`, `reference_id`, and `crm_entity_id` (resolved from `slug`).
+Fetch CRM entries for one entity slug and one reference.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -536,13 +619,11 @@ Fetch CRM entries for one entity slug and one reference. Elasticsearch query alw
 | `limit` | number | `50` | Max entries (max 200) |
 
 ```javascript
-var entries = getCrmEntries({ slug: 'pattern-tracker', limit: 50 });
+var entries = getCrmEntries({ slug: 'weight-tracker', limit: 50 });
 
 for (var i = 0; i < entries.length; i++) {
   console.log(entries[i].title, entries[i].values_flat);
 }
-
-var orderEntries = getCrmEntries({ slug: 'deals', referenceType: 'order', referenceId: '12345' });
 ```
 
 Each entry object contains:
@@ -550,14 +631,10 @@ Each entry object contains:
 ```javascript
 {
   id: 'abc123',
-  title: 'Weight Tracker',
-  crm_entity_id: 1,
-  pipeline_id: 1,
-  stage_id: 2,
   reference_type: 'customer',
   reference_id: 'xyz789',
   values_flat: {
-    current_weight: 185,
+    current_weight: 182,
     goal_weight: 165,
     last_checkin: '2026-03-15'
   },
@@ -566,124 +643,183 @@ Each entry object contains:
 }
 ```
 
-### `GetCrmField({ slug, fieldKey, referenceType?, referenceId? })`
+### `getCrmField({ slug, fieldKey, referenceType?, referenceId? })`
 
-Reads one field from the first matching entry for that **slug** + reference. Query always includes `brand_id` and resolved `crm_entity_id`.
+Reads one field from the first matching entry for that **slug** + reference.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `slug` | string | **required** | CRM entity slug |
-| `fieldKey` | string | **required** | Field key (e.g. `current-weight`, `user_id`) |
+| `fieldKey` | string | **required** | Field key (e.g. `current_weight`, `goal_weight`) |
 | `referenceType` | string | `'customer'` | Linked record type |
 | `referenceId` | string | session `customer_id` | Linked record id |
 
 ```javascript
-var weight = getCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight' });
+var weight = getCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight' });
 
 if (weight && Number(weight) <= 165) {
   setVariable('show_goal_reached', true);
 }
 ```
 
-### `GetCrmFieldValues({ slug, fieldKey, referenceType?, referenceId?, limit?, filters? })`
+### `setCrmField({ slug, fieldKey, value, force?, referenceType?, referenceId?, async? })`
 
-Always returns an array of values for the field key, newest → oldest.
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `slug` | string | **required** | CRM entity slug |
-| `fieldKey` | string | **required** | Field key (e.g. `current-weight`, `user_id`) |
-| `referenceType` | string | `'customer'` | Linked record type |
-| `referenceId` | string | session `customer_id` | Linked record id |
-| `limit` | number | `100` | Max entries scanned (max 200) |
-| `filters` | object | none | Optional value filters (`equals`, `notEquals`, `in`, `notIn`, `contains`) |
-
-```javascript
-var outbreakDates = getCrmFieldValues({
-  slug: 'pattern-tracker',
-  fieldKey: 'last_outbreak_date',
-  limit: 50
-});
-
-var mildOnly = getCrmFieldValues({
-  slug: 'pattern-tracker',
-  fieldKey: 'last_outbreak_severity',
-  filters: { equals: 'mild' }
-});
-
-var severeOrModerate = getCrmFieldValues({
-  slug: 'pattern-tracker',
-  fieldKey: 'last_outbreak_severity',
-  filters: { in: ['severe', 'moderate'] }
-});
-```
-
-### `SetCrmField({ slug, fieldKey, value, referenceType?, referenceId?, force? })`
-
-Sets one canonical value for a field key under that entity/reference.
+Updates an existing entry's field or creates a new entry under that entity slug and reference.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `slug` | string | **required** | CRM entity slug |
 | `fieldKey` | string | **required** | Field key to set |
 | `value` | any | **required** | Must be present (`value: 0` / `false` allowed) |
+| `force` | boolean | `false` | Skip per-key entry scan — merge into the newest entry directly |
 | `referenceType` | string | `'customer'` | Linked record type |
 | `referenceId` | string | session `customer_id` | Linked record id |
-| `force` | boolean | `false` | If duplicates exist for this key, `false` fails safely; `true` collapses duplicates to one value |
+| `async` | boolean | `false` | When `true`, write runs in background (faster, eventual consistency) |
 
 ```javascript
-setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182 });
-setCrmField({ slug: 'pattern-tracker', fieldKey: 'last_checkin', value: new Date().toISOString() });
-setCrmField({ slug: 'deals', referenceType: 'order', referenceId: '12345', fieldKey: 'followup_status', value: 'contacted' });
-
-// Explicitly clean duplicates if needed:
-setCrmField({ slug: 'pattern-tracker', fieldKey: 'current-weight', value: 182, force: true });
+setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182 });
+setCrmField({ slug: 'weight-tracker', fieldKey: 'last_checkin', value: new Date().toISOString() });
 ```
 
-Behavior details:
+**Performance tip:** When setting multiple fields in one script, pass `force: true`. Without it, each call searches all entries (up to 100) to find the document containing that key. With `force`, it fetches only the newest entry (limit 1) and merges the field into it — much faster for sequential writes:
 
-- No existing value for key -> creates one
-- Exactly one existing value -> updates it
-- Multiple existing values:
-  - `force: false` -> returns `false` (no destructive write)
-  - `force: true` -> removes old duplicates and keeps one canonical value
+```javascript
+setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182, force: true });
+setCrmField({ slug: 'weight-tracker', fieldKey: 'goal_weight', value: 165, force: true });
+setCrmField({ slug: 'weight-tracker', fieldKey: 'last_checkin', value: today, force: true });
+```
 
-### `AddCrmFieldValue({ slug, fieldKey, value, referenceType?, referenceId? })`
+### `addCrmFieldValue({ slug, fieldKey, value, referenceType?, referenceId?, async? })`
 
-Appends a value by creating a new CRM entry for that key (history/list style storage).
+Creates a **new** CRM entry with the given field value. Unlike `setCrmField` which upserts a single value per key, this always creates a new entry — enabling multiple values for the same key over time.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `slug` | string | **required** | CRM entity slug |
-| `fieldKey` | string | **required** | Field key to append |
-| `value` | any | **required** | Value to append (`0` / `false` allowed) |
+| `fieldKey` | string | **required** | Field key to store the value under |
+| `value` | any | **required** | The value to store (string, number, boolean, or object) |
 | `referenceType` | string | `'customer'` | Linked record type |
 | `referenceId` | string | session `customer_id` | Linked record id |
+| `async` | boolean | `false` | When `true`, write runs in background |
 
 ```javascript
-addCrmFieldValue({ slug: 'pattern-tracker', fieldKey: 'last_outbreak_date', value: '2026-03-31' });
-addCrmFieldValue({ slug: 'pattern-tracker', fieldKey: 'last_outbreak_severity', value: 'mild' });
-```
-
-### `ClearCrmFieldValues({ slug, fieldKey, referenceType?, referenceId? })`
-
-Removes a field key from all matching entries for that slug/reference. Returns the number of entries updated.
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `slug` | string | **required** | CRM entity slug |
-| `fieldKey` | string | **required** | Field key to remove |
-| `referenceType` | string | `'customer'` | Linked record type |
-| `referenceId` | string | session `customer_id` | Linked record id |
-
-```javascript
-var removed = clearCrmFieldValues({
-  slug: 'pattern-tracker',
-  fieldKey: 'outbreak_history'
+addCrmFieldValue({
+  slug: 'weight-tracker',
+  fieldKey: 'weighin_history',
+  value: { date: today, weight: 182, notes: 'post-workout' }
 });
-console.log('Removed from entries:', removed);
 ```
 
-<Note>
-`slug` is resolved against MySQL (`brand_crm_entities`) on the app database. The offer runtime must use the same database as the CRM module for resolution to work.
-</Note>
+### `getCrmFieldValues({ slug, fieldKey, limit?, referenceType?, referenceId? })`
+
+Collects all values for a given field key across CRM entries. Returns an array of the raw values (string, number, object, etc.), newest first.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKey` | string | **required** | Field key to collect values for |
+| `limit` | number | `50` | Max values to return (max 200) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+
+```javascript
+var history = getCrmFieldValues({ slug: 'weight-tracker', fieldKey: 'weighin_history', limit: 10 });
+
+for (var i = 0; i < history.length; i++) {
+  console.log(history[i].date, history[i].weight);
+}
+```
+
+### `clearCrmEntries({ slug, referenceType?, referenceId?, async? })`
+
+Deletes **all** CRM entries for the given entity slug and reference. Returns `{ ok: boolean, deleted: number }`.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `async` | boolean | `false` | When `true`, deletes run in background |
+
+```javascript
+var result = clearCrmEntries({ slug: 'weight-tracker' });
+console.log(result.deleted, 'entries removed');
+```
+
+### `moveCrmLead({ slug, pipelineId?, pipelineSlug?, stageId?, stageSlug?, referenceType?, referenceId?, allEntries?, async? })`
+
+Moves a CRM entry to a specific pipeline and stage. Either `pipelineId` or `pipelineSlug` is required; either `stageId` or `stageSlug` is required.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `pipelineId` | number | — | Pipeline id (or use `pipelineSlug`) |
+| `pipelineSlug` | string | — | Pipeline slug (or use `pipelineId`) |
+| `stageId` | number | — | Stage id (or use `stageSlug`) |
+| `stageSlug` | string | — | Stage slug (or use `stageId`) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `allEntries` | boolean | `false` | When `true`, updates all matching entries (not just the newest) |
+| `async` | boolean | `false` | When `true`, update runs in background |
+
+Returns `{ ok, moved, totalMatched, pipeline_id, stage_id }` on success, or `{ ok: false, moved: 0, error }`.
+
+```javascript
+var result = moveCrmLead({ slug: 'deals', pipelineSlug: 'sales', stageSlug: 'qualified' });
+
+if (!result.ok) {
+  console.log('Move failed:', result.error);
+}
+```
+
+### `moveCrmToStage({ slug, stageId?, stageSlug?, pipelineId?, pipelineSlug?, referenceType?, referenceId?, allEntries?, async? })`
+
+Moves a CRM entry to a specific stage. The pipeline is resolved from the stage automatically — only `stageId` or `stageSlug` is strictly required (pipeline id/slug can narrow the lookup if stage slugs are not unique across pipelines).
+
+```javascript
+moveCrmToStage({ slug: 'deals', stageSlug: 'won' });
+```
+
+### `moveCrmToPipeline({ slug, pipelineId?, pipelineSlug?, stageId?, stageSlug?, referenceType?, referenceId?, allEntries?, async? })`
+
+Moves a CRM entry into a pipeline. The entry lands on the pipeline's first stage unless a specific stage is provided.
+
+```javascript
+moveCrmToPipeline({ slug: 'deals', pipelineSlug: 'onboarding' });
+```
+
+### `moveCrmToEntity({ fromSlug, toSlug, fieldMap, referenceType?, referenceId?, pipelineId?, pipelineSlug?, stageId?, stageSlug?, removeFromOld?, async? })`
+
+Copies field values from one CRM entity to another for the same reference. Use this to promote a lead to a deal, or migrate data between entity types.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `fromSlug` | string | **required** | Source entity slug |
+| `toSlug` | string | **required** | Target entity slug (must differ from `fromSlug`) |
+| `fieldMap` | object | **required** | `{ sourceFieldKey: targetFieldKey }` mapping — at least one pair required |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `pipelineId` / `pipelineSlug` | number / string | — | Optional pipeline to place the new entry in |
+| `stageId` / `stageSlug` | number / string | — | Optional stage within that pipeline |
+| `removeFromOld` | boolean | `false` | When `true`, deletes all source entries after copying |
+| `async` | boolean | `false` | When `true`, write runs in background |
+
+Returns `{ ok, moved, removed_from_old }` where `moved` is the number of fields copied.
+
+```javascript
+var result = moveCrmToEntity({
+  fromSlug: 'leads',
+  toSlug: 'deals',
+  fieldMap: {
+    lead_score: 'initial_score',
+    source: 'lead_source'
+  },
+  pipelineSlug: 'sales',
+  stageSlug: 'new',
+  removeFromOld: false
+});
+
+if (result.ok) {
+  console.log(result.moved, 'fields copied');
+}
+```

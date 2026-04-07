@@ -1,0 +1,104 @@
+---
+title: 'Products, categories & shipping (backend)'
+description: 'Backend template functions for catalog data: products, product categories, shipping profiles, and tax-related hints.'
+---
+
+These functions load **your brand’s** product catalog and shipping configuration. They are available in **backend** templates (server-rendered `{{ }}` and `@foreach`, etc.). All data is **scoped to the current brand** automatically—the page’s brand context supplies the brand id, and the platform never mixes another brand’s products or profiles into your page.
+
+<Note>
+If the brand context is missing or invalid, these functions return **empty results** or **`null`** (they do not fall back to a global list). Category joins also require category rows to belong to the **same brand** as the product.
+</Note>
+
+## Product lookups
+
+| Function | What it returns |
+|----------|-----------------|
+| **`GetProduct(code)`** | One product by **code** or numeric **id** (for the current brand). |
+| **`GetProduct(brandId, code)`** | Same, but the first argument is an explicit brand id (advanced; still validated). |
+| **`GetAllProducts()`** | All active products for the brand (cached on the server for performance). |
+| **`GetProducts(filters)`** | Filtered list. Optional object `filters`: `type`, `classification`, `codes`, **`category_id`**, **`subcategory_id`** (see below). |
+| **`GetProductByCode(brandId, merchantCode, productCode)`** | Resolve a product by merchant integration code (advanced). |
+
+### Fields you can use on a product
+
+Typical fields include **code**, **title**, **checkout_title**, **price**, **retail_price**, **currency**, **image**, **description**, **classification**, **tax_category** (tax provider code), **tax_exempt**, subscription fields when applicable, and merchandising categories:
+
+- **`product_category_id`** / **`product_subcategory_id`** — ids in your **product category** tree (configured in the Products area).
+- **`category_name`** / **`subcategory_name`** — display names for those ids (when set on the product).
+
+Use **`GetProducts`** with **`category_id`** to limit to products in that category or subcategory row (matches either primary or subcategory assignment). Use **`subcategory_id`** to require a specific subcategory id on the product.
+
+### Display helpers
+
+| Function / filter | Purpose |
+|-------------------|---------|
+| **`ProductSavings(product)`** | Object with savings **amount**, **percent**, and formatted strings for marketing copy. |
+| **`SubscriptionSummary(product)`** | Short human-readable subscription line (trial, billing interval). |
+| **`formatPrice`** filter | Format a number with currency (e.g. `{{ product.price \| formatPrice:product.currency }}`). |
+| **`savings`**, **`compareAt`**, **`pricePerUnit`**, **`subscriptionLabel`**, **`merchantPriceId`** filters | Convenience formatting on a product object. |
+
+## Product categories
+
+| Function | What it returns |
+|----------|-----------------|
+| **`GetProductCategories()`** | Default: full category **tree** in order, each item includes **`depth`** (0 = top level). |
+| **`GetProductCategories({ parent_id: N })`** | Direct **children** of category `N` only (flat list, sorted). |
+| **`GetProductCategories({ tree: false })`** or **`{ flat: true }`** | Flat list of all categories (no `depth`). |
+| **`GetProductCategories({ top_level: true })`** | Only categories with no parent (then tree or flat as above). |
+
+Combine with **`@foreach`** to build category navigation or filter UI on landing pages.
+
+## Shipping profiles
+
+Shipping profiles define **rates and rules** used at checkout. These functions help you build **shipping policy** or **FAQ** pages.
+
+| Function | What it returns |
+|----------|-----------------|
+| **`GetShippingProfiles()`** | All shipping profiles for the brand. **`shipping_costs`** is a **parsed object** (e.g. regional keys, `default`, `overrides`). **`has_shipping_rates`** is true when that object has keys. |
+| **`GetShippingProfiles({ selectable_only: true })`** | Only profiles visitors can pick at checkout (when that option is enabled on the profile). |
+| **`GetShippingProfiles({ include_product_stats: true })`** | Same as list mode, but each row also includes **`products_count`** and **`tax_categories`**. Use only when you need counts or tax-code summaries—extra queries run per profile. |
+| **`GetShippingProfile(profileId)`** | One profile by id, **including** product stats (**`products_count`**, **`tax_categories`**). |
+| **`GetDefaultShippingProfile()`** | The profile marked default, with the same enrichment as a single **`GetShippingProfile`**. |
+
+### `tax_categories` on a shipping profile
+
+Shipping profiles do **not** store a tax code themselves. **`tax_categories`** is the list of **distinct `tax_category` values** from **products** that use that shipping profile—useful for disclosure text (“products shipped under this method may use tax codes …”), not for live tax calculation (checkout handles that).
+
+### Other useful fields
+
+- **`name`**, **`description`**
+- **`is_default`**, **`allow_select_on_checkout`**
+- **`product_stats_loaded`** — `false` on list responses unless you set **`include_product_stats: true`**
+
+## Examples
+
+**List products in a category** (replace `3` with a real category id from your store):
+
+```html
+@foreach(p in GetProducts({ category_id: 3 }))
+  <p>{{ p.title }} — {{ p.price | formatPrice:p.currency }}</p>
+@endforeach
+```
+
+**Category menu (tree):**
+
+```html
+@foreach(c in GetProductCategories())
+  <p style="padding-left: {{ c.depth * 12 }}px">{{ c.name }}</p>
+@endforeach
+```
+
+**Shipping methods (names only, fast):**
+
+```html
+@foreach(s in GetShippingProfiles())
+  <li>{{ s.name }}@if(s.is_default) (default)@endif</li>
+@endforeach
+```
+
+## See also
+
+- [Backend Template Engine overview](/backend-template-engine/overview)
+- [Directives](/backend-template-engine/directives)
+- [Variables and filters](/backend-template-engine/variables-and-filters)
+- Product links and checkout: [Buy links](/products/buy-links), [Cart page tag](/pages/cart)

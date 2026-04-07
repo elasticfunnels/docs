@@ -22,7 +22,10 @@
           {
             "group": "Essentials",
             "pages": [
-              "essentials/brand-actions"
+              "essentials/brand-actions",
+              "essentials/roles-permissions-metrics",
+              "essentials/permission-matrix",
+              "essentials/restricted-role-troubleshooting"
             ]
           },
           {
@@ -39,6 +42,7 @@
             "group": "Funnels",
             "pages": [
               "funnels/create-funnel",
+              "guides/how-to-design-a-checkout-page",
               "funnels/checkout-redirect-behavior",
               "funnels/trigger-pages",
               "funnels/trigger-rules",
@@ -246,7 +250,8 @@
             "pages": [
               "backend-template-engine/overview",
               "backend-template-engine/directives",
-              "backend-template-engine/variables-and-filters"
+              "backend-template-engine/variables-and-filters",
+              "backend-template-engine/products-and-shipping"
             ]
           },
           {

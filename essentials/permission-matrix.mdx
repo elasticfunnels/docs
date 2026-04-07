@@ -1,0 +1,95 @@
+---
+title: Permission matrix
+description: A user-facing map of common ElasticFunnels capabilities to the permissions typically required.
+---
+
+## How to use this page
+
+This matrix is designed for brand owners and organization admins who need to build or troubleshoot roles.
+
+- Use the **capability** column to find the behavior you want.
+- Use the **permission** column to configure the role.
+- Also verify the related **module** is enabled for the brand.
+
+## Core rules
+
+- `*.view` usually controls whether a user can open a section or list.
+- `*.create` controls creation flows.
+- `*.update` controls edits, state changes, and many operational actions.
+- `*.delete` controls destructive actions.
+- `*.export` controls exports where supported.
+- Metrics are separate from feature permissions.
+
+## Common capability matrix
+
+| Capability | Typical permission | Notes |
+|-----------|--------------------|-------|
+| Open Conversions list | `conversions.view` | Also requires the brand's conversions-related module to be enabled. |
+| Create manual conversion-style flows | `conversions.create` | Plan rules may still limit creation in some cases. |
+| Update conversion-related operational actions | `conversions.update` | Used for actions like subscription updates and fulfillment operational flows. |
+| Open Customers report | `customers.view` | Separate from conversions visibility. |
+| Export customers | `customers.export` | Export is separate from view. |
+| Open Fulfillment list | `conversions.view` | Fulfillment list access is based on conversions access. |
+| Configure or inspect integrations | `integrations.view` | Separate from fulfillment list visibility. |
+| Open Merchants settings | `merchants.view` | Needed for merchant settings and some merchant-dependent selectors. |
+| Open Products settings | `products.view` | Product management is separate from conversions/customers. |
+| Open Pages | `pages.view` | Base pages access. |
+| Open Advanced pages tools | `pagecomponents.view`, `collections.view`, `trackingscripts.view`, `backendscripts.view`, `files.view`, and related page permissions | Advanced page tooling can depend on several permissions. |
+| Open Custom Reports | `reports.view` | In some UI contexts `analytics.view` may also appear; use the report-specific permission model when assigning roles. |
+| Open Tracking reports | `tracking.view` or `reporting.utm_performance.view` | Depends on the report page. |
+| Open Billing | `billing.invoices.view`, `billing.cards.view` | Billing checks use the `.view` form. |
+
+## Metrics access matrix
+
+Metrics are assigned separately from page permissions.
+
+| Behavior | Metric requirement |
+|----------|--------------------|
+| See all dashboard metrics | `*` |
+| See only selected metrics | Add only those metric keys to the role |
+| Hide the dashboard metric grid, cards, and metrics table | Leave the role with no metric grants |
+
+Examples of metric keys include:
+
+- `revenue`
+- `sales`
+- `net_revenue`
+- `conversion_rate`
+- `refund_total`
+
+## Recommended restricted-role patterns
+
+### Conversions-only viewer
+
+- `conversions.view`
+- selected metrics if you want dashboard visibility
+
+### Customers-only viewer
+
+- `customers.view`
+- `customers.export` only if export is required
+- selected metrics only if you want dashboard analytics
+
+### Reports reader
+
+- `reports.view`
+- report-specific permissions such as `conversions.view`, `customers.view`, `tracking.view`, or `reporting.utm_performance.view`
+- selected metrics if the dashboard should also be visible
+
+### Operations user
+
+- `conversions.view`
+- `conversions.update`
+- optionally `integrations.view` if they should inspect integration setup
+- optionally `merchants.view` if they need merchant settings or merchant-based selectors
+
+## Important differences to remember
+
+- **Feature permissions** decide what pages and actions a user can access.
+- **Metrics** decide whether analytics widgets and dashboard numbers appear.
+- A user may be able to view **Fulfillment** without being able to view **Integrations**.
+- A user may see **Reports** but only be allowed into a subset of report pages.
+
+## Next step
+
+If a role still behaves unexpectedly, use [Restricted Role Troubleshooting](/essentials/restricted-role-troubleshooting).

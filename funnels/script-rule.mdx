@@ -376,7 +376,7 @@ To use visit data, your script must reference `visit_data` - the system automati
 - `visit_data.rapid_visits_detected` - Suspicious rapid visiting pattern
 
 <Warning>
-Using `visit_data` adds ~100-300ms to script execution time as it queries Elasticsearch. Only use when behavior-based logic is essential.
+Using `visit_data` adds ~100–300ms to script execution time because it loads visit history. Only use when behavior-based logic is essential.
 </Warning>
 
 ```javascript

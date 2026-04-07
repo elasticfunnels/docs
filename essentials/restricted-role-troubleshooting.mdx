@@ -1,0 +1,144 @@
+---
+title: Restricted role troubleshooting
+description: How to configure restricted roles and diagnose why a user can or cannot see a page, menu item, or dashboard metric.
+---
+
+## Before you troubleshoot
+
+When a restricted role does not behave as expected, check these in order:
+
+1. Is the user in the correct organization and brand?
+2. Is the related brand module enabled?
+3. Does the role include the required permission?
+4. Does the role include the required metrics for analytics widgets?
+
+## Common symptoms
+
+### “I cannot see a menu item”
+
+Usually one of these is true:
+
+- the brand module is disabled
+- the role is missing the related `*.view` permission
+- the parent section is filtered because none of its child pages are allowed
+
+Examples:
+
+- Missing `customers.view` means the Customers report item will not appear.
+- Missing `conversions.view` means conversions-related reports and lists stay hidden.
+- Missing both `billing.invoices.view` and `billing.cards.view` means Billing stays hidden.
+
+### “I can see Reports, but it opens a different page than expected”
+
+Reports opens the **first child page the user is allowed to access**.
+
+That means:
+
+- a user with `customers.view` but not `conversions.view` may land on Customers
+- a user with only custom-report access may land on Custom Reports
+
+This is expected behavior.
+
+### “I can see the page, but the dashboard is empty”
+
+Check the role's **metrics**, not just its permissions.
+
+If the role has no metric grants, the user will not see:
+
+- dashboard metric tiles
+- dashboard cards
+- the metrics table
+
+This is expected for heavily restricted roles.
+
+### “I can see Fulfillment, but not Integrations”
+
+That can be correct.
+
+- Fulfillment list access follows conversions/report access
+- Integrations visibility is a separate permission area
+
+A role can be allowed to work with fulfillment orders while still being blocked from integration setup pages.
+
+### “I can see the menu, but the data will not load”
+
+This usually means one of the following:
+
+- the menu permission is present, but a deeper action permission is missing
+- the user has the page permission, but not the required module
+- the role was configured with feature permissions but no metric grants
+
+## Example role setups
+
+### Example 1: Conversions and customers viewer
+
+Use this when someone should review orders and customers, but not manage settings.
+
+Recommended permissions:
+
+- `conversions.view`
+- `customers.view`
+- `customers.export` only if export is required
+
+Recommended metrics:
+
+- add only the dashboard metrics they should see
+- leave metrics empty if they should not see dashboard analytics
+
+Expected behavior:
+
+- Reports is visible
+- Reports opens the first allowed report child
+- Conversions and Customers are available
+- Settings areas such as merchants/products/integrations remain hidden unless added
+
+### Example 2: Fulfillment operations user
+
+Use this when someone should process fulfillment-related work.
+
+Recommended permissions:
+
+- `conversions.view`
+- `conversions.update`
+
+Optional additions:
+
+- `integrations.view` if they should inspect integration setup
+- `merchants.view` if they need merchant settings or merchant-related selectors
+
+Expected behavior:
+
+- Fulfillment list is visible
+- operational actions are available if update permission is present
+- Integrations may still be hidden unless explicitly granted
+
+### Example 3: Dashboard-free support role
+
+Use this when a teammate needs operational access but should not see analytics.
+
+Recommended permissions:
+
+- feature permissions needed for the role, such as `conversions.view` or `customers.view`
+
+Recommended metrics:
+
+- none
+
+Expected behavior:
+
+- the user can still access allowed lists and reports
+- dashboard metrics, cards, and metrics table stay hidden
+
+## Admin checklist
+
+Before assigning a restricted role widely:
+
+1. Test with a real non-owner account.
+2. Open the sidebar and verify only intended sections appear.
+3. Click Reports and confirm it opens the expected first child.
+4. Open the dashboard and confirm metrics visibility matches the role's metric grants.
+5. Test one read action and one operational action relevant to that role.
+
+## Need the full mapping?
+
+Use the [Permission Matrix](/essentials/permission-matrix) for a quick reference of common capabilities and their permission keys.

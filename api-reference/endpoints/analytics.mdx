@@ -95,7 +95,7 @@ Retrieve actual metrics values for a date range.
 </ParamField>
 
 <ParamField query="engine" type="string">
-  Analytics engine: `elasticsearch` or `clickhouse` (optional)
+  Optional. Only use when your integration or account documentation specifies a value.
 </ParamField>
 
 ```bash Request
@@ -460,7 +460,7 @@ Custom metric formulas support:
   - The system automatically compares current period with previous period of equal length
   - Some metrics require specific modules to be enabled
   - Permission-restricted metrics (like `aff_id`) require appropriate user permissions
-  - Both Elasticsearch and ClickHouse backends are supported (auto-selected based on brand configuration)
+  - Analytics storage may vary by brand configuration
 </Info>
 
 <Warning>
