@@ -71,10 +71,24 @@ Action buttons appear at the bottom of the drawer:
 - **Force Bill** — Trigger an immediate charge attempt
 - **Change Date** — Set a new next billing date (opens a date picker)
 - **Reactivate** — Restart a canceled or past-due subscription
+- **Edit Pricing** — Adjust the recurring charge amount, shipping, and discount for the subscription
 
 <Note>
 Actions are context-aware. For example, **Resume** only appears for paused subscriptions, and **Reactivate** only appears for canceled or past-due subscriptions.
 </Note>
+
+### Edit Pricing
+
+The **Edit Pricing** action opens a modal where you can adjust:
+
+| Field | Description |
+|-------|-------------|
+| **Amount** | The recurring charge per cycle |
+| **Shipping Amount** | Shipping cost per cycle |
+| **Discount Type** | Percentage or fixed amount |
+| **Discount Value** | The percentage or dollar amount of the discount |
+
+Changes take effect on the next billing cycle. The discount amount is calculated automatically based on the type and value.
 
 ### Bulk Actions
 

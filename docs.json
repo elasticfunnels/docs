@@ -247,13 +247,14 @@
             ]
           },
           {
-            "group": "Backend Template Engine",
-            "pages": [
-              "backend-template-engine/overview",
-              "backend-template-engine/directives",
-              "backend-template-engine/variables-and-filters",
-              "backend-template-engine/products-and-shipping"
-            ]
+          "group": "Backend Template Engine",
+          "pages": [
+            "backend-template-engine/overview",
+            "backend-template-engine/directives",
+            "backend-template-engine/variables-and-filters",
+            "backend-template-engine/products-and-shipping",
+            "backend-template-engine/subscriptions"
+          ]
           },
           {
             "group": "CRM",
@@ -291,20 +292,42 @@
               "api-reference/introduction",
               "api-reference/quick-start",
               "api-reference/authentication",
+              "api-reference/endpoints/security-and-data",
               "api-reference/errors"
             ]
           },
           {
             "group": "Endpoints",
             "pages": [
-              "api-reference/endpoints/brands",
-              "api-reference/endpoints/pages",
-              "api-reference/endpoints/products",
-              "api-reference/endpoints/funnels",
-              "api-reference/endpoints/conversions",
-              "api-reference/endpoints/subscriptions",
-              "api-reference/endpoints/analytics",
-              "api-reference/endpoints/tickets"
+              {
+                "group": "Analytics and dashboards",
+                "pages": [
+                  "api-reference/endpoints/analytics",
+                  "api-reference/endpoints/analytics-cards"
+                ]
+              },
+              {
+                "group": "Programmatic Split Tests",
+                "pages": [
+                  "api-reference/endpoints/programmatic-split-tests/overview",
+                  "api-reference/endpoints/programmatic-split-tests/inspect-flow",
+                  "api-reference/endpoints/programmatic-split-tests/create",
+                  "api-reference/endpoints/programmatic-split-tests/manage",
+                  "api-reference/endpoints/programmatic-split-tests/reference"
+                ]
+              },
+              {
+                "group": "Core resources",
+                "pages": [
+                  "api-reference/endpoints/brands",
+                  "api-reference/endpoints/pages",
+                  "api-reference/endpoints/products",
+                  "api-reference/endpoints/funnels",
+                  "api-reference/endpoints/conversions",
+                  "api-reference/endpoints/subscriptions",
+                  "api-reference/endpoints/tickets"
+                ]
+              }
             ]
           }
         ]

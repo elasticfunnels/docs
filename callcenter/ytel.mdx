@@ -1,0 +1,169 @@
+---
+title: 'Ytel Integration'
+description: 'Connect Ytel telephony to ElasticFunnels Call Center for click-to-dial, transfers, hangup, recordings, and screen pop.'
+---
+
+The Ytel phone switch integration lets ElasticFunnels Call Center place and control calls through your Ytel account. The service supports **JWT bearer authentication (v4)** and **HTTP Basic authentication (v3 legacy)** so you can align with the API version your organization uses.
+
+<Warning>
+  **Ytel v3 (Basic Auth) is legacy.** Ytel and ElasticFunnels recommend **v4 with a JWT bearer token** (`api_token`) for new setups. Plan to migrate existing v3 configurations when your Ytel account allows.
+</Warning>
+
+<Info>
+  **`auth_mode`** selects the mode explicitly. If it is omitted, the integration **auto-detects**: if **`account_sid`** is present, Basic (v3) is used; otherwise Bearer (v4) is used.
+</Info>
+
+## Prerequisites
+
+Before you configure the phone switch in ElasticFunnels, gather:
+
+- Ytel admin or API access to create or copy credentials (JWT for v4, or Account SID + Auth Token for v3)
+- Your **Ytel API base URL** (required in all setups)
+- A **from number** in **E.164** format for outbound caller ID
+- Agent **extensions** in ElasticFunnels that match how Ytel identifies agents for routing
+- A test destination number for a live dial test after save
+
+You will enter credentials under **Call Center** → **Call Centers** → open a center → **Brand Settings** → **Phone Switch** → select Ytel (see [Phone Switches](/callcenter/phone-switches) for the general flow).
+
+## Authentication modes
+
+| Mode | Config | API |
+| --- | --- | --- |
+| **Bearer (v4)** | `api_token` (JWT) | Recommended for new integrations |
+| **Basic (v3)** | `account_sid` + `auth_token` | Legacy v3 API |
+
+## Configuration fields
+
+### v4 (Bearer) fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `api_base_url` | Yes | Ytel API base URL |
+| `auth_mode` | No | Set to `bearer` to force v4 (recommended when using JWT) |
+| `api_token` | Yes* | JWT bearer token for v4 |
+| `from_number` | Recommended | Caller ID for outbound calls (E.164) |
+| `rest_create_call_path` | No | Create call path (default `/calls`) |
+| `rest_hangup_path` | No | Hangup path (default `/calls/{callId}/hangup`) |
+| `rest_transfer_path` | No | Transfer path (default `/calls/{callId}/transfer`) |
+| `rest_recording_path` | No | Recording URL path (default `/calls/{callId}/recording`) |
+
+\*Required when using v4; omit `account_sid` if you rely on auto-detection so the integration chooses Bearer.
+
+### v3 (Basic) fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `api_base_url` | Yes | Ytel API base URL |
+| `auth_mode` | No | Set to `basic` to force v3 when both credential types might be present |
+| `account_sid` | Yes | Account SID (v3) |
+| `auth_token` | Yes | Auth token (v3) |
+| `from_number` | Recommended | Caller ID for outbound calls (E.164) |
+| `rest_create_call_path` | No | Same defaults as v4 |
+| `rest_hangup_path` | No | Same defaults as v4 |
+| `rest_transfer_path` | No | Same defaults as v4 |
+| `rest_recording_path` | No | Same defaults as v4 |
+
+### Shared REST path placeholders
+
+Paths may include the literal segment `{callId}`; the integration substitutes the active call identifier when hanging up, transferring, or fetching a recording.
+
+## Setup: v4 (JWT Bearer)
+
+<Steps>
+  <Step title="Obtain a JWT from Ytel">
+    In the Ytel dashboard or API tools, create or copy a **v4 API token** (JWT) with permissions needed for calls and recordings per Ytel’s documentation.
+  </Step>
+  <Step title="Confirm the API base URL">
+    Use the base URL Ytel provides for the v4 API. This value maps to **`api_base_url`**.
+  </Step>
+  <Step title="Configure ElasticFunnels">
+    In the brand’s **Phone Switch** settings, choose Ytel and set **`api_base_url`**, **`api_token`**, and **`from_number`**. Optionally set **`auth_mode`** to `bearer` for clarity.
+  </Step>
+  <Step title="Save and validate">
+    Save the brand configuration. **`connect()`** checks that credentials are present; it does **not** perform a live API handshake—run a real agent dial test to confirm end-to-end behavior.
+  </Step>
+</Steps>
+
+Example shape (field names as stored in config; adjust values for your environment):
+
+```json
+{
+  "api_base_url": "https://api.your-ytel-host.example",
+  "auth_mode": "bearer",
+  "api_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "from_number": "+15551234567"
+}
+```
+
+<Tip>
+  Prefer explicit **`auth_mode`: `bearer`** on new centers so future edits do not accidentally trigger Basic mode if a legacy `account_sid` is pasted into the same config.
+</Tip>
+
+## Setup: v3 (Basic Auth)
+
+<Steps>
+  <Step title="Open Ytel API credentials">
+    In the Ytel dashboard, locate **Account SID** and **Auth Token** for the v3 API.
+  </Step>
+  <Step title="Map to ElasticFunnels">
+    Set **`api_base_url`**, **`account_sid`**, **`auth_token`**, and **`from_number`**. Set **`auth_mode`** to `basic` if you want to lock behavior to v3.
+  </Step>
+  <Step title="Save and test">
+    Save the configuration, then place a test call from an agent with a valid extension and verify hangup, transfer, and recording if used.
+  </Step>
+</Steps>
+
+```json
+{
+  "api_base_url": "https://api.your-ytel-host.example",
+  "auth_mode": "basic",
+  "account_sid": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "auth_token": "your_auth_token",
+  "from_number": "+15551234567"
+}
+```
+
+## How each feature works
+
+### Connection check (`connect()`)
+
+Validates that the configured credentials exist for the selected **`auth_mode`** (or auto-detected mode). It does **not** call the Ytel API; use operational tests to confirm connectivity and permissions.
+
+### Outbound call (`makeCall()`)
+
+Sends a **POST** to **`rest_create_call_path`** (default **`/calls`**) with payload fields including **`to`**, **`from`**, and **`agent_extension`**, using the configured base URL and authentication.
+
+### Hangup (`hangupCall()`)
+
+Sends a **POST** to **`rest_hangup_path`** (default **`/calls/{callId}/hangup`**) for the active call.
+
+### Transfer (`transferCall()`)
+
+Sends a **POST** to **`rest_transfer_path`** (default **`/calls/{callId}/transfer`**) with a **`target`** (transfer destination per your Ytel setup).
+
+### Recording URL (`getCallRecordingUrl()`)
+
+Sends a **GET** to **`rest_recording_path`** (default **`/calls/{callId}/recording`**) to retrieve recording location for the call.
+
+### Screen pop
+
+Incoming call context uses a **webhook** flow. The integration performs **phone-based customer lookup** so agents see matching customer records when calls arrive.
+
+### Call SID from responses
+
+After create or status responses, the integration resolves the call identifier from the first present field among **`sid`**, **`call_sid`**, or **`id`**.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Wrong auth mode / 401 errors | Confirm **`auth_mode`** or remove conflicting fields. If **`account_sid`** is set, auto-detection chooses Basic unless you force **`bearer`**. |
+| v4 works in Postman but not in EF | Verify **`api_base_url`** has no trailing slash issues and matches the host Ytel expects; confirm the JWT is not expired. |
+| Calls fail immediately | **`from_number`** must be valid E.164 where required; agent **extension** in ElasticFunnels must match Ytel’s expectation for **`agent_extension`**. |
+| Hangup / transfer / recording fail | Confirm **`{callId}`** paths match your Ytel deployment; override defaults with **`rest_hangup_path`**, **`rest_transfer_path`**, and **`rest_recording_path`** if your API layout differs. |
+| No screen pop / wrong customer | Verify the webhook is configured and reachable; confirm phone numbers normalize consistently between Ytel payloads and stored customer phone fields. |
+| `connect()` passes but dialing fails | **`connect()`** only checks credential presence—inspect Ytel API error responses, scopes, and account limits on a real **`makeCall()`** attempt. |
+
+<Info>
+  Custom REST paths are intended for environments where Ytel or a proxy exposes a different route layout. Defaults align with typical **`/calls`**-style resources; adjust only when your integration spec requires it.
+</Info>

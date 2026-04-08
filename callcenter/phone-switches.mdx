@@ -1,0 +1,89 @@
+---
+title: 'Phone Switches'
+description: 'Provider-specific setup for ViciDial, Five9, and Ytel in the in-house Call Center suite'
+---
+
+Use this page when you are connecting the in-house Call Center suite to your telephony provider.
+
+Phone switch configuration is done in the call center detail page:
+
+1. Go to **Call Center** → **Call Centers**
+2. Open the center
+3. Go to the **Phone Switch** tab
+4. Select a provider by clicking its card
+5. Enter the provider-specific credentials
+6. Click **Test Connection** to verify
+7. Save
+
+<Info>
+Brand-specific phone switch overrides can be configured in the **Brand Settings** tab. When a brand config includes phone switch credentials, those override the center-level defaults for that brand.
+</Info>
+
+## What the phone switch powers
+
+Once configured correctly, the phone switch is responsible for:
+
+- Click-to-dial
+- Screen pop / incoming call context
+- Call transfer
+- Hangup requests
+- Recording lookups
+
+## Before you start
+
+Have these ready before opening the ElasticFunnels setup form:
+
+- Provider admin access
+- The correct agent extensions
+- The API or admin credentials for the provider
+- Any required base URL or API endpoint
+- A real test number you can call
+
+## Supported providers
+
+<CardGroup cols={3}>
+  <Card title="ViciDial" icon="phone-volume" href="/callcenter/vicidial">
+    Non-agent API for status and recordings, agent API for dial/hangup/transfer. Uses query-parameter authentication.
+  </Card>
+  <Card title="Five9" icon="headset" href="/callcenter/five9">
+    REST API integration with Bearer token or Basic Auth. Most deployments use a middleware proxy in front of Five9's native SOAP API.
+  </Card>
+  <Card title="Ytel" icon="phone" href="/callcenter/ytel">
+    Supports v4 JWT bearer tokens (recommended) and v3 Basic Auth (legacy). RESTful call management API.
+  </Card>
+</CardGroup>
+
+See the individual provider pages above for detailed setup instructions, field references, and troubleshooting.
+
+## Test Connection
+
+After entering credentials, click **Test Connection** in the phone switch configuration panel. This calls the provider's connectivity check and reports success or failure immediately — before you save.
+
+Use this to verify:
+
+- The API URL is reachable
+- Credentials are accepted
+- The provider responds as expected
+
+<Tip>
+If the test fails, double-check the API URL and credentials. For ViciDial, make sure the URL points to `non_agent_api.php` specifically. For Five9, confirm your middleware is running. For Ytel, confirm whether you should be using v4 (JWT) or v3 (Basic Auth).
+</Tip>
+
+## Screen pop and webhooks
+
+Screen-pop behavior in the in-house suite is primarily browser-driven and call-log driven. When a call arrives, the platform looks up the customer by phone number and populates the agent's screen with customer context.
+
+The platform includes webhook verification middleware for CTI integrations. The webhook secret is stored in the phone switch configuration under `webhook_secret`.
+
+## Troubleshooting checklist
+
+If calls are not working:
+
+- Check that the brand config is active
+- Check the selected provider type
+- Use **Test Connection** to verify API connectivity
+- Reconfirm the API URL
+- Reconfirm the username and password or token
+- Confirm the agent extension exists in the provider
+- Confirm the brand and call center belong to the same organization
+- Test with one known-good agent and one known-good phone number first

@@ -1,0 +1,133 @@
+---
+title: 'Chargeback Management'
+description: 'Prevent and manage chargebacks with automated alert monitoring, auto-refund rules, and dispute representment via Dispute.com.'
+---
+
+## Overview
+
+The chargeback management integration connects ElasticFunnels to third-party chargeback prevention services. When a customer initiates a dispute with their bank, these services detect it **before** it becomes a formal chargeback and notify ElasticFunnels in real time. You can then auto-refund the transaction to prevent the chargeback, or fight it with evidence.
+
+<Info>
+  This integration only works with **direct payment gateways** where ElasticFunnels can issue refunds (NMI, Stripe, Klarna). Platforms like BuyGoods, ClickBank, and Digistore24 handle chargebacks through their own systems.
+</Info>
+
+## Supported Providers
+
+<CardGroup cols={2}>
+  <Card title="Dispute.com" icon="shield-check">
+    Alert monitoring (Ethoca & Verifi CDRN), Rapid Dispute Resolution (RDR), and chargeback representment.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+Dispute.com monitors card network activity for your merchant accounts. When a customer begins a dispute process, the flow is:
+
+1. **Alert Received** — Dispute.com detects a pre-chargeback alert from the card network (Ethoca or Verifi CDRN) and sends a notification to ElasticFunnels.
+2. **Transaction Matched** — ElasticFunnels matches the alert to the original order using the transaction ID, order ID, or card details.
+3. **Auto-Refund Check** — If you've configured auto-refund rules and the transaction meets the criteria (amount threshold, merchant, alert type), ElasticFunnels automatically issues a refund through your payment gateway.
+4. **Alert Responded** — ElasticFunnels notifies Dispute.com that the refund was processed, preventing the chargeback from being filed.
+5. **Chargeback Prevented** — The dispute is resolved before it becomes a formal chargeback on your merchant account.
+
+If a chargeback is filed despite prevention (or no alert was received), Dispute.com can help fight it through representment — compiling and submitting evidence to the card network.
+
+### Rapid Dispute Resolution (RDR)
+
+For Visa transactions, Dispute.com can automatically resolve disputes through Visa's RDR program before they become chargebacks. These are logged in your dashboard as auto-resolved cases.
+
+## Eligible Gateways
+
+Chargeback management requires a gateway where ElasticFunnels has direct API access to issue refunds:
+
+| Gateway | Supported | Why |
+|---------|-----------|-----|
+| **NMI** | Yes | Direct refund API |
+| **Stripe** | Yes | Direct refund API |
+| **Klarna** | Yes | Direct refund API |
+| BuyGoods | No | Chargebacks handled by BuyGoods |
+| ClickBank | No | Chargebacks handled by ClickBank |
+| Digistore24 | No | Chargebacks handled by Digistore24 |
+
+When you set up the integration, the merchant selector only shows merchants using eligible gateways. Merchants on unsupported gateways are automatically excluded.
+
+## Setup
+
+<Steps>
+  <Step title="Get your Dispute.com API key">
+    Log in to your Dispute.com dashboard and generate an API key. You'll need either an **Account Key** (for a single account) or an **Organization Key** (for multiple accounts).
+  </Step>
+  <Step title="Create the integration">
+    Go to **Settings → Integrations** in ElasticFunnels. Click **Add Integration** and select **Dispute.com** under the Chargeback category. Enter your API key and save.
+  </Step>
+  <Step title="Test the connection">
+    After saving, click **Test Connection** to verify your API key is valid and Dispute.com is reachable.
+  </Step>
+  <Step title="Configure merchant filtering">
+    Choose which merchants this integration applies to. You can select **All eligible merchants** (default) or use a **Whitelist** or **Blacklist** to target specific ones. Only merchants using NMI, Stripe, or Klarna will appear in the list.
+  </Step>
+  <Step title="Set up auto-refund rules">
+    Enable **Auto-Refund** and configure your rules:
+
+    - **Maximum amount** — Only auto-refund alerts below this dollar amount (e.g., $50)
+    - **Alert types** — Choose which alert types trigger auto-refund (Ethoca, Verifi CDRN, or both)
+    - **Cancel subscription** — Automatically cancel the customer's subscription when an alert is refunded
+    - **Flag customer** — Mark the customer as a chargebacker for future reference
+
+    Alerts that don't match your rules are logged for manual review.
+  </Step>
+</Steps>
+
+<Tip>
+  Start with a conservative auto-refund threshold (e.g., $30–$50) and monitor the results before increasing it. You can always manually handle higher-value alerts.
+</Tip>
+
+## Auto-Refund Rules
+
+Auto-refund rules are processed entirely by ElasticFunnels when an alert arrives from Dispute.com. The rules are evaluated in order:
+
+1. Is auto-refund **enabled** for this integration?
+2. Is the disputed amount **≤** the maximum threshold?
+3. Does the alert type match (Ethoca / CDRN)?
+4. Does the merchant match the filter (whitelist/blacklist)?
+5. Is the merchant's gateway **eligible** for refunds?
+
+If all conditions pass, ElasticFunnels:
+- Issues a refund through the payment gateway
+- Responds to Dispute.com confirming the refund
+- Optionally cancels the subscription and flags the customer
+
+If any condition fails, the alert is logged for manual review in the Chargebacks section of your dashboard.
+
+## Monitoring
+
+### Chargebacks Page
+
+Navigate to **Conversions → Chargebacks** to see all chargeback-related activity:
+
+- **Alerts** — Pre-chargeback alerts received, with status (auto-refunded, manually reviewed, declined)
+- **Chargebacks** — Filed chargebacks, with representment status (pending, won, lost)
+- **RDR Cases** — Disputes auto-resolved through Visa's RDR program
+
+### Conversion Detail
+
+Each conversion that has chargeback activity shows a **Chargeback Services** card in the conversion drawer. This displays the alert/chargeback history, current status, and any actions taken.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I need to set up anything on Dispute.com's side?">
+    No. When you save the integration, ElasticFunnels automatically registers the necessary webhooks with Dispute.com. Your Dispute.com account just needs an active API key and the relevant alert monitoring services enabled (Ethoca, Verifi CDRN, or RDR).
+  </Accordion>
+  <Accordion title="What happens if auto-refund is disabled?">
+    Alerts are still received and logged in your dashboard. You can review them and take manual action (refund or decline) from the Chargebacks page.
+  </Accordion>
+  <Accordion title="Can I use this with BuyGoods or ClickBank merchants?">
+    No. These platforms manage chargebacks through their own systems. The Dispute.com integration only applies to merchants using NMI, Stripe, or Klarna where ElasticFunnels has direct refund access.
+  </Accordion>
+  <Accordion title="How does ElasticFunnels match alerts to orders?">
+    When Dispute.com sends an alert, ElasticFunnels matches it using the transaction ID, order ID, ARN (Acquirer Reference Number), and card details (last four digits + amount). If no match is found, the alert is logged as unmatched for manual review.
+  </Accordion>
+  <Accordion title="What is RDR?">
+    Rapid Dispute Resolution is a Visa program that allows disputes to be automatically resolved before they become formal chargebacks. Dispute.com handles this based on rules you configure in their dashboard. ElasticFunnels logs these as prevented chargebacks.
+  </Accordion>
+</AccordionGroup>

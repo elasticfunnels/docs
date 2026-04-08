@@ -1,0 +1,146 @@
+---
+title: 'ViciDial Integration'
+description: 'Connect ViciDial to ElasticFunnels Call Center for click-to-dial, screen pop, recordings, and transfers using the non-agent and agent APIs.'
+---
+
+The ElasticFunnels Call Center phone switch for **ViciDial** uses two HTTP endpoints on your dialer: the **non-agent API** (`non_agent_api.php`) for read-side and administrative checks, and the **agent API** (`agc/api.php`) for live agent actions such as dial, hangup, and transfer. Authentication uses **API user** and **password** sent as query parameters on every request.
+
+<Info>
+This integration is for the **in-house Call Center** suite (agents, orders, commissions). Configure it per brand under **Call Center** → your center → **Brand Settings** → **Phone Switch** → **ViciDial**.
+</Info>
+
+## Prerequisites
+
+Before you configure ElasticFunnels, obtain the following from your ViciDial administrator:
+
+- **Non-agent API URL** — Full HTTPS URL to `non_agent_api.php` (path varies by install; often under `/vicidial/non_agent_api.php`).
+- **Agent API URL** — Full URL to `agc/api.php`, or confirmation that it follows the standard layout relative to the non-agent URL (see [API reference](#api-reference-non-agent-vs-agent)).
+- **API-enabled user** — A `vicidial_users` account (or equivalent) allowed to use the non-agent and agent APIs, with **user** and **pass** values you can place in ElasticFunnels.
+- **Agent extensions** — Each agent must use a ViciDial **agent user** / extension that matches what you enter in ElasticFunnels for CTI (click-to-dial and status).
+- **Network access** — ElasticFunnels application servers must reach your dialer host over HTTPS (firewall / allowlist as required).
+- **Screen pop webhook** — If you use incoming call context, your CTI or dialer must POST to the ElasticFunnels screen-pop webhook with enough fields to identify the caller’s phone number (see [Screen pop](#screen-pop)).
+
+<Warning>
+Store API credentials only in ElasticFunnels brand settings. Rotate passwords if they are exposed. Restrict API user permissions in ViciDial to the minimum required for your workflows.
+</Warning>
+
+## Configuration fields
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `api_url` | Yes | Full URL to `non_agent_api.php`, e.g. `https://dialer.example.com/vicidial/non_agent_api.php`. Used for connectivity tests, agent status, and recording lookup. |
+| `api_user` | Yes | ViciDial API username (sent as the `user` query parameter). |
+| `api_pass` | Yes | ViciDial API password (sent as the `pass` query parameter). |
+| `agent_api_url` | No | Full URL to `agc/api.php`. If omitted, ElasticFunnels derives it from `api_url` by replacing the non-agent path with the standard `agc/api.php` path. Set explicitly if your deployment uses a non-standard layout. |
+| `source` | No | Optional source tag for ViciDial API calls. Maximum **20 characters**. Default: `EF`. |
+| `phone_code` | No | Default country code passed to `external_dial` when placing outbound calls. Default: `1`. |
+
+<Tip>
+If **Test connection** succeeds but dial fails, the non-agent URL is usually correct while the **agent** URL may be wrong. Set `agent_api_url` explicitly to the real `agc/api.php` URL for your server.
+</Tip>
+
+## Setup
+
+<Steps>
+  <Step title="Create or verify the API user in ViciDial">
+    Ensure a dedicated API user exists with permissions for non-agent functions (e.g. `version`, `agent_ingroup_info`, `recording_lookup`) and agent API functions (`external_dial`, `external_hangup`, `transfer_conference`, `ra_call_control` as needed).
+  </Step>
+  <Step title="Copy the non-agent API URL">
+    Use the exact HTTPS URL your installation exposes for `non_agent_api.php`, including path and no trailing slash issues in your load balancer or reverse proxy.
+  </Step>
+  <Step title="Open ElasticFunnels brand phone switch settings">
+    Go to **Call Center** → **Call Centers** → open your center → **Brand Settings** → **Phone Switch** → select **ViciDial**.
+  </Step>
+  <Step title="Enter credentials and URLs">
+    Paste `api_url`, `api_user`, and `api_pass`. Optionally set `agent_api_url`, `source`, and `phone_code` per the table above.
+  </Step>
+  <Step title="Save and test connectivity">
+    Use the connection test in the UI. Internally, this calls the non-agent API **`version`** function and expects a successful response containing `VERSION:`.
+  </Step>
+  <Step title="Validate with a live agent">
+    Log in as an agent with a known extension, run **click-to-dial** to a test number, then verify hangup, transfer (if used), and recording link behavior.
+  </Step>
+</Steps>
+
+## How features work
+
+### Click-to-dial
+
+Outbound dialing uses the **agent API** with `function=external_dial`. ElasticFunnels passes the agent’s extension as `agent_user`, normalizes the destination number to digits, and sends `phone_code` from metadata or from the configured default (`phone_code` field).
+
+Successful responses are parsed so ElasticFunnels can track a **composite call identifier** when ViciDial returns a bridge-style ID in the body; otherwise the integration may fall back to extension-only tracking for hangup operations.
+
+### Screen pop
+
+Screen pop does **not** pull customer data from ViciDial’s APIs directly for the lookup. When your telephony stack sends a **webhook** to ElasticFunnels with call metadata, the integration uses the **caller phone number** (from fields such as `caller_phone`, `caller_id`, or `phone`) and the **brand** context to run an internal **customer lookup** (customer profile, recent orders, subscription where applicable). The merged payload is returned to the agent UI.
+
+<Info>
+Configure your ViciDial / CTI integration to POST the webhook ElasticFunnels provides for screen pop, including a reliable caller ID or ANI field.
+</Info>
+
+### Recording URLs
+
+Recording retrieval uses the **non-agent API** with `function=recording_lookup`. Parameters include the agent user, date, and optional `uniqueid` when available from configuration or call context. The integration parses the pipe-delimited response and extracts the recording URL from the expected column position in the last data line.
+
+### Transfer
+
+- **Blind transfer** (external / simple path): agent API `transfer_conference` with `value=BLIND_TRANSFER` and the target as `phone_number`.
+- **Bridge transfer**: when the active call has a non-external bridge identifier, the integration uses `ra_call_control` with `stage=EXTENSIONTRANSFER` and the appropriate bridge `value`.
+
+### Hangup
+
+- If only the agent extension is known (`EXTONLY:` style id), the integration uses **`external_hangup`**.
+- When a bridge ID is present and is not the external placeholder, the integration uses **`ra_call_control`** with `stage=HANGUP` and the bridge as `value`.
+- Otherwise it attempts **`external_hangup`** for the resolved agent user.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Connection test fails | `api_url` reachable from the app server, TLS valid, `api_user` / `api_pass` correct, non-agent API enabled, and `version` allowed for this user. |
+| Dial returns error or no success | Set **`agent_api_url`** explicitly; confirm agent is logged into ViciDial; verify extension matches **agent_user**; check `phone_code` for international dialing. |
+| Hangup or transfer inconsistent | Composite call ID may be extension-only if the dial response did not include a bridge ID; some operations work only when a bridge ID was captured. |
+| No recording URL | Confirm `recording_lookup` permissions; agent user and **date** must match the call; verify ViciDial recording retention and path output format. |
+| Screen pop empty | Webhook must include a parseable phone number and correct **brand**; confirm the URL and authentication your middleware uses. |
+
+<Warning>
+ViciDial responses often start with `ERROR:` on failure. Check application logs for raw API bodies when diagnosing agent API failures.
+</Warning>
+
+## API reference: non-agent vs agent
+
+### Non-agent API (`non_agent_api.php`)
+
+Called with **GET** (query string). Base authentication on every request:
+
+```text
+user=<api_user>&pass=<api_pass>&function=<function_name>&...
+```
+
+ElasticFunnels uses this endpoint for:
+
+| Function | Purpose |
+| --- | --- |
+| `version` | **Connectivity test** — verifies the server is reachable and credentials are accepted; success body includes `VERSION:`. |
+| `agent_ingroup_info` | Agent status checks (with `agent_user`, `stage`, `source`). |
+| `recording_lookup` | Resolve **recording URL** for a call context (`agent_user`, `date`, `stage=pipe`, optional `uniqueid`). |
+
+### Agent API (`agc/api.php`)
+
+Also **GET** with the same `user` / `pass` pattern plus `function` and action-specific parameters. Used for real-time agent control:
+
+| Function | Purpose |
+| --- | --- |
+| `external_dial` | **Click-to-dial** — `agent_user`, `value` (digits), `phone_code`, optional `search` / `preview` / `focus`, `source`. |
+| `external_hangup` | Hang up when only the agent side or simple external context applies (`agent_user`, `value`). |
+| `ra_call_control` | **Hangup** or **bridge transfer** when a bridge identifier is known (`stage` = `HANGUP` or `EXTENSIONTRANSFER`, `value` = bridge, `phone_number` for transfer). |
+| `transfer_conference` | **Blind transfer** — `value=BLIND_TRANSFER`, `phone_number` target. |
+
+<Tip>
+If `api_url` matches the common pattern ending in `/vicidial/non_agent_api.php`, ElasticFunnels builds `agent_api_url` as the same origin and parent path segment with `/agc/api.php`. Custom installs may require the explicit `agent_api_url` field.
+</Tip>
+
+## Related
+
+- [Phone Switches](/callcenter/phone-switches) — Overview of ViciDial, Five9, and Ytel in Call Center.
+- [Call Center overview](/callcenter/overview) — Suite features and navigation.

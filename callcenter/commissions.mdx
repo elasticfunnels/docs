@@ -1,0 +1,81 @@
+---
+title: 'Commission Tracking'
+description: 'Track, approve, and export agent commissions for phone sales'
+---
+
+The commission system tracks per-sale commissions for call center agents. Commissions are calculated automatically when an agent places an order through Order Entry.
+
+Go to **Call Center** → **Commissions** in the sidebar.
+
+## How It Works
+
+<Steps>
+  <Step title="Agent places an order">
+    Through the Order Entry page during a phone call.
+  </Step>
+  <Step title="Commission is calculated">
+    Based on the campaign's commission configuration (flat amount or percentage of sale).
+  </Step>
+  <Step title="Pending review">
+    The commission enters the approval queue with a **Pending** status.
+  </Step>
+  <Step title="Admin approves">
+    An admin reviews and approves the commission for payout.
+  </Step>
+  <Step title="Marked as paid">
+    After payout, the admin marks the commission as **Paid**.
+  </Step>
+</Steps>
+
+## Commission Report
+
+The report shows a filterable table of all commissions.
+
+### Filters
+
+- **Date range** — Filter by start and end date using the date-from and date-to pickers
+- **Agent** — View a specific agent's commissions
+- **Status** — Show only pending, approved, or paid
+
+<Tip>
+The date range filter defaults to the current month. Use it to pull reports for any custom period — weekly, bi-weekly, or monthly payroll cycles.
+</Tip>
+
+### Commission Details
+
+Each entry shows:
+
+| Field | Description |
+|-------|-------------|
+| **Agent** | Who made the sale |
+| **Order** | Link to the original transaction |
+| **Type** | Base (initial sale) or Upsell (add-on product) |
+| **Rate** | The commission rate (flat $ or %) |
+| **Amount** | Calculated dollar amount |
+| **Order Total** | The total order value |
+| **Status** | Pending, Approved, or Paid |
+
+## Approval Workflow
+
+Commissions follow a three-step status flow:
+
+1. **Pending** — Created after a successful sale, awaiting review
+2. **Approved** — Admin has verified the commission and approved it for payout
+3. **Paid** — Commission has been paid to the agent
+
+### Bulk Actions
+
+- **Approve** — Select multiple pending commissions and approve them at once
+- **Mark Paid** — Select approved commissions and mark them as paid in batch
+
+## Exporting
+
+Click **Export** to download commission data as a CSV file for payroll processing. The export respects your current filters, so you can export by date range, agent, or status.
+
+Common payroll workflow:
+
+1. Open **Call Center** → **Commissions**
+2. Set the **Date range** for the payroll period
+3. Filter by agent or status if needed
+4. Approve or mark paid in bulk
+5. Export the final CSV

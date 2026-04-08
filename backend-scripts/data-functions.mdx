@@ -197,6 +197,149 @@ setVariable('all_bonus_skus', catalogBonuses);
 For the same filter but **raw** product fields (`bonus_file`, merchant fields, etc.), use `getProducts({ classification: 'bonus' })` instead.
 </Tip>
 
+## Subscriptions
+
+Query and manage the current customer's recurring subscriptions. All functions are scoped to the **session customer email** — a customer can only see and modify their own subscriptions.
+
+<Note>
+Write functions (`cancelSubscription`, `pauseSubscription`, etc.) validate status transitions automatically. For example, you cannot cancel an already-canceled subscription or pause one that is not active. Invalid operations return `{ ok: false, error: '...' }`.
+</Note>
+
+### `getSubscriptions(status?, limit?)`
+
+Fetch the current customer's subscriptions.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `status` | string | — | Optional filter: `active`, `paused`, `canceled`, `past_due`, `trial` |
+| `limit` | number | `50` | Max subscriptions to return (max 200) |
+
+```javascript
+var subs = getSubscriptions();
+
+if (subs.length > 0) {
+  setVariable('subscriptions', subs);
+  setVariable('has_subscriptions', true);
+}
+
+// Only active subscriptions
+var active = getSubscriptions('active');
+setVariable('active_subs', active);
+```
+
+Each subscription object contains:
+
+```javascript
+{
+  id: 'abc123',
+  status: 'active',
+  customer_email: 'john@example.com',
+  customer_name: 'John Doe',
+  products: [
+    { code: 'monthly-plan', name: 'Monthly Plan', price: 29.99, quantity: 1, type: 'main' }
+  ],
+  amount: 29.99,
+  currency_code: 'USD',
+  tax_amount: 2.50,
+  shipping_amount: 0,
+  discount_amount: null,
+  frequency: 1,
+  frequency_unit: 'month',
+  next_charge_at: '2026-05-01T00:00:00Z',
+  started_at: '2026-01-01T10:00:00Z',
+  paused_at: null,
+  resume_at: null,
+  canceled_at: null,
+  cancel_reason: null,
+  cycle_number: 4,
+  trial_days: 0,
+  first_charge_free: false,
+  original_transaction_id: 'txn_abc123',
+  gateway: 'nmi',
+  card_last4: '4242',
+  card_brand: 'visa',
+  created_at: '2026-01-01T10:00:00Z',
+  updated_at: '2026-04-01T10:00:00Z'
+}
+```
+
+### `getSubscription(transactionId)`
+
+Fetch a single subscription by its original transaction ID. Returns `null` if not found or not owned by the current customer.
+
+```javascript
+var sub = getSubscription('txn_abc123');
+if (sub) {
+  setVariable('subscription', sub);
+}
+```
+
+### `cancelSubscription(transactionId, reason?)`
+
+Cancel a subscription. The subscription must not already be canceled.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `transactionId` | string | **required** | Original transaction ID |
+| `reason` | string | `null` | Optional cancellation reason |
+
+```javascript
+var result = cancelSubscription('txn_abc123', 'Too expensive');
+// { ok: true } or { ok: false, error: '...' }
+```
+
+### `pauseSubscription(transactionId, resumeAt?)`
+
+Pause an active subscription. Optionally schedule an automatic resume date.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `transactionId` | string | **required** | Original transaction ID |
+| `resumeAt` | string | `null` | ISO date string for automatic resume (e.g. `'2026-06-01'`) |
+
+```javascript
+var result = pauseSubscription('txn_abc123');
+
+// Pause with scheduled resume
+var result = pauseSubscription('txn_abc123', '2026-06-01');
+```
+
+### `resumeSubscription(transactionId)`
+
+Resume a paused subscription. If the next charge date has passed, it is recalculated.
+
+```javascript
+var result = resumeSubscription('txn_abc123');
+```
+
+### `skipSubscription(transactionId)`
+
+Skip the next billing cycle for an active subscription. Advances the next charge date by one interval without charging.
+
+```javascript
+var result = skipSubscription('txn_abc123');
+// { ok: true, next_charge_at: '2026-06-01T...' }
+```
+
+### `changeSubscriptionFrequency(transactionId, interval, intervalCount)`
+
+Change the billing frequency of an active or paused subscription. Recalculates the next charge date.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `transactionId` | string | Original transaction ID |
+| `interval` | string | `'day'`, `'week'`, `'month'`, or `'year'` |
+| `intervalCount` | number | Positive integer (e.g. `1` for every month, `3` for every 3 months) |
+
+```javascript
+var result = changeSubscriptionFrequency('txn_abc123', 'month', 3);
+// { ok: true, frequency_unit: 'month', frequency: 3, next_charge_at: '...' }
+```
+
+<Tip>
+For the recommended way to expose these functions as page-based JSON APIs, see [Subscriptions (backend template engine)](/backend-template-engine/subscriptions).
+</Tip>
+
 ## Conversions
 
 ### `getConversions(email)`

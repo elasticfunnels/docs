@@ -1,0 +1,360 @@
+---
+title: 'Subscriptions (backend)'
+description: 'Backend template functions for listing and managing customer subscriptions — with ready-to-use page-based API examples.'
+---
+
+These functions let you **query and manage** recurring subscriptions from backend templates and backend scripts. All operations are scoped to the current customer's email — a customer can only access their own subscriptions.
+
+<Note>
+The internal `/api/subscription-*` routes are used by the call center and subscription portal. You do **not** call those routes directly from your pages. Instead, use the functions below in backend scripts to build your own subscription management pages.
+</Note>
+
+## Functions reference
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| **`getSubscriptions(status?, limit?)`** | array | List current customer's subscriptions. Optional `status` filter (`active`, `paused`, `canceled`, `past_due`, `trial`). Default limit 50, max 200. |
+| **`getSubscription(transactionId)`** | object \| null | Single subscription by original transaction ID. Returns `null` if not found or not owned by the customer. |
+| **`cancelSubscription(transactionId, reason?)`** | `{ ok, error? }` | Cancel a subscription. Must not already be canceled. |
+| **`pauseSubscription(transactionId, resumeAt?)`** | `{ ok, error? }` | Pause an active subscription. Optional `resumeAt` ISO date for auto-resume. |
+| **`resumeSubscription(transactionId)`** | `{ ok, error? }` | Resume a paused subscription. Recalculates next charge if past due. |
+| **`skipSubscription(transactionId)`** | `{ ok, next_charge_at?, error? }` | Skip next billing cycle (active only). Returns new next charge date. |
+| **`changeSubscriptionFrequency(transactionId, interval, intervalCount)`** | `{ ok, frequency_unit?, frequency?, next_charge_at?, error? }` | Change billing interval. `interval`: `day`, `week`, `month`, `year`. |
+
+### Built-in validation
+
+Write functions enforce these rules automatically — even if your script does not check:
+
+- Customer session must have an email
+- Subscription must exist and belong to the session customer (email match)
+- Status must be valid for the action (e.g. only `active` subscriptions can be paused or skipped, only `paused` can be resumed, already-canceled cannot be canceled again)
+- `changeSubscriptionFrequency` requires a valid interval unit and a positive integer count
+
+Invalid operations return `{ ok: false, error: '...' }` without modifying the subscription.
+
+### Subscription object shape
+
+```javascript
+{
+  id: 'abc123',
+  status: 'active',
+  customer_email: 'john@example.com',
+  customer_name: 'John Doe',
+  products: [
+    { code: 'monthly-plan', name: 'Monthly Plan', price: 29.99, quantity: 1, type: 'main' }
+  ],
+  amount: 29.99,
+  currency_code: 'USD',
+  frequency: 1,
+  frequency_unit: 'month',
+  next_charge_at: '2026-05-01T00:00:00Z',
+  started_at: '2026-01-01T10:00:00Z',
+  paused_at: null,
+  resume_at: null,
+  canceled_at: null,
+  cancel_reason: null,
+  cycle_number: 4,
+  trial_days: 0,
+  first_charge_free: false,
+  original_transaction_id: 'txn_abc123',
+  gateway: 'nmi',
+  card_last4: '4242',
+  card_brand: 'visa',
+  created_at: '2026-01-01T10:00:00Z',
+  updated_at: '2026-04-01T10:00:00Z'
+}
+```
+
+Sensitive fields (`vault_id`, `billing_id`, `merchant_id`, `customer_address`, `tax_report`, `metadata`) are never exposed.
+
+## Displaying subscriptions in templates
+
+Use `getSubscriptions()` in a backend script and render with `@foreach`:
+
+```html
+<script scope="backend">
+var subs = getSubscriptions('active');
+setVariable('subscriptions', subs);
+</script>
+
+@if(var.subscriptions.length > 0)
+  <h2>Your Active Subscriptions</h2>
+  @foreach(sub in var.subscriptions)
+    <div class="subscription-card">
+      <h3>@foreach(p in sub.products){{ p.name }}@endforeach</h3>
+      <p>{{ sub.amount | formatPrice:sub.currency_code }} / {{ sub.frequency }} {{ sub.frequency_unit }}</p>
+      <p>Next charge: {{ sub.next_charge_at | date:'MMM D, YYYY' }}</p>
+      <p>Cycle #{{ sub.cycle_number }}</p>
+    </div>
+  @endforeach
+@else
+  <p>No active subscriptions.</p>
+@endif
+```
+
+## Building page-based APIs
+
+The recommended pattern for subscription management: create EF pages with slugs like `api/subscription-list`, `api/subscription-cancel`, etc. Each page uses a backend script to validate, call the adapter, and return JSON.
+
+<Note>
+These pages accept `POST` requests with JSON bodies (via `request.body`) and return JSON via `response.json()`. No HTML is rendered — the backend script handles the entire response.
+</Note>
+
+### List subscriptions
+
+Create a page with slug **`api/subscription-list`**:
+
+```html
+<script scope="backend">
+if (!is_customer) {
+  response.status(401);
+  response.json({ ok: false, error: 'Not authenticated' });
+}
+
+var status = request.query.status || null;
+var subs = getSubscriptions(status);
+response.json({ ok: true, subscriptions: subs });
+</script>
+```
+
+### Cancel subscription
+
+Create a page with slug **`api/subscription-cancel`**:
+
+```html
+<script scope="backend">
+if (request.method !== 'POST') {
+  response.status(405);
+  response.json({ ok: false, error: 'POST required' });
+}
+if (!is_customer) {
+  response.status(401);
+  response.json({ ok: false, error: 'Not authenticated' });
+}
+
+var body = request.body;
+if (!body || !body.transactionId) {
+  response.status(400);
+  response.json({ ok: false, error: 'transactionId is required' });
+}
+
+var sub = getSubscription(body.transactionId);
+if (!sub) {
+  response.status(404);
+  response.json({ ok: false, error: 'Subscription not found' });
+}
+if (sub.status === 'canceled') {
+  response.status(400);
+  response.json({ ok: false, error: 'Subscription is already canceled' });
+}
+
+var result = cancelSubscription(body.transactionId, body.reason || null);
+response.json(result);
+</script>
+```
+
+### Pause subscription
+
+Create a page with slug **`api/subscription-pause`**:
+
+```html
+<script scope="backend">
+if (request.method !== 'POST') {
+  response.status(405);
+  response.json({ ok: false, error: 'POST required' });
+}
+if (!is_customer) {
+  response.status(401);
+  response.json({ ok: false, error: 'Not authenticated' });
+}
+
+var body = request.body;
+if (!body || !body.transactionId) {
+  response.status(400);
+  response.json({ ok: false, error: 'transactionId is required' });
+}
+
+var sub = getSubscription(body.transactionId);
+if (!sub || sub.status !== 'active') {
+  response.status(400);
+  response.json({ ok: false, error: 'Subscription must be active to pause' });
+}
+
+var result = pauseSubscription(body.transactionId, body.resume_at || null);
+response.json(result);
+</script>
+```
+
+### Resume subscription
+
+Create a page with slug **`api/subscription-resume`**:
+
+```html
+<script scope="backend">
+if (request.method !== 'POST') {
+  response.status(405);
+  response.json({ ok: false, error: 'POST required' });
+}
+if (!is_customer) {
+  response.status(401);
+  response.json({ ok: false, error: 'Not authenticated' });
+}
+
+var body = request.body;
+if (!body || !body.transactionId) {
+  response.status(400);
+  response.json({ ok: false, error: 'transactionId is required' });
+}
+
+var sub = getSubscription(body.transactionId);
+if (!sub || sub.status !== 'paused') {
+  response.status(400);
+  response.json({ ok: false, error: 'Subscription must be paused to resume' });
+}
+
+var result = resumeSubscription(body.transactionId);
+response.json(result);
+</script>
+```
+
+### Skip next charge
+
+Create a page with slug **`api/subscription-skip`**:
+
+```html
+<script scope="backend">
+if (request.method !== 'POST') {
+  response.status(405);
+  response.json({ ok: false, error: 'POST required' });
+}
+if (!is_customer) {
+  response.status(401);
+  response.json({ ok: false, error: 'Not authenticated' });
+}
+
+var body = request.body;
+if (!body || !body.transactionId) {
+  response.status(400);
+  response.json({ ok: false, error: 'transactionId is required' });
+}
+
+var sub = getSubscription(body.transactionId);
+if (!sub || sub.status !== 'active') {
+  response.status(400);
+  response.json({ ok: false, error: 'Subscription must be active to skip' });
+}
+
+var result = skipSubscription(body.transactionId);
+response.json(result);
+</script>
+```
+
+### Change frequency
+
+Create a page with slug **`api/subscription-change-frequency`**:
+
+```html
+<script scope="backend">
+if (request.method !== 'POST') {
+  response.status(405);
+  response.json({ ok: false, error: 'POST required' });
+}
+if (!is_customer) {
+  response.status(401);
+  response.json({ ok: false, error: 'Not authenticated' });
+}
+
+var body = request.body;
+if (!body || !body.transactionId || !body.interval || !body.interval_count) {
+  response.status(400);
+  response.json({ ok: false, error: 'transactionId, interval, and interval_count are required' });
+}
+
+var allowed = ['day', 'week', 'month', 'year'];
+if (allowed.indexOf(body.interval) === -1) {
+  response.status(400);
+  response.json({ ok: false, error: 'interval must be day, week, month, or year' });
+}
+
+var result = changeSubscriptionFrequency(body.transactionId, body.interval, body.interval_count);
+response.json(result);
+</script>
+```
+
+## Calling from frontend JavaScript
+
+Once you have the page-based APIs set up, call them from your frontend code:
+
+```javascript
+// List subscriptions
+async function loadSubscriptions() {
+  const res = await fetch('/api/subscription-list');
+  const data = await res.json();
+  if (data.ok) {
+    renderSubscriptions(data.subscriptions);
+  }
+}
+
+// Cancel a subscription
+async function cancelSub(transactionId, reason) {
+  const res = await fetch('/api/subscription-cancel', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionId, reason })
+  });
+  const data = await res.json();
+  if (data.ok) {
+    alert('Subscription canceled');
+    loadSubscriptions();
+  } else {
+    alert(data.error);
+  }
+}
+
+// Pause a subscription
+async function pauseSub(transactionId) {
+  const res = await fetch('/api/subscription-pause', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionId })
+  });
+  return res.json();
+}
+
+// Resume a subscription
+async function resumeSub(transactionId) {
+  const res = await fetch('/api/subscription-resume', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionId })
+  });
+  return res.json();
+}
+
+// Skip next charge
+async function skipSub(transactionId) {
+  const res = await fetch('/api/subscription-skip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionId })
+  });
+  return res.json();
+}
+
+// Change frequency
+async function changeFrequency(transactionId, interval, intervalCount) {
+  const res = await fetch('/api/subscription-change-frequency', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transactionId, interval, interval_count: intervalCount })
+  });
+  return res.json();
+}
+```
+
+## See also
+
+- [Backend Template Engine overview](/backend-template-engine/overview)
+- [Data Functions — Subscriptions](/backend-scripts/data-functions#subscriptions)
+- [Backend Scripts — Actions](/backend-scripts/actions) (`response.json()`, `response.status()`)
+- [Subscriptions Overview](/subscriptions/overview)

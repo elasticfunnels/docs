@@ -92,6 +92,10 @@ The following functions are available in both the template engine and backend sc
 | `moveCrmToEntity({ fromSlug, toSlug, fieldMap, ... })` | Move mapped fields from one CRM entity to another |
 | `moveCrmLead({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug, ... })` | Lower-level direct pipeline + stage move (kept for compatibility) |
 | `clearCrmEntries({ slug, ... })` | Delete all entries for an entity slug + reference |
+| `moveCrmLead({ slug, pipelineId/pipelineSlug, stageId/stageSlug, ... })` | Move entry to a specific pipeline + stage |
+| `moveCrmToStage({ slug, stageId/stageSlug, ... })` | Move entry to a stage (pipeline resolved from stage) |
+| `moveCrmToPipeline({ slug, pipelineId/pipelineSlug, ... })` | Move entry to a pipeline (lands on first stage) |
+| `moveCrmToEntity({ fromSlug, toSlug, fieldMap, ... })` | Copy mapped fields across entity types |
 
 `slug` is always required (the entity's slug from CRM settings). Reference defaults: `customer` + session customer id.
 
@@ -171,25 +175,30 @@ var result = clearCrmEntries({ slug: 'weight-tracker' });
 // { ok: true, deleted: 3 }
 ```
 
-### Moving leads through stages and pipelines
+### Pipeline and stage movement
 
-Use `moveCrmToStage` / `moveCrmToPipeline` to change workflow position. This updates `pipeline_id` and `stage_id` on CRM entries for the selected reference.
+Use `moveCrmLead` to move a CRM entry to a specific pipeline and stage by id or slug:
 
 ```javascript
-// Stage-to-stage (same pipeline), using slugs
-moveCrmToStage({
-  slug: 'weight-tracker',
-  stageSlug: 'in-progress'
-});
+// By slug (recommended — works across environments)
+moveCrmLead({ slug: 'deals', pipelineSlug: 'sales', stageSlug: 'qualified' });
+
+// By id
+moveCrmLead({ slug: 'deals', pipelineId: 3, stageId: 12 });
 ```
 
+Returns `{ ok, moved, totalMatched, pipeline_id, stage_id }`. `moved` is the number of entries updated (1 unless `allEntries: true`).
+
+Use `moveCrmToStage` when you only know the stage — the pipeline is resolved automatically:
+
 ```javascript
-// Pipeline-to-pipeline move: choose a stage in the target pipeline
-moveCrmToPipeline({
-  slug: 'weight-tracker',
-  pipelineSlug: 'reactivation',
-  stageSlug: 'new'
-});
+moveCrmToStage({ slug: 'deals', stageSlug: 'won' });
+```
+
+Use `moveCrmToPipeline` to move an entry into a pipeline; it lands on the first stage:
+
+```javascript
+moveCrmToPipeline({ slug: 'deals', pipelineSlug: 'onboarding' });
 ```
 
 ```javascript
@@ -211,6 +220,8 @@ moveCrmToStage({
 });
 ```
 
+Pass `allEntries: true` to any move function to update all matching entries instead of just the newest one.
+
 <Tip>
 `moveCrmToStage` / `moveCrmToPipeline` / `moveCrmLead` are for workflow position only (pipeline/stage). They do not remap field values.
 If you need to copy values between keys (for example `quiz_email -> email`), use `getCrmField` + `setCrmField` explicitly in your script.
@@ -218,7 +229,7 @@ If you need to copy values between keys (for example `quiz_email -> email`), use
 
 ### Moving between CRM entities (with field mapping)
 
-Use `moveCrmToEntity` when data needs to move from one CRM entity to another.
+Use `moveCrmToEntity` when data needs to move from one CRM entity to another (e.g. promoting a lead to a deal):
 
 ```javascript
 moveCrmToEntity({
@@ -234,6 +245,8 @@ moveCrmToEntity({
   removeFromOld: true
 });
 ```
+
+Returns `{ ok, moved, removed_from_old }`.
 
 ```javascript
 // Async cross-entity move
@@ -252,6 +265,7 @@ For non-critical writes where you don't need immediate consistency, pass `async:
 ```javascript
 setCrmField({ slug: 'weight-tracker', fieldKey: 'last_page_view', value: today, async: true });
 addCrmFieldValue({ slug: 'weight-tracker', fieldKey: 'page_views', value: { url: '/dashboard', ts: today }, async: true });
+moveCrmLead({ slug: 'deals', pipelineSlug: 'sales', stageSlug: 'contacted', async: true });
 ```
 
 See [Data Functions](/backend-scripts/data-functions#crm-data) for full parameter details and examples.
