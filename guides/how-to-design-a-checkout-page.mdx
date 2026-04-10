@@ -94,7 +94,9 @@ Use `name="<field>"` and `data-template-value="checkout.customer.<field>"` toget
     <label>Country*</label>
     <select name="shipping_country" data-template-value="checkout.customer.shipping_country">
       <option value="">Select Country</option>
-      <option data-each="opt in checkout.countries" data-ef-value="opt.value">[[ opt.label ]]</option>
+      <template-foreach data-each="opt in checkout.countries">
+        <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+      </template-foreach>
     </select>
     <div class="form-error" data-checkout-error="shipping_country"></div>
   </div>
@@ -110,7 +112,9 @@ Use `name="<field>"` and `data-template-value="checkout.customer.<field>"` toget
       <label>State*</label>
       <select name="shipping_state" data-template-value="checkout.customer.shipping_state">
         <option value="">Select State</option>
-        <option data-each="opt in checkout.usStates" data-ef-value="opt.value">[[ opt.label ]]</option>
+        <template-foreach data-each="opt in checkout.usStates">
+          <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+        </template-foreach>
       </select>
       <div class="form-error" data-checkout-error="shipping_state"></div>
     </div>
@@ -146,7 +150,9 @@ So you do not need to manually define all countries/states in your page code.
 ```html
 <select name="shipping_country" data-template-value="checkout.customer.shipping_country">
   <option value="">Select Country</option>
-  <option data-each="opt in checkout.countries" data-ef-value="opt.value">[[ opt.label ]]</option>
+  <template-foreach data-each="opt in checkout.countries">
+    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+  </template-foreach>
 </select>
 ```
 
@@ -166,6 +172,25 @@ You can limit visible countries by filtering inside the loop:
 ```
 
 If you only show a subset in the dropdown, customers can only choose from that subset.
+
+#### Enforce country/state allowlist on submit (recommended)
+
+Filtering the dropdown is a frontend UX helper only. To enforce allowed countries/states server-side at checkout submit, set `checkout_settings` in `<script scope="backend">` using `setVariable(...)`.
+
+```html
+<script scope="backend">
+setVariable('checkout_settings', {
+  countries: ['US'],
+  usStates: ['AL', 'AK', 'AZ', 'AR', 'CA', 'TX']
+});
+</script>
+```
+
+Notes:
+
+- `countries` uses country codes from `checkout.countries` (`US`, `CA`, `GB`, ...).
+- `usStates` uses US state codes from `checkout.usStates` (`AL`, `CA`, `TX`, ...).
+- Use `setVariable('checkout_settings', ...)` (not direct assignment) so the value is available to checkout processing.
 
 ## Step 2: Billing + payment details
 
