@@ -1,0 +1,70 @@
+---
+title: 'Overview'
+description: 'Create and manage A/B split tests programmatically with full flow integration'
+---
+
+Programmatic split tests let you create, update, and manage A/B tests via API without using the visual builder. Tests are immediately active — the API modifies the underlying flow configuration directly.
+
+## Two Creation Modes
+
+### Mode 1: `page_top`
+
+Insert a quick A/B test at the top of a page's event flow. One variant is the control (current page), others redirect to different pages.
+
+- Simplest way to test page variations
+- Optionally filter who enters the test with a `script_rule`
+- Control variant stays on the current page; other variants redirect
+- Each variant supports `load_page_events` — when enabled, the loaded page's own page events replace the current page's events entirely
+
+<Note>
+**Stacking**: You can add multiple `page_top` split tests to the same page. They all execute on page load, in the order they were created. Each test independently routes visitors to its chosen variant. If you want only one test active at a time, pause the others or use a `script_rule` to segment traffic.
+</Note>
+
+#### Load & Override Page Events
+
+By default, when a variant loads a different page, the **current** page's events still run. If you set `load_page_events: true` on a variant, the current page's events are stopped and replaced with the events from the loaded page. This is useful when the variant page has its own tracking, popups, or scripts that should take over completely.
+
+### Mode 2: `insert_after`
+
+Insert a split test at a specific point in a page events or funnel flow.
+
+- Requires inspecting the flow first to find target node codes
+- Each variant can define a chain of nodes (see [Allowed Node Types](/api-reference/endpoints/programmatic-split-tests/reference#allowed-node-types))
+- Works in both page events and funnel contexts
+
+## Placement Rules
+
+Split tests run server-side and have placement restrictions:
+
+**In funnels**, split tests can only be placed after: `entry`, `purchase`, `decline`, `exit_intent`, `product_check_product`, `product_check_all`, `script_rule`, `mark_whitelisted`, `router`. You cannot place a split test directly after a `page` node.
+
+**In page events**, split tests cannot be placed after frontend-only nodes like `exit_intent`, `on-form-success`, `on-add-to-cart`, `on_cta`, etc. These nodes execute in the browser while split tests are resolved server-side.
+
+**Script rules** cannot be used in Mode 1 if the entry node connects to a frontend-only node, as this would create an invalid flow.
+
+## Managing Tests After Creation
+
+Once a split test is live, you can:
+
+- **Update** weights, name, status, or settings via `PATCH` — changes apply to the flow immediately
+- **Delete** a test via `DELETE` — removes all split test nodes from the flow and reconnects the remaining flow. The test record is marked as deleted.
+- **Declare a winner** via `POST .../declare-winner` — the flow is updated so only the winning variant's path is served to all traffic. The test is finalized and stops splitting.
+
+See [Manage Split Tests](/api-reference/endpoints/programmatic-split-tests/manage) for full endpoint documentation.
+
+## Authentication
+
+All endpoints use the `EF-Access-Key` header for authentication:
+
+```bash
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+## Base URL
+
+All endpoints are under:
+
+```
+/api/brands/{brand}/
+```

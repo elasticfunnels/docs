@@ -1,0 +1,232 @@
+---
+title: 'Create Split Test'
+description: 'Create a new split test with full flow integration using Mode 1 or Mode 2'
+---
+
+Create a new split test. The test is immediately active — no manual builder setup required.
+
+```bash Request
+POST /api/brands/{brand}/programmatic-split-tests
+```
+
+## Common Parameters
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="mode" type="string" required>
+  `page_top` or `insert_after`
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Human-readable name for the test
+</ParamField>
+
+<ParamField body="variants" type="array" required>
+  Array of 2–5 variants. Each variant requires `name` (string) and `weight` (integer, 1–100). Weights must sum to 100.
+</ParamField>
+
+<ParamField body="goals" type="array">
+  Custom conversion goals. Each goal has `name` (display name) and `value` (event identifier, alphanumeric/underscore/dash).
+</ParamField>
+
+## Mode 1 (`page_top`) Parameters
+
+<ParamField body="page_id" type="integer" required>
+  The page to add the test to
+</ParamField>
+
+<ParamField body="script_rule" type="string">
+  Optional JavaScript expression to filter who enters the test (e.g. `return visitor.country === 'US';`). When provided, visitors who don't match bypass the test. Cannot be used if the entry node connects to a frontend-only node.
+</ParamField>
+
+<ParamField body="variants.*.page_id" type="integer">
+  Page ID to redirect this variant to. The first variant (control) has no `page_id` — visitors stay on the current page. Other variants must specify a `page_id`.
+</ParamField>
+
+<ParamField body="variants.*.load_page_events" type="boolean">
+  When `true`, the loaded page's events replace the current page's events entirely. By default (`false`), the current page's events continue to run. Useful when the variant page has its own tracking, popups, or scripts.
+</ParamField>
+
+## Mode 2 (`insert_after`) Parameters
+
+<ParamField body="context" type="string" required>
+  `page_events` or `funnel`
+</ParamField>
+
+<ParamField body="page_id" type="integer">
+  Required when context is `page_events`
+</ParamField>
+
+<ParamField body="funnel_id" type="integer">
+  Required when context is `funnel`
+</ParamField>
+
+<ParamField body="previous_node_code" type="string" required>
+  The node code to insert the split test after. Use the [flow inspection endpoint](/api-reference/endpoints/programmatic-split-tests/inspect-flow) to find this value. In funnels, must be one of: `entry`, `purchase`, `decline`, `exit_intent`, `product_check_product`, `product_check_all`, `script_rule`, `mark_whitelisted`, `router`. Cannot be a frontend-only node.
+</ParamField>
+
+<ParamField body="output_index" type="integer">
+  Which output of the previous node to intercept (default: 1). Nodes like `script_rule` and `product_check` have multiple outputs.
+</ParamField>
+
+<ParamField body="variants.*.nodes" type="array" required>
+  Chain of nodes for this variant. Each node has `type` and type-specific data fields. See [Allowed Node Types](/api-reference/endpoints/programmatic-split-tests/reference#allowed-node-types).
+</ParamField>
+
+<ParamField body="variants.*.next_node_code" type="string" required>
+  The node code to reconnect to after this variant's chain ends.
+</ParamField>
+
+All [settings](/api-reference/endpoints/programmatic-split-tests/reference) (duration, statistical config, etc.) can also be included in the create payload.
+
+---
+
+## Example: Mode 1 — Quick A/B Test
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "page_top",
+    "page_id": 456,
+    "name": "Homepage hero test",
+    "variants": [
+      { "name": "Control", "weight": 50 },
+      { "name": "Variant B", "weight": 30, "page_id": 789, "load_page_events": true },
+      { "name": "Variant C", "weight": 20, "page_id": 101 }
+    ],
+    "goals": [
+      { "name": "Purchase", "value": "purchase_complete" }
+    ]
+  }'
+```
+
+## Example: Mode 1 with Script Rule
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "page_top",
+    "page_id": 456,
+    "name": "US visitors only test",
+    "script_rule": "return visitor.country === '\''US'\'';",
+    "variants": [
+      { "name": "Control", "weight": 50 },
+      { "name": "New Design", "weight": 50, "page_id": 789 }
+    ]
+  }'
+```
+
+## Example: Mode 2 — Insert in Page Events
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "insert_after",
+    "context": "page_events",
+    "page_id": 456,
+    "name": "Checkout flow test",
+    "previous_node_code": "abc123def456gh78",
+    "output_index": 1,
+    "variants": [
+      {
+        "name": "Path A",
+        "weight": 50,
+        "nodes": [{ "type": "page", "value": 123 }],
+        "next_node_code": "xyz789abc012de34"
+      },
+      {
+        "name": "Path B",
+        "weight": 50,
+        "nodes": [{ "type": "page", "value": 321 }],
+        "next_node_code": "xyz789abc012de34"
+      }
+    ]
+  }'
+```
+
+## Example: Mode 2 — Insert in Funnel
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "mode": "insert_after",
+    "context": "funnel",
+    "funnel_id": 99,
+    "name": "Upsell page test",
+    "previous_node_code": "def456ghi789jk01",
+    "output_index": 1,
+    "variants": [
+      {
+        "name": "Upsell V1",
+        "weight": 50,
+        "nodes": [{ "type": "page", "value": 500 }],
+        "next_node_code": "ghi012jkl345mn67"
+      },
+      {
+        "name": "Upsell V2",
+        "weight": 50,
+        "nodes": [{ "type": "page", "value": 501 }],
+        "next_node_code": "ghi012jkl345mn67"
+      }
+    ],
+    "duration": 7,
+    "min_sample_size_per_variant": 1000
+  }'
+```
+
+<ResponseExample>
+```json Response (201)
+{
+  "id": 42,
+  "brand_id": 63,
+  "funnel_id": null,
+  "page_id": 456,
+  "user_id": 1,
+  "type": "split_test",
+  "name": "Homepage hero test",
+  "status": "running",
+  "views": 0,
+  "config": {
+    "node_code": "st1a2b3c4d5e6f7g",
+    "items": [
+      {
+        "weight": 50,
+        "name": "Control",
+        "target": { "type": "page_variant", "value": "456", "node_code": "t1a2b3c4d5e6f7g8" },
+        "node_code": "w1a2b3c4d5e6f7g8"
+      },
+      {
+        "weight": 30,
+        "name": "Variant B",
+        "target": { "type": "page_variant", "value": "789", "load_page_events": true, "node_code": "t2b3c4d5e6f7g8h9" },
+        "node_code": "w2b3c4d5e6f7g8h9"
+      },
+      {
+        "weight": 20,
+        "name": "Variant C",
+        "target": { "type": "page_variant", "value": "101", "node_code": "t3c4d5e6f7g8h9i0" },
+        "node_code": "w3c4d5e6f7g8h9i0"
+      }
+    ],
+    "goals": [
+      { "name": "Purchase", "value": "purchase_complete" }
+    ]
+  },
+  "start_date": "2025-03-30T12:00:00.000000Z",
+  "end_date": null,
+  "duration": null,
+  "created_at": "2025-03-30T12:00:00.000000Z",
+  "updated_at": "2025-03-30T12:00:00.000000Z"
+}
+```
+</ResponseExample>

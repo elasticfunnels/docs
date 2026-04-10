@@ -1,0 +1,143 @@
+---
+title: 'Settings & Node Types'
+description: 'Complete reference for split test settings and allowed node types in variant chains'
+---
+
+## Settings Reference
+
+All settings can be included when creating or updating a split test. Only `name`, `mode`, and `variants` are required for creation; everything else is optional with sensible defaults.
+
+### Core
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `name` | string | *required* | Human-readable test name |
+| `status` | string | `running` | `running` or `paused` |
+| `start_date` | datetime | now | ISO 8601 datetime |
+| `end_date` | datetime | null | ISO 8601 datetime |
+
+### Duration & Auto-Winner
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `duration` | integer | null | Test duration in days |
+| `auto_select_winner` | boolean | false | Automatically declare a winner |
+| `winner_selection_criteria` | array | null | Metrics to evaluate, e.g. `["aov", "add_to_carts_pct"]` |
+| `winner_selection_confidence` | integer | null | Confidence threshold (1–100) |
+| `sample_size_limit` | integer | null | Stop after this many total views |
+| `baseline` | string | null | Node code of the baseline variant |
+
+### Statistical Configuration
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `significance_level` | decimal | 0.05 | Alpha (0.001–0.5) |
+| `statistical_power` | decimal | 0.8 | 1 - beta (0.1–0.99) |
+| `minimum_detectable_effect` | decimal | 5 | MDE in percent (0.1–100) |
+| `multiple_testing_correction` | string | `bonferroni` | `none`, `bonferroni`, `holm`, `fdr` |
+| `statistical_method` | string | `frequentist` | `frequentist` or `bayesian` |
+| `primary_metric` | string | `conversion_rate` | Main metric to optimize |
+| `practical_significance_threshold` | decimal | 2 | Minimum meaningful improvement (%) |
+| `require_practical_significance` | boolean | true | Require practical significance |
+| `min_sample_size_per_variant` | integer | 2000 | Minimum views before declaring winner |
+| `max_sample_size_per_variant` | integer | null | Stop variant at this many views |
+| `min_duration_days` | integer | null | Minimum test duration |
+| `max_duration_days` | integer | null | Auto-stop after this many days |
+| `enable_sequential_testing` | boolean | false | Allow peeking with alpha spending |
+| `alpha_spending_function` | string | null | e.g. `obrien-fleming` |
+| `guardrail_metrics` | array | null | Metrics that must not degrade |
+| `enable_automated_winner_selection` | boolean | false | Auto-declare when thresholds met |
+| `automated_decision_threshold` | decimal | 0.95 | Probability threshold for auto-declaration |
+
+### Bayesian Settings
+
+Used when `statistical_method` is `bayesian`.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `bayesian_prior_mean` | decimal | null | Prior mean |
+| `bayesian_prior_variance` | decimal | null | Prior variance |
+| `bayesian_credible_interval` | decimal | 0.95 | Credible interval (0.5–0.99) |
+
+### Advanced
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `enable_variance_reduction` | boolean | false | CUPED-style variance reduction |
+| `covariate_metrics` | string | null | Comma-separated covariate metric names |
+| `enable_segmentation_analysis` | boolean | false | Segment results by dimensions |
+| `segmentation_dimensions` | array | null | e.g. `["device", "country"]` |
+| `statistical_notes` | string | null | Free-text notes |
+
+### Custom Goals
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `goals` | array | Array of goal objects |
+| `goals.*.name` | string | Display name (e.g. "Purchase") |
+| `goals.*.value` | string | Event identifier matching a page interaction (e.g. `purchase_complete`). Alphanumeric, underscores, and dashes only. |
+
+### Full Settings Example
+
+```json
+{
+  "mode": "page_top",
+  "page_id": 456,
+  "name": "Homepage hero test",
+  "variants": [
+    { "name": "Control", "weight": 50 },
+    { "name": "Variant B", "weight": 50, "page_id": 789 }
+  ],
+  "duration": 14,
+  "auto_select_winner": true,
+  "winner_selection_confidence": 95,
+  "sample_size_limit": 10000,
+  "significance_level": 0.05,
+  "statistical_power": 0.8,
+  "minimum_detectable_effect": 5,
+  "statistical_method": "frequentist",
+  "primary_metric": "conversion_rate",
+  "min_sample_size_per_variant": 2000,
+  "goals": [
+    { "name": "Add to Cart", "value": "add_to_cart" },
+    { "name": "Purchase", "value": "purchase_complete" }
+  ]
+}
+```
+
+---
+
+## Allowed Node Types
+
+For Mode 2 variant chains, each node in the `nodes` array must have a `type` from this whitelist:
+
+| Type | Data Fields | Inputs | Outputs | Constraint |
+|------|------------|--------|---------|------------|
+| `page` | `value`: page ID (integer) | 1 | 1 | Funnel context only |
+| `page_variant` | `value`: page ID (string), `load_page_events`: boolean (optional) | 1 | 1 | — |
+| `url_redirect` | `value`: URL (string) | 1 | 0 | Terminal node |
+| `product_check` | *(none)* | 1 | 2 | — |
+| `product_check_product` | `value`: product code (string) | 1 | 1 | Must follow `product_check` |
+| `product_check_all` | *(none)* | 1 | 1 | Must follow `product_check` |
+| `script_rule` | `script_rule`: JS expression (string) | 1 | 2 | — |
+| `set_variable` | `variables`: key-value object | 1 | 1 | — |
+| `add_tag` | `value`: tag name (string) | 1 | 1 | — |
+
+### Example: Node chain with product check
+
+```json
+{
+  "variants": [
+    {
+      "name": "Product Path",
+      "weight": 50,
+      "nodes": [
+        { "type": "product_check" },
+        { "type": "product_check_product", "value": "premium-bundle" },
+        { "type": "page", "value": 500 }
+      ],
+      "next_node_code": "abc123def456gh78"
+    }
+  ]
+}
+```

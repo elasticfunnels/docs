@@ -1,0 +1,251 @@
+---
+title: 'Manage Split Tests'
+description: 'List, view, update, delete, and declare winners for split tests'
+---
+
+## List Split Tests
+
+Retrieve all split tests for a brand.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/programmatic-split-tests
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": 42,
+      "user_id": 1,
+      "type": "split_test",
+      "name": "Homepage hero test",
+      "views": 1523,
+      "status": "running",
+      "funnel_id": null,
+      "page_id": 456,
+      "config": { "node_code": "st1a2b3c4d5e6f7g", "items": [] },
+      "created_at": "2025-03-30T12:00:00.000000Z",
+      "start_date": "2025-03-30T12:00:00.000000Z",
+      "end_date": null,
+      "duration": null,
+      "page": { "id": 456, "title": "Landing Page" },
+      "funnel": null
+    }
+  ],
+  "current_page": 1,
+  "last_page": 1,
+  "per_page": 25,
+  "total": 1
+}
+```
+</ResponseExample>
+
+---
+
+## Get Split Test
+
+Retrieve a single split test by ID.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="programmatic_split_test" type="string" required>
+  The split test ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/programmatic-split-tests/{id}
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests/42 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 42,
+  "brand_id": 63,
+  "funnel_id": null,
+  "page_id": 456,
+  "user_id": 1,
+  "type": "split_test",
+  "name": "Homepage hero test",
+  "status": "running",
+  "views": 1523,
+  "config": {
+    "node_code": "st1a2b3c4d5e6f7g",
+    "items": [
+      {
+        "weight": 50,
+        "name": "Control",
+        "target": { "type": "page_variant", "value": "456", "node_code": "t1a2b3c4d5e6f7g8" },
+        "node_code": "w1a2b3c4d5e6f7g8"
+      },
+      {
+        "weight": 50,
+        "name": "Variant B",
+        "target": { "type": "page_variant", "value": "789", "load_page_events": true, "node_code": "t2b3c4d5e6f7g8h9" },
+        "node_code": "w2b3c4d5e6f7g8h9"
+      }
+    ]
+  },
+  "significance_level": 0.05,
+  "statistical_power": 0.8,
+  "start_date": "2025-03-30T12:00:00.000000Z",
+  "end_date": null,
+  "created_at": "2025-03-30T12:00:00.000000Z",
+  "updated_at": "2025-03-30T12:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Update Split Test
+
+Update weights, status, or settings of an existing split test. When weights change, the underlying flow configuration is also updated.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="programmatic_split_test" type="string" required>
+  The split test ID
+</ParamField>
+
+<ParamField body="status" type="string">
+  `running` or `paused`
+</ParamField>
+
+<ParamField body="variants" type="array">
+  Updated variants with new weights. Must match the existing variant count and sum to 100.
+</ParamField>
+
+<ParamField body="name" type="string">
+  Updated test name
+</ParamField>
+
+```bash Request
+PATCH /api/brands/{brand}/programmatic-split-tests/{id}
+```
+
+```bash cURL
+curl -X PATCH https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests/42 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "variants": [
+      { "name": "Control", "weight": 70 },
+      { "name": "Variant B", "weight": 30 }
+    ]
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 42,
+  "brand_id": 63,
+  "name": "Homepage hero test",
+  "status": "running",
+  "config": {
+    "node_code": "st1a2b3c4d5e6f7g",
+    "items": [
+      { "weight": 70, "name": "Control", "node_code": "w1a2b3c4d5e6f7g8" },
+      { "weight": 30, "name": "Variant B", "node_code": "w2b3c4d5e6f7g8h9" }
+    ]
+  },
+  "updated_at": "2025-03-31T08:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Split Test
+
+Remove a split test. This removes all split test nodes (the split test, weight nodes, and their target nodes) from the flow configuration and reconnects the remaining flow so downstream nodes are not orphaned. The test record is marked as `deleted`.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="programmatic_split_test" type="string" required>
+  The split test ID
+</ParamField>
+
+```bash Request
+DELETE /api/brands/{brand}/programmatic-split-tests/{id}
+```
+
+```bash cURL
+curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests/42 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Split test deleted."
+}
+```
+</ResponseExample>
+
+---
+
+## Declare Winner
+
+Manually declare a winning variant. This finalizes the test — the flow is updated so all traffic follows the winning variant's path. The test status is set to `finalized` and an `end_date` is recorded. Non-winning variants remain in the flow configuration but are no longer served.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="split_test" type="string" required>
+  The split test ID
+</ParamField>
+
+<ParamField body="winner_node_code" type="string" required>
+  The `node_code` of the winning variant's weight node. Find this in the split test's `config.items[].node_code`.
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/programmatic-split-tests/{id}/declare-winner
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/programmatic-split-tests/42/declare-winner \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "winner_node_code": "w1a2b3c4d5e6f7g8"
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 42,
+  "status": "finalized",
+  "winner": "w1a2b3c4d5e6f7g8",
+  "end_date": "2025-04-10T15:30:00.000000Z"
+}
+```
+</ResponseExample>

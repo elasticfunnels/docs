@@ -1,0 +1,164 @@
+---
+title: 'Analytics dashboard cards'
+description: 'Batch metrics/cards endpoint, per-card GET APIs, and subscription analytics used by dashboard cards.'
+---
+
+Dashboard cards load data either as a **batch** (single request for many KPIs) or through **per-card** endpoints. Base path for all examples: `https://app.elasticfunnels.io/api/brands/{brand_id}/…` with header `EF-Access-Key` (or session cookie for the SPA).
+
+## Batch load: dashboard cards payload
+
+Loads multiple metrics at once for KPI-style cards.
+
+```http
+GET /api/brands/{brand}/analytics/metrics/cards
+```
+
+### Query parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `start` | Yes (typical) | ISO 8601 start of range |
+| `end` | Yes (typical) | ISO 8601 end of range |
+| `tz` | Optional | IANA timezone |
+| `enabled_cards[]` | Yes (typical) | Repeated query key containing dashboard card IDs (for example `enabled_cards[]=video_play_rate`) |
+| `funnel_id` | Optional | Scope to a funnel |
+| `split_test_id` | Optional | Scope to a split test |
+| `page_id` | Optional | Scope to a page |
+| `filter[{key}]` | Optional | Unified dashboard filters (for example `filter[aff_id]=…`) |
+
+### Server behavior
+
+- **Integration gating:** If the brand does not have `advertising` or `reconciliation` in `has_integrations`, ad and fulfillment card IDs are omitted from processing.
+- **Subscription card IDs:** The response may include `special_cards` placeholders with `{ "enabled": true }` only. Use the **subscription analytics** endpoints below for real series data.
+
+### Response shape (conceptual)
+
+```json
+{
+  "cards": {
+    "video_analytics": {},
+    "fulfillment_metrics": {},
+    "advanced_metrics": {},
+    "core_metrics": {},
+    "special_cards": {}
+  },
+  "enabled_cards": [],
+  "available_cards": [],
+  "filters_applied": {
+    "date_range": ["2024-12-01T00:00:00.000000Z", "2024-12-10T23:59:59.000000Z"],
+    "page_id": null,
+    "split_test_id": null,
+    "funnel_id": null,
+    "aff_id": null
+  }
+}
+```
+
+Metric objects inside buckets usually include `value`, `formatted`, and often `previous_value` for period comparison. Exact keys depend on the metric type.
+
+### cURL example
+
+```bash
+curl -G "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/cards" \
+  -H "EF-Access-Key: your_api_key_here" \
+  --data-urlencode "start=2024-12-01T00:00:00.000Z" \
+  --data-urlencode "end=2024-12-10T23:59:59.999Z" \
+  --data-urlencode "tz=America/New_York" \
+  --data-urlencode "enabled_cards[]=engagement_overview" \
+  --data-urlencode "enabled_cards[]=video_play_rate"
+```
+
+---
+
+## Per-card GET endpoints (breakdowns and charts)
+
+These paths are relative to `/api/brands/{brand}/`. Query params generally mirror the batch endpoint (`start`, `end`, `tz`, `funnel_id`, and `filter[...]`).
+
+| Card ID | Path |
+|---------|------|
+| `top_sources` | `analytics/metrics/utm/source/data` |
+| `top_campaigns` | `analytics/metrics/utm/campaign/data` |
+| `traffic_source_breakdown` | `analytics/metrics/utm/medium/data` |
+| `top_countries` | `analytics/metrics/country/data` |
+| `revenue_by_country` | `analytics/metrics/country/data` |
+| `top_browsers` | `analytics/metrics/browser/data` |
+| `top_devices` | `analytics/metrics/device/data` |
+| `top_operating_systems` | `analytics/metrics/os/data` |
+| `top_pages` | `analytics/metrics/page/data` |
+| `sessions_by_hour` | `analytics/metrics/hour_of_day/data` |
+| `revenue_by_hour` | `analytics/metrics/hour_of_day/data` |
+| `sales_by_day_of_week` | `analytics/metrics/day_of_week/data` |
+| `top_affiliates`, `commission_breakdown` | `analytics/metrics/aff_id/data` |
+| `split_test_winners` | `analytics/metrics/split_test/data` |
+| `split_test_comparison` | `analytics/metrics/{field}/data` |
+| `profitability_by_product`, `revenue_by_product` | `analytics/metrics/product/data` |
+| `average_fulfillment_cost_by_product` | `analytics/metrics/product/data` |
+| `top_products_by_pages` | `analytics/metrics/products-by-pages/summary` |
+| `upsell_take_rate` | `analytics/metrics/upsell-take-rate/summary` |
+| `units_sold` | `analytics/metrics/units-sold/summary` |
+| `customer_gender` | `analytics/metrics/customer_gender/data` |
+| `video_completion_gender` | `analytics/metrics/video-completion-by-gender` |
+| `add_to_carts_by_video_time` | `analytics/metrics/add-to-carts-by-video-time` |
+| `average_shipping_cost_by_state` | `analytics/metrics/shipping_state/data` |
+| `average_shipping_cost_by_country` | `analytics/metrics/shipping_country/data` |
+| `refund_overview` | `analytics/metrics/data` |
+
+Example:
+
+```bash
+curl -G "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/country/data" \
+  -H "EF-Access-Key: your_api_key_here" \
+  --data-urlencode "start=2024-12-01T00:00:00.000Z" \
+  --data-urlencode "end=2024-12-10T23:59:59.999Z"
+```
+
+---
+
+## Subscription analytics (subscription card components)
+
+Base: `/api/brands/{brand}/subscriptions/analytics/…`. Params typically include `start`, `end`, `tz`, and optional `funnel_id` and filters.
+
+| Card ID | Path |
+|---------|------|
+| `sub_mrr_trend` | `subscriptions/analytics/mrr-trend` |
+| `sub_churn_trend` | `subscriptions/analytics/churn-trend` |
+| `sub_cohort_ltv` | `subscriptions/analytics/cohort-ltv` |
+| `sub_dunning` | `subscriptions/analytics/dunning-stats` |
+| `sub_payment_health` | `subscriptions/analytics/payment-health` |
+| `sub_decline_reasons` | `subscriptions/analytics/payment-health` (reads `decline_reasons` from the same response) |
+| `sub_retention` | `subscriptions/analytics/retention-curves` |
+| `sub_cancel_reasons` | `subscriptions/analytics/cancel-reasons` |
+
+---
+
+## Split test dashboard cards
+
+| Card ID | Path |
+|---------|------|
+| `st_revenue_impact`, `st_statistical_significance`, `st_conversion_comparison`, `st_epc_comparison`, `st_funnel_comparison` | `split-tests/{split_test_id}/chart-data` |
+| `st_goal_conversion` | `component-split-tests/{split_test_id}/metrics` |
+
+Clients may call `chart-data` with additional query parameters depending on chart type.
+
+---
+
+## Cards without extra HTTP
+
+These rely on **`/analytics/metrics/cards`** only, or on parent split-test resources rather than a separate dedicated card endpoint:
+
+- Video KPIs (`average_video_watch_time`, `video_play_rate`, …)
+- Fulfillment KPIs when reconciliation is enabled
+- `ad_spend_overview`, `ad_efficiency`, `max_cpa_card`
+- `engagement_overview`, `active_split_tests`, `affiliate_performance`
+- `funnel_conversion`, `funnel_ctr`
+- `time_on_page_before_purchase`
+- `st_test_overview`, `st_winner_summary`, `st_sample_size_progress` (use parent split-test resource for API)
+
+---
+
+## Related
+
+- [Analytics](/api-reference/endpoints/analytics) — metrics list, `metrics/data`, exports, segments
+- [Subscriptions](/api-reference/endpoints/subscriptions)
+- [Split tests](/api-reference/endpoints/split-tests)
+- [Security and sensitive data](/api-reference/endpoints/security-and-data)

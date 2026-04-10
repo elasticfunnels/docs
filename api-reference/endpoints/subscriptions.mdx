@@ -1,0 +1,388 @@
+---
+title: 'Subscriptions'
+description: 'Manage subscription lifecycle, analytics, and retention'
+---
+
+## List Subscriptions
+
+Returns a paginated list of subscriptions for the brand. Supports filters for status, date ranges, search, merchant, and product.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number for pagination
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by subscription status: `active`, `trial`, `paused`, `past_due`, `canceled` (use `all` or omit for no status filter)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by customer name, email, public order ID, or transaction ID
+</ParamField>
+
+<ParamField query="start" type="string">
+  Start of date range (ISO 8601 or date string accepted by the API)
+</ParamField>
+
+<ParamField query="end" type="string">
+  End of date range (ISO 8601 or date string accepted by the API)
+</ParamField>
+
+<ParamField query="filter.merchant_id" type="number">
+  Filter by merchant ID
+</ParamField>
+
+<ParamField query="filter.product_code" type="string">
+  Filter by product code
+</ParamField>
+
+<ParamField query="filter.email" type="string">
+  Filter by customer email
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/subscriptions
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions?status=active&page=1" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Show Subscription
+
+Returns full details of a single subscription (identified by **transaction ID**), including enriched subscription flags from the conversion record.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription **transaction ID** (not the public order code)
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/{id}
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Update Subscription Flag
+
+Updates a keyed flag on the subscription conversion (for example `subscription_status`, `subscription_next_charge_at`). In practice, prefer the **dedicated POST endpoints** below for lifecycle actions; they perform validation and side effects. Use a generic flag update only when you need to align data with an external system and your deployment exposes this route.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+<ParamField body="key" type="string" required>
+  Flag key (e.g. `subscription_status`, `subscription_next_charge_at`)
+</ParamField>
+
+<ParamField body="value" type="string" required>
+  New value for the flag
+</ParamField>
+
+```bash Request
+PATCH /api/brands/{brand}/subscriptions/{id}/flag
+```
+
+```bash cURL
+curl -X PATCH "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/flag" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"key":"subscription_status","value":"paused"}'
+```
+
+<Note>
+If this path returns 404, use **Pause**, **Resume**, **Reactivate**, **Change Next Bill Date**, and related POST routes in this reference instead.
+</Note>
+
+---
+
+## Skip Next Charge
+
+Advances the subscription by one billing cycle without taking payment now (skips the next scheduled charge).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/skip
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/skip" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Force Bill
+
+Triggers an immediate billing attempt for the subscription.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/force-bill
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/force-bill" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Change Next Charge Date
+
+Updates the next billing date for the subscription.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+<ParamField body="next_charge_at" type="string" required>
+  New charge date/time (must be after now; ISO 8601 recommended)
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/change-next-bill-date
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/change-next-bill-date" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"next_charge_at":"2026-04-15T12:00:00Z"}'
+```
+
+---
+
+## Reactivate Subscription
+
+Reactivates a canceled (or otherwise eligible) subscription.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/reactivate
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/reactivate" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Subscription Emails
+
+Returns the email log for a subscription (from brand email logs when available).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/{id}/emails
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/emails" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Analytics Endpoints
+
+### Summary
+
+Returns key metrics such as active count, MRR, churn, and average LTV (exact fields depend on implementation).
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/analytics/summary
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/analytics/summary" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+### MRR Trend
+
+Returns monthly MRR values over time.
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/analytics/mrr-trend
+```
+
+### Churn Trend
+
+Returns monthly churn rate values over time.
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/analytics/churn-trend
+```
+
+### Cohort LTV
+
+Returns lifetime value analysis grouped by subscription start month.
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/analytics/cohort-ltv
+```
+
+### Dunning Stats
+
+Returns dunning recovery metrics: totals in dunning, recovered, lost, and recovery rate.
+
+```bash Request
+GET /api/brands/{brand}/subscriptions/analytics/dunning-stats
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/analytics/dunning-stats" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Retention Offers
+
+Retention configuration is stored **per merchant**. Replace `{merchant}` with the merchant record ID.
+
+### Get Retention Offers
+
+Returns the merchant's configured retention offers and exit survey reasons.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="merchant" type="string" required>
+  Merchant ID
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/merchants/{merchant}/retention-offers
+```
+
+### Save Retention Offers
+
+Updates the merchant's retention offer configuration.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="merchant" type="string" required>
+  Merchant ID
+</ParamField>
+
+<ParamField body="retention_offers" type="object" required>
+  Configuration object: `enabled`, `offers` (array with `offer_type`, optional `cancel_reason`, `offer_value`, `offer_label`, `offer_duration_cycles`, `offer_product_code`), and optional `exit_survey_reasons`
+</ParamField>
+
+```bash Request
+PUT /api/brands/{brand}/merchants/{merchant}/retention-offers
+```
+
+```bash cURL
+curl -X PUT "https://app.elasticfunnels.io/api/brands/{brand_id}/merchants/{merchant_id}/retention-offers" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"retention_offers":{"enabled":true,"offers":[],"exit_survey_reasons":[]}}'
+```
+
+### Apply Retention Offer
+
+Applies a retention offer to a specific subscription transaction.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="transaction_id" type="string" required>
+  The subscription transaction ID
+</ParamField>
+
+<ParamField body="merchant_id" type="integer" required>
+  Merchant ID that owns the transaction
+</ParamField>
+
+<ParamField body="offer_type" type="string" required>
+  `discount`, `pause`, or `downgrade`
+</ParamField>
+
+<ParamField body="offer_value" type="number">
+  For `discount`, percent off; for `pause`, pause length in **days** (minimum 1)
+</ParamField>
+
+<ParamField body="offer_duration_cycles" type="integer">
+  For `discount`, number of billing cycles the discount applies
+</ParamField>
+
+<ParamField body="offer_product_code" type="string">
+  For `downgrade`, target product code when applicable
+</ParamField>
+
+<ParamField body="cancel_reason" type="string">
+  Customer's selected cancellation reason
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/retention-offers/apply
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/retention-offers/apply" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"transaction_id":"...","merchant_id":1,"offer_type":"discount","offer_value":15,"offer_duration_cycles":3,"cancel_reason":"Too expensive"}'
+```
