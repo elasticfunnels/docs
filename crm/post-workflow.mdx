@@ -56,12 +56,17 @@ Create a backend script module (code: `validators`) with shared schemas:
     var data = result.value;
 
     var entitySlug = 'pattern-tracker'; // your CRM entity slug from settings
-    setCrmField({ slug: entitySlug, fieldKey: 'current_weight', value: data.weight });
-    setCrmField({ slug: entitySlug, fieldKey: 'weight_unit', value: data.unit });
-    setCrmField({ slug: entitySlug, fieldKey: 'last_checkin', value: new Date().toISOString() });
+    var fields = [
+      { fieldKey: 'current_weight', value: data.weight },
+      { fieldKey: 'weight_unit', value: data.unit },
+      { fieldKey: 'last_checkin', value: new Date().toISOString() }
+    ];
+
     if (data.notes) {
-      setCrmField({ slug: entitySlug, fieldKey: 'checkin_notes', value: data.notes });
+      fields.push({ fieldKey: 'checkin_notes', value: data.notes });
     }
+
+    setCrmFields({ slug: entitySlug, fields: fields });
 
     response.json({ ok: true, data: data });
   }
@@ -136,7 +141,7 @@ fetch('/weight/checkin', {     → request.method = 'POST'
   method: 'POST',               request.body = { weight: 182, ... }
   body: JSON.stringify(data)
 })                             → Schema.validate(request.body)
-                               → setCrmField({ slug: 'pattern-tracker', fieldKey: 'current_weight', value: 182 })
+                              → setCrmFields({ slug: 'pattern-tracker', fields: [...] })
 ← { ok: true, data: {...} }   ← response.json({ ok: true, data })
 ```
 
@@ -147,6 +152,7 @@ fetch('/weight/checkin', {     → request.method = 'POST'
 | `getCrmEntries({ slug, ... })` | Fetch entries — **`slug` required** ([Data Functions](/backend-scripts/data-functions#crm-data)) |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field |
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field |
+| `setCrmFields({ slug, fields, ... })` | Set multiple fields in one call |
 | `moveCrmToStage({ slug, stageId \| stageSlug, ... })` | Move an entry to a specific stage |
 | `moveCrmToPipeline({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug?, ... })` | Move an entry into a pipeline |
 | `moveCrmToEntity({ fromSlug, toSlug, fieldMap, ... })` | Move mapped fields to another CRM entity |

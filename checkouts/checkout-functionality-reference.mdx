@@ -99,6 +99,8 @@ Behavior:
 3. If nothing valid remains, the full default lists are used (not restricted).
 4. The effective allowlist is stored in the visitor **session** and **re-validated on submit**, so blocked values cannot be forced with browser devtools alone.
 
+Frontend-only filtering is a UX helper. To actually enforce allowed countries/states at checkout submit, define `checkout_settings` in the backend script with `setVariable(...)`.
+
 ### 4.2 Example: countries only
 
 ```html
@@ -118,6 +120,12 @@ setVariable('checkout_settings', {
 });
 </script>
 ```
+
+Notes:
+
+- `countries` uses country codes from `checkout.countries` (`US`, `CA`, `GB`, ...).
+- `usStates` uses US state codes from `checkout.usStates` (`AL`, `CA`, `TX`, ...).
+- Use `setVariable('checkout_settings', ...)` and not direct assignment so the value is available to checkout processing.
 
 ---
 

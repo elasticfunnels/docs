@@ -197,149 +197,6 @@ setVariable('all_bonus_skus', catalogBonuses);
 For the same filter but **raw** product fields (`bonus_file`, merchant fields, etc.), use `getProducts({ classification: 'bonus' })` instead.
 </Tip>
 
-## Subscriptions
-
-Query and manage the current customer's recurring subscriptions. All functions are scoped to the **session customer email** — a customer can only see and modify their own subscriptions.
-
-<Note>
-Write functions (`cancelSubscription`, `pauseSubscription`, etc.) validate status transitions automatically. For example, you cannot cancel an already-canceled subscription or pause one that is not active. Invalid operations return `{ ok: false, error: '...' }`.
-</Note>
-
-### `getSubscriptions(status?, limit?)`
-
-Fetch the current customer's subscriptions.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `status` | string | — | Optional filter: `active`, `paused`, `canceled`, `past_due`, `trial` |
-| `limit` | number | `50` | Max subscriptions to return (max 200) |
-
-```javascript
-var subs = getSubscriptions();
-
-if (subs.length > 0) {
-  setVariable('subscriptions', subs);
-  setVariable('has_subscriptions', true);
-}
-
-// Only active subscriptions
-var active = getSubscriptions('active');
-setVariable('active_subs', active);
-```
-
-Each subscription object contains:
-
-```javascript
-{
-  id: 'abc123',
-  status: 'active',
-  customer_email: 'john@example.com',
-  customer_name: 'John Doe',
-  products: [
-    { code: 'monthly-plan', name: 'Monthly Plan', price: 29.99, quantity: 1, type: 'main' }
-  ],
-  amount: 29.99,
-  currency_code: 'USD',
-  tax_amount: 2.50,
-  shipping_amount: 0,
-  discount_amount: null,
-  frequency: 1,
-  frequency_unit: 'month',
-  next_charge_at: '2026-05-01T00:00:00Z',
-  started_at: '2026-01-01T10:00:00Z',
-  paused_at: null,
-  resume_at: null,
-  canceled_at: null,
-  cancel_reason: null,
-  cycle_number: 4,
-  trial_days: 0,
-  first_charge_free: false,
-  original_transaction_id: 'txn_abc123',
-  gateway: 'nmi',
-  card_last4: '4242',
-  card_brand: 'visa',
-  created_at: '2026-01-01T10:00:00Z',
-  updated_at: '2026-04-01T10:00:00Z'
-}
-```
-
-### `getSubscription(transactionId)`
-
-Fetch a single subscription by its original transaction ID. Returns `null` if not found or not owned by the current customer.
-
-```javascript
-var sub = getSubscription('txn_abc123');
-if (sub) {
-  setVariable('subscription', sub);
-}
-```
-
-### `cancelSubscription(transactionId, reason?)`
-
-Cancel a subscription. The subscription must not already be canceled.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `transactionId` | string | **required** | Original transaction ID |
-| `reason` | string | `null` | Optional cancellation reason |
-
-```javascript
-var result = cancelSubscription('txn_abc123', 'Too expensive');
-// { ok: true } or { ok: false, error: '...' }
-```
-
-### `pauseSubscription(transactionId, resumeAt?)`
-
-Pause an active subscription. Optionally schedule an automatic resume date.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `transactionId` | string | **required** | Original transaction ID |
-| `resumeAt` | string | `null` | ISO date string for automatic resume (e.g. `'2026-06-01'`) |
-
-```javascript
-var result = pauseSubscription('txn_abc123');
-
-// Pause with scheduled resume
-var result = pauseSubscription('txn_abc123', '2026-06-01');
-```
-
-### `resumeSubscription(transactionId)`
-
-Resume a paused subscription. If the next charge date has passed, it is recalculated.
-
-```javascript
-var result = resumeSubscription('txn_abc123');
-```
-
-### `skipSubscription(transactionId)`
-
-Skip the next billing cycle for an active subscription. Advances the next charge date by one interval without charging.
-
-```javascript
-var result = skipSubscription('txn_abc123');
-// { ok: true, next_charge_at: '2026-06-01T...' }
-```
-
-### `changeSubscriptionFrequency(transactionId, interval, intervalCount)`
-
-Change the billing frequency of an active or paused subscription. Recalculates the next charge date.
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `transactionId` | string | Original transaction ID |
-| `interval` | string | `'day'`, `'week'`, `'month'`, or `'year'` |
-| `intervalCount` | number | Positive integer (e.g. `1` for every month, `3` for every 3 months) |
-
-```javascript
-var result = changeSubscriptionFrequency('txn_abc123', 'month', 3);
-// { ok: true, frequency_unit: 'month', frequency: 3, next_charge_at: '...' }
-```
-
-<Tip>
-For the recommended way to expose these functions as page-based JSON APIs, see [Subscriptions (backend template engine)](/backend-template-engine/subscriptions).
-</Tip>
-
 ## Conversions
 
 ### `getConversions(email)`
@@ -739,20 +596,28 @@ Pass a **single options object** only (positional arguments are not supported). 
 
 Slug aliases: `crmEntitySlug`, `crm_entity_slug`. Reference aliases: `reference_type`, `reference_id`. Field key: `fieldKey` or `field_key`.
 
-Write functions (`setCrmField`, `addCrmFieldValue`, `clearCrmEntries`) accept an optional **`async`** parameter (default `false`). When `true`, the write runs in the background — faster but with eventual consistency. Read functions are always synchronous.
+Write functions (`setCrmField`, `setCrmFields`, `addCrmFieldValue`, `clearCrmEntries`) accept an optional **`async`** parameter (default `false`). When `true`, the write runs in the background — faster but with eventual consistency. Read functions are always synchronous.
 
 ```javascript
 getCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight' });
 
 setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182, force: true });
 
+setCrmFields({
+  slug: 'weight-tracker',
+  fields: [
+    { fieldKey: 'current_weight', value: 182 },
+    { fieldKey: 'goal_weight', value: 165 }
+  ]
+});
+
 // Another record type / id
 setCrmField({ slug: 'weight-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' });
 ```
 
-### `getCrmEntries({ slug, referenceType?, referenceId?, limit?, fieldKey?, fieldValue?, fieldFilters? })`
+### `getCrmEntries({ slug, referenceType?, referenceId?, limit? })`
 
-Fetch CRM entries for one entity slug and one reference. Optionally filter so only documents that contain a matching CRM **field row** (same nested `values` structure as `setCrmField`) are returned. Filters use validated field keys and sanitized values (same rules as writes); the server builds Elasticsearch queries from structured objects, not raw query strings.
+Fetch CRM entries for one entity slug and one reference.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -760,28 +625,9 @@ Fetch CRM entries for one entity slug and one reference. Optionally filter so on
 | `referenceType` | string | `'customer'` | Linked record type |
 | `referenceId` | string | session `customer_id` | Linked record id |
 | `limit` | number | `50` | Max entries (max 200) |
-| `fieldKey` | string | — | With `fieldValue`, require this key to equal that value (aliases: `field_key`) |
-| `fieldValue` | any | — | With `fieldKey`, value to match (aliases: `field_value`) |
-| `fieldFilters` | array | — | AND of `{ fieldKey, value }` rows (aliases: `field_filters`). Do not combine with `fieldKey` / `fieldValue`. |
 
 ```javascript
 var entries = getCrmEntries({ slug: 'weight-tracker', limit: 50 });
-
-// Only entries where values_flat.status === 'active' (per ES nested match)
-var active = getCrmEntries({
-  slug: 'weight-tracker',
-  fieldKey: 'status',
-  fieldValue: 'active',
-});
-
-// Multiple conditions (AND)
-var both = getCrmEntries({
-  slug: 'weight-tracker',
-  fieldFilters: [
-    { fieldKey: 'tier', value: 'gold' },
-    { fieldKey: 'region', value: 'US' },
-  ],
-});
 
 for (var i = 0; i < entries.length; i++) {
   console.log(entries[i].title, entries[i].values_flat);
@@ -851,6 +697,50 @@ setCrmField({ slug: 'weight-tracker', fieldKey: 'goal_weight', value: 165, force
 setCrmField({ slug: 'weight-tracker', fieldKey: 'last_checkin', value: today, force: true });
 ```
 
+### `setCrmFields({ slug, fields, force?, referenceType?, referenceId?, async? })`
+
+Sets multiple field values for the same CRM entity + reference in one read/write cycle. This is the preferred API when one script needs to write several fields at once.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fields` | array | **required** | Non-empty array of `{ fieldKey, value }` objects |
+| `force` | boolean | `false` | Skip per-key scan and merge into the newest entry directly |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `async` | boolean | `false` | When `true`, write runs in background |
+
+```javascript
+setCrmFields({
+  slug: 'weight-tracker',
+  fields: [
+    { fieldKey: 'current_weight', value: 182 },
+    { fieldKey: 'goal_weight', value: 165 },
+    { fieldKey: 'last_checkin', value: today }
+  ]
+});
+```
+
+Snake_case keys are also accepted inside `fields`:
+
+```javascript
+setCrmFields({
+  slug: 'affiliate-requests',
+  referenceType: 'affiliate_request',
+  referenceId: 'leon@elasticfunnels.io',
+  fields: [
+    { field_key: 'affiliate_experience', value: 'Wellness' },
+    { field_key: 'niche', value: 'Health' }
+  ]
+});
+```
+
+Behavior matches `setCrmField`:
+
+- If an existing entry for the same reference already contains one of the requested keys, that entry is updated.
+- If the keys are new but the reference already has entries, the newest entry is reused.
+- A new CRM entry is created only when that reference has no entry yet.
+
 ### `addCrmFieldValue({ slug, fieldKey, value, referenceType?, referenceId?, async? })`
 
 Creates a **new** CRM entry with the given field value. Unlike `setCrmField` which upserts a single value per key, this always creates a new entry — enabling multiple values for the same key over time.
@@ -906,4 +796,82 @@ Deletes **all** CRM entries for the given entity slug and reference. Returns `{ 
 ```javascript
 var result = clearCrmEntries({ slug: 'weight-tracker' });
 console.log(result.deleted, 'entries removed');
+```
+
+### `moveCrmLead({ slug, pipelineId?, pipelineSlug?, stageId?, stageSlug?, referenceType?, referenceId?, allEntries?, async? })`
+
+Moves a CRM entry to a specific pipeline and stage. Either `pipelineId` or `pipelineSlug` is required; either `stageId` or `stageSlug` is required.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `pipelineId` | number | — | Pipeline id (or use `pipelineSlug`) |
+| `pipelineSlug` | string | — | Pipeline slug (or use `pipelineId`) |
+| `stageId` | number | — | Stage id (or use `stageSlug`) |
+| `stageSlug` | string | — | Stage slug (or use `stageId`) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `allEntries` | boolean | `false` | When `true`, updates all matching entries (not just the newest) |
+| `async` | boolean | `false` | When `true`, update runs in background |
+
+Returns `{ ok, moved, totalMatched, pipeline_id, stage_id }` on success, or `{ ok: false, moved: 0, error }`.
+
+```javascript
+var result = moveCrmLead({ slug: 'deals', pipelineSlug: 'sales', stageSlug: 'qualified' });
+
+if (!result.ok) {
+  console.log('Move failed:', result.error);
+}
+```
+
+### `moveCrmToStage({ slug, stageId?, stageSlug?, pipelineId?, pipelineSlug?, referenceType?, referenceId?, allEntries?, async? })`
+
+Moves a CRM entry to a specific stage. The pipeline is resolved from the stage automatically — only `stageId` or `stageSlug` is strictly required (pipeline id/slug can narrow the lookup if stage slugs are not unique across pipelines).
+
+```javascript
+moveCrmToStage({ slug: 'deals', stageSlug: 'won' });
+```
+
+### `moveCrmToPipeline({ slug, pipelineId?, pipelineSlug?, stageId?, stageSlug?, referenceType?, referenceId?, allEntries?, async? })`
+
+Moves a CRM entry into a pipeline. The entry lands on the pipeline's first stage unless a specific stage is provided.
+
+```javascript
+moveCrmToPipeline({ slug: 'deals', pipelineSlug: 'onboarding' });
+```
+
+### `moveCrmToEntity({ fromSlug, toSlug, fieldMap, referenceType?, referenceId?, pipelineId?, pipelineSlug?, stageId?, stageSlug?, removeFromOld?, async? })`
+
+Copies field values from one CRM entity to another for the same reference. Use this to promote a lead to a deal, or migrate data between entity types.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `fromSlug` | string | **required** | Source entity slug |
+| `toSlug` | string | **required** | Target entity slug (must differ from `fromSlug`) |
+| `fieldMap` | object | **required** | `{ sourceFieldKey: targetFieldKey }` mapping — at least one pair required |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+| `pipelineId` / `pipelineSlug` | number / string | — | Optional pipeline to place the new entry in |
+| `stageId` / `stageSlug` | number / string | — | Optional stage within that pipeline |
+| `removeFromOld` | boolean | `false` | When `true`, deletes all source entries after copying |
+| `async` | boolean | `false` | When `true`, write runs in background |
+
+Returns `{ ok, moved, removed_from_old }` where `moved` is the number of fields copied.
+
+```javascript
+var result = moveCrmToEntity({
+  fromSlug: 'leads',
+  toSlug: 'deals',
+  fieldMap: {
+    lead_score: 'initial_score',
+    source: 'lead_source'
+  },
+  pipelineSlug: 'sales',
+  stageSlug: 'new',
+  removeFromOld: false
+});
+
+if (result.ok) {
+  console.log(result.moved, 'fields copied');
+}
 ```
