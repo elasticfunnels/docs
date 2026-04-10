@@ -1,0 +1,256 @@
+---
+title: "Checkout functionality reference"
+description: "Canonical reference for ElasticFunnels checkout: scope, fields, checkout_settings, abuse protection, submit flow, and redirects."
+---
+
+This page is the **source of truth** for how ElasticFunnels checkout works: configuration keys, server behavior, and what visitors experience.
+
+For **template syntax** (`[[ ]]`, bindings, `checkout.*` in the page builder), see [Frontend Template Engine: Checkout](/frontend-template-engine/checkout).
+
+---
+
+## 1) Enable checkout on a page
+
+Checkout behavior runs only when the page is marked as a checkout page:
+
+1. Open **Page List** → **Edit Page**
+2. Enable **Is checkout page**
+3. Save
+
+If this is off, `checkout` scope data, submit handling, payment processing, and post-purchase redirects may not run as documented here.
+
+---
+
+## 2) Checkout scope (frontend)
+
+On checkout pages, the `checkout` scope is available to templates and bindings.
+
+Common keys:
+
+| Area | Keys |
+|------|------|
+| Customer | `checkout.customer.*` (names, email, phone, shipping/billing address fields) |
+| Geography | `checkout.countries`, `checkout.usStates` (dropdown options) |
+| Commerce | `checkout.coupon`, `checkout.coupon_message`, `checkout.bump_products`, `checkout.selectedBumpLines` |
+| Totals | `checkout.subtotal`, `checkout.tax`, `checkout.shipping`, `checkout.total`, plus `*_raw` variants (see template engine doc) |
+| Toggle | `checkout.shipping_same_as_billing` |
+
+Template engine details: [Checkout](/frontend-template-engine/checkout).
+
+---
+
+## 3) Supported form field names
+
+These align with what the checkout runtime validates and submits (shipping-first; billing can mirror shipping).
+
+**Shipping / personal (primary)**
+
+- `first_name`, `last_name`, `email`
+- `phone` (optional)
+- `shipping_address`, `shipping_address2` (optional)
+- `shipping_country`, `shipping_city`, `shipping_state`, `shipping_zip`
+- Optional explicit shipping names: `shipping_first_name`, `shipping_last_name`
+
+**Billing** (when shown; if empty, shipping values are used)
+
+- `billing_first_name`, `billing_last_name`
+- `billing_address`, `billing_address2`, `billing_country`, `billing_city`, `billing_state`, `billing_zip`
+
+**Toggle**
+
+- `shipping_same_as_billing` → `checkout.shipping_same_as_billing`
+
+**Errors**
+
+- Use `data-checkout-error="<field_name>"` matching the input `name` for inline validation messages.
+
+---
+
+## 4) `checkout_settings` (backend script)
+
+Configure checkout using variables set in a **backend** script on the **same checkout page** (`<script scope="backend">`). Expose the object with `setVariable('checkout_settings', ...)`, and the platform reads it when the page is rendered.
+
+```html
+<script scope="backend">
+setVariable('checkout_settings', {
+  // Optional: restrict countries / US states (see below)
+  // Optional: checkout abuse protection (see section 5)
+});
+</script>
+```
+
+### 4.1 Countries and US states allowlist
+
+Keys:
+
+- `checkout_settings.countries` → drives `checkout.countries` in the UI
+- `checkout_settings.usStates` → drives `checkout.usStates` for US state dropdowns
+
+Allowed entry formats:
+
+- Two-letter codes as strings: `'US'`, `'ca'`, `'tx'`
+- `{ value: 'US' }`
+- `{ value: 'US', label: 'United States' }`
+
+Behavior:
+
+1. Values are normalized (e.g. uppercase) and validated against built-in lists.
+2. Invalid entries are dropped.
+3. If nothing valid remains, the full default lists are used (not restricted).
+4. The effective allowlist is stored in the visitor **session** and **re-validated on submit**, so blocked values cannot be forced with browser devtools alone.
+
+### 4.2 Example: countries only
+
+```html
+<script scope="backend">
+setVariable('checkout_settings', {
+  countries: ['US', 'CA', 'GB']
+});
+</script>
+```
+
+### 4.3 Example: US states only
+
+```html
+<script scope="backend">
+setVariable('checkout_settings', {
+  usStates: ['CA', 'TX', 'NY', 'FL']
+});
+</script>
+```
+
+---
+
+## 5) Checkout abuse protection (card-testing / velocity)
+
+Optional **progressive** friction on **main sale** card checkout submissions (`POST /process-checkout`). It is **off by default** unless you set `checkout_settings.abuse_protection.enabled` to `true`.
+
+<Info>
+This is separate from **site-wide** page rate limiting / HTML captcha on normal page views. Abuse protection here applies only to the checkout payment submit path when enabled on the checkout page.
+</Info>
+
+### 5.1 Configuration
+
+```html
+<script scope="backend">
+setVariable('checkout_settings', {
+  abuse_protection: {
+    enabled: true,
+    mode: 'progressive',
+    thresholds: {
+      captcha_requests: 8,
+      hard_block_requests: 20,
+      window_ms: 60000,
+      block_duration_ms: 3600000
+    }
+  }
+});
+</script>
+```
+
+| Key | Type | Default when omitted |
+|-----|------|----------------------|
+| `checkout_settings.abuse_protection.enabled` | boolean | `false` (feature off) |
+| `checkout_settings.abuse_protection.mode` | string | `"progressive"` (only mode documented) |
+| `thresholds.captcha_requests` | integer | `8` |
+| `thresholds.hard_block_requests` | integer | `20` |
+| `thresholds.window_ms` | integer | `60000` (1 minute) |
+| `thresholds.block_duration_ms` | integer | platform default block window (typically one hour) |
+
+You can omit `thresholds` entirely to use defaults. Partial overrides are merged with defaults for any key you specify.
+
+### 5.2 What is protected
+
+- **In scope:** Main sale submissions to **`POST /process-checkout`** when the request is **not** marked as an upsell (`type` ≠ `upsell`).
+- **Out of scope:** One-click upsell charges, PayPal/Klarna flows that do not use the same submit path, and arbitrary API calls. Tighten other surfaces separately if needed.
+
+### 5.3 Session lifecycle
+
+1. When a visitor loads a checkout page, sanitized abuse settings are stored in session (with `brand_id`, checkout `page_id` from the render context, and a timestamp).
+2. Each qualifying `POST /process-checkout` is counted per visitor IP inside a **checkout-specific** bucket (not mixed with generic page-view rate limits).
+3. If settings are **stale** (e.g. older than 24 hours) or **brand / page** no longer match the request, the stored config is cleared and protection does not apply until the visitor loads checkout again.
+4. After a successful **checkout captcha** verification, the visitor receives a **short-lived** “verified” flag for checkout (default **15 minutes**) and the checkout attempt counter for that IP is reset, so legitimate users can complete payment after solving the challenge.
+
+### 5.4 Progressive behavior
+
+Within `window_ms`, counting **checkout submit attempts** for the IP:
+
+| Condition | HTTP | Visitor experience |
+|-----------|------|---------------------|
+| Below `captcha_requests` | 200 path | Normal checkout continues. |
+| At or above `captcha_requests`, below `hard_block_requests` | `429` | JSON response asks for captcha; checkout UI opens a **modal**, visitor solves math challenge, then checkout **resubmits** automatically. |
+| At or above `hard_block_requests` | `403` | Submit blocked for a period (`block_duration_ms`); message indicates too many attempts. |
+
+Local and private IPs are not rate-limited by this checkout guard.
+
+### 5.5 JSON response fields (checkout submit)
+
+When abuse protection returns an error-shaped response, the JSON may include:
+
+| Field | Meaning |
+|-------|---------|
+| `success` | `false` |
+| `error` | Human-readable message |
+| `error_code` | Machine code (see below) |
+| `error_type` | `"abuse_protection"` when from this feature |
+| `retry_allowed` | `true` when captcha path may retry; `false` on hard block |
+| `captcha_required` | `true` when the UI should show the captcha step |
+| `captcha_payload` | `{ question, token }` for the modal challenge |
+
+**`error_code` values (submit / middleware)**
+
+| Code | Typical HTTP | Meaning |
+|------|----------------|---------|
+| `CHECKOUT_CAPTCHA_REQUIRED` | 429 | Solve captcha, then retry submit. |
+| `CHECKOUT_HARD_BLOCKED` | 403 | Too many attempts; wait before retrying. |
+
+Captcha verification (handled inside checkout UI, not a merchant integration surface) may return `CHECKOUT_CAPTCHA_INVALID`, `CHECKOUT_CAPTCHA_DISABLED`, `CHECKOUT_CAPTCHA_SAVE_FAILED`, or `CHECKOUT_CAPTCHA_ERROR` if something goes wrong; the UI refreshes the challenge or shows an error.
+
+### 5.6 Tuning and false positives
+
+- Corporate NAT or shared IPs can concentrate traffic on one address; if legitimate buyers are challenged too often, **raise** `captcha_requests` or **widen** `window_ms`.
+- For testing, use **low** thresholds only on a **sandbox** checkout or test brand.
+- If protection “never fires,” confirm the checkout page was **loaded in the same browser session** before submit (session must contain the config).
+
+---
+
+## 6) Payment panel and submit wiring
+
+Recommended card flow:
+
+```html
+<checkout-cc-panel></checkout-cc-panel>
+<div data-checkout-message class="checkout-message"></div>
+<button type="submit" data-checkout-submit>Pay now</button>
+```
+
+Optional alternative payment methods use `payment_method_choice` with values such as `card`, `paypal`, `klarna` (see [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) for markup patterns).
+
+---
+
+## 7) After successful payment (redirects)
+
+- If the server returns `redirectUrl`, the visitor is sent there.
+- Otherwise, the default purchase confirmation route is used (query parameters typically include order and email).
+
+Details: [Checkout redirect behavior](/funnels/checkout-redirect-behavior).
+
+---
+
+## 8) Troubleshooting
+
+| Issue | What to check |
+|-------|----------------|
+| Country/state restriction ignored | `checkout_settings` on backend scope; valid codes; session + server enforcement after page load |
+| Abuse protection never triggers | `enabled: true`; visitor opened checkout page first; thresholds not too high; not upsell-only flow |
+| Too many captchas | Increase `captcha_requests` or `window_ms`; check shared IP / VPN concentration |
+| Hard blocks too aggressive | Increase `hard_block_requests` or `window_ms`; review `block_duration_ms` |
+
+---
+
+## Related docs
+
+- [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` in templates
+- [Frontend Template Engine: Cart](/frontend-template-engine/cart) — cart lines, bumps, qty controls
+- [Checkout redirect behavior](/funnels/checkout-redirect-behavior) — post-checkout routing
+- [reCAPTCHA setup](/domains/recaptcha-setup) — site-wide captcha (separate from checkout abuse modal)

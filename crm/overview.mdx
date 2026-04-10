@@ -87,6 +87,10 @@ The following functions are available in both the template engine and backend sc
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field value — upserts a single value per key |
 | `addCrmFieldValue({ slug, fieldKey, value, ... })` | Append a new entry with a field value — enables multiple values per key |
 | `getCrmFieldValues({ slug, fieldKey, ... })` | Get all values for a field key across entries (returns array) |
+| `moveCrmToStage({ slug, stageId \| stageSlug, ... })` | Move to a specific stage (pipeline inferred from stage) |
+| `moveCrmToPipeline({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug?, ... })` | Move to a pipeline (optionally choose target stage) |
+| `moveCrmToEntity({ fromSlug, toSlug, fieldMap, ... })` | Move mapped fields from one CRM entity to another |
+| `moveCrmLead({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug, ... })` | Lower-level direct pipeline + stage move (kept for compatibility) |
 | `clearCrmEntries({ slug, ... })` | Delete all entries for an entity slug + reference |
 | `moveCrmLead({ slug, pipelineId/pipelineSlug, stageId/stageSlug, ... })` | Move entry to a specific pipeline + stage |
 | `moveCrmToStage({ slug, stageId/stageSlug, ... })` | Move entry to a stage (pipeline resolved from stage) |
@@ -109,6 +113,26 @@ Write functions also accept:
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `async` | boolean | `false` | When `true`, writes run in the background — faster but eventual consistency |
+
+`moveCrmToStage` / `moveCrmToPipeline` / `moveCrmLead` also accept:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `pipelineId` / `pipeline_id` | number | - | Target pipeline id |
+| `pipelineSlug` / `pipeline_slug` | string | - | Target pipeline slug (alternative to id) |
+| `stageId` / `stage_id` | number | - | Target stage id |
+| `stageSlug` / `stage_slug` | string | - | Target stage slug (alternative to id) |
+| `allEntries` / `all_entries` | boolean | `false` | Update only newest entry (`false`) or all matching entries (`true`) |
+
+`moveCrmToEntity` accepts:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `fromSlug` / `from_slug` | string | - | Source CRM entity slug |
+| `toSlug` / `to_slug` | string | - | Target CRM entity slug |
+| `fieldMap` / `field_map` | object | - | Required key mapping (`{ fromKey: toKey }`) |
+| `removeFromOld` / `remove_from_old` | boolean | `false` | Delete source entries after successful transfer |
+| `pipelineId` / `pipelineSlug` / `stageId` / `stageSlug` | number/string | optional | Optional target workflow placement in destination CRM |
 
 ### Single-value fields
 
@@ -177,22 +201,62 @@ Use `moveCrmToPipeline` to move an entry into a pipeline; it lands on the first 
 moveCrmToPipeline({ slug: 'deals', pipelineSlug: 'onboarding' });
 ```
 
-Use `moveCrmToEntity` to copy field values from one entity type to another (e.g. promoting a lead to a deal):
+```javascript
+// ID-based targeting also works
+moveCrmToPipeline({
+  slug: 'weight-tracker',
+  pipelineId: 12,
+  stageId: 44,
+  allEntries: true
+});
+```
+
+```javascript
+// Async move (returns quickly with pending: true)
+moveCrmToStage({
+  slug: 'weight-tracker',
+  stageSlug: 'in-progress',
+  async: true
+});
+```
+
+Pass `allEntries: true` to any move function to update all matching entries instead of just the newest one.
+
+<Tip>
+`moveCrmToStage` / `moveCrmToPipeline` / `moveCrmLead` are for workflow position only (pipeline/stage). They do not remap field values.
+If you need to copy values between keys (for example `quiz_email -> email`), use `getCrmField` + `setCrmField` explicitly in your script.
+</Tip>
+
+### Moving between CRM entities (with field mapping)
+
+Use `moveCrmToEntity` when data needs to move from one CRM entity to another (e.g. promoting a lead to a deal):
 
 ```javascript
 moveCrmToEntity({
-  fromSlug: 'leads',
-  toSlug: 'deals',
-  fieldMap: { lead_score: 'initial_score', source: 'lead_source' },
-  pipelineSlug: 'sales',
+  fromSlug: 'quiz-leads',
+  toSlug: 'sales-leads',
+  fieldMap: {
+    quiz_email: 'email',
+    quiz_phone: 'phone',
+    quiz_score: 'lead_score'
+  },
+  pipelineSlug: 'inbound',
   stageSlug: 'new',
-  removeFromOld: false  // set true to delete source entries after copy
+  removeFromOld: true
 });
 ```
 
 Returns `{ ok, moved, removed_from_old }`.
 
-Pass `allEntries: true` to any move function to update all matching entries instead of just the newest one.
+```javascript
+// Async cross-entity move
+moveCrmToEntity({
+  fromSlug: 'quiz-leads',
+  toSlug: 'sales-leads',
+  fieldMap: { quiz_email: 'email' },
+  async: true
+});
+```
 
 ### Async writes
 

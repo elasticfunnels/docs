@@ -1,0 +1,196 @@
+---
+title: 'Five9 Integration'
+description: 'Connect Five9 telephony to ElasticFunnels Call Center with REST-based click-to-dial, transfers, hangup, recordings, and screen pop.'
+---
+
+ElasticFunnels Call Center can drive Five9 through a configurable **REST** integration: outbound actions, call control, and recording lookups all use JSON over HTTP against a base URL you provide.
+
+<Warning>
+Five9’s native platform APIs are largely **SOAP**-oriented and can be complex to wire directly. ElasticFunnels expects **REST** endpoints with predictable JSON request and response shapes. In practice, most deployments use a **middleware proxy** that translates ElasticFunnels’ REST calls into Five9 (or tenant-specific) APIs.
+</Warning>
+
+## Prerequisites
+
+Before configuring the Five9 phone switch for a brand, gather:
+
+- **ElasticFunnels access**: Call Center admin, brand linked to the center, and permission to edit **Brand Settings** → **Phone Switch**
+- **REST surface**: Either a supported direct REST base URL or a middleware service you control, reachable from ElasticFunnels servers
+- **Authentication**: Either a **Bearer token** (`api_key`) or **HTTP Basic** credentials (`username` / `password`)
+- **Agent extensions**: Values in ElasticFunnels **Agents** must match what your Five9 or middleware expects for the placing agent
+- **Optional routing defaults**: Campaign name and skill ID if your dial or queue logic requires them
+- **Screen pop**: Webhook URL and shared secret (if used) configured on the telephony side to POST inbound events to ElasticFunnels
+
+<Tip>
+Complete the general phone switch flow first: **Call Center** → **Call Centers** → open the center → **Brand Settings** → **Phone Switch** → select Five9, then save.
+</Tip>
+
+## Configuration fields
+
+| Field | Purpose |
+| --- | --- |
+| `api_base_url` | Base URL for the Five9 REST API or your middleware (no trailing path segments required; paths below are appended). |
+| `api_key` | Bearer token sent as `Authorization: Bearer …` when using token-based auth. |
+| `username` | HTTP Basic username when using basic auth (used with `password`). |
+| `password` | HTTP Basic password when using basic auth. |
+| `campaign_name` | Optional default campaign passed on make-call when your integration expects it. |
+| `skill_id` | Optional default skill passed on make-call when your integration expects it. |
+| `rest_connect_path` | Path used for connectivity / credential checks (default `/`). |
+| `rest_make_call_path` | Path for placing a call (default `/calls/make`). |
+| `rest_hangup_path` | Path for hanging up (default `/calls/hangup`). |
+| `rest_transfer_path` | Path for blind or attended transfer as implemented by your API (default `/calls/transfer`). |
+| `rest_recording_path` | Path to resolve a recording URL for a call (default `/calls/recording`). |
+
+<Info>
+Use **either** Bearer (`api_key`) **or** Basic (`username` + `password`), according to what your REST layer accepts. Do not assume both are required unless your middleware explicitly needs them.
+</Info>
+
+## Setup
+
+Choose the pattern that matches your infrastructure.
+
+### Direct REST API
+
+Use this when Five9 or your tenant exposes (or you host) REST endpoints at `api_base_url` that match the default paths or your customized paths.
+
+<Steps>
+  <Step title="Confirm the base URL and auth">
+    Obtain the HTTPS base URL and whether the service expects a Bearer token or HTTP Basic. Test with `curl` or your API client using the same auth ElasticFunnels will use.
+  </Step>
+  <Step title="Map paths">
+    If your API uses different routes, set `rest_connect_path`, `rest_make_call_path`, `rest_hangup_path`, `rest_transfer_path`, and `rest_recording_path` to match. Defaults assume a small REST surface under the base URL.
+  </Step>
+  <Step title="Enter credentials in ElasticFunnels">
+    In **Brand Settings** → **Phone Switch**, select Five9 and fill `api_base_url` plus either `api_key` or `username` and `password`. Add `campaign_name` and `skill_id` if required.
+  </Step>
+  <Step title="Align agent extensions">
+    Ensure each agent’s extension in **Call Center** → **Agents** matches the identifier your API uses for `agent_extension` on make-call.
+  </Step>
+  <Step title="Save and verify">
+    Save the brand config. Use connect / health behavior in the product (or a test dial) to confirm reachability and auth.
+  </Step>
+</Steps>
+
+### Middleware proxy pattern
+
+Use this when Five9 is reached via SOAP or proprietary APIs and a small service translates REST into those calls.
+
+<Steps>
+  <Step title="Deploy the proxy">
+    Host a service that implements the REST contract ElasticFunnels uses (see [How each feature works](#how-each-feature-works)). The proxy holds Five9 credentials and tenant configuration server-side.
+  </Step>
+  <Step title="Point ElasticFunnels at the proxy">
+    Set `api_base_url` to the proxy’s public HTTPS origin. Configure path overrides only if your proxy uses non-default routes.
+  </Step>
+  <Step title="Authenticate ElasticFunnels to the proxy">
+    Prefer a dedicated `api_key` (Bearer) scoped to ElasticFunnels. The proxy then uses its own Five9 credentials separately.
+  </Step>
+  <Step title="Test end-to-end">
+    Exercise connect, make call, hangup, transfer, and recording URL retrieval against a sandbox or low-risk campaign before production traffic.
+  </Step>
+</Steps>
+
+## How each feature works
+
+All responses are treated as **JSON**. Success is determined by **HTTP status** (typically 2xx) plus, when present, an optional boolean `success` field in the response body. Your API should return consistent JSON for errors (message body) and use appropriate status codes.
+
+### Connect (`connect()`)
+
+ElasticFunnels issues a request to the configured **`rest_connect_path`** (default `/`) to verify that the base URL is reachable and credentials are valid.
+
+If there is **no** dedicated connect endpoint, the implementation may **fall back** to a generic credential or connectivity check against the base URL.
+
+### Make call (`makeCall()`)
+
+**Method:** `POST`  
+**Path:** `rest_make_call_path` (default `/calls/make`)
+
+Typical JSON body fields:
+
+| Field | Role |
+| --- | --- |
+| `agent_extension` | Agent placing the call |
+| `destination` | Number or destination to dial |
+| `campaign_name` | Campaign context (optional default from config) |
+| `skill_id` | Skill / queue hint (optional default from config) |
+
+### Hangup (`hangupCall()`)
+
+**Method:** `POST`  
+**Path:** `rest_hangup_path` (default `/calls/hangup`)
+
+Includes `call_id` identifying the active call to terminate.
+
+### Transfer (`transferCall()`)
+
+**Method:** `POST`  
+**Path:** `rest_transfer_path` (default `/calls/transfer`)
+
+Includes `call_id` and `target_extension` (or equivalent routing target your API defines).
+
+### Recording URL (`getCallRecordingUrl()`)
+
+**Method:** `POST`  
+**Path:** `rest_recording_path` (default `/calls/recording`)
+
+Includes `call_id`. The response should expose whatever field your UI or downstream code expects for the playable or downloadable recording URL (per your middleware contract).
+
+### Screen pop (incoming calls)
+
+Screen pop uses a **webhook** into ElasticFunnels. The telephony platform (or middleware) sends an event that includes enough information to perform a **phone-based customer lookup** and surface the matching record to the agent.
+
+Configure the webhook URL and signing or secret requirements in line with Call Center screen pop documentation for your environment.
+
+Example payload shape (illustrative; align with your actual webhook contract):
+
+```json
+{
+  "caller_id": "+15551234567",
+  "call_id": "five9-call-identifier",
+  "agent_extension": "1001"
+}
+```
+
+## Example request (make call)
+
+Replace placeholders with your base URL, token, and paths.
+
+```bash
+curl -sS -X POST 'https://your-api.example.com/calls/make' \
+  -H 'Authorization: Bearer YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "agent_extension": "1001",
+    "destination": "+15559876543",
+    "campaign_name": "Outbound Sales",
+    "skill_id": "42"
+  }'
+```
+
+For HTTP Basic:
+
+```bash
+curl -sS -X POST 'https://your-api.example.com/calls/make' \
+  -u 'username:password' \
+  -H 'Content-Type: application/json' \
+  -d '{"agent_extension":"1001","destination":"+15559876543"}'
+```
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Connect fails immediately | `api_base_url` typo, TLS/certificate issues, firewall allowlisting for ElasticFunnels egress IPs, and whether `rest_connect_path` exists on your service. |
+| 401 / 403 on all calls | Wrong `api_key` or Basic credentials; proxy expecting a different header; clock skew if tokens are time-bound. |
+| Make call returns 4xx with JSON error | Request body field names (`agent_extension`, `destination`, `campaign_name`, `skill_id`) must match what your REST layer implements. |
+| Agent cannot dial | Extension mismatch between **Agents** in ElasticFunnels and Five9 / middleware; agent not logged in or not eligible in Five9 for that campaign or skill. |
+| Hangup or transfer no-ops | `call_id` from the dial or webhook session must be the same identifier your hangup/transfer endpoints expect. |
+| Recording URL empty or invalid | Recording retention, permissions, and async availability in Five9; proxy mapping from Five9 recording IDs to HTTPS URLs. |
+| Screen pop missing customer | Webhook not firing, wrong number normalization for lookup, or customer not found by phone in CRM. |
+
+<Warning>
+Because many Five9 setups rely on a **custom middleware** contract, field names and response JSON may differ slightly from the defaults described here. Treat your proxy’s OpenAPI spec or README as the source of truth and align path overrides and payload mapping accordingly.
+</Warning>
+
+<Tip>
+When debugging, log request URL, HTTP status, and response body on the middleware side. Compare with ElasticFunnels server logs or support exports to isolate network versus application errors quickly.
+</Tip>

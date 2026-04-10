@@ -42,7 +42,6 @@
             "group": "Funnels",
             "pages": [
               "funnels/create-funnel",
-              "guides/how-to-design-a-checkout-page",
               "funnels/checkout-redirect-behavior",
               "funnels/trigger-pages",
               "funnels/trigger-rules",

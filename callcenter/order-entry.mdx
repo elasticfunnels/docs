@@ -11,65 +11,99 @@ Go to **Call Center** → **Order Entry** in the sidebar.
 Agents need the **Create Orders** permission (included in the Call agent role) to access this page.
 </Warning>
 
-## Exact order-entry flow
+## Page Layout
+
+The page uses the standard details layout with:
+
+- **Header** — Brand selector, call center selector, and call timer
+- **Main area** — Customer form, product lines, payment, and order summary
+- **Side drawer** — Customer context (order history, stats, cards on file, call notes) when viewing a returning customer
+
+<Tip>
+Only brands you have access to and that are enabled in the selected call center are shown.
+</Tip>
+
+## Exact Order-Entry Flow
 
 1. Open **Call Center** → **Order Entry**.
 2. If the page was opened from a live call, confirm the linked call appears in the **Call timer** box.
 3. Search for the customer by phone or email in the customer lookup field.
-4. If a match is found, review the auto-filled customer details.
-5. Add one or more products.
-6. Confirm the address fields.
-7. Choose the payment method:
+4. If a match is found, review the auto-filled customer details and the customer context drawer.
+5. Select a product — it is added to the order lines automatically.
+6. Adjust quantity or unit price in the product lines table if needed.
+7. Confirm the address fields.
+8. Choose the payment method:
    - **Card on File** if the customer already has a stored token
    - **New Card** if a fresh card needs to be entered
-8. If the order should create a subscription, enable the subscription section and choose the interval.
-9. Click the order button to submit.
-10. If upsells are returned, present them before closing the call.
-11. Choose the final disposition and save the call outcome.
+9. Tax is calculated automatically based on the customer's address.
+10. If the order should create a subscription, enable the subscription section and choose the interval.
+11. Click the order button to submit.
+12. If upsells are returned, present them before closing the call.
+13. Choose the final disposition and save the call outcome.
 
-## Page Layout
+## Customer Context Drawer
 
-### Products
+When a returning customer is loaded, a side drawer displays:
 
-Browse and select products from the active campaign. Each product shows its price, description, and whether it's a subscription.
+- **Customer stats** — Total orders, total revenue, last order date
+- **Order history** — Recent orders with dates and amounts
+- **Cards on file** — Stored payment tokens with card brand and last 4 digits
+- **Call notes** — Notes from previous agent interactions
 
-### Customer Form
+This gives the agent full context without leaving the order form.
 
-Billing and shipping address fields. If the customer has ordered before, their information auto-fills when you search by phone or email.
+## Products
 
-### Payment
+Select a product from the active campaign. Once selected, it's added to the order lines table automatically — there is no separate "Add" button.
+
+Each product line shows:
+
+| Field | Description |
+|-------|-------------|
+| **Product** | Name and code |
+| **Quantity** | Editable quantity field |
+| **Unit Price** | Editable — agents can override the default product price |
+| **Subtotal** | Calculated from quantity and unit price |
+
+### Custom Unit Price
+
+Agents can change the **Unit Price** field to apply a custom price for any product line. The overridden price is used for the subtotal calculation, tax estimation, and the actual charge.
+
+<Info>
+Price overrides are only available through Order Entry. Customer-facing checkout pages always use the product's configured price and cannot be manipulated.
+</Info>
+
+## Payment
 
 The payment section supports two paths:
 
-- **Card on File**: shown automatically when the customer profile includes a reusable vault token
+- **Card on File**: shown when the customer profile includes reusable vault tokens; the agent can select which card to use
 - **New Card**: standard card number, expiry, and CVV entry
 
-The stored token is used automatically and is not shown as an editable field.
+If a payment fails, the specific error from the gateway is shown above the order button and the card fields are highlighted.
 
-### Sales Scripts
+## Tax Calculation
 
-A sidebar panel shows the campaign's configured sales scripts (main pitch, rebuttal, upsell talking points) for the agent to reference during the call.
+Tax is calculated automatically when the customer's address and product lines are set. The estimated tax amount appears in the order summary before submission. If an agent has overridden the unit price, the tax estimate uses the custom price, not the product's default.
 
-### Call Controls
+## Sales Scripts
+
+A sidebar panel shows the campaign's configured sales scripts (main pitch, rebuttal, upsell talking points) for the agent to reference during the call. Scripts are loaded based on the selected call center and brand.
+
+## Call Controls
 
 - **Call timer** — Tracks how long the current call has been active
 - **Agent info** — Shows the agent's call center and team
-- **Disposition** — Required before closing the session
-
-## Tax Estimation
-
-Before submitting, agents can click **Estimate Tax** to preview the tax amount based on the customer's address and selected products.
+- **Disposition** — Required before closing the session; defaults to the first assigned call center's disposition list
 
 ## Returning Customers
 
 When a phone number or email matches an existing customer:
 
 - Contact and address information auto-fills
-- The page checks whether a payment token already exists
-- If a token exists, **Card on File** becomes available automatically
-- The raw token is not exposed to the agent as a form field
-
-If no token exists, the agent enters a new card normally.
+- The customer context drawer opens with full history
+- The customer lookup results include the last order date for quick identification
+- If payment tokens exist, **Card on File** becomes available and the agent can pick which card to use
 
 ## After the Order
 

@@ -63,15 +63,15 @@ For a new organization, use this order:
 Connect your existing phone switch for click-to-dial, automatic screen pops, and call recording:
 
 <CardGroup cols={3}>
-  <Card title="ViciDial" icon="phone-volume">
-    Screen pop when a call connects, disposition callbacks, and campaign routing.
+  <Card title="ViciDial" icon="phone-volume" href="/callcenter/vicidial">
+    Non-agent API for status and recordings, agent API for dial/hangup/transfer.
   </Card>
-  <Card title="Five9" icon="headset">
-    Skills-based routing and automatic screen pop when a call is accepted.
+  <Card title="Five9" icon="headset" href="/callcenter/five9">
+    REST API integration, typically fronted by a middleware proxy.
   </Card>
-  <Card title="Ytel" icon="phone">
-    Campaign and user routing with screen pop support.
+  <Card title="Ytel" icon="phone" href="/callcenter/ytel">
+    v4 JWT bearer tokens (recommended) or v3 Basic Auth (legacy).
   </Card>
 </CardGroup>
 
-Phone switch configuration is done per call center. See [Call Center Setup](/callcenter/setup) and [Phone Switches](/callcenter/phone-switches) for the full setup path.
+Phone switch configuration is done per call center with provider-specific setup cards and a built-in **Test Connection** button. See [Call Center Setup](/callcenter/setup) and [Phone Switches](/callcenter/phone-switches) for the full setup path.

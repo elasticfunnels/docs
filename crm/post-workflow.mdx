@@ -147,6 +147,10 @@ fetch('/weight/checkin', {     → request.method = 'POST'
 | `getCrmEntries({ slug, ... })` | Fetch entries — **`slug` required** ([Data Functions](/backend-scripts/data-functions#crm-data)) |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field |
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field |
+| `moveCrmToStage({ slug, stageId \| stageSlug, ... })` | Move an entry to a specific stage |
+| `moveCrmToPipeline({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug?, ... })` | Move an entry into a pipeline |
+| `moveCrmToEntity({ fromSlug, toSlug, fieldMap, ... })` | Move mapped fields to another CRM entity |
+| `moveCrmLead({ slug, pipelineId \| pipelineSlug, stageId \| stageSlug, ... })` | Direct workflow move (compatibility helper) |
 | `reassignCrmReference({ slug, fromReferenceType, fromReferenceId, ... })` | Move entries from a visitor reference to the logged-in customer ([Data Functions — CRM](/backend-scripts/data-functions)) |
 
 ### `slug` (CRM entity) vs reference
@@ -178,6 +182,68 @@ Calls must use a **single options object** (no positional lists).
 | `referenceId` | string (max 512 chars) or omit / `null` |
 | `fieldKey` | string (alphanumeric, `_`, `.`, `-`) — **required** |
 | `value` | string, number, boolean, or JSON object — **required** for set (`0` / `false` valid) |
+| `pipelineId` / `stageId` | integer id for workflow move targets |
+| `pipelineSlug` / `stageSlug` | slug string for workflow move targets |
+
+### Moving through CRM workflow
+
+`moveCrmToStage` and `moveCrmToPipeline` are the workflow transition functions. You can move:
+
+- Stage to stage in the same pipeline
+- Pipeline to pipeline (by setting a stage that belongs to the new pipeline)
+
+```javascript
+moveCrmToStage({
+  slug: 'pattern-tracker',
+  stageSlug: 'qualified'
+});
+
+moveCrmToPipeline({
+  slug: 'pattern-tracker',
+  pipelineSlug: 'sales',
+  stageSlug: 'proposal-sent'
+});
+
+moveCrmToPipeline({
+  slug: 'pattern-tracker',
+  pipelineSlug: 'sales',
+  stageSlug: 'proposal-sent',
+  async: true
+});
+```
+
+These only change workflow placement (`pipeline_id`, `stage_id`). They do not map one field key into another.
+For field mapping (for example `quiz_email -> email`), do it explicitly with reads/writes:
+
+```javascript
+var quizEmail = getCrmField({ slug: 'pattern-tracker', fieldKey: 'quiz_email' });
+if (quizEmail) {
+  setCrmField({ slug: 'pattern-tracker', fieldKey: 'email', value: quizEmail, force: true });
+}
+```
+
+Or move across entities in one call:
+
+```javascript
+moveCrmToEntity({
+  fromSlug: 'quiz-tracker',
+  toSlug: 'sales-leads',
+  fieldMap: {
+    quiz_email: 'email',
+    quiz_score: 'lead_score'
+  },
+  pipelineSlug: 'sales',
+  stageSlug: 'new',
+  removeFromOld: true
+});
+
+moveCrmToEntity({
+  fromSlug: 'quiz-tracker',
+  toSlug: 'sales-leads',
+  fieldMap: { quiz_email: 'email' },
+  async: true
+});
+```
 
 ### Input validation
 

@@ -20,7 +20,7 @@ This page walks through the recommended setup order for the in-house Call Center
    - Add sales scripts
 
 <Info>
-The **Setup** page is the fastest way to see what is still missing. It checks your real configuration state and is the best first stop for a new organization.
+The **Setup** page is the fastest way to see what is still missing. It checks your real configuration state and is the best first stop for a new organization. Steps that depend on a previous step (e.g. teams require a call center) are disabled until their prerequisites are met.
 </Info>
 
 ## Step 1: Create the call center
@@ -49,24 +49,19 @@ Teams are organization-level records, not center-only records.
 5. Use the **Teams** tab to link the center to the appropriate organization teams.
 
 <Tip>
-If you used **Apply Defaults** in the setup wizard, you may already have starter teams connected.
+If you used **Apply Defaults** in the setup wizard, you may already have starter teams connected. The defaults create a "Sales" and "Support" team.
 </Tip>
 
 ## Step 3: Add agents
 
-1. Go to **Call Center** → **Agents**.
-2. Click **Add Agent**.
-3. Select the existing organization user.
-4. Choose the **Call Center**.
-5. Choose the **Team**.
-6. Enter the agent **Extension** exactly as it exists in your phone switch.
-7. Set the **Status** to `available` for active agents.
-8. Save.
+Agents are organization users who have the **Call Agent** role assigned.
 
-Use **Call Center** → **Agents** when you want to manage agents across all centers from one screen.
+1. Go to **Settings** → **Organization** → **Users**.
+2. Assign the **Call Agent** role to users who should work in the call center.
+3. Once a user has the role, they appear in **Call Center** → **Agents** automatically.
 
 <Info>
-Agents also need the correct organization role and permissions. In most setups that means the user has the **Call agent** role, or an org role with the relevant `callcenter.*` permissions.
+The Agents list shows a guidance banner when no agents are found, linking directly to the organization users page.
 </Info>
 
 ## Step 4: Create dispositions
@@ -84,6 +79,8 @@ Dispositions are the outcomes agents pick when they finish a call.
    - **Active**: leave enabled if agents should be able to select it
 6. Save.
 7. Drag and drop to reorder if needed.
+
+Dispositions are editable after creation — click a disposition row to update its name, code, or category.
 
 Recommended starter dispositions:
 
@@ -112,6 +109,10 @@ Recommended starter dispositions:
 
 Center-level scripts are the default. You can override them for a specific brand in **Brand Settings**.
 
+<Info>
+Users without the **Manage Setup** permission can view scripts but cannot edit them. A read-only indicator is shown in that case.
+</Info>
+
 ## Step 6: Connect brands
 
 If one center serves multiple brands, each brand needs its own configuration row.
@@ -122,7 +123,7 @@ If one center serves multiple brands, each brand needs its own configuration row
 4. Choose the brand.
 5. Set:
    - **Active**: enable the center for that brand
-   - **Phone Switch**: provider and credentials for that brand
+   - **Phone Switch**: provider and credentials for that brand (overrides center-level settings)
    - **Sales Script**: optional brand-specific script override
 6. Save.
 
@@ -130,25 +131,50 @@ Repeat for every brand the center should handle.
 
 ## Step 7: Connect the phone switch
 
-Phone switch setup is done inside each brand config.
+Phone switch setup is done in the call center detail page.
 
-1. In **Brand Settings**, open the brand config you want to edit.
-2. In the **Phone Switch** section, select the provider.
-3. Enter the credentials from your provider admin panel.
-4. Save.
-5. Test with a real agent extension and a test call.
-
-Supported providers in the in-house suite:
-
-- ViciDial
-- Five9
-- Ytel
-
-Each provider has different credential requirements. See [Phone Switches](/callcenter/phone-switches) for the full provider-by-provider guide.
+1. Open the call center and go to the **Phone Switch** tab.
+2. Select a provider by clicking its card (ViciDial, Five9, or Ytel).
+3. Enter the credentials — the form shows provider-specific fields.
+4. Click **Test Connection** to verify the credentials are valid.
+5. Save.
 
 <Warning>
 Phone switch credentials are sensitive and should only be edited by users with **Manage Setup** access.
 </Warning>
+
+See [Phone Switches](/callcenter/phone-switches) for the full provider-by-provider guide, or go directly to:
+
+- [ViciDial](/callcenter/vicidial)
+- [Five9](/callcenter/five9)
+- [Ytel](/callcenter/ytel)
+
+## Setup prerequisites
+
+The setup page enforces dependencies between steps:
+
+| Step | Requires |
+|------|----------|
+| Create call center | At least one brand in the organization |
+| Teams | A call center must exist first |
+| Dispositions | A call center must exist first |
+| Brand configs | A call center must exist first |
+| Phone switch | A call center with brand config must exist first |
+| Scripts | A call center with brand config must exist first |
+
+If a prerequisite is not met, the step is shown as disabled with an explanation of what needs to be done first.
+
+## Apply Defaults
+
+The **Apply Defaults** button auto-creates sensible starter records:
+
+- A call center named after your organization
+- Two teams: Sales and Support
+- Eight starter dispositions (Sale, No Sale, Callback, Voicemail, Wrong Number, Refund Request, Cancel Request, Not Interested)
+- Brand configs for all existing brands
+- A starter sales script template
+
+If any of these already exist, the step is skipped to avoid duplicates.
 
 ## Brand settings reference
 

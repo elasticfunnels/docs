@@ -18,6 +18,13 @@ Use the search bar to find customers by:
 
 If the page was opened from a screen pop, the active call log is loaded automatically and the page will prefill the search using the customer email or phone from that call.
 
+## Page Layout
+
+The page uses a two-column layout:
+
+- **Main area** — Customer contact info, order history with expandable rows, and subscription management
+- **Side rail** — Cards on file, add-card form, and call notes
+
 ## Customer Profile
 
 Once a customer is selected, the profile shows:
@@ -27,15 +34,63 @@ Once a customer is selected, the profile shows:
     Name, email, phone, billing and shipping addresses, total order count, total revenue, and whether a payment method is already on file.
   </Tab>
   <Tab title="Orders">
-    All orders placed by this customer — order ID, date, products, amount, payment status, and gateway.
+    All orders placed by this customer in a table with expandable rows. Each row shows order ID, date, products, amount, payment status, and gateway. Expanding a row reveals per-order actions.
   </Tab>
   <Tab title="Subscriptions">
     Active and past subscriptions with status, product, amount, frequency, cycle count, and next charge date.
   </Tab>
-  <Tab title="Notes">
-    Call notes from previous interactions, visible to all agents.
-  </Tab>
 </Tabs>
+
+## Per-Order Actions
+
+Each order row can be expanded to reveal contextual actions:
+
+| Action | What It Does |
+|--------|-------------|
+| **Refund** | Opens a confirmation dialog, then processes a refund for that specific order |
+| **Resend Confirmation** | Re-sends the purchase confirmation email for that specific order |
+
+<Info>
+Actions are tied to the specific order, not to the customer globally. This prevents mistakes like refunding the wrong order.
+</Info>
+
+## Cards on File
+
+The side rail displays all stored payment tokens for the customer. Each card shows:
+
+- Card brand and last 4 digits
+- Whether the card is a test token
+- Whether the card previously failed
+- **Gateway badge** — If the card was stored through a gateway other than NMI (e.g. Stripe), a badge indicates which gateway holds the token
+
+A customer can have **multiple cards on file** across different gateways and merchant accounts. All cards are listed regardless of which brand or gateway originally stored them.
+
+### Removing a Card
+
+Cards that support multi-billing (those with a billing record ID) display a **Remove** button. Clicking it:
+
+1. Deletes the billing record from the gateway vault
+2. Removes the token from the customer's stored payment methods
+3. Refreshes the card list
+
+<Warning>
+Removing a card is permanent. If a subscription is actively billing against that card, the agent should update the subscription's payment method first.
+</Warning>
+
+## Adding a New Card
+
+Instead of a browser prompt, the side rail includes an inline card form:
+
+1. Enter the card number, expiry, and CVV
+2. Click **Add Card**
+3. The system vaults the card through the gateway without charging it
+4. On success, the new card appears in the Cards on File list immediately
+
+If the customer already has a vault on file, the new card is added as an additional billing record under the same vault. If no vault exists, a new one is created automatically.
+
+<Info>
+The vaulted card is stored as a reusable payment token on the customer record. It can be used later in Order Entry or subscription updates. Cards are shared across all brands in the same organization.
+</Info>
 
 ## Managing Subscriptions
 
@@ -46,10 +101,28 @@ Agents can take action on a customer's subscriptions directly from the profile:
 | **Cancel** | Any non-canceled subscription | Cancels with a reason select |
 | **Pause** | Active subscriptions | Pauses billing with optional resume date |
 | **Resume** | Paused subscriptions | Restarts billing |
+| **Skip Next Charge** | Active subscriptions | Skips one billing cycle and advances the next charge date |
 | **Force Bill** | Non-canceled subscriptions | Triggers an immediate charge attempt |
 | **Update Payment** | Any active subscription | Updates the payment method on file |
+| **Edit Pricing** | Any non-canceled subscription | Opens the pricing editor modal |
 
 Subscription actions are executed against the brand that actually owns the customer's subscription, not just the first organization brand.
+
+### Edit Pricing
+
+Each subscription card has an **Edit Pricing** button that opens a modal where agents can adjust:
+
+- **Charge amount** — The recurring amount billed each cycle
+- **Shipping amount** — Shipping cost per cycle
+- **Discount type** — Percentage or fixed amount
+- **Discount value** — The discount percentage or dollar amount
+- **Calculated discount** — Shows the resulting discount amount
+
+Changes are saved immediately to the subscription record and take effect on the next billing cycle.
+
+<Info>
+Pricing edits are only available to agents through the Customer Service page. Customers cannot modify pricing through self-service portals.
+</Info>
 
 ## Handling Cancellation Requests
 
@@ -83,16 +156,10 @@ Call logs are saved and visible in the customer's interaction history.
 
 If the page is attached to an active inbound or outbound call, saving the log updates that existing call record instead of creating a disconnected note.
 
-## Additional Actions
+## Call Center Selection
 
-- **Resend Confirmation** — Re-send the purchase confirmation email for any order
-- **Add Conversion Notes** — Attach internal notes to a specific conversion record
+The page defaults to the first call center assigned to the current user. If the agent belongs to multiple centers, they can switch using the call center dropdown.
 
-## Payment-on-file behavior
-
-The customer profile now exposes whether the platform already has a reusable payment token on file for the customer.
-
-That token is not shown directly to agents in Customer Service, but it is used by Order Entry so the agent can choose between:
-
-- using the existing payment method
-- collecting a new card
+<Tip>
+Only brands you have access to and that are enabled in the selected call center are shown.
+</Tip>
