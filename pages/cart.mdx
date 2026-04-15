@@ -71,10 +71,74 @@ Inside a `template-foreach` loop, each item exposes:
 | **`[[ item.retail_price ]]`** | Original/retail price (formatted) — shown when there is a discount |
 | **`[[ item.discount_total ]]`** | Per-line savings (formatted) |
 | **`[[ item.currency ]]`** | Currency code for this item |
+| **`[[ item.is_subscription ]]`** | `true` when this is a subscription product |
+| **`[[ item.subscription ]]`** | Subscription billing details — `null` for one-time products (see [Subscription info](#subscription-info)) |
+| **`[[ item.bonuses ]]`** | Free bonus products linked to this item (see [Bonus products](#bonus-products)) |
+| **`[[ item.courses ]]`** | Courses linked to this product (see [Courses](#courses)) |
 
 <Info>
 **`item.price`** and **`item.total`** are already formatted. Use them as-is. See [Frontend Template Engine — Cart](/frontend-template-engine/cart) for the full data attributes reference.
+
+`bonuses`, `courses`, `is_subscription`, and `subscription` are populated after a brief async fetch when the cart loads. They are always present so templates never error on an undefined value.
 </Info>
+
+### Subscription info
+
+When `item.is_subscription` is `true`, `item.subscription` contains:
+
+| Property | Description |
+|----------|-------------|
+| **`frequency`** | Billing interval number (e.g. `3`) |
+| **`frequency_unit`** | Unit: `"day"`, `"week"`, `"month"`, or `"year"` |
+| **`trial_days`** | Free trial days (`0` = no trial) |
+| **`first_charge_free`** | `true` when the first cycle is free |
+
+```html
+<template-if data-condition="item.is_subscription">
+  <span>Every [[ item.subscription.frequency ]] [[ item.subscription.frequency_unit ]]</span>
+</template-if>
+```
+
+The same fields are available on the checkout scope for single-product checkout pages:
+`[[ checkout.is_subscription ]]` and `[[ checkout.subscription.frequency ]]` etc.
+
+### Bonus products
+
+Products can have **bonus items** attached — free gifts or complementary products included with the purchase (configured in the product catalog). They are available as `item.bonuses` — always an array, empty when no bonuses are configured.
+
+Each bonus has: `code`, `name`, `image`, `price`, `retail_price`, `original_price`, `currency`.
+
+```html
+<template-foreach data-each="item in cartItems">
+  <div class="cart-line">
+    <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+    <span>[[ item.name ]]</span>
+    <span>[[ item.price ]]</span>
+    <template-foreach data-each="bonus in item.bonuses">
+      <div class="cart-bonus-row">
+        <img src="[[ bonus.image ]]" alt="[[ bonus.name ]]" />
+        <span>[[ bonus.name ]]</span>
+        <span>FREE <s>[[ bonus.retail_price ]]</s></span>
+      </div>
+    </template-foreach>
+  </div>
+</template-foreach>
+```
+
+### Courses
+
+When a product has linked courses (e.g. digital bonuses delivered via the course platform), they are available as `item.courses` — always an array, empty when no courses are linked.
+
+Each course has: `id`, `title`, `slug`, `description`, `cover`, `instructor_name`, `status`.
+
+```html
+<template-foreach data-each="course in item.courses">
+  <div class="cart-course-row">
+    <img src="[[ course.cover ]]" alt="[[ course.title ]]" />
+    <span>[[ course.title ]]</span>
+  </div>
+</template-foreach>
+```
 
 Both the `[[ ]]` placeholder syntax and the **`ef-text`** binding attribute are supported. They are equivalent — use whichever fits your template:
 
@@ -196,3 +260,5 @@ When these attributes are present, adding to cart stores the price locally, so `
 - **Multiple carts** – You can add more than one cart or dropdown on a page; they all show the same cart data and stay in sync when the visitor changes quantity or adds items.
 - **Item count badge** – Use `[[ ef-cart.count ]]` anywhere on the page (e.g. in the header next to "Cart") to show the total number of items in the cart.
 - **Savings display** – Show `[[ ef-cart.discount_total ]]` in the cart footer or `[[ item.retail_price ]]` beside the unit price to highlight discounts when a retail price is set.
+- **Subscription label** – Use `[[ item.is_subscription ]]` with `template-if` to show billing cadence (e.g. "Every 3 months") only for subscription products.
+- **Bonuses & courses** – Use nested `template-foreach` on `item.bonuses` and `item.courses` to list included free products or digital courses beneath each cart line.

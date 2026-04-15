@@ -252,7 +252,18 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/pages \
 
 ## Update Page
 
-Update an existing page. Only include fields you want to update.
+Update an existing page. Only include the fields you want to change.
+
+<Warning>
+  **Common causes of errors on PUT/PATCH:**
+
+  | Symptom | Cause | Fix |
+  |---------|-------|-----|
+  | `422` with `title is required` | `title` is always required by the validator, even if you're only changing HTML | Always include `"title"` in the body |
+  | `401` / redirect to login | Missing or invalid `EF-Access-Key` header, or key doesn't belong to this brand | Check the header name (`EF-Access-Key`) and value |
+  | `403` module access | Brand user role doesn't have `pages` access | Update role permissions in Project Settings |
+  | Slug `422` uniqueness error | Provided `slug` already exists for another page on the same domain | Choose a unique slug or omit it |
+</Warning>
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -378,7 +389,19 @@ curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} 
   }'
 ```
 
-### Update HTML Content
+### Update page title and status
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Page Name",
+    "status": "published"
+  }'
+```
+
+### Update HTML content
 
 ```bash cURL
 curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
@@ -392,10 +415,10 @@ curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} 
 ```
 
 <Note>
-  Providing `html` in an update request automatically converts the page to `editor` type if it isn't already.
+  Providing `html` automatically converts the page to `editor` type if it isn't already.
 </Note>
 
-### Update SEO Settings
+### Update SEO settings
 
 ```bash cURL
 curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} \
@@ -408,6 +431,48 @@ curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id} 
     "prevent_indexing": false
   }'
 ```
+
+<ResponseExample>
+```json 200 Updated
+{
+  "id": 3,
+  "brand_id": 42,
+  "title": "My Custom Page",
+  "slug": "my-custom-page",
+  "status": "published",
+  "page_type": "editor",
+  "html": "<!DOCTYPE html><html><body><h1>Updated Content</h1></body></html>",
+  "css": "body { font-family: Arial; }",
+  "seo_title": "My Custom Page",
+  "seo_description": null,
+  "domain_id": null,
+  "folder_id": null,
+  "updated_at": "2024-12-11T09:15:00.000000Z"
+}
+```
+
+```json 422 Missing title
+{
+  "errors": {
+    "title": ["The title field is required."]
+  }
+}
+```
+
+```json 422 Duplicate slug
+{
+  "errors": {
+    "slug": ["The slug has already been taken."]
+  }
+}
+```
+
+```json 401 Bad API key
+{
+  "message": "Invalid API key or brand access denied"
+}
+```
+</ResponseExample>
 
 ---
 

@@ -1,0 +1,642 @@
+---
+title: 'File Manager'
+description: 'Upload, list, rename, and delete brand media assets via API'
+---
+
+<Note>
+  All File Manager endpoints authenticate via the `EF-Access-Key` header. No session cookie or CSRF token is required.
+</Note>
+
+---
+
+## Upload File
+
+Upload a single file to the brand's asset storage.
+
+```
+POST /api/brands/{brand}/file-manager/upload-file
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="file" type="file" required>
+  Binary file (`multipart/form-data`)
+</ParamField>
+
+<ParamField body="path" type="string">
+  Target subdirectory within the brand's assets folder (e.g. `media`, `media/icons`). Defaults to the root assets folder. Omit leading/trailing slashes.
+</ParamField>
+
+<ParamField body="custom_filename" type="string">
+  Override the stored filename. Defaults to the original filename from the `file` field.
+</ParamField>
+
+**Accepted MIME types:** images (`image/*`), video (`video/mp4`, `video/webm`, `video/quicktime`), fonts (`font/ttf`, `font/woff`, `font/woff2`, `font/otf`), code/text (`text/css`, `text/javascript`, `application/json`, `application/javascript`).
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/upload-file \
+  -H "EF-Access-Key: your_api_key_here" \
+  -F "file=@/path/to/cards.png" \
+  -F "path=media" \
+  -F "custom_filename=cards.png"
+```
+
+```javascript JavaScript
+const form = new FormData();
+form.append('file', fileBlob, 'cards.png');
+form.append('path', 'media');
+
+const res = await fetch(
+  'https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/upload-file',
+  { method: 'POST', headers: { 'EF-Access-Key': 'your_api_key_here' }, body: form }
+);
+const result = await res.json();
+// CDN URL: `https://cdn.elasticfunnels.io/{brand_id}/assets/media/${filename}`
+```
+
+<ResponseExample>
+```json 201 Uploaded
+{
+  "HttpCode": 201,
+  "Message": "File Uploaded.",
+  "file_path": "ef-files/42/assets/media/cards.png"
+}
+```
+</ResponseExample>
+
+<Note>
+  The CDN URL is not included in the upload response. Derive it as:
+  `https://cdn.elasticfunnels.io/{brand_id}/assets/{path}/{filename}`
+
+  Example: `https://cdn.elasticfunnels.io/42/assets/media/cards.png`
+</Note>
+
+---
+
+## Bulk Upload Files
+
+Upload up to **20 files** in a single request. Each file is validated and uploaded independently — files that fail validation are reported per-file without aborting the rest.
+
+```
+POST /api/brands/{brand}/file-manager/bulk-upload-files
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="files[]" type="file[]" required>
+  Array of files (multipart/form-data). Maximum 20 files per request.
+</ParamField>
+
+<ParamField body="path" type="string">
+  Target subdirectory for all files in this batch (e.g. `media`). All files land in the same folder.
+</ParamField>
+
+<ParamField body="filenames[]" type="string[]">
+  Optional array of custom filenames, positionally matched to `files[]`. Use to override individual filenames. `filenames[0]` overrides the name of `files[0]`, etc.
+</ParamField>
+
+**Per-file validation rules:**
+- File must be a valid upload (not corrupted in transit)
+- Maximum **10 MB** per file
+- MIME type must be in the allowed list (same as single upload)
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/bulk-upload-files \
+  -H "EF-Access-Key: your_api_key_here" \
+  -F "files[]=@/assets/refund-icon.png" \
+  -F "files[]=@/assets/guarantee-badge.png" \
+  -F "files[]=@/assets/trust-seal.svg" \
+  -F "files[]=@/assets/virus.exe" \
+  -F "path=media"
+```
+
+```python Python
+import requests
+
+BRAND_ID = 42
+BASE = f"https://app.elasticfunnels.io/api/brands/{BRAND_ID}/file-manager"
+HEADERS = {"EF-Access-Key": "your_api_key_here"}
+
+asset_paths = [
+    "assets/universal/refund-icon.png",
+    "assets/universal/guarantee-badge.png",
+    "assets/universal/trust-seal.svg",
+    "assets/universal/cc-icons.png",
+    "assets/product/bottle-shot.png",
+    "assets/product/logo.png",
+]
+
+files = [("files[]", (Path(p).name, open(p, "rb"))) for p in asset_paths]
+
+response = requests.post(
+    f"{BASE}/bulk-upload-files",
+    headers=HEADERS,
+    files=files,
+    data={"path": "media"},
+)
+
+result = response.json()
+print(f"Uploaded: {result['summary']['uploaded']}, Failed: {result['summary']['failed']}")
+
+for f in result["files"]:
+    if f["status"] == "uploaded":
+        print(f"  ✓ {f['filename']} → {f['url']}")
+    else:
+        print(f"  ✗ {f['filename']}: {f['error']}")
+```
+
+```javascript Node.js
+import FormData from 'form-data';
+import fs from 'fs';
+import fetch from 'node-fetch';
+
+const BRAND_ID = 42;
+const form = new FormData();
+
+const assets = [
+  'assets/refund-icon.png',
+  'assets/guarantee-badge.png',
+  'assets/trust-seal.svg',
+];
+
+for (const p of assets) {
+  form.append('files[]', fs.createReadStream(p));
+}
+form.append('path', 'media');
+
+const res = await fetch(
+  `https://app.elasticfunnels.io/api/brands/${BRAND_ID}/file-manager/bulk-upload-files`,
+  { method: 'POST', headers: { 'EF-Access-Key': 'your_api_key_here', ...form.getHeaders() }, body: form }
+);
+
+const { summary, files } = await res.json();
+console.log(`${summary.uploaded} uploaded, ${summary.failed} failed`);
+```
+
+<ResponseExample>
+```json 200 Partial success
+{
+  "summary": {
+    "total": 4,
+    "uploaded": 3,
+    "failed": 1
+  },
+  "files": [
+    {
+      "filename": "refund-icon.png",
+      "status": "uploaded",
+      "url": "https://cdn.elasticfunnels.io/42/assets/media/refund-icon.png",
+      "size": 18432,
+      "mime_type": "image/png",
+      "width": 200,
+      "height": 200
+    },
+    {
+      "filename": "guarantee-badge.png",
+      "status": "uploaded",
+      "url": "https://cdn.elasticfunnels.io/42/assets/media/guarantee-badge.png",
+      "size": 34567,
+      "mime_type": "image/png",
+      "width": 400,
+      "height": 400
+    },
+    {
+      "filename": "trust-seal.svg",
+      "status": "uploaded",
+      "url": "https://cdn.elasticfunnels.io/42/assets/media/trust-seal.svg",
+      "size": 1204,
+      "mime_type": "image/svg+xml",
+      "width": null,
+      "height": null
+    },
+    {
+      "filename": "virus.exe",
+      "status": "failed",
+      "error": "MIME type \"application/x-msdownload\" is not allowed"
+    }
+  ]
+}
+```
+
+```json 422 Too many files
+{
+  "errors": {
+    "files": ["A maximum of 20 files can be uploaded in a single request."]
+  }
+}
+```
+</ResponseExample>
+
+<Note>
+  HTTP status is always **200** even when some files fail — inspect the `status` field on each entry. A `failed` entry never prevents other files from uploading.
+</Note>
+
+---
+
+## Check File Exists
+
+Check whether a file already exists at a given path. Useful for idempotency before uploading.
+
+```
+POST /api/brands/{brand}/file-manager/file-exists
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="filename" type="string" required>
+  The filename only (e.g. `cards.png`)
+</ParamField>
+
+<ParamField body="path" type="string">
+  The subdirectory to look in (e.g. `media`). Defaults to the root assets folder.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/file-exists \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"filename": "cards.png", "path": "media"}'
+```
+
+<ResponseExample>
+```json File exists
+{
+  "exists": true
+}
+```
+
+```json File does not exist
+{
+  "exists": false
+}
+```
+</ResponseExample>
+
+---
+
+## List Files
+
+Browse the raw Bunny CDN storage directory for the brand. Returns files and folders from storage directly (not the database). Sorted newest-first; folders are listed before files.
+
+```
+GET /api/brands/{brand}/file-manager/files
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="extensions" type="string">
+  Comma-separated list of extensions to filter by (e.g. `png,jpg,svg`)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/files" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```bash cURL (filter by extension)
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/files?extensions=png,jpg,svg" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "ObjectName": "media",
+    "IsDirectory": true,
+    "type": "folder",
+    "BrowsePath": "media/",
+    "Length": "0 KB",
+    "sizeBytes": 0,
+    "LastChanged": "2024-12-10T14:00:00Z"
+  },
+  {
+    "ObjectName": "cards.png",
+    "IsDirectory": false,
+    "type": "file",
+    "BrowsePath": "media/cards.png",
+    "src": "https://cdn.elasticfunnels.io/42/assets/media/cards.png",
+    "Length": "33.76 KB",
+    "sizeBytes": 34567,
+    "width": 400,
+    "height": 400,
+    "srcset": "https://cdn.elasticfunnels.io/42/assets/media/cards.png?width=200 200w, ...",
+    "sizes": "(max-width: 640px) 100vw, ...",
+    "LastChanged": "2024-12-10T14:01:00Z"
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## List Assets
+
+Return all brand assets tracked in the **database**. Unlike [List Files](#list-files) which reads from CDN storage, this returns structured records including file IDs and paths — useful for linking uploaded files to other API operations.
+
+```
+GET /api/brands/{brand}/file-manager/assets
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="updated_after" type="string">
+  ISO 8601 timestamp — only return assets updated after this date (e.g. `2024-12-01T00:00:00Z`). Useful for incremental sync.
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/assets" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```bash cURL (incremental sync)
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/assets?updated_after=2024-12-01T00:00:00Z" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 101,
+    "file_name": "cards.png",
+    "file_path": "media/cards.png",
+    "updated_at": "2024-12-10T14:01:00+00:00"
+  },
+  {
+    "id": 102,
+    "file_name": "guarantee-badge.png",
+    "file_path": "media/guarantee-badge.png",
+    "updated_at": "2024-12-10T14:02:00+00:00"
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## Delete File
+
+Delete a file or folder from asset storage. The corresponding database record is also removed.
+
+```
+POST /api/brands/{brand}/file-manager/delete-file
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="path" type="string" required>
+  Path of the file to delete, relative to the brand's assets folder (e.g. `media/cards.png`). No leading slash.
+</ParamField>
+
+<Warning>
+  Deletion is permanent. The following paths are **protected** and cannot be deleted via API:
+  - `media` (the folder itself)
+  - `products` and anything inside it (used in product forms)
+  - Empty path (root assets folder)
+</Warning>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/delete-file \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "media/old-badge.png"}'
+```
+
+<ResponseExample>
+```json Success
+{
+  "HttpCode": 200,
+  "Message": "File Deleted Successfully."
+}
+```
+
+```json Protected path
+{
+  "errors": {
+    "message": "Cannot delete media folder"
+  }
+}
+```
+
+```json Out-of-bounds path
+{
+  "errors": {
+    "message": "Invalid path: Cannot access files outside of brand assets folder"
+  }
+}
+```
+
+```json File not found
+{
+  "errors": {
+    "message": "File not found"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Rename File
+
+Rename a file in asset storage. Because Bunny CDN does not support atomic rename, this downloads the original content, uploads it under the new name, and deletes the original. The database record is updated automatically.
+
+```
+POST /api/brands/{brand}/file-manager/rename-file
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="path" type="string" required>
+  Current path of the file relative to the brand's assets folder (e.g. `media/old-name.png`). No leading slash.
+</ParamField>
+
+<ParamField body="new_name" type="string" required>
+  New filename only — not a path (e.g. `new-name.png`). Must not contain `/` or `\`.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/rename-file \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "media/old-name.png", "new_name": "cards.png"}'
+```
+
+<ResponseExample>
+```json Success
+{
+  "success": true,
+  "old_path": "media/old-name.png",
+  "new_path": "media/cards.png",
+  "url": "https://cdn.elasticfunnels.io/42/assets/media/cards.png"
+}
+```
+
+```json File not found
+{
+  "errors": {
+    "message": "File not found"
+  }
+}
+```
+
+```json Invalid new_name
+{
+  "errors": {
+    "new_name": ["new_name must be a filename only, not a path."]
+  }
+}
+```
+</ResponseExample>
+
+<Note>
+  **Rename folder** (`POST …/file-manager/rename-folder`) is not yet supported via the API. It returns `501 Not Implemented`. Use the File Manager UI to rename folders.
+</Note>
+
+---
+
+## Create Folder
+
+Create a new folder inside the brand's asset storage.
+
+```
+POST /api/brands/{brand}/file-manager/create-folder
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="path" type="string" required>
+  Parent directory for the new folder (e.g. `media`)
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Folder name. Must match `^[a-z0-9_-]+$` — lowercase letters, numbers, hyphens, underscores only.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/create-folder \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"path": "media", "name": "product-shots"}'
+```
+
+<ResponseExample>
+```json Success
+{
+  "message": "Folder created successfully."
+}
+```
+
+```json Already exists
+{
+  "errors": {
+    "name": ["Folder already exists"]
+  }
+}
+```
+
+```json Invalid name
+{
+  "errors": {
+    "name": ["Folder name can only contain letters, numbers, underscores, and hyphens."]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Automated Product Provisioning
+
+Complete example: bulk-upload all universal + product-specific assets for a new product, then idempotently re-run without re-uploading existing files.
+
+```python Python
+import requests
+from pathlib import Path
+
+BRAND_ID = 42
+API_KEY = "your_api_key_here"
+BASE = f"https://app.elasticfunnels.io/api/brands/{BRAND_ID}/file-manager"
+CDN = f"https://cdn.elasticfunnels.io/{BRAND_ID}/assets"
+HEADERS = {"EF-Access-Key": API_KEY}
+
+
+def bulk_upload(local_paths: list[Path], folder: str) -> dict[str, str]:
+    """Upload a batch; skip files that already exist. Returns {filename: cdn_url}."""
+
+    # Check which already exist
+    to_upload = []
+    urls = {}
+    for p in local_paths:
+        r = requests.post(
+            f"{BASE}/file-exists",
+            headers=HEADERS,
+            json={"filename": p.name, "path": folder},
+        )
+        if r.json().get("exists"):
+            print(f"  skip  {p.name} (already on CDN)")
+            urls[p.name] = f"{CDN}/{folder}/{p.name}"
+        else:
+            to_upload.append(p)
+
+    if not to_upload:
+        return urls
+
+    # Bulk upload the rest
+    files = [("files[]", (p.name, p.open("rb"))) for p in to_upload]
+    r = requests.post(
+        f"{BASE}/bulk-upload-files",
+        headers=HEADERS,
+        files=files,
+        data={"path": folder},
+    )
+    r.raise_for_status()
+
+    for entry in r.json()["files"]:
+        if entry["status"] == "uploaded":
+            print(f"  ✓  {entry['filename']}")
+            urls[entry["filename"]] = entry["url"]
+        else:
+            print(f"  ✗  {entry['filename']}: {entry['error']}")
+
+    return urls
+
+
+UNIVERSAL = [
+    Path("assets/universal/refund-icon.png"),
+    Path("assets/universal/guarantee-badge.png"),
+    Path("assets/universal/trust-seal.svg"),
+    Path("assets/universal/cc-icons.png"),
+]
+
+PRODUCT = [
+    Path("assets/product/bottle-shot.png"),
+    Path("assets/product/logo.png"),
+]
+
+print("Uploading universal assets…")
+universal_urls = bulk_upload(UNIVERSAL, "media")
+
+print("Uploading product assets…")
+product_urls = bulk_upload(PRODUCT, "media/products")
+
+all_urls = {**universal_urls, **product_urls}
+print(f"\nDone. {len(all_urls)} assets ready.")
+```

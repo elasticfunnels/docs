@@ -1,0 +1,463 @@
+---
+title: 'Automations'
+description: 'Create and manage automation workflows, read execution stats, and manage builder configs'
+---
+
+<Note>
+  All Automations endpoints sit under `/api/brands/{brand}/automations/` with `moduleAccess:automations` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## List Automations
+
+```
+GET /api/brands/{brand}/automations
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by title
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest` (default), `oldest`, `created_at`, `updated_at`
+</ParamField>
+
+<ParamField query="sort_direction" type="string">
+  `asc` or `desc` (used with `created_at` / `updated_at`)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/automations?q=welcome&per_page=50" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 12,
+      "title": "Welcome Email Sequence",
+      "status": "active",
+      "trigger_node_type": "form_submission",
+      "entry_node": "start",
+      "postback_code": "abc-123",
+      "collection_code": "lead-capture",
+      "created_at": "2024-12-01T10:00:00.000000Z",
+      "updated_at": "2024-12-10T15:00:00.000000Z"
+    }
+  ],
+  "per_page": 25,
+  "total": 8,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List Automations (Unpaginated)
+
+```
+GET /api/brands/{brand}/automations/all
+```
+
+Returns `{ id, title }` for all automations — useful for dropdowns.
+
+<ResponseExample>
+```json Response
+[
+  { "id": 12, "title": "Welcome Email Sequence" },
+  { "id": 15, "title": "Abandoned Cart Recovery" }
+]
+```
+</ResponseExample>
+
+---
+
+## Get Automation
+
+```
+GET /api/brands/{brand}/automations/{automation}
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 12,
+  "title": "Welcome Email Sequence",
+  "postback_code": "abc-123",
+  "trigger_node_type": "form_submission"
+}
+```
+</ResponseExample>
+
+---
+
+## Create Automation
+
+```
+POST /api/brands/{brand}/automations
+```
+
+<ParamField body="title" type="string" required>
+  Automation name (max 255 chars)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/automations \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Post-Purchase Upsell"}'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "automation": {
+    "id": 16,
+    "title": "Post-Purchase Upsell",
+    "status": "draft",
+    "brand_id": 42,
+    "created_at": "2024-12-11T10:00:00.000000Z"
+  }
+}
+```
+
+```json 403 Plan limit
+{
+  "error": "Upgrade required to create automations",
+  "plan_error": {
+    "message": "Your current plan does not allow creating automations.",
+    "upgrade_info": {}
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Automation
+
+```
+PUT /api/brands/{brand}/automations/{automation}
+```
+
+<ParamField body="title" type="string">
+  New title (max 255)
+</ParamField>
+
+<ParamField body="status" type="string">
+  `active`, `inactive`, or `draft`
+</ParamField>
+
+<ParamField body="trigger_node_type" type="string">
+  Trigger type (e.g. `form_submission`, `purchase`, `tag_added`)
+</ParamField>
+
+<ParamField body="entry_node" type="string">
+  Entry node code
+</ParamField>
+
+<ParamField body="postback_code" type="string">
+  Custom postback code (max 255)
+</ParamField>
+
+<ParamField body="collection_code" type="string">
+  Collection code to attach
+</ParamField>
+
+---
+
+## Delete Automation
+
+```
+DELETE /api/brands/{brand}/automations/{automation}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Clone Automation
+
+Creates a full copy of an automation within the same brand.
+
+```
+POST /api/brands/{brand}/automations/{automation}/clone
+```
+
+<ParamField body="title" type="string">
+  New name for the clone. Defaults to `"<original title> (Copy)"`.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/automations/12/clone \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Welcome Sequence v2"}'
+```
+
+<ResponseExample>
+```json Response
+{
+  "automation": {
+    "id": 17,
+    "title": "Welcome Sequence v2",
+    "status": "draft"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Copy Automation to Another Brand
+
+```
+POST /api/brands/{brand}/automations/copy
+```
+
+<ParamField body="id" type="number" required>
+  Source automation ID
+</ParamField>
+
+<ParamField body="brand_id" type="number" required>
+  Target brand ID to copy into
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Title for the copied automation in the target brand
+</ParamField>
+
+<ResponseExample>
+```json 200 Copied
+{
+  "automation_id": 23
+}
+```
+
+```json 404 Not found
+{
+  "error": "Automation not found."
+}
+```
+</ResponseExample>
+
+---
+
+## Export Automations
+
+Queue a CSV export of automation records.
+
+```
+POST /api/brands/{brand}/automations/export
+```
+
+<ParamField body="filters" type="array">
+  Filter conditions
+</ParamField>
+
+<ParamField body="selected_ids" type="array">
+  Limit export to specific automation IDs
+</ParamField>
+
+<ParamField body="columns" type="array">
+  Columns to include
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Export started. You will receive an email when it is ready."
+}
+```
+</ResponseExample>
+
+---
+
+## Get Builder Config
+
+Returns the full visual-builder JSON for an automation. If a draft revision exists, the draft is returned instead of the published version.
+
+```
+GET /api/brands/{brand}/automations/{automation}/builder
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/automations/12/builder \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 12,
+  "title": "Welcome Email Sequence",
+  "config": {
+    "nodes": { /* builder nodes */ },
+    "connections": { /* node connections */ }
+  },
+  "version": 3,
+  "trigger_node_type": "form_submission"
+}
+```
+
+```
+200 (empty string)  — automation exists but has no builder config yet
+```
+</ResponseExample>
+
+---
+
+## Save Builder Config
+
+Saves the visual-builder JSON. Pass `draft=true` to save as a draft revision without publishing.
+
+```
+POST /api/brands/{brand}/automations/{automation}/builder
+```
+
+<ParamField body="(full builder document)" type="object">
+  The complete builder config object (same shape as returned by GET)
+</ParamField>
+
+<ParamField query="draft" type="boolean">
+  If `true`, saves as a draft revision. Published configs are deployed to S3 and activate the automation.
+</ParamField>
+
+```bash cURL — save as draft
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/automations/12/builder?draft=true" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{ /* builder JSON */ }'
+```
+
+---
+
+## Discard Draft Revision
+
+Discards the current draft revision and reverts to the last published version.
+
+```
+POST /api/brands/{brand}/automations/{automation}/discard-revision
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 12,
+  "title": "Welcome Email Sequence",
+  "config": { /* last published config */ }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Automation Stats
+
+Returns execution counts per node, aggregated from the event log.
+
+```
+GET /api/brands/{brand}/automations/{automation}/stats
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/automations/12/stats \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "start-node-abc": {
+    "success": 315,
+    "failed": 2,
+    "skipped": 5
+  },
+  "send-email-def": {
+    "success": 308,
+    "failed": 9
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Execution Summary
+
+Global summary of automation runs for the brand.
+
+```
+GET /api/brands/{brand}/automations/summary
+```
+
+<ResponseExample>
+```json Response
+{
+  "total_runs": 1420,
+  "successful_tasks": 1387,
+  "failed_tasks": 33,
+  "task_status_counts": {
+    "success": 1387,
+    "failed": 33
+  },
+  "period_start_date": "2024-12-01T00:00:00Z",
+  "period_end_date": "2024-12-31T23:59:59Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Execution Summary by Automation
+
+```
+GET /api/brands/{brand}/automations/summary-by-automation
+```
+
+Returns execution stats grouped per automation ID.
+
+---
+
+## Automation Event Log
+
+```
+GET /api/brands/{brand}/automations/{automation}/logs
+```
+
+Returns paginated execution log for a specific automation.
+
+---
+
+## Automation Events
+
+```
+GET /api/brands/{brand}/automations/{automation}/events
+```
+
+Returns available event types that have fired for this automation.
+
+---
+
+## Notes
+
+<Info>
+  - `postback_code` is the unique trigger code used in postback URLs (`/webhooks/{code}`)
+  - Builder configs are deployed to S3 on publish — **draft saves do not activate** the automation
+  - Stats are read from Elasticsearch and may have a short indexing delay
+  - The `copy` endpoint copies across brands; `clone` copies within the same brand
+</Info>

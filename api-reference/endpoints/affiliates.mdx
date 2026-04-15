@@ -1,0 +1,428 @@
+---
+title: 'Affiliates'
+description: 'Manage affiliate accounts, commissions, and payout processing'
+---
+
+<Note>
+  Affiliate endpoints sit under `/api/brands/{brand}/affiliates/` with `moduleAccess:affiliates` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## List Affiliates
+
+```
+GET /api/brands/{brand}/affiliates
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by type: `external` or `affcenter`
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by name or merchant account ID
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest`, `oldest`, `created_at`, `updated_at`
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/affiliates \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 5,
+      "name": "John Smith",
+      "email": "john@affiliate.com",
+      "status": "active",
+      "type": "external",
+      "commission_rate": 30,
+      "commission_type": "percent",
+      "merchant": { "id": 1, "merchant": "NMI", "account_id": "123" },
+      "commissionGroup": null,
+      "brand_id": 42
+    }
+  ],
+  "per_page": 25,
+  "total": 18,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List All Affiliates (Unpaginated)
+
+```
+GET /api/brands/{brand}/affiliates/all
+```
+
+Returns `id`, `name`, `type`, and `merchant` for all affiliates — useful for dropdowns.
+
+---
+
+## Quick Access Stats
+
+```
+GET /api/brands/{brand}/affiliates/quick-access
+```
+
+<ResponseExample>
+```json Response
+{
+  "all": 18,
+  "external": 12,
+  "affcenter": 6
+}
+```
+</ResponseExample>
+
+---
+
+## Organization Affiliates Options
+
+Search affiliates from the organization's affiliate center — used for linking org affiliates to a brand.
+
+```
+GET /api/brands/{brand}/affiliates/organization-affiliates-options
+```
+
+<ParamField query="q" type="string">
+  Search by name, email, or nickname
+</ParamField>
+
+<ParamField query="selected_id" type="number">
+  Ensure this affiliate is included even if outside the search results
+</ParamField>
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 3,
+    "name": "Jane Affiliate",
+    "email": "jane@example.com",
+    "nickname": "jane_aff",
+    "displayLabel": "Jane Affiliate (jane@example.com)"
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## Get Affiliate
+
+```
+GET /api/brands/{brand}/affiliates/{affiliate}
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 5,
+  "name": "John Smith",
+  "email": "john@affiliate.com",
+  "phone": null,
+  "status": "active",
+  "type": "external",
+  "commission_rate": 30,
+  "commission_type": "percent",
+  "is_whitelisted": false,
+  "merchant_id": 1,
+  "merchant": null
+}
+```
+</ResponseExample>
+
+---
+
+## Create Affiliate
+
+```
+POST /api/brands/{brand}/affiliates
+```
+
+<ParamField body="name" type="string" required>
+  Affiliate display name (max 255)
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  `active`, `disabled`, `blacklisted`, `pending`, `pending_email`, or `pending_approve`
+</ParamField>
+
+<ParamField body="email" type="string">
+  Affiliate email. Must be unique per brand.
+</ParamField>
+
+<ParamField body="phone" type="string">
+  Phone number (max 255)
+</ParamField>
+
+<ParamField body="type" type="string">
+  `external` (manually managed) or `affcenter` (linked to org affiliate center)
+</ParamField>
+
+<ParamField body="commission_rate" type="number">
+  Commission percentage or fixed amount
+</ParamField>
+
+<ParamField body="commission_type" type="string">
+  `percent` or `fixed`
+</ParamField>
+
+<ParamField body="merchant_id" type="number">
+  Link to a brand merchant integration
+</ParamField>
+
+<ParamField body="is_whitelisted" type="boolean">
+  Bypass approval requirements
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/affiliates \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Smith",
+    "email": "john@affiliate.com",
+    "status": "active",
+    "type": "external",
+    "commission_rate": 30,
+    "commission_type": "percent"
+  }'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "affiliate": {
+    "id": 5,
+    "name": "John Smith",
+    "email": "john@affiliate.com",
+    "status": "active",
+    "type": "external",
+    "commission_rate": 30,
+    "commission_type": "percent",
+    "brand_id": 42,
+    "created_at": "2024-12-11T10:00:00.000000Z"
+  }
+}
+```
+
+```json 422 Duplicate email
+{
+  "errors": {
+    "email": ["The email has already been taken."]
+  }
+}
+```
+
+```json 403 Plan limit
+{
+  "error": "Upgrade required to create affiliates",
+  "plan_error": {
+    "message": "Your current plan does not allow creating affiliates.",
+    "upgrade_info": {}
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Affiliate
+
+```
+PUT /api/brands/{brand}/affiliates/{affiliate}
+```
+
+Same body as Create — all fields optional on update.
+
+---
+
+## Delete Affiliate
+
+```
+DELETE /api/brands/{brand}/affiliates/{affiliate}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Export Affiliates
+
+```
+POST /api/brands/{brand}/affiliates/export
+```
+
+<ParamField body="filters" type="array">
+  Filter conditions (same as list query params)
+</ParamField>
+
+<ParamField body="selected_ids" type="array">
+  Limit export to specific affiliate IDs
+</ParamField>
+
+<ParamField body="columns" type="array">
+  Columns to include in the export
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Export started. You will receive an email when it is ready."
+}
+```
+</ResponseExample>
+
+---
+
+## Payouts
+
+Payouts represent commission payments owed to affiliates for a billing period.
+
+### List Payouts
+
+```
+GET /api/brands/{brand}/affiliates/payouts
+```
+
+<ParamField query="affiliate_id" type="number">
+  Filter by affiliate ID
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by status: `pending`, `approved`, `paid`, `rejected`, `cancelled`
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/affiliates/payouts?status=pending" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 3,
+      "brand_affiliate_id": 5,
+      "status": "pending",
+      "amount": 450.00,
+      "currency": "USD",
+      "period_start": "2024-12-01",
+      "period_end": "2024-12-31",
+      "conversions_count": 15,
+      "affiliate": { "id": 5, "name": "John Smith" },
+      "created_at": "2025-01-01T00:00:00Z"
+    }
+  ],
+  "per_page": 25,
+  "total": 4
+}
+```
+</ResponseExample>
+
+### Create Payout
+
+Generate a payout for an affiliate based on their conversions in a date range.
+
+```
+POST /api/brands/{brand}/affiliates/payouts
+```
+
+<ParamField body="brand_affiliate_id" type="number" required>
+  Affiliate ID to create the payout for
+</ParamField>
+
+<ParamField body="period_start" type="string" required>
+  Start date (ISO 8601)
+</ParamField>
+
+<ParamField body="period_end" type="string" required>
+  End date (ISO 8601, must be on or after `period_start`)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/affiliates/payouts \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "brand_affiliate_id": 5,
+    "period_start": "2024-12-01",
+    "period_end": "2024-12-31"
+  }'
+```
+
+### Update Payout Status
+
+```
+PUT /api/brands/{brand}/affiliates/payouts/{payout}
+```
+
+<ParamField body="status" type="string" required>
+  `approved`, `rejected`, `paid`, or `cancelled`
+</ParamField>
+
+<ParamField body="rejection_reason" type="string">
+  Required when `status` is `rejected` (max 1000 chars)
+</ParamField>
+
+<ParamField body="payment_method" type="string">
+  Required when `status` is `paid` (e.g. `bank_transfer`, `paypal`)
+</ParamField>
+
+<ParamField body="payment_reference" type="string">
+  Optional payment reference/transaction ID (max 255)
+</ParamField>
+
+```bash cURL — mark as paid
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/affiliates/payouts/3 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "paid", "payment_method": "bank_transfer", "payment_reference": "TXN-987654"}'
+```
+
+### Upload Payout Invoice
+
+```
+POST /api/brands/{brand}/affiliates/payouts/{payout}/invoice
+```
+
+<ParamField body="invoice" type="file">
+  Invoice PDF file (multipart/form-data)
+</ParamField>
+
+---
+
+## Notes
+
+<Info>
+  - `type: "affcenter"` affiliates are linked to your organization's affiliate center and require the `viewOrganizationAffiliates` permission
+  - Some organization portals require an uploaded invoice before a payout can be marked as `paid`
+  - Payout amounts are calculated from the affiliate's commissions on approved conversions within the period
+</Info>

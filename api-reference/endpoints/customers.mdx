@@ -1,0 +1,246 @@
+---
+title: 'Customers'
+description: 'List, search, and export customer records'
+---
+
+<Note>
+  Customer endpoints sit under `/api/brands/{brand}/customers/` with `moduleAccess:customers` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+Customer records are built from conversion and tracking events (purchases, abandoned carts, chargebacks). They are stored in Elasticsearch and cannot be created via API directly — they are created automatically when conversions are recorded.
+
+---
+
+## List Customers
+
+```
+GET /api/brands/{brand}/customers
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by customer type: `customer` (purchases only) or `abandon` (abandoned carts only)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by email, name, or phone
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Sort field. Any of the sortable columns below.
+</ParamField>
+
+<ParamField query="sort_direction" type="string">
+  `asc` or `desc`
+</ParamField>
+
+<ParamField query="columns" type="array">
+  Subset of columns to return. Allowed values: `customer_email`, `customer_name`, `customer_first_name`, `customer_last_name`, `customer_phone`, `customer_country`, `customer_state`, `customer_city`, `last_order_date`, `first_order_date`, `total_orders`, `total_revenue`, `total_refunds`, `total_chargebacks`, `lifetime_value`, `order_frequency`, `products_purchased`, `is_abandoned_customer`, `abandoned_value`
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/customers?sort=total_revenue&sort_direction=desc&per_page=50" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "customer_email": "jane@example.com",
+      "customer_name": "Jane Doe",
+      "customer_first_name": "Jane",
+      "customer_last_name": "Doe",
+      "customer_phone": "+15551234567",
+      "customer_country": "US",
+      "customer_state": "CA",
+      "customer_city": "Los Angeles",
+      "first_order_date": "2024-06-01T00:00:00Z",
+      "last_order_date": "2024-12-01T00:00:00Z",
+      "total_orders": 3,
+      "total_revenue": 207.00,
+      "total_refunds": 0,
+      "total_chargebacks": 0,
+      "lifetime_value": 207.00,
+      "order_frequency": 90,
+      "is_abandoned_customer": false,
+      "abandoned_value": 0
+    }
+  ],
+  "per_page": 25,
+  "total": 1842,
+  "last_page": 74
+}
+```
+</ResponseExample>
+
+---
+
+## Quick Access Stats
+
+Returns customer counts by type — useful for dashboard badges.
+
+```
+GET /api/brands/{brand}/customers/quick-access
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/customers/quick-access \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "all": 1842,
+  "customers": 1205,
+  "abandons": 637,
+  "chargebacks": 14,
+  "refunds": 38
+}
+```
+</ResponseExample>
+
+---
+
+## Get Customer Details
+
+Retrieve the full profile for a single customer by email address — includes lifetime stats, order history, subscriptions, and notes.
+
+```
+GET /api/brands/{brand}/customers/{customerEmail}/details
+```
+
+<ParamField path="customerEmail" type="string" required>
+  Customer's email address (URL-encoded if it contains special characters)
+</ParamField>
+
+<ParamField query="include_orders" type="boolean">
+  Include full order history (default: true)
+</ParamField>
+
+<ParamField query="include_subscriptions" type="boolean">
+  Include active subscriptions (default: true)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/customers/jane%40example.com/details" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```python Python
+import requests, urllib.parse
+
+email = urllib.parse.quote("jane@example.com", safe="")
+r = requests.get(
+    f'https://app.elasticfunnels.io/api/brands/{brand_id}/customers/{email}/details',
+    headers={'EF-Access-Key': 'your_api_key_here'},
+)
+print(r.json())
+```
+
+<ResponseExample>
+```json Response
+{
+  "customer": {
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "phone": "+15551234567",
+    "country": "US",
+    "state": "CA",
+    "city": "Los Angeles",
+    "address": "123 Main St"
+  },
+  "stats": {
+    "total_orders": 3,
+    "total_revenue": 207.00,
+    "total_refunds": 0,
+    "total_chargebacks": 0,
+    "lifetime_value": 207.00,
+    "first_order_date": "2024-06-01T00:00:00Z",
+    "last_order_date": "2024-12-01T00:00:00Z",
+    "average_order_value": 69.00
+  },
+  "orders": [
+    {
+      "id": "conv-abc",
+      "date": "2024-12-01T00:00:00Z",
+      "total": 69.00,
+      "products": ["1 Bottle"],
+      "status": "approved"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": 12,
+      "status": "active",
+      "product": "Monthly Bundle",
+      "next_charge_date": "2025-01-01"
+    }
+  ]
+}
+```
+
+```json 404 Not found
+{
+  "message": "Customer not found."
+}
+```
+</ResponseExample>
+
+---
+
+## Export Customers
+
+Queue a CSV export of customer records. An email is sent when the export is ready.
+
+```
+POST /api/brands/{brand}/customers/export
+```
+
+<ParamField body="filters" type="array">
+  Filter conditions (same keys as the list endpoint `?type`, `?q`, etc.)
+</ParamField>
+
+<ParamField body="selected_emails" type="array">
+  Limit export to specific email addresses
+</ParamField>
+
+<ParamField body="columns" type="array">
+  Columns to include (subset of the allowed column list above)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/customers/export \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "columns": ["customer_email", "customer_name", "total_revenue", "last_order_date"],
+    "filters": {"type": "customer"}
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Export started. You will receive an email when it is ready."
+}
+```
+</ResponseExample>
+
+---
+
+## Notes
+
+<Info>
+  - Customer records are read-only — they are created automatically from conversion events
+  - The `{customerEmail}` path parameter should be URL-encoded
+  - Sorting and filtering use Elasticsearch under the hood; large result sets may be slightly delayed
+  - The `columns` parameter controls both what is fetched and what is returned, reducing response size for large lists
+</Info>

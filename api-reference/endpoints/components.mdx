@@ -1,0 +1,506 @@
+---
+title: 'Components'
+description: 'Create, read, update, and delete reusable page components via API'
+---
+
+<Note>
+  All component endpoints authenticate via `EF-Access-Key`. The brand user's role must have `components` module access.
+</Note>
+
+---
+
+## List Components
+
+Return all components for a brand with pagination.
+
+```
+GET /api/brands/{brand}/components
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number (default: 1)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components?per_page=100" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```javascript JavaScript
+const res = await fetch(
+  'https://app.elasticfunnels.io/api/brands/{brand_id}/components',
+  { headers: { 'EF-Access-Key': 'your_api_key_here' } }
+);
+const { data, total, current_page, last_page } = await res.json();
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 12,
+      "name": "Hero Section",
+      "code": "custom-hero-section",
+      "type": "editor",
+      "html_only": false,
+      "brand_id": 42,
+      "created_at": "2024-11-01T09:00:00.000000Z",
+      "updated_at": "2024-12-10T14:30:00.000000Z",
+      "tags": []
+    },
+    {
+      "id": 13,
+      "name": "Guarantee Badge",
+      "code": "custom-guarantee-badge",
+      "type": null,
+      "html_only": true,
+      "brand_id": 42,
+      "created_at": "2024-11-05T10:00:00.000000Z",
+      "updated_at": "2024-11-05T10:00:00.000000Z",
+      "tags": []
+    }
+  ],
+  "per_page": 25,
+  "total": 2,
+  "last_page": 1,
+  "from": 1,
+  "to": 2
+}
+```
+</ResponseExample>
+
+---
+
+## Get Component
+
+Retrieve a single component. Accepts either a numeric ID or the component's `code` string.
+
+```
+GET /api/brands/{brand}/components/{component}
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string (e.g. `custom-hero-section`)
+</ParamField>
+
+```bash cURL (by ID)
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/12 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```bash cURL (by code)
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero-section \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 12,
+  "name": "Hero Section",
+  "code": "custom-hero-section",
+  "type": "editor",
+  "html": "<!DOCTYPE html><html><body><section class=\"hero\">...</section></body></html>",
+  "css": ".hero { background: #fff; padding: 60px 0; }",
+  "config": null,
+  "html_only": false,
+  "brand_id": 42,
+  "created_at": "2024-11-01T09:00:00.000000Z",
+  "updated_at": "2024-12-10T14:30:00.000000Z"
+}
+```
+
+```json 404 Not found
+{
+  "message": "No query results for model [BrandPageComponent]."
+}
+```
+</ResponseExample>
+
+---
+
+## Create Component
+
+Create a new reusable component.
+
+```
+POST /api/brands/{brand}/components
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Display name (shown in the component library)
+</ParamField>
+
+<ParamField body="code" type="string">
+  Unique identifier used to embed the component in pages (e.g. `custom-guarantee-badge`). Auto-generated if omitted. Components not of type `editor` are automatically prefixed with `custom-`.
+</ParamField>
+
+<ParamField body="html" type="string">
+  HTML markup for the component
+</ParamField>
+
+<ParamField body="css" type="string">
+  CSS styles scoped to this component
+</ParamField>
+
+<ParamField body="html_only" type="boolean">
+  When `true`, the component is plain HTML with no visual builder support. If no `config` is provided, a minimal builder config is auto-generated.
+</ParamField>
+
+<ParamField body="type" type="string">
+  Component type. For API-created components this is typically omitted (or set to `editor`).
+</ParamField>
+
+<ParamField body="config" type="object">
+  GrapesJS builder config. Relevant only for visual-builder components.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Guarantee Badge",
+    "code": "custom-guarantee-badge",
+    "html_only": true,
+    "html": "<div class=\"badge\"><img src=\"https://cdn.elasticfunnels.io/42/assets/media/guarantee-badge.png\" alt=\"60-Day Guarantee\"></div>",
+    "css": ".badge { max-width: 200px; margin: 20px auto; text-align: center; }"
+  }'
+```
+
+```python Python
+import requests
+
+r = requests.post(
+    'https://app.elasticfunnels.io/api/brands/{brand_id}/components',
+    headers={'EF-Access-Key': 'your_api_key_here', 'Content-Type': 'application/json'},
+    json={
+        'name': 'Guarantee Badge',
+        'code': 'custom-guarantee-badge',
+        'html_only': True,
+        'html': '<div class="badge">...</div>',
+        'css': '.badge { max-width: 200px; }',
+    },
+)
+component = r.json()['pageComponent']
+print(component['id'], component['code'])
+```
+
+```javascript JavaScript
+const res = await fetch(
+  'https://app.elasticfunnels.io/api/brands/{brand_id}/components',
+  {
+    method: 'POST',
+    headers: {
+      'EF-Access-Key': 'your_api_key_here',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: 'Guarantee Badge',
+      code: 'custom-guarantee-badge',
+      html_only: true,
+      html: '<div class="badge">...</div>',
+      css: '.badge { max-width: 200px; }',
+    }),
+  }
+);
+const { pageComponent } = await res.json();
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "pageComponent": {
+    "id": 14,
+    "name": "Guarantee Badge",
+    "code": "custom-guarantee-badge",
+    "type": null,
+    "html": "<div class=\"badge\">...</div>",
+    "css": ".badge { max-width: 200px; margin: 20px auto; text-align: center; }",
+    "html_only": true,
+    "brand_id": 42,
+    "created_at": "2024-12-10T16:00:00.000000Z",
+    "updated_at": "2024-12-10T16:00:00.000000Z"
+  }
+}
+```
+
+```json 422 Validation error
+{
+  "errors": {
+    "name": ["The name field is required."]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Component
+
+Update an existing component. Only the fields you include are changed.
+
+```
+PUT /api/brands/{brand}/components/{component}
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Display name. **Required even if you are not changing it** — send the current name.
+</ParamField>
+
+<ParamField body="html" type="string">
+  Updated HTML markup
+</ParamField>
+
+<ParamField body="css" type="string">
+  Updated CSS styles
+</ParamField>
+
+<ParamField body="html_only" type="boolean">
+  Toggle raw HTML mode
+</ParamField>
+
+<ParamField body="code" type="string">
+  Rename the component code. If changed, **all pages that reference this component are automatically updated** to use the new code.
+</ParamField>
+
+<ParamField body="config" type="object">
+  Updated GrapesJS builder config
+</ParamField>
+
+```bash cURL (by ID)
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/components/14 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Guarantee Badge",
+    "html": "<div class=\"badge\"><img src=\"https://cdn.elasticfunnels.io/42/assets/media/guarantee-v2.png\" alt=\"60-Day Guarantee\"></div>"
+  }'
+```
+
+```bash cURL (by code)
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-guarantee-badge \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Guarantee Badge",
+    "html": "<div class=\"badge\">Updated content</div>"
+  }'
+```
+
+```python Python (upsert pattern)
+def upsert_component(brand_id, code, name, html, css=''):
+    base = f'https://app.elasticfunnels.io/api/brands/{brand_id}/components'
+    headers = {'EF-Access-Key': 'your_api_key_here', 'Content-Type': 'application/json'}
+    payload = {'name': name, 'html': html, 'css': css, 'html_only': True}
+
+    # Try update first
+    r = requests.put(f'{base}/{code}', headers=headers, json=payload)
+    if r.status_code == 404:
+        # Component doesn't exist yet — create it
+        r = requests.post(base, headers=headers, json={**payload, 'code': code})
+    r.raise_for_status()
+    return r.json()
+```
+
+<ResponseExample>
+```json 200 Updated
+{
+  "id": 14,
+  "name": "Guarantee Badge",
+  "code": "custom-guarantee-badge",
+  "html": "<div class=\"badge\">Updated content</div>",
+  "css": ".badge { max-width: 200px; }",
+  "html_only": true,
+  "brand_id": 42,
+  "updated_at": "2024-12-11T09:15:00.000000Z"
+}
+```
+
+```json 422 Missing required name
+{
+  "errors": {
+    "name": ["The name field is required."]
+  }
+}
+```
+
+```json 404 Component not found
+{
+  "message": "No query results for model [BrandPageComponent]."
+}
+```
+</ResponseExample>
+
+<Warning>
+  **Common causes of errors on PUT:**
+
+  | Symptom | Cause | Fix |
+  |---------|-------|-----|
+  | `422` with `name is required` | `name` is always required by the validator, even if unchanged | Always include `"name"` in the body |
+  | `404` when using code string | Previously only numeric IDs were supported in the authorization layer | Fixed — both ID and `code` are now accepted |
+  | `401` redirect to login | Missing or invalid `EF-Access-Key` header, or key doesn't belong to this brand | Check header name and key value |
+  | `403` module access | Brand user role doesn't have `components` access | Update role permissions in Project Settings |
+</Warning>
+
+---
+
+## Delete Component
+
+Permanently delete a component. Pages that reference it by code will have an empty slot where the component was.
+
+```
+DELETE /api/brands/{brand}/components/{component}
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string
+</ParamField>
+
+```bash cURL
+curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/components/14 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json 200 Deleted
+{
+  "success": true
+}
+```
+
+```json 404 Not found
+{
+  "message": "No query results for model [BrandPageComponent]."
+}
+```
+</ResponseExample>
+
+---
+
+## Automated Product Provisioning
+
+Provision a full set of reusable brand components in one run. The script creates components that don't exist and updates those that do.
+
+```python Python
+import requests
+from pathlib import Path
+
+BRAND_ID = 42
+BASE = f'https://app.elasticfunnels.io/api/brands/{BRAND_ID}'
+CDN  = f'https://cdn.elasticfunnels.io/{BRAND_ID}/assets/media'
+H    = {'EF-Access-Key': 'your_api_key_here', 'Content-Type': 'application/json'}
+
+
+def upsert_component(code: str, name: str, html: str, css: str = '') -> dict:
+    payload = {'name': name, 'html': html, 'css': css, 'html_only': True}
+    r = requests.put(f'{BASE}/components/{code}', headers=H, json=payload)
+    if r.status_code == 404:
+        r = requests.post(f'{BASE}/components', headers=H, json={**payload, 'code': code})
+    r.raise_for_status()
+    result = r.json()
+    comp = result.get('pageComponent', result)
+    print(f'  ✓  {code} (id={comp.get("id")})')
+    return comp
+
+
+COMPONENTS = [
+    {
+        'code': 'custom-refund-icon',
+        'name': 'Refund Icon',
+        'html': f'<div class="refund"><img src="{CDN}/refund-icon.png" alt="Money Back Guarantee"></div>',
+        'css':  '.refund { max-width: 80px; margin: 0 auto; }',
+    },
+    {
+        'code': 'custom-guarantee-badge',
+        'name': '60-Day Guarantee Badge',
+        'html': f'<div class="guarantee"><img src="{CDN}/guarantee-badge.png" alt="60-Day Money Back"></div>',
+        'css':  '.guarantee { max-width: 200px; margin: 20px auto; text-align: center; }',
+    },
+    {
+        'code': 'custom-trust-seal',
+        'name': 'Trust Seal',
+        'html': f'<div class="trust"><img src="{CDN}/trust-seal.svg" alt="Secure Checkout"></div>',
+        'css':  '.trust { display: flex; justify-content: center; }',
+    },
+    {
+        'code': 'custom-cc-icons',
+        'name': 'Credit Card Icons',
+        'html': f'<div class="cc"><img src="{CDN}/cc-icons.png" alt="Visa Mastercard Amex"></div>',
+        'css':  '.cc { max-width: 260px; margin: 0 auto; }',
+    },
+]
+
+print(f'Provisioning {len(COMPONENTS)} components for brand {BRAND_ID}…')
+for comp in COMPONENTS:
+    upsert_component(**comp)
+
+print('Done.')
+```
+
+```javascript Node.js
+const BASE = `https://app.elasticfunnels.io/api/brands/${BRAND_ID}`;
+const CDN  = `https://cdn.elasticfunnels.io/${BRAND_ID}/assets/media`;
+const H    = { 'EF-Access-Key': API_KEY, 'Content-Type': 'application/json' };
+
+async function upsertComponent({ code, name, html, css = '' }) {
+  const payload = { name, html, css, html_only: true };
+
+  let res = await fetch(`${BASE}/components/${code}`, {
+    method: 'PUT', headers: H, body: JSON.stringify(payload),
+  });
+
+  if (res.status === 404) {
+    res = await fetch(`${BASE}/components`, {
+      method: 'POST', headers: H, body: JSON.stringify({ ...payload, code }),
+    });
+  }
+
+  if (!res.ok) throw new Error(`${code}: ${res.status} ${await res.text()}`);
+  const data = await res.json();
+  const comp = data.pageComponent ?? data;
+  console.log(`  ✓  ${code} (id=${comp.id})`);
+  return comp;
+}
+
+const components = [
+  { code: 'custom-guarantee-badge', name: '60-Day Guarantee Badge',
+    html: `<div class="guarantee"><img src="${CDN}/guarantee-badge.png" alt="Guarantee"></div>`,
+    css:  '.guarantee { max-width: 200px; margin: 20px auto; text-align: center; }' },
+  { code: 'custom-trust-seal', name: 'Trust Seal',
+    html: `<div class="trust"><img src="${CDN}/trust-seal.svg" alt="Secure"></div>`,
+    css:  '.trust { display: flex; justify-content: center; }' },
+];
+
+for (const c of components) await upsertComponent(c);
+```

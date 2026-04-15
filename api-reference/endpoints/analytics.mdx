@@ -466,3 +466,433 @@ Custom metric formulas support:
 <Warning>
   When grouping by `aff_id`, ensure your API key's user has the `affiliates.view` permission
 </Warning>
+
+---
+
+## UTM Performance
+
+Break down conversions and revenue by a single UTM dimension across a date range.
+
+```
+GET /api/brands/{brand}/utm-performance/{type}
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="type" type="string" required>
+  UTM dimension: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`
+</ParamField>
+
+<ParamField query="start" type="string" required>
+  Start date (ISO 8601)
+</ParamField>
+
+<ParamField query="end" type="string" required>
+  End date (ISO 8601)
+</ParamField>
+
+<ParamField query="tz" type="string">
+  Timezone (e.g. `America/New_York`)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/utm-performance/utm_source?start=2024-12-01T00:00:00Z&end=2024-12-10T23:59:59Z" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  { "utm_source": "facebook", "revenue": 9200.00, "sales": 184, "aov": 50.00, "conversion_rate": 0.038, "page_views": 4842 },
+  { "utm_source": "google",   "revenue": 4100.00, "sales": 82,  "aov": 50.00, "conversion_rate": 0.041, "page_views": 2000 }
+]
+```
+</ResponseExample>
+
+---
+
+## Specific Analytics Cards
+
+Individual endpoints for specialised analytics data. All accept `start` and `end` (ISO 8601) query params.
+
+### Time Before First Purchase
+
+How long visitors waited before converting — useful for identifying checkout hesitation.
+
+```
+GET /api/brands/{brand}/analytics/metrics/time-before-first-purchase
+```
+
+<ResponseExample>
+```json Response
+{
+  "buckets": [
+    { "label": "< 1 min",   "count": 92,  "pct": 0.29 },
+    { "label": "1–5 min",   "count": 118, "pct": 0.37 },
+    { "label": "5–15 min",  "count": 64,  "pct": 0.20 },
+    { "label": "15–60 min", "count": 30,  "pct": 0.10 },
+    { "label": "> 1 hour",  "count": 11,  "pct": 0.04 }
+  ],
+  "median_seconds": 187,
+  "sample_size": 315
+}
+```
+</ResponseExample>
+
+### Add-to-Carts by Video Watch Time
+
+Identifies at which point in a video visitors add to cart — use to find optimal CTA placement.
+
+```
+GET /api/brands/{brand}/analytics/metrics/add-to-carts-by-video-time
+```
+
+<ResponseExample>
+```json Response
+{
+  "buckets": [
+    { "video_pct": 0,   "atcs": 12 },
+    { "video_pct": 25,  "atcs": 31 },
+    { "video_pct": 50,  "atcs": 54 },
+    { "video_pct": 75,  "atcs": 29 },
+    { "video_pct": 100, "atcs": 8 }
+  ]
+}
+```
+</ResponseExample>
+
+### Customer Gender Distribution
+
+```
+GET /api/brands/{brand}/analytics/metrics/customer-gender
+```
+
+<ResponseExample>
+```json Response
+{
+  "male":    { "count": 182, "pct": 0.58 },
+  "female":  { "count": 121, "pct": 0.38 },
+  "unknown": { "count": 12,  "pct": 0.04 }
+}
+```
+</ResponseExample>
+
+### Video Completion by Gender
+
+```
+GET /api/brands/{brand}/analytics/metrics/video-completion-by-gender
+```
+
+<ResponseExample>
+```json Response
+{
+  "male":   { "avg_completion_pct": 64, "sample": 182 },
+  "female": { "avg_completion_pct": 71, "sample": 121 }
+}
+```
+</ResponseExample>
+
+### Products by Pages
+
+Conversion performance broken down by page → product pair.
+
+```
+GET /api/brands/{brand}/analytics/metrics/products-by-pages/data
+GET /api/brands/{brand}/analytics/metrics/products-by-pages/summary
+```
+
+<ResponseExample>
+```json data response
+[
+  {
+    "page_id": 101, "page_title": "Nutra Landing",
+    "product_id": 5, "product_title": "1 Bottle",
+    "revenue": 4600.00, "sales": 92, "conversion_rate": 0.038
+  }
+]
+```
+</ResponseExample>
+
+### Upsell Take Rate
+
+```
+GET /api/brands/{brand}/analytics/metrics/upsell-take-rate/summary
+```
+
+<ResponseExample>
+```json Response
+{
+  "upsells": [
+    { "product_id": 8, "product_title": "3-Bottle Bundle", "shown": 315, "taken": 87, "take_rate": 0.276, "revenue": 7830.00 }
+  ]
+}
+```
+</ResponseExample>
+
+### Units Sold
+
+```
+GET /api/brands/{brand}/analytics/metrics/units-sold/summary
+```
+
+<ResponseExample>
+```json Response
+{
+  "total_units": 847,
+  "by_product": [
+    { "product_id": 5, "title": "1 Bottle",   "units": 315 },
+    { "product_id": 6, "title": "3 Bottles",  "units": 532 }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Report Builder
+
+Build, save, and export custom cross-dimensional analytics reports.
+
+### Generate Report
+
+```
+POST /api/brands/{brand}/analytics/reports/generate
+```
+
+<ParamField body="group_by" type="array" required>
+  Dimension keys to group by (e.g. `["product", "utm_source"]`). See [grouping fields](#available-grouping-fields).
+</ParamField>
+
+<ParamField body="metrics" type="array" required>
+  Metric keys (e.g. `["revenue", "sales", "conversion_rate"]`)
+</ParamField>
+
+<ParamField body="start" type="string" required>
+  Start date (ISO 8601)
+</ParamField>
+
+<ParamField body="end" type="string" required>
+  End date (ISO 8601)
+</ParamField>
+
+<ParamField body="filters" type="object">
+  Key-value filters (e.g. `{"device": "mobile", "country": "US"}`)
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Max rows returned (default: 100)
+</ParamField>
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/reports/generate" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "group_by": ["utm_source", "product"],
+    "metrics": ["revenue", "sales", "conversion_rate"],
+    "start": "2024-12-01T00:00:00Z",
+    "end": "2024-12-10T23:59:59Z",
+    "filters": {"device": "mobile"},
+    "limit": 50
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "rows": [
+    {
+      "utm_source": "facebook",
+      "product": "1 Bottle",
+      "revenue": { "value": 4600.00, "formatted_value": "$4,600.00" },
+      "sales": { "value": 92, "formatted_value": "92" },
+      "conversion_rate": { "value": 0.038, "formatted_value": "3.8%" }
+    }
+  ],
+  "total_rows": 14,
+  "truncated": false
+}
+```
+</ResponseExample>
+
+### Get Available Grouping Fields (Report Builder)
+
+```
+GET /api/brands/{brand}/analytics/reports/grouping-fields
+```
+
+### Get Reporting Periods
+
+```
+GET /api/brands/{brand}/analytics/reports/reporting-periods
+```
+
+Returns available pre-set periods: `today`, `yesterday`, `last_7_days`, `last_30_days`, `this_month`, `last_month`, etc.
+
+### Save Report
+
+```
+POST /api/brands/{brand}/analytics/reports/save
+```
+
+<ParamField body="name" type="string" required>
+  Report name
+</ParamField>
+
+<ParamField body="config" type="object" required>
+  Same body as `generate` — stored and re-runnable on demand.
+</ParamField>
+
+### List Saved Reports
+
+```
+GET /api/brands/{brand}/analytics/reports/saved
+```
+
+### Load Saved Report
+
+```
+GET /api/brands/{brand}/analytics/reports/saved/{reportId}
+```
+
+### Export Saved Report
+
+```
+POST /api/brands/{brand}/analytics/reports/saved/{reportId}/export
+```
+
+### Delete Saved Report
+
+```
+DELETE /api/brands/{brand}/analytics/reports/saved/{reportId}
+```
+
+### Export Current Report
+
+```
+POST /api/brands/{brand}/analytics/reports/export
+```
+
+<ParamField body="format" type="string">
+  `csv` (default) or `excel`
+</ParamField>
+
+Other body fields same as Generate. Queues an export job and emails a download link when complete.
+
+<ResponseExample>
+```json 200 Queued
+{
+  "message": "Export has been queued. You will receive an email when it's ready.",
+  "status": "queued"
+}
+```
+</ResponseExample>
+
+---
+
+## Analytics Segments
+
+Create and manage reusable audience segments for filtering reports.
+
+### List Segments
+
+```
+GET /api/brands/{brand}/analytics/segments
+```
+
+### Get Segment
+
+```
+GET /api/brands/{brand}/analytics/segments/{segment}
+```
+
+### Create Segment
+
+```
+POST /api/brands/{brand}/analytics/segments
+```
+
+<ParamField body="name" type="string" required>
+  Segment name
+</ParamField>
+
+<ParamField body="conditions" type="array" required>
+  Array of condition objects. Each has `field`, `operator` (`eq`, `neq`, `gte`, `lte`, `in`), and `value`.
+</ParamField>
+
+<ParamField body="operator" type="string">
+  How conditions combine: `and` (default) or `or`
+</ParamField>
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/segments" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "High-Value Mobile Buyers",
+    "operator": "and",
+    "conditions": [
+      { "field": "device",  "operator": "eq",  "value": "mobile" },
+      { "field": "revenue", "operator": "gte", "value": 100 }
+    ]
+  }'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "id": 4,
+  "name": "High-Value Mobile Buyers",
+  "operator": "and",
+  "conditions": [
+    { "field": "device",  "operator": "eq",  "value": "mobile" },
+    { "field": "revenue", "operator": "gte", "value": 100 }
+  ],
+  "brand_id": 42,
+  "created_at": "2024-12-11T09:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+### Update Segment
+
+```
+PUT /api/brands/{brand}/analytics/segments/{segment}
+```
+
+### Delete Segment
+
+```
+DELETE /api/brands/{brand}/analytics/segments/{segment}
+```
+
+### Preview Segment
+
+Run a segment definition against live data without saving it.
+
+```
+POST /api/brands/{brand}/analytics/segments/preview
+```
+
+Body: same as Create.
+
+<ResponseExample>
+```json Preview response
+{
+  "count": 487,
+  "sample": [
+    { "session_id": "abc123", "revenue": 147.00, "device": "mobile" }
+  ]
+}
+```
+</ResponseExample>
+
+### Install Default Segments
+
+```
+POST /api/brands/{brand}/analytics/segments/install-defaults
+```
+
+Installs a curated starter set (e.g. "New Buyers", "Repeat Customers", "Abandoned Carts").

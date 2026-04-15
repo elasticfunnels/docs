@@ -1,0 +1,377 @@
+---
+title: 'Blogs'
+description: 'Manage blogs, articles, and blog categories'
+---
+
+<Note>
+  Blog endpoints sit under `/api/brands/{brand}/blogs/` with `brandAccess` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## List Blogs
+
+```
+GET /api/brands/{brand}/blogs
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by name
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest`, `oldest`, `created_at`, `updated_at`
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/blogs \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 2,
+      "name": "Health Tips Blog",
+      "slug": "health-tips",
+      "domain_id": 7,
+      "status": "published",
+      "comments_enabled": false,
+      "article_url_pattern": "slug_only",
+      "created_at": "2024-10-01T00:00:00.000000Z"
+    }
+  ],
+  "per_page": 25,
+  "total": 2,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List Blogs (Unpaginated)
+
+```
+GET /api/brands/{brand}/blogs/all
+```
+
+Returns `{ id, name }` for all blogs with a saved config — useful for dropdowns.
+
+---
+
+## Get Blog
+
+```
+GET /api/brands/{brand}/blogs/{blog}
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 2,
+  "name": "Health Tips Blog",
+  "domain_id": 7,
+  "brand_template_id": null,
+  "slug": "health-tips",
+  "article_url_pattern": "slug_only",
+  "article_url_segment": null,
+  "category_url_segment": "category",
+  "tag_url_segment": "tag",
+  "search_url_segment": "search",
+  "comments_enabled": false,
+  "comments_require_email_confirmation": false,
+  "seo_settings": [],
+  "template": null
+}
+```
+</ResponseExample>
+
+---
+
+## Create Blog
+
+```
+POST /api/brands/{brand}/blogs
+```
+
+<ParamField body="name" type="string" required>
+  Blog name
+</ParamField>
+
+<ParamField body="domain_id" type="number">
+  ID of the domain this blog lives on
+</ParamField>
+
+<ParamField body="slug" type="string">
+  URL slug (kebab-case, max 255). Must be unique per brand + domain.
+</ParamField>
+
+<ParamField body="brand_template_id" type="number">
+  ID of the template to apply (`context=blog`)
+</ParamField>
+
+<ParamField body="article_url_pattern" type="string">
+  `slug_only`, `segment`, or `category`
+</ParamField>
+
+<ParamField body="article_url_segment" type="string">
+  URL prefix for articles (max 64)
+</ParamField>
+
+<ParamField body="category_url_segment" type="string">
+  URL prefix for category pages (default: `category`, max 64)
+</ParamField>
+
+<ParamField body="tag_url_segment" type="string">
+  URL prefix for tag pages (default: `tag`, max 64)
+</ParamField>
+
+<ParamField body="search_url_segment" type="string">
+  URL prefix for search results (default: `search`, max 64)
+</ParamField>
+
+<ParamField body="comments_enabled" type="boolean">
+  Enable comment system for articles
+</ParamField>
+
+<ParamField body="comments_require_email_confirmation" type="boolean">
+  Require email confirmation before comments appear
+</ParamField>
+
+<ParamField body="seo_settings" type="object">
+  SEO metadata object (meta title, description, OG tags, Twitter card fields)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/blogs \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Health Tips Blog",
+    "domain_id": 7,
+    "slug": "health-tips",
+    "article_url_pattern": "slug_only"
+  }'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "blog": {
+    "id": 2,
+    "name": "Health Tips Blog",
+    "slug": "health-tips",
+    "domain_id": 7,
+    "comments_enabled": false,
+    "brand_id": 42,
+    "created_at": "2024-12-11T10:00:00.000000Z"
+  }
+}
+```
+
+```json 422 Missing name
+{
+  "errors": {
+    "name": ["The name field is required."]
+  }
+}
+```
+
+```json 422 Duplicate slug
+{
+  "errors": {
+    "slug": ["The slug has already been taken."]
+  }
+}
+```
+</ResponseExample>
+
+<Warning>
+  `name` is **always required** — even on `PUT`/`PATCH` updates. A partial update that omits `name` will return a 422 validation error.
+</Warning>
+
+---
+
+## Update Blog
+
+```
+PUT /api/brands/{brand}/blogs/{blog}
+```
+
+Same body as Create. `name` is still required.
+
+---
+
+## Delete Blog
+
+```
+DELETE /api/brands/{brand}/blogs/{blog}
+```
+
+<ResponseExample>
+```json Response
+{ "blog": { /* soft-deleted blog object */ } }
+```
+</ResponseExample>
+
+---
+
+## Clone Blog
+
+Creates a copy of a blog within the same brand.
+
+```
+POST /api/brands/{brand}/blogs/{blog}/clone
+```
+
+<ParamField body="title" type="string">
+  Name for the cloned blog (max 255). Defaults to `"<original name> (Copy)"` if omitted.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/blogs/2/clone \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Health Tips Blog v2"}'
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 3,
+  "blog": { /* cloned BrandBlog model */ }
+}
+```
+</ResponseExample>
+
+---
+
+## Export Blogs
+
+```
+POST /api/brands/{brand}/blogs/export
+```
+
+<ParamField body="filters" type="array">
+  Filter conditions (same as list query params)
+</ParamField>
+
+<ParamField body="selected_ids" type="array">
+  Limit export to specific blog IDs
+</ParamField>
+
+<ParamField body="columns" type="array">
+  Columns to include
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Export started. You will receive an email when it is ready."
+}
+```
+</ResponseExample>
+
+---
+
+## Blog Categories
+
+### List Categories
+
+```
+GET /api/brands/{brand}/blogs/{blog}/categories
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 1,
+    "blog_id": 2,
+    "name": "Nutrition",
+    "slug": "nutrition",
+    "hero_image": null,
+    "seo_settings": {}
+  }
+]
+```
+</ResponseExample>
+
+### Create Category
+
+```
+POST /api/brands/{brand}/blogs/{blog}/categories
+```
+
+<ParamField body="name" type="string" required>
+  Category name (max 255)
+</ParamField>
+
+<ParamField body="slug" type="string">
+  URL slug. Auto-generated from `name` if omitted; appends numeric suffix on collision.
+</ParamField>
+
+<ParamField body="hero_image" type="string">
+  Image URL (max 2048 chars)
+</ParamField>
+
+<ParamField body="seo_settings" type="object">
+  SEO metadata (meta title, description, OG tags, Twitter card)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/blogs/2/categories \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Nutrition", "slug": "nutrition"}'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 1,
+  "blog_id": 2,
+  "name": "Nutrition",
+  "slug": "nutrition"
+}
+```
+</ResponseExample>
+
+### Update Category
+
+```
+PUT /api/brands/{brand}/blogs/{blog}/categories/{category}
+```
+
+Same body as Create (all fields optional on update).
+
+### Delete Category
+
+```
+DELETE /api/brands/{brand}/blogs/{blog}/categories/{category}
+```
+
+<ResponseExample>
+```json Response
+{ "deleted": true }
+```
+</ResponseExample>
+
+---
+
+## Notes
+
+<Info>
+  - Blog slugs must be globally unique per `brand_id` + `domain_id` combination
+  - The `clone` endpoint copies the blog's `config`, `html`, `css`, and `interactions` to the new blog. Slug uniqueness is handled automatically with a numeric suffix
+  - The builder (`GET/POST .../blogs/{blog}/builder`) and articles CRUD endpoints are managed through the page builder and article editor controllers respectively
+</Info>

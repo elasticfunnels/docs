@@ -1,0 +1,502 @@
+---
+title: 'Courses'
+description: 'Manage online courses, modules, content, and student enrollments'
+---
+
+<Note>
+  Course endpoints sit under `/api/brands/{brand}/courses/` with `brandAccess` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## List Courses
+
+```
+GET /api/brands/{brand}/courses
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by title, description, slug, or instructor name
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest`, `oldest`, `created_at`, `updated_at`
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/courses \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 1,
+      "title": "Gut Health Masterclass",
+      "slug": "gut-health",
+      "status": "published",
+      "delivery_type": "module",
+      "language_code": "en",
+      "instructor_name": "Dr. Jane Smith",
+      "domain_id": 7,
+      "modules_count": 6,
+      "enrollments_count": 124
+    }
+  ],
+  "per_page": 25,
+  "total": 3,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List Courses (Unpaginated)
+
+```
+GET /api/brands/{brand}/courses/all
+```
+
+Returns `{ id, title }` for all courses — useful for dropdowns.
+
+---
+
+## Get Course
+
+```
+GET /api/brands/{brand}/courses/{course}
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 1,
+  "title": "Gut Health Masterclass",
+  "slug": "gut-health",
+  "status": "published",
+  "delivery_type": "module",
+  "language_code": "en",
+  "description": "Learn how to improve your gut health...",
+  "instructor_name": "Dr. Jane Smith",
+  "instructor_photo": "https://cdn.elasticfunnels.io/42/assets/media/instructor.jpg",
+  "logo": null,
+  "cover": "https://cdn.elasticfunnels.io/42/assets/media/cover.jpg",
+  "domain_id": 7,
+  "domain": { "id": 7, "domain": "courses.mybrand.com" },
+  "show_module_titles": true,
+  "allow_comments": false,
+  "details_page_id": null,
+  "module_page_id": 101,
+  "content_page_id": 102,
+  "enrollment_email_template_id": null,
+  "enrollments_count": 124
+}
+```
+</ResponseExample>
+
+---
+
+## Create Course
+
+```
+POST /api/brands/{brand}/courses
+```
+
+<ParamField body="title" type="string" required>
+  Course title (max 255)
+</ParamField>
+
+<ParamField body="language_code" type="string" required>
+  Language code (e.g. `en`, `pt`)
+</ParamField>
+
+<ParamField body="description" type="string" required>
+  Course description
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  `draft` or `published`
+</ParamField>
+
+<ParamField body="delivery_type" type="string" required>
+  `embedded` (content lives inline on a page) or `module` (dedicated course pages on a domain)
+</ParamField>
+
+<ParamField body="domain_id" type="number">
+  Required when `delivery_type` is `module`. Must be an existing brand domain.
+</ParamField>
+
+<ParamField body="slug" type="string">
+  Required when `delivery_type` is `module`. Must be unique per `brand_id` + `domain_id`.
+</ParamField>
+
+<ParamField body="instructor_name" type="string">
+  Instructor display name (max 255)
+</ParamField>
+
+<ParamField body="instructor_photo" type="file | string">
+  Instructor photo — upload as file (multipart) or provide as URL string
+</ParamField>
+
+<ParamField body="logo" type="file | string">
+  Course logo — upload as file or URL string
+</ParamField>
+
+<ParamField body="cover" type="file | string">
+  Cover image — upload as file or URL string
+</ParamField>
+
+<ParamField body="show_module_titles" type="boolean">
+  Show module titles in the course outline
+</ParamField>
+
+<ParamField body="allow_comments" type="boolean">
+  Enable commenting on content
+</ParamField>
+
+<ParamField body="category_name" type="string">
+  Course category name (max 255)
+</ParamField>
+
+<ParamField body="details_page_id" type="number">
+  Page ID for the course details/landing page
+</ParamField>
+
+<ParamField body="module_page_id" type="number">
+  Page ID for module listing
+</ParamField>
+
+<ParamField body="content_page_id" type="number">
+  Page ID for content viewing
+</ParamField>
+
+<ParamField body="enrollment_email_template_id" type="number">
+  Email template ID to send upon enrollment
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/courses \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Gut Health Masterclass",
+    "language_code": "en",
+    "description": "Learn how to improve your gut health naturally.",
+    "status": "draft",
+    "delivery_type": "module",
+    "domain_id": 7,
+    "slug": "gut-health",
+    "instructor_name": "Dr. Jane Smith"
+  }'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "course": {
+    "id": 1,
+    "title": "Gut Health Masterclass",
+    "slug": "gut-health",
+    "status": "draft",
+    "brand_id": 42,
+    "created_at": "2024-12-11T10:00:00.000000Z"
+  }
+}
+```
+
+```json 403 Plan limit
+{
+  "error": "Upgrade required to create courses",
+  "plan_error": {
+    "message": "Your current plan does not allow creating courses.",
+    "upgrade_info": {}
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Course
+
+```
+PUT /api/brands/{brand}/courses/{course}
+```
+
+Same body as Create. `title`, `language_code`, `description`, `status`, and `delivery_type` are required.
+
+---
+
+## Delete Course
+
+```
+DELETE /api/brands/{brand}/courses/{course}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Copy Course to Another Brand
+
+```
+POST /api/brands/{brand}/courses/copy
+```
+
+<ParamField body="id" type="number" required>
+  Source course ID
+</ParamField>
+
+<ParamField body="brand_id" type="number" required>
+  Target brand ID
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Title for the copied course in the target brand
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "course_id": 5
+}
+```
+</ResponseExample>
+
+---
+
+## Enrollments
+
+### List Enrollments
+
+```
+GET /api/brands/{brand}/courses/{course}/enrollments
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": "es-enroll-abc123",
+      "email": "student@example.com",
+      "name": "Jane Student",
+      "user_id": 99,
+      "notes": null,
+      "created_at": "2024-12-01T00:00:00Z",
+      "completed_content_ids": [10, 11],
+      "progress_percent": 33,
+      "last_content_id": 11,
+      "last_module_id": 2
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Get Enrollment
+
+```
+GET /api/brands/{brand}/courses/{course}/enrollments/{enrollment}
+```
+
+<ParamField path="enrollment" type="string" required>
+  Elasticsearch document ID for the enrollment
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "data": { /* same enrollment object */ }
+}
+```
+</ResponseExample>
+
+### Enroll Student
+
+```
+POST /api/brands/{brand}/courses/{course}/enrollments
+```
+
+<ParamField body="email" type="string" required>
+  Student email address. Returns 422 if already enrolled.
+</ParamField>
+
+<ParamField body="name" type="string">
+  Student display name (max 255)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/courses/1/enrollments \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "student@example.com", "name": "Jane Student"}'
+```
+
+<ResponseExample>
+```json 201 Enrolled
+{
+  "data": {
+    "id": "es-enroll-abc123",
+    "email": "student@example.com",
+    "name": "Jane Student",
+    "created_at": "2024-12-11T10:00:00Z"
+  }
+}
+```
+
+```json 422 Already enrolled
+{
+  "message": "Failed to create enrollment",
+  "errors": {
+    "email": ["This student is already enrolled in this course."]
+  }
+}
+```
+</ResponseExample>
+
+### Update Enrollment Notes
+
+```
+PUT /api/brands/{brand}/courses/{course}/enrollments/{enrollment}
+```
+
+<ParamField body="notes" type="string">
+  Internal notes about the enrollment (max 10,000 chars)
+</ParamField>
+
+### Complete Content Item
+
+Mark a specific content item as completed for an enrolled student.
+
+```
+POST /api/brands/{brand}/courses/{course}/enrollments/{enrollment}/complete
+```
+
+<ParamField body="content_id" type="number" required>
+  The course content item ID to mark as complete
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "data": {
+    "completed_content_ids": [10, 11, 12],
+    "progress_percent": 50,
+    "last_content_id": 12
+  }
+}
+```
+</ResponseExample>
+
+<Info>
+  This endpoint is **idempotent** — marking an already-completed item again does not create duplicates.
+</Info>
+
+### Remove Enrollment
+
+```
+DELETE /api/brands/{brand}/courses/{course}/enrollments/{enrollment}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Modules
+
+### List Modules
+
+```
+GET /api/brands/{brand}/courses/{course}/modules
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": 3,
+      "title": "Module 1: Introduction",
+      "description": "Overview of gut health fundamentals.",
+      "order": 1,
+      "contents": [
+        { "id": 10, "title": "What is Gut Flora?", "type": "video", "order": 1 },
+        { "id": 11, "title": "The Gut-Brain Axis", "type": "text", "order": 2 }
+      ]
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### List Modules (Unpaginated)
+
+```
+GET /api/brands/{brand}/courses/{course}/modules/all
+```
+
+Returns `{ id, title }` array — cached.
+
+### Create Module
+
+```
+POST /api/brands/{brand}/courses/{course}/modules
+```
+
+<ParamField body="title" type="string" required>
+  Module title (max 255)
+</ParamField>
+
+<ParamField body="description" type="string" required>
+  Module description
+</ParamField>
+
+### Update Module
+
+```
+PUT /api/brands/{brand}/courses/{course}/modules/{module}
+```
+
+### Delete Module
+
+```
+DELETE /api/brands/{brand}/courses/{course}/modules/{module}
+```
+
+### Reorder Modules
+
+```
+POST /api/brands/{brand}/courses/{course}/modules/order
+```
+
+<ParamField body="order" type="object" required>
+  Map of `{ "<module_id>": <integer order>, ... }`
+</ParamField>
+
+---
+
+## Notes
+
+<Info>
+  - Enrollment IDs are Elasticsearch document IDs (strings), not numeric database IDs
+  - File uploads (`logo`, `cover`, `instructor_photo`) are stored on BunnyCDN — you can provide a URL string instead of uploading a file
+  - The `copy` endpoint replicates the course's modules and all content to the target brand
+  - `progress_percent` is recalculated automatically when content is marked complete
+</Info>

@@ -1,0 +1,630 @@
+---
+title: 'Split Tests'
+description: 'Create and manage A/B split tests, read statistical results, declare winners'
+---
+
+<Note>
+  All split test endpoints authenticate via `EF-Access-Key` with `brandAccess` middleware. Request bodies are nested under a `split_test` key.
+</Note>
+
+---
+
+## List Split Tests
+
+```
+GET /api/brands/{brand}/split-tests
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter by status: `running`, `paused`, `finalized`, `deleted`
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests?status=running" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 7,
+      "name": "Headline Test — Hero Section",
+      "type": "split_test",
+      "status": "running",
+      "page_id": 101,
+      "funnel_id": null,
+      "start_date": "2024-12-01",
+      "end_date": "2024-12-31",
+      "duration": 30,
+      "auto_select_winner": false,
+      "winner_selection_criteria": null,
+      "winner_selection_confidence": 95,
+      "sample_size_limit": null,
+      "baseline": "control",
+      "views": 4820,
+      "time_left": "20 days",
+      "user": { "id": 1, "name": "Sam" },
+      "page": { "id": 101, "title": "Nutra Landing Page" },
+      "funnel": null,
+      "created_at": "2024-12-01T10:00:00.000000Z"
+    }
+  ],
+  "per_page": 25,
+  "total": 3,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## Get Split Test
+
+```
+GET /api/brands/{brand}/split-tests/{split_test}
+```
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="split_test" type="string" required>
+  Split test ID
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 7,
+  "name": "Headline Test — Hero Section",
+  "type": "split_test",
+  "status": "running",
+  "page_id": 101,
+  "funnel_id": null,
+  "start_date": "2024-12-01",
+  "end_date": "2024-12-31",
+  "statistical_method": "frequentist",
+  "significance_level": 0.05,
+  "statistical_power": 0.8,
+  "primary_metric": "conversion_rate",
+  "config": {
+    "items": [
+      { "name": "Control", "node_code": "ctrl-abc123", "weight": 50 },
+      { "name": "Variant B", "node_code": "var-def456", "weight": 50 }
+    ]
+  },
+  "winner": null,
+  "goals": [
+    { "name": "Purchase", "value": "purchase" }
+  ],
+  "created_at": "2024-12-01T10:00:00.000000Z",
+  "updated_at": "2024-12-10T15:30:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Create Split Test
+
+```
+POST /api/brands/{brand}/split-tests
+```
+
+<Note>
+  All body fields must be nested under the `split_test` key (e.g. `split_test.name`, `split_test.config`).
+</Note>
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField body="split_test.name" type="string" required>
+  Human-readable name for the test
+</ParamField>
+
+<ParamField body="split_test.type" type="string" required>
+  `split_test` (funnel/page variants) or `component_split_test` (component-level test)
+</ParamField>
+
+<ParamField body="split_test.config" type="object" required>
+  Test configuration including `items` array. Each item has `name`, `node_code`, and `weight`.
+</ParamField>
+
+<ParamField body="split_test.status" type="string">
+  `running`, `paused`, `completed`, `deleted` (default: `running`)
+</ParamField>
+
+<ParamField body="split_test.start_date" type="string">
+  ISO 8601 date (default: today)
+</ParamField>
+
+<ParamField body="split_test.end_date" type="string">
+  ISO 8601 date
+</ParamField>
+
+<ParamField body="split_test.primary_metric" type="string">
+  Primary metric to optimise for (e.g. `conversion_rate`, `revenue`)
+</ParamField>
+
+<ParamField body="split_test.statistical_method" type="string">
+  `frequentist` (default) or `bayesian`
+</ParamField>
+
+<ParamField body="split_test.significance_level" type="number">
+  Alpha level (0.001–0.5, default: 0.05)
+</ParamField>
+
+<ParamField body="split_test.statistical_power" type="number">
+  Beta level (0.1–0.99, default: 0.8)
+</ParamField>
+
+<ParamField body="split_test.min_sample_size_per_variant" type="number">
+  Minimum visitors per variant before declaring a winner (100–1,000,000)
+</ParamField>
+
+<ParamField body="split_test.auto_select_winner" type="boolean">
+  Automatically select winner when confidence threshold is reached
+</ParamField>
+
+<ParamField body="split_test.winner_selection_confidence" type="number">
+  Confidence % required for auto-winner selection (e.g. `95`)
+</ParamField>
+
+<ParamField body="split_test.goals" type="array">
+  Conversion goal events. Each goal has `name` (string) and `value` (alphanumeric slug).
+</ParamField>
+
+<ParamField body="split_test.baseline" type="string">
+  The control variant's name or node code
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "split_test": {
+      "name": "Headline Test — Hero Section",
+      "type": "split_test",
+      "status": "running",
+      "page_id": 101,
+      "primary_metric": "conversion_rate",
+      "significance_level": 0.05,
+      "winner_selection_confidence": 95,
+      "start_date": "2024-12-01",
+      "end_date": "2024-12-31",
+      "goals": [
+        { "name": "Purchase", "value": "purchase" }
+      ],
+      "config": {
+        "items": [
+          { "name": "Control",   "node_code": "ctrl-abc123", "weight": 50 },
+          { "name": "Variant B", "node_code": "var-def456",  "weight": 50 }
+        ]
+      }
+    }
+  }'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "id": 7,
+  "name": "Headline Test — Hero Section",
+  "type": "split_test",
+  "status": "running",
+  "page_id": 101,
+  "brand_id": 42,
+  "start_date": "2024-12-01",
+  "end_date": "2024-12-31",
+  "primary_metric": "conversion_rate",
+  "significance_level": 0.05,
+  "statistical_method": "frequentist",
+  "winner_selection_confidence": 95,
+  "config": {
+    "items": [
+      { "name": "Control",   "node_code": "ctrl-abc123", "weight": 50 },
+      { "name": "Variant B", "node_code": "var-def456",  "weight": 50 }
+    ]
+  },
+  "goals": [{ "name": "Purchase", "value": "purchase" }],
+  "created_at": "2024-12-01T10:00:00.000000Z"
+}
+```
+
+```json 422 Validation error
+{
+  "errors": {
+    "split_test.name": ["The split test.name field is required."],
+    "split_test.config": ["The split test.config field is required."]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Split Test
+
+```
+PUT /api/brands/{brand}/split-tests/{split_test}
+```
+
+Same body structure as Create — all fields nested under `split_test`, all optional on update except as noted. To pause a running test: set `split_test.status` to `paused`.
+
+```bash cURL — pause a running test
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"split_test": {"status": "paused"}}'
+```
+
+```bash cURL — extend end date
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"split_test": {"end_date": "2025-01-15"}}'
+```
+
+<ResponseExample>
+```json 200 Updated
+{
+  "id": 7,
+  "name": "Headline Test — Hero Section",
+  "status": "paused",
+  "end_date": "2025-01-15",
+  "updated_at": "2024-12-11T09:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Split Test
+
+```
+DELETE /api/brands/{brand}/split-tests/{split_test}
+```
+
+```bash cURL
+curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json 200
+{
+  "message": "Split test deleted successfully."
+}
+```
+</ResponseExample>
+
+---
+
+## Get Chart Data
+
+Retrieve time-series and comparison data for visualisations.
+
+```
+GET /api/brands/{brand}/split-tests/{split_test}/chart-data
+```
+
+<ParamField path="split_test" type="string" required>
+  Split test ID
+</ParamField>
+
+<ParamField query="chart_type" type="string" required>
+  One of: `conversion_trends`, `funnel_analysis`, `statistical_confidence`, `performance_comparison`
+</ParamField>
+
+<ParamField query="start" type="string">
+  Start date (ISO 8601)
+</ParamField>
+
+<ParamField query="end" type="string">
+  End date (ISO 8601)
+</ParamField>
+
+<ParamField query="tz" type="string">
+  Timezone (e.g. `America/New_York`)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7/chart-data?chart_type=conversion_trends&start=2024-12-01&end=2024-12-10" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json conversion_trends
+{
+  "chart_type": "conversion_trends",
+  "labels": ["Dec 1", "Dec 2", "Dec 3"],
+  "datasets": [
+    {
+      "label": "Control",
+      "data": [0.031, 0.033, 0.029],
+      "node_code": "ctrl-abc123"
+    },
+    {
+      "label": "Variant B",
+      "data": [0.038, 0.041, 0.039],
+      "node_code": "var-def456"
+    }
+  ]
+}
+```
+
+```json statistical_confidence
+{
+  "chart_type": "statistical_confidence",
+  "variants": [
+    {
+      "name": "Control",
+      "node_code": "ctrl-abc123",
+      "conversion_rate": 0.031,
+      "conversions": 149,
+      "visitors": 4806,
+      "confidence": null,
+      "is_baseline": true
+    },
+    {
+      "name": "Variant B",
+      "node_code": "var-def456",
+      "conversion_rate": 0.039,
+      "conversions": 188,
+      "visitors": 4820,
+      "confidence": 87.4,
+      "lift": 25.8,
+      "is_winner": false
+    }
+  ],
+  "required_confidence": 95,
+  "has_winner": false
+}
+```
+</ResponseExample>
+
+---
+
+## Declare Winner
+
+Manually select the winning variant and finalize the test. Sets `status` to `finalized`.
+
+```
+POST /api/brands/{brand}/split-tests/{split_test}/declare-winner
+```
+
+<ParamField body="winner_node_code" type="string" required>
+  The `node_code` of the winning variant
+</ParamField>
+
+<ParamField body="variant_name" type="string" required>
+  Display name of the winning variant
+</ParamField>
+
+<ParamField body="confidence" type="number">
+  Statistical confidence at time of declaration (0–100)
+</ParamField>
+
+<ParamField body="improvement" type="number">
+  Relative lift over baseline (e.g. `25.8` for 25.8% improvement)
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Free-text note for the decision (max 500 chars)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7/declare-winner \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "winner_node_code": "var-def456",
+    "variant_name": "Variant B",
+    "confidence": 87.4,
+    "improvement": 25.8,
+    "reason": "Strong uplift on mobile; acceptable confidence given campaign deadline."
+  }'
+```
+
+<ResponseExample>
+```json 200 Winner declared
+{
+  "message": "Winner declared successfully",
+  "split_test": {
+    "id": 7,
+    "status": "finalized",
+    "winner_selected_at": "2024-12-11T09:15:00.000000Z",
+    "winner_selected_by": "manual"
+  },
+  "winner": {
+    "variant": "Variant B",
+    "node_code": "var-def456",
+    "confidence": 87.4,
+    "improvement": 25.8
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Export Results
+
+Queue a CSV/Excel export of all split test results. An email is sent when ready.
+
+```
+POST /api/brands/{brand}/split-tests/{split_test}/export
+```
+
+<ParamField body="format" type="string">
+  `csv` (default) or `excel`
+</ParamField>
+
+<ParamField body="include_statistics" type="boolean">
+  Include p-values, confidence intervals, lift (default: `true`)
+</ParamField>
+
+<ParamField body="include_confidence_intervals" type="boolean">
+  Include CI columns (default: `false`)
+</ParamField>
+
+<ParamField body="date_range" type="object">
+  Optional `{start, end}` to restrict export date range
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7/export \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"format": "csv", "include_statistics": true}'
+```
+
+<ResponseExample>
+```json 200
+{
+  "message": "Export has been queued. You will receive an email when it's ready.",
+  "status": "queued",
+  "split_test_name": "Headline Test — Hero Section"
+}
+```
+</ResponseExample>
+
+---
+
+## Get Node Codes
+
+Return the variant names and `node_code` identifiers for a split test — useful for linking analytics filter calls.
+
+```
+GET /api/brands/{brand}/split-tests/{split_test}/node-codes
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7/node-codes \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  { "code": "ctrl-abc123", "name": "Control" },
+  { "code": "var-def456",  "name": "Variant B" }
+]
+```
+</ResponseExample>
+
+---
+
+## Quick Access Stats
+
+Counts by status — useful for dashboard badges.
+
+```
+GET /api/brands/{brand}/split-tests/quick-access
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/quick-access \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "all": 12,
+  "running": 3,
+  "finalized": 7,
+  "not_running": 2
+}
+```
+</ResponseExample>
+
+---
+
+## Notes
+
+Add freeform notes to a split test for team collaboration.
+
+### List notes
+
+```
+GET /api/brands/{brand}/split-tests/{split_test}/notes
+```
+
+### Add note
+
+```
+POST /api/brands/{brand}/split-tests/{split_test}/notes
+```
+
+<ParamField body="content" type="string" required>
+  Note text
+</ParamField>
+
+### Delete note
+
+```
+DELETE /api/brands/{brand}/split-tests/{split_test}/notes/{note}
+```
+
+```bash cURL — add note
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/split-tests/7/notes \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Pausing — holiday traffic skewing mobile numbers."}'
+```
+
+<ResponseExample>
+```json Note added
+{
+  "id": 3,
+  "split_test_id": 7,
+  "content": "Pausing — holiday traffic skewing mobile numbers.",
+  "user": { "id": 1, "name": "Sam" },
+  "created_at": "2024-12-11T09:30:00.000000Z"
+}
+```
+</ResponseExample>
+
+---
+
+## Using Split Test Data with Analytics
+
+To filter analytics metrics by split test variant, pass the `split_test_id` and `filter[node_code]` to the analytics endpoints:
+
+```bash
+# Metrics for a specific variant
+GET /api/brands/{brand}/analytics/metrics/data
+  ?start=2024-12-01T00:00:00Z
+  &end=2024-12-10T23:59:59Z
+  &selected_metrics[]=conversion_rate&selected_metrics[]=revenue
+  &split_test_id=7
+  &filter[node_code]=var-def456
+```
+
+```bash
+# Compare metrics across all variants grouped by node_code
+GET /api/brands/{brand}/analytics/metrics/node_code/data
+  ?start=2024-12-01T00:00:00Z
+  &end=2024-12-10T23:59:59Z
+  &selected_metrics[]=conversion_rate
+  &split_test_id=7
+```

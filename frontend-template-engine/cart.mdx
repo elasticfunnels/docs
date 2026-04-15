@@ -11,18 +11,127 @@ This page covers **cart** usage: **`cartItems`**, item properties, and **data at
 
 **`cartItems`** (or **`items`**) is an array of line items. The cart plugin fills it; UI updates are reactive when cart scope changes.
 
-| Item property | Description | In template |
-|---------------|--------------|-------------|
-| **`code`** | Product/cart line code | Use with qty/remove data attributes |
-| **`name`** | Product name | `[[ item.name ]]` |
-| **`image`** | Product image URL | `[[ item.image ]]` |
-| **`quantity`** | Quantity | `[[ item.quantity ]]` |
-| **`price`** | Unit price (formatted) | `[[ item.price ]]` — do not use formatPrice |
-| **`total`** | Line total (formatted) | `[[ item.total ]]` — do not use formatPrice |
+| Item property | Type | Description | In template |
+|---------------|------|-------------|-------------|
+| **`code`** | string | Product/cart line code | Use with qty/remove data attributes |
+| **`name`** | string | Product name | `[[ item.name ]]` |
+| **`image`** | string | Product image URL | `[[ item.image ]]` |
+| **`quantity`** | number | Quantity | `[[ item.quantity ]]` |
+| **`price`** | string | Unit price (formatted) | `[[ item.price ]]` — do not use formatPrice |
+| **`total`** | string | Line total (formatted) | `[[ item.total ]]` — do not use formatPrice |
+| **`retail_price`** | string | Original/retail price (formatted) | `[[ item.retail_price ]]` |
+| **`discount_total`** | string | Per-line savings (formatted) | `[[ item.discount_total ]]` |
+| **`currency`** | string | Currency code | `[[ item.currency ]]` |
+| **`is_subscription`** | boolean | `true` when this is a subscription product | `[[ item.is_subscription ]]` |
+| **`subscription`** | object \| null | Subscription details (see below) — `null` for one-time products | `[[ item.subscription.frequency ]]` |
+| **`bonuses`** | array | Bonus products included with this item (see below) | `template-foreach` loop |
+| **`courses`** | array | Courses linked to this product (see below) | `template-foreach` loop |
 
 <Info>
 **`price`** and **`total`** are already formatted. Use **`[[ item.price ]]`** and **`[[ item.total ]]`** as-is. See [Functions](/frontend-template-engine/built-in-functions#price-display-table) for when to use **formatPrice**.
+
+`bonuses`, `courses`, `is_subscription`, and `subscription` are populated after a brief async fetch from the server when the cart loads. They are always present (empty array / `false` / `null`) so templates never error.
 </Info>
+
+---
+
+## Subscription details (`item.subscription`)
+
+When `item.is_subscription` is `true`, `item.subscription` contains billing cadence and trial settings:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| **`frequency`** | number | How often the subscription bills (e.g. `3`) |
+| **`frequency_unit`** | string | Unit for the frequency: `"day"`, `"week"`, `"month"`, or `"year"` |
+| **`trial_days`** | number | Free trial length in days (`0` = no trial) |
+| **`first_charge_free`** | boolean | `true` when the first billing cycle is free |
+
+Example — showing billing cadence next to the price:
+
+```html
+<template-foreach data-each="item in cartItems">
+  <span>[[ item.name ]]</span>
+  <span>[[ item.price ]]</span>
+  <template-if data-condition="item.is_subscription">
+    <span>Every [[ item.subscription.frequency ]] [[ item.subscription.frequency_unit ]]</span>
+  </template-if>
+</template-foreach>
+```
+
+The same `is_subscription` and `subscription` fields are available on `checkout` scope for single-product checkout pages (e.g. `[[ checkout.is_subscription ]]`, `[[ checkout.subscription.frequency ]]`).
+
+---
+
+## Bonus products (`item.bonuses`)
+
+Each cart item may include a **`bonuses`** array — products that are included free with that item (configured in the product catalog under Bonuses). Populated automatically from the `/api/cart-products` response after the cart loads.
+
+Each element in `item.bonuses` has:
+
+| Property | Description |
+|----------|-------------|
+| **`code`** | Bonus product code |
+| **`name`** | Bonus product name |
+| **`image`** | Bonus product image URL |
+| **`price`** | Price (formatted) — typically `$0.00` for free bonuses |
+| **`retail_price`** | Retail value (formatted) — useful for "valued at" display |
+| **`original_price`** | Same as `retail_price` |
+| **`currency`** | Currency code |
+
+Example:
+
+```html
+<template-foreach data-each="item in cartItems">
+  <div class="cart-line">
+    <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+    <span>[[ item.name ]]</span>
+    <span>[[ item.price ]]</span>
+    <template-foreach data-each="bonus in item.bonuses">
+      <div class="cart-bonus">
+        <img src="[[ bonus.image ]]" alt="[[ bonus.name ]]" />
+        <span>[[ bonus.name ]]</span>
+        <span>FREE (valued at [[ bonus.retail_price ]])</span>
+      </div>
+    </template-foreach>
+  </div>
+</template-foreach>
+```
+
+`item.bonuses` is always an array — empty when the product has no bonuses configured.
+
+---
+
+## Courses (`item.courses`)
+
+When a product has linked courses, they are available as `item.courses`. Populated automatically from the `/api/cart-products` response after the cart loads.
+
+Each element in `item.courses` has:
+
+| Property | Description |
+|----------|-------------|
+| **`id`** | Course ID |
+| **`title`** | Course title |
+| **`slug`** | URL slug (used to link to the course page) |
+| **`description`** | Short description |
+| **`cover`** | Cover image URL |
+| **`instructor_name`** | Instructor name (if set) |
+| **`status`** | Publication status (`"published"`, `"draft"`, etc.) |
+
+Example — listing included courses beneath a cart line:
+
+```html
+<template-foreach data-each="item in cartItems">
+  <span>[[ item.name ]]</span>
+  <template-foreach data-each="course in item.courses">
+    <div class="cart-course">
+      <img src="[[ course.cover ]]" alt="[[ course.title ]]" />
+      <span>[[ course.title ]]</span>
+    </div>
+  </template-foreach>
+</template-foreach>
+```
+
+`item.courses` is always an array — empty when the product has no linked courses.
 
 ---
 
@@ -78,5 +187,8 @@ For **scope** (**`checkout.bump_products`**, **`checkout.selectedBumpLines`**) a
 ## Summary
 
 - Use **`cartItems`** and **`[[ item.* ]]`**; **`item.price`** and **`item.total`** are already formatted.
+- **`item.is_subscription`** / **`item.subscription`** — billing cadence; also on `checkout` scope for single-product pages.
+- **`item.bonuses`** — free bonus products linked to the item; always an array.
+- **`item.courses`** — courses linked to the product; always an array.
 - Use **data-cart-qty-minus/plus/remove** and **data-code** for qty and remove.
 - Bumps: use **data-bump-*** attributes; scope and patterns are in [Checkout](/frontend-template-engine/checkout).

@@ -1,0 +1,378 @@
+---
+title: 'Tracking'
+description: 'Access click data, session replays, and manage short links'
+---
+
+<Note>
+  Tracking endpoints sit under `/api/brands/{brand}/` with `moduleAccess:tracking` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## Clicks
+
+The Clicks API exposes click tracking data from visitor sessions. Clicks are stored in Elasticsearch (or ClickHouse when enabled for the account).
+
+### List Clicks
+
+```
+GET /api/brands/{brand}/clicks
+```
+
+<Note>
+  Page size is fixed at **30** for the clicks index and cannot be changed via `per_page`.
+</Note>
+
+<ParamField query="page" type="number">
+  Page number (default: 1)
+</ParamField>
+
+<ParamField query="query" type="string">
+  Filter by URL (partial match)
+</ParamField>
+
+<ParamField query="subid" type="string">
+  Filter by Sub ID 1 (`sub` tracking parameter)
+</ParamField>
+
+<ParamField query="subid2" type="string">
+  Filter by Sub ID 2
+</ParamField>
+
+<ParamField query="subid3" type="string">
+  Filter by Sub ID 3
+</ParamField>
+
+<ParamField query="subid4" type="string">
+  Filter by Sub ID 4
+</ParamField>
+
+<ParamField query="vtid" type="string">
+  Filter by visit tracking ID
+</ParamField>
+
+<ParamField query="click_id" type="string">
+  Filter by specific click/session ID — collapses results to unique sessions
+</ParamField>
+
+<ParamField query="ip_address" type="string">
+  Filter by IP address
+</ParamField>
+
+<ParamField query="pgid" type="number">
+  Filter by page ID
+</ParamField>
+
+<ParamField query="funnel_id" type="number">
+  Filter by funnel ID
+</ParamField>
+
+<ParamField query="merchant_id" type="number">
+  Filter by merchant ID
+</ParamField>
+
+<ParamField query="exclude_bots" type="boolean">
+  Exclude bot traffic from results
+</ParamField>
+
+<ParamField query="start" type="string">
+  Date range start (ISO 8601). Used by `DateRangeService`.
+</ParamField>
+
+<ParamField query="sortBy" type="string">
+  Column to sort by (limited to sortable fields)
+</ParamField>
+
+<ParamField query="sortDir" type="string">
+  Sort direction: `asc` or `desc`
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/clicks?funnel_id=5&page=1" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "total": 1240,
+  "last_page": 42,
+  "current_page": 1,
+  "per_page": 30,
+  "next_page_url": true,
+  "data": [
+    {
+      "id": "click-es-doc-abc",
+      "session_id": "sess-xyz-123",
+      "ip_address": "203.0.113.50",
+      "url": "/checkout",
+      "funnel_id": 5,
+      "domain": { "id": 7, "domain": "checkout.mybrand.com" },
+      "affiliate": null,
+      "merchant": { "id": 1, "merchant": "NMI" },
+      "events": [ /* event objects */ ],
+      "created_at": "2024-12-10T09:00:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+### Get Click Details
+
+```
+GET /api/brands/{brand}/clicks/{click_code}
+```
+
+<ParamField path="click_code" type="string" required>
+  Session ID or click code
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "id": "click-es-doc-abc",
+  "session_id": "sess-xyz-123",
+  "ip_address": "203.0.113.50",
+  "url": "/checkout",
+  "funnel_id": 5,
+  "domain": { /* domain */ },
+  "events": [ /* events */ ]
+}
+```
+
+```json 404
+{ "message": "Not found" }
+```
+</ResponseExample>
+
+---
+
+### Get Session Details
+
+Returns geo data and the full sequence of events for a visitor session.
+
+```
+GET /api/brands/{brand}/clicks/session/{sessionId}
+```
+
+<ParamField path="sessionId" type="string" required>
+  Session ID
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/clicks/session/sess-xyz-123 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "geoData": {
+    "lat": 34.052,
+    "lon": -118.244,
+    "city": "Los Angeles",
+    "region": "CA",
+    "country": "US",
+    "zip": "90001",
+    "ip_address": "203.0.113.50"
+  },
+  "events": [
+    {
+      "type": "page_view",
+      "url": "/checkout",
+      "timestamp": "2024-12-10T09:00:00Z",
+      "data": {}
+    },
+    {
+      "type": "add_to_cart",
+      "timestamp": "2024-12-10T09:01:30Z",
+      "data": { "product_id": 3 }
+    }
+  ],
+  "domains": {
+    "7": "https://checkout.mybrand.com"
+  }
+}
+```
+
+```json No data found
+{
+  "geoData": [],
+  "events": []
+}
+```
+</ResponseExample>
+
+---
+
+### Export Clicks
+
+Queue a CSV export of click records.
+
+```
+POST /api/brands/{brand}/clicks/export
+```
+
+<ParamField body="filters" type="array">
+  Filter conditions (same as list query params)
+</ParamField>
+
+<ParamField body="selected_codes" type="array">
+  Limit export to specific click codes
+</ParamField>
+
+<ParamField body="columns" type="array">
+  Columns to include in the export
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/clicks/export \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"columns": ["session_id", "ip_address", "url", "created_at"]}'
+```
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Export started. You will receive an email when it is ready."
+}
+```
+</ResponseExample>
+
+---
+
+## Session Replays
+
+Session replays capture mouse movements, clicks, and scroll events for visitor sessions.
+
+### List Session Replays
+
+```
+GET /api/brands/{brand}/replays
+```
+
+<ParamField query="session_id" type="string" required>
+  Session ID to retrieve replays for
+</ParamField>
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": "replay-doc-abc",
+    "session_id": "sess-xyz-123",
+    "page_session_id": "page-sess-456"
+  }
+]
+```
+</ResponseExample>
+
+---
+
+### Get Session Replay
+
+Retrieve the full recorded event stream for a session.
+
+```
+GET /api/brands/{brand}/replays/{sessionId}
+```
+
+<ParamField path="sessionId" type="string" required>
+  Session replay document ID (from the list endpoint)
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/replays/replay-doc-abc \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": "replay-doc-abc",
+  "session_id": "sess-xyz-123",
+  "page_session_id": "page-sess-456",
+  "url": "/checkout",
+  "duration_ms": 45000,
+  "viewport_width": 1440,
+  "viewport_height": 900,
+  "events": [
+    { "type": "mousemove", "x": 100, "y": 200, "ts": 1500 },
+    { "type": "click", "x": 300, "y": 400, "ts": 2300, "target": "button#buy-now" },
+    { "type": "scroll", "scrollY": 800, "ts": 5000 }
+  ]
+}
+```
+</ResponseExample>
+
+<Warning>
+  If the session replay document does not exist in Elasticsearch, the response may produce an error. Always use `session_id` values returned from the list endpoint.
+</Warning>
+
+---
+
+## Short Links
+
+Short links create trackable redirects for marketing campaigns, affiliate links, and social sharing.
+
+### Generate Short Link
+
+```
+POST /api/brands/{brand}/short-links/generate
+```
+
+<ParamField body="destination_url" type="string" required>
+  The destination URL the short link will redirect to. Must be a valid URL.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/short-links/generate \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"destination_url": "https://checkout.mybrand.com/offer?utm_source=email"}'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f'https://app.elasticfunnels.io/api/brands/{brand_id}/short-links/generate',
+    headers={'EF-Access-Key': 'your_api_key_here'},
+    json={'destination_url': 'https://checkout.mybrand.com/offer?utm_source=email'}
+)
+data = response.json()
+print(f"Short URL: {data['url']}")  # https://go.mybrand.com/g/abc123
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "code": "abc123",
+  "url": "https://go.mybrand.com/g/abc123"
+}
+```
+
+```json 422 Invalid URL
+{
+  "errors": {
+    "destination_url": ["Invalid URL"]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Notes
+
+<Info>
+  - Click data is stored in **Elasticsearch** by default, but accounts with ClickHouse enabled use a separate engine — both are queried transparently via the same API
+  - The session replay `events` array is stored as a compressed/encoded string in Elasticsearch and decoded automatically before being returned
+  - Short links are served from the `SHORT_URL_DOMAIN` configured for your account (e.g. `go.yourdomain.com`)
+  - The clicks `index` endpoint always returns **30 results per page** regardless of `per_page` parameter
+</Info>

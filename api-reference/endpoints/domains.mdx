@@ -1,0 +1,376 @@
+---
+title: 'Domains'
+description: 'Manage custom domains, SSL certificates, DNS validation, and tracking domains'
+---
+
+<Note>
+  Domain endpoints sit under `/api/brands/{brand}/` (no `moduleAccess` required). Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## List Domains
+
+```
+GET /api/brands/{brand}/domains
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by domain name
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/domains \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 7,
+      "domain": "checkout.mybrand.com",
+      "dedicated_domain": true,
+      "status": "validated",
+      "ssl_ready": true,
+      "cname_validated": true,
+      "is_tracking_domain": false,
+      "brand_id": 42,
+      "created_at": "2024-06-01T00:00:00.000000Z"
+    }
+  ],
+  "per_page": 25,
+  "total": 2,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List All Domains (Unpaginated)
+
+```
+GET /api/brands/{brand}/domains/all
+```
+
+Returns all domains as an array — used for dropdown selectors.
+
+---
+
+## Get Domain
+
+```
+GET /api/brands/{brand}/domains/{domain}
+```
+
+---
+
+## Add Domain
+
+```
+POST /api/brands/{brand}/domains
+```
+
+<ParamField body="domain" type="string" required>
+  Fully-qualified domain name (e.g. `checkout.mybrand.com`). Must be globally unique.
+</ParamField>
+
+<ParamField body="dedicated_domain" type="boolean" required>
+  `true` for custom domains (requires DNS setup); `false` for subdomains on the platform's root domain.
+</ParamField>
+
+```bash cURL — add custom domain
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/domains \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"domain": "checkout.mybrand.com", "dedicated_domain": true}'
+```
+
+```bash cURL — add platform subdomain
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/domains \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"domain": "mybrand", "dedicated_domain": false}'
+```
+
+<ResponseExample>
+```json 200 Custom domain added
+{
+  "id": 7,
+  "domain": "checkout.mybrand.com",
+  "dedicated_domain": true,
+  "status": "pending-cname",
+  "ssl_ready": false,
+  "cname_validated": false
+}
+```
+
+```json 422 Already taken
+{
+  "errors": {
+    "domain": ["The domain has already been taken."]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Domain
+
+```
+PUT /api/brands/{brand}/domains/{domain}
+```
+
+---
+
+## Delete Domain
+
+```
+DELETE /api/brands/{brand}/domains/{domain}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Get Validation Instructions
+
+Returns the DNS records that must be set to validate a custom domain. Call this after adding a domain to get the CNAME record to configure.
+
+```
+GET /api/brands/{brand}/domains/{domain}/validation-instructions
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/domains/7/validation-instructions \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "cname_record": {
+    "type": "CNAME",
+    "host": "checkout.mybrand.com",
+    "value": "proxy.elasticfunnels.io",
+    "ttl": 3600
+  },
+  "instructions": "Add the following CNAME record to your DNS provider, then click Validate."
+}
+```
+</ResponseExample>
+
+---
+
+## Validate Domain
+
+Trigger a DNS validation check for a domain. Marks `cname_validated = true` if the CNAME resolves correctly.
+
+```
+POST /api/brands/{brand}/domains/{domain}/validate
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/domains/7/validate \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json 200 Validated
+{
+  "success": true,
+  "status": "validated",
+  "cname_validated": true
+}
+```
+
+```json 200 Not yet validated
+{
+  "success": false,
+  "status": "pending-cname",
+  "message": "CNAME record not found. Please check your DNS settings and try again."
+}
+```
+</ResponseExample>
+
+---
+
+## Test Domain Configuration
+
+Run a full connectivity and configuration test for a domain.
+
+```
+GET /api/brands/{brand}/domains/{domain}/test-configuration
+```
+
+<ResponseExample>
+```json Response
+{
+  "dns_ok": true,
+  "ssl_ok": true,
+  "http_reachable": true,
+  "https_reachable": true,
+  "status": "healthy"
+}
+```
+</ResponseExample>
+
+---
+
+## Request SSL Certificate
+
+Provision or re-provision an SSL certificate for a validated custom domain.
+
+```
+POST /api/brands/{brand}/domains/{domain}/request-ssl
+GET  /api/brands/{brand}/domains/{domain}/request-ssl
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/domains/7/request-ssl \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "SSL certificate provisioning started. This may take a few minutes."
+}
+```
+</ResponseExample>
+
+---
+
+## Move Domain (Preview)
+
+Preview what pages and components would be affected by moving all content from one domain to another.
+
+```
+POST /api/brands/{brand}/domains/{domain}/move/preview
+```
+
+<ParamField body="target_domain_id" type="number" required>
+  Target domain ID to move content to
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "pages_affected": 12,
+  "components_affected": 3,
+  "preview": [
+    { "id": 101, "title": "Landing Page", "current_domain": "old.mybrand.com", "new_domain": "new.mybrand.com" }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Move Domain (Apply)
+
+Execute the domain migration — update all pages and components from one domain to another.
+
+```
+POST /api/brands/{brand}/domains/{domain}/move/apply
+```
+
+<ParamField body="target_domain_id" type="number" required>
+  Target domain ID
+</ParamField>
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "pages_updated": 12,
+  "components_updated": 3
+}
+```
+</ResponseExample>
+
+---
+
+## Tracking Domains
+
+Tracking domains are separate first-party domains used for click tracking and analytics (improves ad attribution). They require Cloudflare integration.
+
+### List Tracking Domains
+
+```
+GET /api/brands/{brand}/tracking-domains
+```
+
+### Add Tracking Domain
+
+```
+POST /api/brands/{brand}/tracking-domains
+```
+
+<ParamField body="domain" type="string" required>
+  Fully-qualified tracking domain (e.g. `track.mybrand.com`). Must be globally unique.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/tracking-domains \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"domain": "track.mybrand.com"}'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "domain": {
+    "id": 9,
+    "domain": "track.mybrand.com",
+    "is_tracking_domain": true,
+    "status": "pending-cloudflare",
+    "cname_validated": false,
+    "cname_validation_record": "proxy.elasticfunnels.io"
+  }
+}
+```
+</ResponseExample>
+
+### Delete Tracking Domain
+
+```
+DELETE /api/brands/{brand}/tracking-domains/{domain}
+```
+
+---
+
+## Domain Status Values
+
+| Status | Meaning |
+|---|---|
+| `pending-cname` | Waiting for CNAME DNS record |
+| `pending-cloudflare` | Cloudflare hostname being provisioned |
+| `validated` | DNS validated, domain active |
+| `ssl-pending` | SSL certificate being issued |
+| `active` | Fully configured and live |
+
+---
+
+## Notes
+
+<Info>
+  - Custom domains (`dedicated_domain: true`) require adding a CNAME record pointing to `proxy.elasticfunnels.io` before they can be validated
+  - Platform subdomains are available instantly with no DNS changes required
+  - Tracking domains go through Cloudflare provisioning automatically after creation — no manual CNAME setup needed
+  - The Move endpoints transfer all page/component associations; the old domain remains but has no pages attached
+</Info>

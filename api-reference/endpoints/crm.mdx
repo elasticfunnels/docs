@@ -1,0 +1,741 @@
+---
+title: 'CRM'
+description: 'Manage CRM entities, pipelines, stages, custom fields, and entries'
+---
+
+<Note>
+  All CRM endpoints are under the prefix `/api/brands/{brand}/crm/` and authenticate via `EF-Access-Key`.
+</Note>
+
+The CRM is structured as:
+
+```
+Entity  (e.g. "Leads", "Deals")
+  └── Pipeline  (e.g. "Sales Pipeline")
+        └── Stage  (e.g. "Prospect", "Qualified", "Closed")
+  └── Fields  (custom fields defined per entity)
+  └── Entries  (the actual records)
+```
+
+---
+
+## Entity Presets
+
+Before creating a custom entity you can list and apply built-in presets (e.g. Leads, Contacts, Deals) which come pre-configured with pipelines and fields.
+
+```
+GET /api/brands/{brand}/crm/entity-presets
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entity-presets \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "presets": [
+    { "key": "leads",    "label": "Leads",    "description": "Track inbound leads through a sales process" },
+    { "key": "contacts", "label": "Contacts", "description": "Manage contacts and customers" },
+    { "key": "deals",    "label": "Deals",    "description": "Deal tracking with revenue stages" }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Entities
+
+Entities define the type of record tracked in the CRM (e.g. "Leads", "Customers"). Each brand can have multiple entities.
+
+### List Entities
+
+```
+GET /api/brands/{brand}/crm/entities
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 1,
+    "name": "Leads",
+    "slug": "leads",
+    "singular_name": "Lead",
+    "plural_name": "Leads",
+    "icon": "user",
+    "color": "#3b82f6",
+    "brand_id": 42,
+    "pipelines_count": 1,
+    "fields_count": 5
+  }
+]
+```
+</ResponseExample>
+
+### Get Entity
+
+```
+GET /api/brands/{brand}/crm/entities/{entity}
+```
+
+Returns the entity with its full `pipelines` (including `stages`) and `fields` loaded.
+
+<ResponseExample>
+```json Response
+{
+  "id": 1,
+  "name": "Leads",
+  "slug": "leads",
+  "pipelines": [
+    {
+      "id": 1,
+      "name": "Sales Pipeline",
+      "stages": [
+        { "id": 1, "name": "New Lead",   "position": 0, "color": "#94a3b8" },
+        { "id": 2, "name": "Contacted",  "position": 1, "color": "#3b82f6" },
+        { "id": 3, "name": "Qualified",  "position": 2, "color": "#10b981" },
+        { "id": 4, "name": "Closed Won", "position": 3, "color": "#22c55e" }
+      ]
+    }
+  ],
+  "fields": [
+    { "id": 1, "name": "Email",   "key": "email",   "type": "text" },
+    { "id": 2, "name": "Phone",   "key": "phone",   "type": "text" },
+    { "id": 3, "name": "Source",  "key": "source",  "type": "select",
+      "options": ["Facebook", "Google", "Organic"] }
+  ]
+}
+```
+</ResponseExample>
+
+### Create Entity
+
+```
+POST /api/brands/{brand}/crm/entities
+```
+
+<ParamField body="name" type="string" required>
+  Display name (e.g. `Leads`)
+</ParamField>
+
+<ParamField body="slug" type="string" required>
+  URL-safe identifier — lowercase alphanumeric, hyphens, underscores (e.g. `leads`). Must be unique per brand.
+</ParamField>
+
+<ParamField body="singular_name" type="string">
+  Singular label (e.g. `Lead`)
+</ParamField>
+
+<ParamField body="plural_name" type="string">
+  Plural label (e.g. `Leads`)
+</ParamField>
+
+<ParamField body="icon" type="string">
+  Icon identifier (max 64 chars)
+</ParamField>
+
+<ParamField body="color" type="string">
+  Hex color (max 64 chars)
+</ParamField>
+
+<ParamField body="preset" type="string">
+  Optional preset key from [Entity Presets](#entity-presets). When set, pre-populates pipelines and fields.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Leads",
+    "slug": "leads",
+    "singular_name": "Lead",
+    "plural_name": "Leads",
+    "icon": "user",
+    "color": "#3b82f6",
+    "preset": "leads"
+  }'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 1,
+  "name": "Leads",
+  "slug": "leads",
+  "singular_name": "Lead",
+  "plural_name": "Leads",
+  "icon": "user",
+  "color": "#3b82f6",
+  "brand_id": 42,
+  "created_at": "2024-12-11T10:00:00.000000Z"
+}
+```
+
+```json 422 Duplicate slug
+{
+  "errors": {
+    "slug": ["The slug has already been taken."]
+  }
+}
+```
+</ResponseExample>
+
+### Update Entity
+
+```
+PUT /api/brands/{brand}/crm/entities/{entity}
+```
+
+Same fields as Create, all optional on update.
+
+### Delete Entity
+
+```
+DELETE /api/brands/{brand}/crm/entities/{entity}
+```
+
+---
+
+## Pipelines
+
+Pipelines belong to an entity and contain an ordered list of stages.
+
+### List Pipelines
+
+```
+GET /api/brands/{brand}/crm/entities/{entity}/pipelines
+```
+
+### Get Pipeline
+
+```
+GET /api/brands/{brand}/crm/pipelines/{pipeline}
+```
+
+### Create Pipeline
+
+```
+POST /api/brands/{brand}/crm/entities/{entity}/pipelines
+```
+
+<ParamField body="name" type="string" required>
+  Pipeline name (e.g. `Sales Pipeline`)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/pipelines \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Sales Pipeline"}'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 1,
+  "name": "Sales Pipeline",
+  "crm_entity_id": 1,
+  "brand_id": 42,
+  "created_at": "2024-12-11T10:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+### Update Pipeline
+
+```
+PUT /api/brands/{brand}/crm/pipelines/{pipeline}
+```
+
+### Delete Pipeline
+
+```
+DELETE /api/brands/{brand}/crm/pipelines/{pipeline}
+```
+
+---
+
+## Stages
+
+Stages belong to a pipeline and represent progress steps (e.g. "Prospect → Qualified → Closed").
+
+### List Stages
+
+```
+GET /api/brands/{brand}/crm/pipelines/{pipeline}/stages
+```
+
+### Get Stage
+
+```
+GET /api/brands/{brand}/crm/stages/{stage}
+```
+
+### Create Stage
+
+```
+POST /api/brands/{brand}/crm/pipelines/{pipeline}/stages
+```
+
+<ParamField body="name" type="string" required>
+  Stage name (e.g. `Qualified`)
+</ParamField>
+
+<ParamField body="color" type="string">
+  Hex color for the stage badge
+</ParamField>
+
+<ParamField body="position" type="number">
+  Sort order (0-based integer). Use [Reorder](#reorder-stages) to batch-update positions.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/pipelines/1/stages \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Qualified", "color": "#10b981", "position": 2}'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 3,
+  "name": "Qualified",
+  "color": "#10b981",
+  "position": 2,
+  "pipeline_id": 1,
+  "created_at": "2024-12-11T10:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+### Update Stage
+
+```
+PUT /api/brands/{brand}/crm/stages/{stage}
+```
+
+### Reorder Stages
+
+```
+PUT /api/brands/{brand}/crm/stages/reorder
+```
+
+<ParamField body="stages" type="array" required>
+  Array of `{id, position}` objects in the desired order.
+</ParamField>
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/crm/stages/reorder \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "stages": [
+      {"id": 1, "position": 0},
+      {"id": 3, "position": 1},
+      {"id": 2, "position": 2},
+      {"id": 4, "position": 3}
+    ]
+  }'
+```
+
+### Delete Stage
+
+```
+DELETE /api/brands/{brand}/crm/stages/{stage}
+```
+
+---
+
+## Custom Fields
+
+Custom fields define the schema for entry data. Each entity has its own set of fields.
+
+### List Fields
+
+```
+GET /api/brands/{brand}/crm/entities/{entity}/fields
+```
+
+### Get Field
+
+```
+GET /api/brands/{brand}/crm/fields/{field}
+```
+
+### Create Field
+
+```
+POST /api/brands/{brand}/crm/entities/{entity}/fields
+```
+
+<ParamField body="name" type="string" required>
+  Field label (e.g. `Email Address`)
+</ParamField>
+
+<ParamField body="key" type="string" required>
+  Slug key used in `values` on entries (e.g. `email`). Lowercase alphanumeric + underscores.
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  Field type: `text`, `number`, `date`, `boolean`, `select`, `multi_select`, `url`, `email`, `phone`
+</ParamField>
+
+<ParamField body="options" type="array">
+  For `select` and `multi_select` types — array of option strings.
+</ParamField>
+
+<ParamField body="required" type="boolean">
+  Whether this field is required on entry creation (default: `false`)
+</ParamField>
+
+<ParamField body="position" type="number">
+  Display order
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/fields \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Lead Source",
+    "key": "lead_source",
+    "type": "select",
+    "options": ["Facebook", "Google", "Organic", "Referral"],
+    "required": false,
+    "position": 2
+  }'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 4,
+  "name": "Lead Source",
+  "key": "lead_source",
+  "type": "select",
+  "options": ["Facebook", "Google", "Organic", "Referral"],
+  "required": false,
+  "position": 2,
+  "crm_entity_id": 1,
+  "created_at": "2024-12-11T10:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+### Update Field
+
+```
+PUT /api/brands/{brand}/crm/fields/{field}
+```
+
+### Delete Field
+
+```
+DELETE /api/brands/{brand}/crm/fields/{field}
+```
+
+---
+
+## Entries
+
+Entries are the individual records in a CRM entity (e.g. a single lead or deal). They are stored and queried via Elasticsearch.
+
+### List Entries
+
+```
+GET /api/brands/{brand}/crm/entities/{entity}/entries
+```
+
+<ParamField path="entity" type="string" required>
+  Entity ID
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page (max 100, default: 25)
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number (default: 1)
+</ParamField>
+
+<ParamField query="pipeline_id" type="number">
+  Filter by pipeline
+</ParamField>
+
+<ParamField query="stage_id" type="number">
+  Filter by stage
+</ParamField>
+
+<ParamField query="reference_type" type="string">
+  Filter by external reference type (e.g. `conversion`, `lead`)
+</ParamField>
+
+<ParamField query="reference_id" type="string">
+  Filter by external reference ID
+</ParamField>
+
+<ParamField query="q" type="string">
+  Full-text search on `title`
+</ParamField>
+
+<ParamField query="include_customer" type="boolean">
+  Attach matched customer record to each entry (default: `false`)
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/entries?pipeline_id=1&stage_id=2&per_page=50" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": "es-doc-id-abc",
+      "title": "Jane Doe",
+      "pipeline_id": 1,
+      "stage_id": 2,
+      "crm_entity_id": 1,
+      "brand_id": 42,
+      "reference_type": "conversion",
+      "reference_id": "conv-123",
+      "assigned_to_user_id": null,
+      "values": [
+        { "key": "email",       "value": "jane@example.com" },
+        { "key": "lead_source", "value": "Facebook" }
+      ],
+      "values_flat": {
+        "email": "jane@example.com",
+        "lead_source": "Facebook"
+      },
+      "updated_at": "2024-12-10T14:00:00Z"
+    }
+  ],
+  "current_page": 1,
+  "last_page": 4,
+  "per_page": 25,
+  "total": 87
+}
+```
+</ResponseExample>
+
+### Get Entry
+
+```
+GET /api/brands/{brand}/crm/entries/{entry}
+GET /api/brands/{brand}/crm/entities/{entity}/entries/{entry}
+```
+
+### Create Entry
+
+```
+POST /api/brands/{brand}/crm/entities/{entity}/entries
+```
+
+<ParamField body="title" type="string" required>
+  Human-readable label for the entry (e.g. the lead's name or email)
+</ParamField>
+
+<ParamField body="pipeline_id" type="number" required>
+  ID of the pipeline this entry belongs to
+</ParamField>
+
+<ParamField body="stage_id" type="number" required>
+  ID of the initial stage
+</ParamField>
+
+<ParamField body="values" type="object">
+  Flat key-value object of custom field values (e.g. `{"email": "jane@example.com", "lead_source": "Facebook"}`). Keys must match a defined field `key` on the entity.
+</ParamField>
+
+<ParamField body="reference_id" type="string">
+  External ID to link the entry to another record (e.g. a conversion ID)
+</ParamField>
+
+<ParamField body="reference_type" type="string">
+  Type of external reference (e.g. `conversion`, `lead`, `order`)
+</ParamField>
+
+<ParamField body="assigned_to_user_id" type="number">
+  Assign to a specific team member by user ID
+</ParamField>
+
+<ParamField body="assigned_to_team_id" type="number">
+  Assign to a CRM team by team ID
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/entries \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Jane Doe",
+    "pipeline_id": 1,
+    "stage_id": 1,
+    "reference_type": "conversion",
+    "reference_id": "conv-123",
+    "values": {
+      "email": "jane@example.com",
+      "phone": "+15551234567",
+      "lead_source": "Facebook"
+    }
+  }'
+```
+
+```python Python
+import requests
+
+r = requests.post(
+    'https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/entries',
+    headers={'EF-Access-Key': 'your_api_key_here', 'Content-Type': 'application/json'},
+    json={
+        'title': 'Jane Doe',
+        'pipeline_id': 1,
+        'stage_id': 1,
+        'reference_type': 'conversion',
+        'reference_id': 'conv-123',
+        'values': {
+            'email': 'jane@example.com',
+            'lead_source': 'Facebook',
+        },
+    },
+)
+entry = r.json()
+print(entry['id'])
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": "es-doc-id-xyz",
+  "title": "Jane Doe",
+  "pipeline_id": 1,
+  "stage_id": 1,
+  "crm_entity_id": 1,
+  "brand_id": 42,
+  "reference_type": "conversion",
+  "reference_id": "conv-123",
+  "values": [
+    { "key": "email",       "value": "jane@example.com" },
+    { "key": "lead_source", "value": "Facebook" }
+  ],
+  "values_flat": {
+    "email": "jane@example.com",
+    "lead_source": "Facebook"
+  },
+  "created_at": "2024-12-11T10:00:00Z",
+  "updated_at": "2024-12-11T10:00:00Z"
+}
+```
+
+```json 422 Missing required fields
+{
+  "errors": {
+    "title":       ["The title field is required."],
+    "pipeline_id": ["The pipeline id field is required."],
+    "stage_id":    ["The stage id field is required."]
+  }
+}
+```
+</ResponseExample>
+
+### Update Entry
+
+```
+PUT /api/brands/{brand}/crm/entries/{entry}
+PUT /api/brands/{brand}/crm/entities/{entity}/entries/{entry}
+```
+
+Same body as Create. All fields optional — only provided fields are updated.
+
+```bash cURL — update values and reassign
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entries/es-doc-id-xyz \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "values": { "lead_source": "Google", "phone": "+15559876543" },
+    "assigned_to_user_id": 7
+  }'
+```
+
+### Move Entry to Stage
+
+Move an entry to a different stage within the same pipeline.
+
+```
+PUT /api/brands/{brand}/crm/entries/{entry}/stage
+PUT /api/brands/{brand}/crm/entities/{entity}/entries/{entry}/stage
+```
+
+<ParamField body="stage_id" type="number" required>
+  Target stage ID (must belong to the entry's current pipeline)
+</ParamField>
+
+```bash cURL
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entries/es-doc-id-xyz/stage \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"stage_id": 3}'
+```
+
+<ResponseExample>
+```json 200 Stage updated
+{
+  "id": "es-doc-id-xyz",
+  "stage_id": 3,
+  "updated_at": "2024-12-11T10:05:00Z"
+}
+```
+</ResponseExample>
+
+### Delete Entry
+
+```
+DELETE /api/brands/{brand}/crm/entries/{entry}
+DELETE /api/brands/{brand}/crm/entities/{entity}/entries/{entry}
+```
+
+---
+
+## Automation: Create CRM Entry from Conversion
+
+A common pattern is creating a CRM entry whenever a conversion is recorded. Using the EF automation pipeline or an external webhook:
+
+```python Python
+import requests
+
+BRAND_ID = 42
+API_KEY = "your_api_key_here"
+BASE = f"https://app.elasticfunnels.io/api/brands/{BRAND_ID}/crm"
+H = {"EF-Access-Key": API_KEY, "Content-Type": "application/json"}
+
+def create_lead_from_conversion(conversion: dict) -> dict:
+    """Create a CRM entry from a conversion webhook payload."""
+    return requests.post(
+        f"{BASE}/entities/1/entries",
+        headers=H,
+        json={
+            "title": f"{conversion['first_name']} {conversion['last_name']}",
+            "pipeline_id": 1,
+            "stage_id": 1,   # "New Lead"
+            "reference_type": "conversion",
+            "reference_id": str(conversion["id"]),
+            "values": {
+                "email":       conversion.get("email"),
+                "phone":       conversion.get("phone"),
+                "lead_source": conversion.get("utm_source", "unknown"),
+            },
+        },
+    ).json()
+```

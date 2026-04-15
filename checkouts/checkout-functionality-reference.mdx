@@ -36,6 +36,7 @@ Common keys:
 | Commerce | `checkout.coupon`, `checkout.coupon_message`, `checkout.bump_products`, `checkout.selectedBumpLines` |
 | Totals | `checkout.subtotal`, `checkout.tax`, `checkout.shipping`, `checkout.total`, plus `*_raw` variants (see template engine doc) |
 | Toggle | `checkout.shipping_same_as_billing` |
+| Wallets | `checkout.wallet_available` (`{ applePay, googlePay }` — set after Collect.js loads) |
 
 Template engine details: [Checkout](/frontend-template-engine/checkout).
 
@@ -217,12 +218,130 @@ Captcha verification (handled inside checkout UI, not a merchant integration sur
 Recommended card flow:
 
 ```html
-<checkout-cc-panel></checkout-cc-panel>
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
 <div data-checkout-message class="checkout-message"></div>
 <button type="submit" data-checkout-submit>Pay now</button>
 ```
 
-Optional alternative payment methods use `payment_method_choice` with values such as `card`, `paypal`, `klarna` (see design guide for markup).
+### `<checkout-cc-panel>` attributes
+
+| Attribute | Values | Default | Description |
+|-----------|--------|---------|-------------|
+| `data-accepted-cards` | Comma-separated card names | `visa,mastercard,amex,discover` | Card brands shown in the payment tab and validated during input |
+| `data-applepay` | `"false"` to disable | enabled | When `"false"`, Apple Pay and Google Pay buttons are not rendered inside this panel. Use with `<checkout-apple-pay />` for standalone placement. |
+| `data-applepay-layout` | `"tab"`, `"separated"`, `"inline"` | `"tab"` | Controls how Apple Pay is displayed. `"tab"` renders Apple Pay as a radio tab alongside Card/PayPal/Klarna. `"separated"` renders Apple Pay above the card panel with an "OR PAY ANOTHER WAY" divider. `"inline"` is the legacy layout (wallet buttons above card fields). |
+| `data-paypal` | Merchant ID | — | Enables PayPal tab (resolved server-side) |
+| `data-klarna` | Merchant ID | — | Enables Klarna tab (resolved server-side) |
+
+The panel builds its UI client-side from these attributes and `efScope.checkout`. When PayPal or Klarna is configured, the panel renders as a tabbed accordion (PayPal / Klarna / Card). Otherwise it renders card fields only.
+
+### Smart field detection
+
+The card panel automatically detects which checkout fields are present on the page and fills in any gaps:
+
+- **Cardholder name:** If `first_name` and `last_name` inputs are not on the page, a "Cardholder Name" field appears inside the card panel.
+- **Billing details:** If no `billing_address` or `shipping_address` inputs are on the page, the card panel shows a billing details section (name, country, address line).
+- **Auto-copy:** When billing fields are inside the card panel and no shipping fields exist on the page, billing values are automatically copied to shipping during submission (and vice versa).
+
+This means a minimal checkout page with only email and the payment panel still collects all required billing information.
+
+### Wallet contact field auto-detection
+
+Apple Pay and Google Pay automatically detect which contact fields to request from the wallet based on which checkout fields are on the page:
+
+| Page has | Wallet requests |
+|----------|----------------|
+| Shipping address fields | Shipping postal address |
+| Billing address fields | Billing postal address |
+| Name fields (`first_name`, `last_name`) | Name (in shipping or billing contact) |
+| Email field | Email |
+| Phone field | Phone |
+| None of the above (card-only) | No contact fields — just the payment token |
+
+No configuration is needed. For digital products that only need email and payment, the wallet skips address collection entirely.
+
+### `<checkout-apple-pay />`
+
+Standalone Apple Pay button placement. Renders a container where the Apple Pay button appears (when the customer's device supports it). Use this to position Apple Pay separately from the card panel:
+
+```html
+<checkout-apple-pay />
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+### Wallet conditional display
+
+After the payment form loads, `checkout.wallet_available` is set with `{ applePay: true/false, googlePay: true/false }`. Use `template-if` to show or hide elements:
+
+```html
+<template-if data-condition="checkout.wallet_available.applePay">
+  <div style="text-align:center; padding: 20px;">
+    <checkout-apple-pay />
+    <p>Or fill out the form below</p>
+  </div>
+</template-if>
+
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+See [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) for full setup, configuration, and layout examples.
+
+### Styling checkout fields
+
+Checkout input fields (floating labels, focus rings, active label color) respond to a single CSS variable:
+
+| Variable | Default | Controls |
+|----------|---------|----------|
+| `--ef-primary` | `#3b82f6` | Focus border color, focus glow, active floating label color |
+
+Set it in the page's `<style>` block to match your brand:
+
+```html
+<style>
+  :root {
+    --ef-primary: #FF4500; /* your brand color */
+  }
+</style>
+```
+
+You can also scope it to a specific container instead of `:root`:
+
+```html
+<style>
+  .checkout-form-section {
+    --ef-primary: #2b3a5c;
+  }
+</style>
+```
+
+All standard input fields (`ef-floating-input`, `ef-form-input`) and quiz fields (`ef-quiz-floating-input`) inherit the value automatically. No other changes are needed.
+
+### Styling the wallet divider
+
+The "or pay another way" divider between Apple Pay and the card panel uses the `ef-wallet-divider` classes. These are **not styled by the platform** — define them in your page's `<style>` block so each page can match its own design:
+
+```html
+<style>
+  .ef-wallet-divider {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    gap: 0.75rem;
+  }
+  .ef-wallet-divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: #e5e7eb;
+  }
+  .ef-wallet-divider-text {
+    color: #9ca3af;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+</style>
+```
 
 ---
 

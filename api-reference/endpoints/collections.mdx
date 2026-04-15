@@ -1,0 +1,456 @@
+---
+title: 'Collections'
+description: 'Manage form collections (schemas) and their entries'
+---
+
+<Note>
+  All Collections endpoints sit under `/api/brands/{brand}/collections/` with `moduleAccess:collections` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+Collections are dynamic form schemas. Each collection has a set of typed **fields**, and every form submission creates an **entry** validated against that schema.
+
+---
+
+## List Collections
+
+```
+GET /api/brands/{brand}/collections
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by name or code
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest` (default), `oldest`, `created_at`, `updated_at`
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/collections \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 3,
+      "code": "contact-form",
+      "name": "Contact Form",
+      "public_export": false,
+      "total_entries": 142
+    }
+  ],
+  "per_page": 25,
+  "total": 3,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List Collections (Unpaginated)
+
+Returns `id`, `name`, `code` only — useful for dropdowns.
+
+```
+GET /api/brands/{brand}/collections/all
+```
+
+<ResponseExample>
+```json Response
+[
+  { "id": 3, "name": "Contact Form", "code": "contact-form" },
+  { "id": 4, "name": "Lead Capture", "code": "lead-capture" }
+]
+```
+</ResponseExample>
+
+---
+
+## Get Collection
+
+Returns the full collection schema including all field definitions.
+
+```
+GET /api/brands/{brand}/collections/{collection}
+```
+
+<ParamField path="collection" type="string" required>
+  Collection numeric ID **or** `code` slug
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/collections/contact-form \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 3,
+  "code": "contact-form",
+  "name": "Contact Form",
+  "public_export": false,
+  "total_entries": 142,
+  "on_new_entry": "send_admin_email",
+  "send_to_email": "admin@example.com",
+  "recaptcha_enabled": false,
+  "recaptcha_site_key": null,
+  "recaptcha_secret_key": null,
+  "ticket_source_id": null,
+  "fields": [
+    {
+      "id": 1,
+      "code": "full_name",
+      "name": "Full Name",
+      "type": "text",
+      "placeholder": "Enter your name",
+      "options": null,
+      "required": true,
+      "searchable": true,
+      "private": false,
+      "public_encrypt": false,
+      "public_exclude": false,
+      "order": 0,
+      "default_value": null
+    },
+    {
+      "id": 2,
+      "code": "email",
+      "name": "Email",
+      "type": "email",
+      "placeholder": "you@example.com",
+      "required": true,
+      "order": 1
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Get Collection Fields
+
+```
+GET /api/brands/{brand}/collections/{collection}/fields
+```
+
+Returns the raw field list for a collection (numeric ID only for this route).
+
+---
+
+## Create Collection
+
+```
+POST /api/brands/{brand}/collections
+```
+
+<ParamField body="name" type="string" required>
+  Collection name (max 255 chars)
+</ParamField>
+
+<ParamField body="fields" type="array" required>
+  Array of field definition objects (at least one)
+</ParamField>
+
+<ParamField body="fields[].name" type="string" required>
+  Field label (max 255)
+</ParamField>
+
+<ParamField body="fields[].type" type="string" required>
+  `text`, `email`, `number`, `checkbox`, `password`, `textarea`, `select`, or `hidden`
+</ParamField>
+
+<ParamField body="fields[].required" type="boolean">
+  Whether the field is required on submission
+</ParamField>
+
+<ParamField body="fields[].placeholder" type="string">
+  Input placeholder (max 255)
+</ParamField>
+
+<ParamField body="fields[].options" type="array">
+  Required when `type` is `select` — array of option strings (at least one)
+</ParamField>
+
+<ParamField body="fields[].default_value" type="string">
+  Default value for the field (max 255)
+</ParamField>
+
+<ParamField body="fields[].order" type="number">
+  Display order (integer, min 0)
+</ParamField>
+
+<ParamField body="fields[].searchable" type="boolean">
+  Whether entries can be searched by this field
+</ParamField>
+
+<ParamField body="fields[].private" type="boolean">
+  Hide field from public-facing builder views
+</ParamField>
+
+<ParamField body="public_export" type="boolean">
+  Allow public CSV download of entries
+</ParamField>
+
+<ParamField body="on_new_entry" type="string">
+  `send_admin_email`, `send_email_to`, or `create_new_ticket`
+</ParamField>
+
+<ParamField body="send_to_email" type="string">
+  Required when `on_new_entry` is `send_email_to`. Valid email address.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/collections \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Lead Capture",
+    "on_new_entry": "send_admin_email",
+    "fields": [
+      { "name": "Full Name", "type": "text",  "required": true,  "order": 0 },
+      { "name": "Email",     "type": "email", "required": true,  "order": 1 },
+      { "name": "Source",    "type": "select","required": false, "order": 2,
+        "options": ["Facebook", "Google", "Organic"] }
+    ]
+  }'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "id": 5,
+  "code": "lead-capture",
+  "name": "Lead Capture",
+  "total_entries": 0,
+  "fields": [ /* ... */ ]
+}
+```
+
+```json 422 Missing required field name
+{
+  "errors": {
+    "fields.0.name": ["Field name is required."],
+    "fields.0.type": ["Field type is required."]
+  }
+}
+```
+
+```json 422 Select missing options
+{
+  "errors": {
+    "fields.2.options": ["You must provide at least one option for select fields."]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Collection
+
+```
+PUT /api/brands/{brand}/collections/{collection}
+```
+
+<ParamField path="collection" type="number" required>
+  Collection numeric ID
+</ParamField>
+
+Same body as Create. To update an existing field, include its `id`; to delete a field, pass `"deleted": true` on the field object.
+
+---
+
+## Delete Collection
+
+```
+DELETE /api/brands/{brand}/collections/{collection}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## List Entries
+
+```
+GET /api/brands/{brand}/collections/{collection}/entries
+```
+
+<ParamField path="collection" type="number" required>
+  Collection numeric ID
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page (default: 30)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search entry titles
+</ParamField>
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/collections/3/entries?per_page=50" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": "es-doc-abc123",
+      "title": "Jane Doe",
+      "full_name": "Jane Doe",
+      "email": "jane@example.com",
+      "source": "Facebook",
+      "created_at": "2024-12-10T09:00:00Z",
+      "updated_at": "2024-12-10T09:00:00Z"
+    }
+  ],
+  "current_page": 1,
+  "total": 142
+}
+```
+</ResponseExample>
+
+---
+
+## Get Entry
+
+```
+GET /api/brands/{brand}/collections/{collection}/entries/{entry}
+```
+
+Returns a single entry with all field values flattened to top-level keys.
+
+---
+
+## Create Entry
+
+```
+POST /api/brands/{brand}/collections/{collection}/entries
+```
+
+<Warning>
+  The request body is validated **dynamically** against the collection's field schema. Field codes (e.g. `email`, `full_name`) become the body keys. Required fields and type rules are enforced per field definition.
+</Warning>
+
+<ParamField body="{field_code}" type="string | number | boolean">
+  One key per collection field, using the field's `code` as the key. Type rules: `email` → valid email, `number` → numeric, `checkbox` → boolean, `select` → must be one of the defined options, all others → string.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/collections/3/entries \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "full_name": "Jane Doe",
+    "email": "jane@example.com",
+    "source": "Facebook"
+  }'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "message": "Entry created successfully",
+  "data": {
+    "full_name": "Jane Doe",
+    "email": "jane@example.com",
+    "source": "Facebook"
+  },
+  "id": "es-doc-abc123"
+}
+```
+
+```json 422 Invalid field value
+{
+  "errors": {
+    "email": ["The email must be a valid email address."],
+    "source": ["The selected source is invalid."]
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Entry
+
+```
+PUT /api/brands/{brand}/collections/{collection}/entries/{entry}
+```
+
+Same body as Create — only provided fields are merged into the existing entry.
+
+---
+
+## Delete Entry
+
+```
+DELETE /api/brands/{brand}/collections/{collection}/entries/{entry}
+```
+
+---
+
+## Bulk Delete Entries
+
+```
+DELETE /api/brands/{brand}/collections/{collection}/entries/bulk-delete
+```
+
+<ParamField body="ids" type="array" required>
+  Array of entry IDs to delete
+</ParamField>
+
+---
+
+## Export Entries
+
+Queue a CSV export of all entries in a collection. The results are emailed to the specified address.
+
+```
+POST /api/brands/{brand}/collections/{collection}/export
+```
+
+<ParamField body="email" type="string" required>
+  Email address to send the export to
+</ParamField>
+
+<ParamField body="fields" type="array" required>
+  Array of field codes to include in the export
+</ParamField>
+
+<ParamField body="new_only" type="boolean">
+  Export only new entries since last export
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/collections/3/export \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "fields": ["full_name", "email", "source"]}'
+```
+
+<ResponseExample>
+```json Response
+{
+  "message": "Export started. You will receive an email when it is ready."
+}
+```
+</ResponseExample>

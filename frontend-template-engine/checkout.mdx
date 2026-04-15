@@ -61,6 +61,43 @@ You can add `ef-*` attributes from the **Data Attributes** section (right sideba
 
 ---
 
+## Subscription products
+
+On single-product checkout pages, `checkout.is_subscription` and `checkout.subscription` are set **server-side** and available immediately when the page loads — no async fetch required.
+
+| Key | Type | Description |
+|-----|------|-------------|
+| **`checkout.is_subscription`** | boolean | `true` when the product is a subscription |
+| **`checkout.subscription`** | object \| null | Billing cadence details — `null` for one-time products |
+| **`checkout.subscription.frequency`** | number | How often the subscription bills (e.g. `3`) |
+| **`checkout.subscription.frequency_unit`** | string | `"day"`, `"week"`, `"month"`, or `"year"` |
+| **`checkout.subscription.trial_days`** | number | Free trial length in days (`0` = no trial) |
+| **`checkout.subscription.first_charge_free`** | boolean | `true` when the first cycle is free |
+
+Use `template-if` to show subscription-specific UI only when the product is a subscription:
+
+```html
+<template-if data-condition="checkout.is_subscription">
+  <p class="billing-notice">
+    You'll be billed every [[ checkout.subscription.frequency ]] [[ checkout.subscription.frequency_unit ]].
+  </p>
+</template-if>
+
+<template-if data-condition="checkout.is_subscription && checkout.subscription.trial_days > 0">
+  <p class="trial-notice">
+    Your [[ checkout.subscription.trial_days ]]-day free trial starts today.
+  </p>
+</template-if>
+
+<template-if data-condition="checkout.is_subscription && checkout.subscription.first_charge_free">
+  <p class="trial-notice">First [[ checkout.subscription.frequency_unit ]] is free.</p>
+</template-if>
+```
+
+For **cart-mode checkout** (multiple items), subscription info is on each cart item instead: `item.is_subscription` and `item.subscription`. See [Cart — Subscription details](/frontend-template-engine/cart#subscription-details-itemsubscription).
+
+---
+
 ## Totals (display + raw)
 
 Checkout exposes the same totals keys in **both** modes (`is_single_product` and `is_cart`) so one layout can be reused for either flow.
@@ -155,11 +192,80 @@ The app injects the full payment UI (method choice, card inputs, etc.). Do not k
 
 **Pattern B (explicit gateway):** When the source already has an explicit gateway structure (e.g. NMI), preserve it. Use a wrapper **`<div class="checkout-cc-panel" data-gateway="nmi">`** (or other gateway). Inside: (1) optional cardholder name in **`<template-if data-condition="!(checkout && checkout.customer && checkout.customer.first_name)">`** with **`data-template-value="checkout.customer.cardholder_name"`** and **`<div class="form-error" id="cc-name-error"></div>`**; (2) a **secure-card-element** div with **`data-brand-id`**, **`data-domain-id`**, **`data-merchant-code`**, **`data-accepted-cards`**, plus a sibling **`<div class="form-error" id="nmi-card-errors"></div>`** for card errors.
 
+### Smart field detection
+
+The payment panel uses `isFieldOnPage()` to check whether specific checkout fields are present on the page. Based on what's missing, it automatically adds fields inside the card section:
+
+- **No `first_name`/`last_name` on page** → shows "Cardholder Name" input
+- **No `billing_address`/`shipping_address` on page** → shows billing details (name, country, address)
+
+You can use `isFieldOnPage()` in your own `template-if` conditions:
+
+```html
+<template-if data-condition="!isFieldOnPage('checkout.customer.first_name')">
+  <p>Name will be collected in the payment panel.</p>
+</template-if>
+```
+
+The function checks for visible, non-hidden inputs bound via `data-template-value`, `data-ef-value`, or `name` attribute. Elements inside the payment panel itself are excluded to prevent self-referencing.
+
+---
+
+## Wallet (Apple Pay / Google Pay)
+
+### Scope key
+
+| Key | Type | Description |
+|-----|------|-------------|
+| **`checkout.wallet_available`** | `{ applePay: bool, googlePay: bool }` | Which wallets are available on the current device/browser. Updated after CollectJS initializes. |
+
+Use in template conditions to show wallet-specific content:
+
+```html
+<template-if data-condition="checkout.wallet_available.applePay">
+  <p class="wallet-hint">You can pay instantly with Apple Pay.</p>
+</template-if>
+<template-if data-condition="checkout.wallet_available.googlePay">
+  <p class="wallet-hint">Google Pay is available on this device.</p>
+</template-if>
+```
+
+### Wallet-first layout
+
+Wallet buttons are rendered inside `<checkout-cc-panel>`. To make them prominent (e.g. for quiz funnels), place the payment panel **above** the shipping address section in your template. Both layouts use the same blocks and backend processing.
+
+```html
+<!-- Email + phone first -->
+<section>...</section>
+
+<!-- Payment panel early = wallet buttons appear above shipping -->
+<checkout-cc-panel></checkout-cc-panel>
+
+<!-- Shipping address below -->
+<section>...</section>
+
+<!-- Submit button -->
+<button type="submit" data-checkout-submit>COMPLETE ORDER</button>
+```
+
+See [How to design a checkout page — Example 2](/guides/how-to-design-a-checkout-page#example-2-wallet-first-checkout) for a full copy-paste template.
+
+### `ef.checkout` API
+
+For programmatic wallet control, a small JavaScript API is available on `window.ef.checkout`:
+
+- **`ef.checkout.walletAvailable`** — same data as `checkout.wallet_available` scope key
+- **`ef.checkout.payWithWallet(method)`** — triggers `'applePay'` or `'googlePay'` programmatically
+- **`ef.checkout.onWalletComplete(callback)`** — fires after wallet payment attempt
+
+Full reference: [Checkout functionality reference — window.ef.checkout API](/checkouts/checkout-functionality-reference#7-windowefcheckout-api).
+
 ---
 
 ## Summary
 
 - Use **`is_single_product`** / **`is_cart`** and **`checkout.product_*`** vs **cartItems** for order summary.
+- **Subscriptions:** `checkout.is_subscription` + `checkout.subscription` on single-product pages (server-side, available immediately); `item.is_subscription` + `item.subscription` on cart items.
 - Prefer explicit subtotal keys: **`checkout.subtotal_before_discount`** / **`checkout.subtotal_after_discount`**.
 - `checkout.subtotal` remains as a backward-compatible alias of `checkout.subtotal_after_discount`.
 - Use **`_raw`** keys only for conditions/math or explicit formatting with `formatPrice`.
@@ -167,3 +273,4 @@ The app injects the full payment UI (method choice, card inputs, etc.). Do not k
 - Coupon: **query.coupon**, **checkout.coupon**, **checkout.coupon_message**; **data-apply-coupon**, **data-clear-coupon**.
 - Bumps: **checkout.bump_products**, **checkout.selectedBumpLines**; **data-bump-*** attributes.
 - Payment: **Pattern A** — **`<checkout-cc-panel></checkout-cc-panel>`** only; **Pattern B** — explicit gateway div with **`data-gateway`**, optional cardholder, **secure-card-element**.
+- Wallet: **`checkout.wallet_available`** for conditional content; **`ef.checkout.payWithWallet()`** for programmatic triggers; place `<checkout-cc-panel>` above shipping for wallet-first layouts.

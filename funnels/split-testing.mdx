@@ -105,6 +105,105 @@ The component embedded inside `<split-test>` acts as the control (variant A) and
 
 ---
 
+## Inline Split Testing (Coded Pages)
+
+Use `<inline-split-test>` when you want to A/B test content **directly in the HTML** without creating separate components or configuring Page Events. Variants and their content live inside the tag itself.
+
+<Note>
+This is the simplest way to split test on coded pages. For more advanced setups (component-based variants, multi-step funnels), use the `<split-test>` container with Page Events described above.
+</Note>
+
+### Syntax
+
+```html
+<inline-split-test>
+    <variant name="variant a" weight="50">
+        <!-- HTML for variant A -->
+    </variant>
+    <variant name="variant b" weight="50">
+        <!-- HTML for variant B -->
+    </variant>
+</inline-split-test>
+```
+
+**Attributes**
+
+| Element | Attribute | Required | Description |
+|---------|-----------|----------|-------------|
+| `<inline-split-test>` | `id` | Auto-generated | Database record ID. Injected automatically on save — do not set or edit manually. |
+| `<variant>` | `name` | Yes | Unique name for the variant. Can contain any characters. |
+| `<variant>` | `weight` | No | Traffic percentage (0–100). If omitted on all variants, traffic splits evenly. |
+
+### Basic example (equal split)
+
+When no `weight` attributes are provided, traffic is distributed evenly across all variants:
+
+```html
+<inline-split-test>
+    <variant name="short headline">
+        <h1>Buy Now</h1>
+    </variant>
+    <variant name="long headline">
+        <h1>Buy Now and Save 50% Today</h1>
+    </variant>
+</inline-split-test>
+```
+
+This creates a 50/50 split. For three variants it would be 33/33/34, and so on.
+
+### Weighted example
+
+Send 70% of traffic to the control and 30% to the challenger:
+
+```html
+<inline-split-test>
+    <variant name="control" weight="70">
+        <h1>Original Headline</h1>
+    </variant>
+    <variant name="challenger" weight="30">
+        <h1>New Headline</h1>
+    </variant>
+</inline-split-test>
+```
+
+Weights must sum to 100.
+
+### How it works
+
+1. **On save**, the system validates the tag structure (minimum 2 variants, each with a name). It creates a split test database record and injects an `id` attribute into the tag. The editor updates automatically to show the assigned ID.
+
+2. **At runtime**, when a visitor loads the page the server:
+   - Checks for an existing cookie (`st_res_{id}`) to maintain consistency for returning visitors
+   - If no cookie exists, selects a variant using deterministic weighted rotation (Redis-backed for consistency across servers)
+   - Sets a 7-day cookie with the selection
+   - Replaces the entire `<inline-split-test>` block with just the chosen variant's HTML
+
+3. **Tracking** is automatic. The rendered output includes `data-sid` and `data-cid` attributes, which the built-in tracking script picks up to fire `split-test-view` events. These appear in your analytics dashboard alongside regular split tests.
+
+4. **Conversion attribution** works out of the box. The split test cookie is included in conversion and click payloads, so you can see which variant drove each purchase.
+
+### Server output
+
+At runtime the tag is replaced with:
+
+```html
+<div data-sid="[split_test_id]" data-cid="[variant_code]">
+    <!-- HTML of the chosen variant -->
+</div>
+```
+
+The `variant_code` is an internal identifier (e.g. `v0`, `v1`) that maps back to the variant name in the analytics dashboard.
+
+### Rules
+
+- Minimum **2 variants** required.
+- Each variant must have a unique **name**.
+- Weights must be positive numbers that sum to **100**. If no weights are set on any variant, traffic splits evenly.
+- Do not manually set or edit the **`id`** attribute — it is managed by the system.
+- Removing the tag from the page and saving will deactivate the split test record.
+
+---
+
 ## Tips for Effective Split Testing
 
 - Test one element at a time for clear results

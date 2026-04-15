@@ -1,0 +1,463 @@
+---
+title: 'Quizzes'
+description: 'Create and manage quizzes, screens, and flow data'
+---
+
+<Note>
+  Quiz endpoints sit under `/api/brands/{brand}/quizzes/` with `moduleAccess:quizzes` middleware. Authenticate with `EF-Access-Key`.
+</Note>
+
+---
+
+## List Quizzes
+
+```
+GET /api/brands/{brand}/quizzes
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (1–100, default: 25)
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search by name
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest`, `oldest`, `created_at`, `updated_at`
+</ParamField>
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/quizzes \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": 4,
+      "code": "health-quiz-xyz",
+      "name": "Health Assessment Quiz",
+      "page_id": 201,
+      "total_entries": 312,
+      "updated_at": "2024-12-10T15:00:00.000000Z"
+    }
+  ],
+  "per_page": 25,
+  "total": 4,
+  "last_page": 1
+}
+```
+</ResponseExample>
+
+---
+
+## List Quizzes (Unpaginated)
+
+```
+GET /api/brands/{brand}/quizzes/all
+```
+
+Returns `{ id, name, code }` for all quizzes — useful for dropdowns and mapping.
+
+---
+
+## Get Quiz
+
+```
+GET /api/brands/{brand}/quizzes/{quiz}
+```
+
+<ResponseExample>
+```json Response
+{
+  "id": 4,
+  "code": "health-quiz-xyz",
+  "name": "Health Assessment Quiz",
+  "page_id": 201,
+  "page": { "id": 201, "title": "Health Quiz Page", "slug": "health-quiz" },
+  "total_entries": 312,
+  "config": { /* quiz theme/layout config */ },
+  "fields": [
+    { "id": 10, "code": "screen-abc", "name": "Question 1", "type": "single_choice", "order": 0 }
+  ],
+  "slug": "health-quiz",
+  "domain": { "domain": "quiz.mybrand.com" }
+}
+```
+</ResponseExample>
+
+<Note>
+  `flow_data` is **not** included in the `show` response. Use `GET .../flow` to retrieve the flow graph.
+</Note>
+
+---
+
+## Create Quiz
+
+```
+POST /api/brands/{brand}/quizzes
+```
+
+<ParamField body="name" type="string" required>
+  Quiz name
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/quizzes \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Health Assessment Quiz"}'
+```
+
+<ResponseExample>
+```json 200 Created
+{
+  "quiz": {
+    "id": 4,
+    "code": "health-quiz-xyz",
+    "name": "Health Assessment Quiz",
+    "page_id": 201,
+    "total_entries": 0
+  }
+}
+```
+
+```json 403 Plan limit
+{
+  "error": "Plan limit exceeded",
+  "plan_error": {
+    "type": "plan_upgrade_required",
+    "feature": "quizzes",
+    "message": "Your plan does not allow creating more quizzes.",
+    "plan_name": "Starter",
+    "upgrade_info": {}
+  },
+  "errors": { /* field errors */ }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Quiz
+
+```
+PUT /api/brands/{brand}/quizzes/{quiz}
+```
+
+<ParamField body="name" type="string" required>
+  Quiz name (max 255)
+</ParamField>
+
+<ParamField body="page_id" type="number">
+  ID of the page to associate with this quiz
+</ParamField>
+
+<ParamField body="config" type="object">
+  Quiz display configuration (theme, layout, computed variables, etc.)
+</ParamField>
+
+<ResponseExample>
+```json 200 Updated
+{
+  "id": 4,
+  "code": "health-quiz-xyz",
+  "name": "Health Assessment Quiz",
+  "config": { /* updated config */ }
+}
+```
+
+```json 422 Validation error
+{
+  "message": "Validation failed.",
+  "errors": {
+    "name": ["The name field is required."]
+  },
+  "component_errors": []
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Quiz
+
+```
+DELETE /api/brands/{brand}/quizzes/{quiz}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Get Quiz Flow
+
+Returns the visual flow graph (Drawflow format) and all screen definitions.
+
+```
+GET /api/brands/{brand}/quizzes/{quiz}/flow
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/quizzes/4/flow \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "flow": {
+    "drawflow": {
+      "Home": {
+        "data": {
+          "1": { "id": 1, "name": "Question 1", "inputs": {}, "outputs": {} },
+          "2": { "id": 2, "name": "Result Screen", "inputs": {}, "outputs": {} }
+        }
+      }
+    }
+  },
+  "screens": [
+    {
+      "id": 10,
+      "code": "screen-abc",
+      "name": "Question 1",
+      "type": "single_choice",
+      "order": 0
+    }
+  ]
+}
+```
+</ResponseExample>
+
+<Info>
+  If no flow has been saved yet, `flow` defaults to a minimal empty Drawflow structure (`{"drawflow":{"Home":{"data":[]}}}`).
+</Info>
+
+---
+
+## Save Quiz Flow
+
+```
+POST /api/brands/{brand}/quizzes/{quiz}/flow
+```
+
+<ParamField body="flow" type="any">
+  The complete Drawflow graph object. Can be `null` to clear the flow.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/quizzes/4/flow \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"flow": { /* drawflow object */ }}'
+```
+
+<ResponseExample>
+```json Response
+{
+  "success": true,
+  "message": "Flow saved successfully"
+}
+```
+</ResponseExample>
+
+---
+
+## Screens
+
+Quiz screens are the individual question/result pages within a quiz. They are nested under the quiz resource.
+
+### List Screens
+
+```
+GET /api/brands/{brand}/quizzes/{quiz}/screens
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": 10,
+      "code": "screen-abc",
+      "name": "Do you experience bloating?",
+      "type": "single_choice",
+      "order": 0,
+      "options": [
+        { "label": "Yes, often", "value": "often" },
+        { "label": "Sometimes", "value": "sometimes" },
+        { "label": "Never", "value": "never" }
+      ],
+      "style": "light"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Get Screen
+
+```
+GET /api/brands/{brand}/quizzes/{quiz}/screens/{screen}
+```
+
+### Create Screen
+
+```
+POST /api/brands/{brand}/quizzes/{quiz}/screens
+```
+
+<ParamField body="name" type="string" required>
+  Screen name / question title
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  Screen type: `single_choice`, `multiple_choice`, `text_input`, `rating`, `result`, `info`, `video`, `image`
+</ParamField>
+
+<ParamField body="title" type="string">
+  Display title shown to the user
+</ParamField>
+
+<ParamField body="subtitle" type="string">
+  Subtitle or question description
+</ParamField>
+
+<ParamField body="options" type="array">
+  Answer options (for choice screens) — each with `label` and `value`
+</ParamField>
+
+<ParamField body="screen_settings" type="object">
+  Additional screen-level configuration
+</ParamField>
+
+<ParamField body="content" type="string">
+  HTML content (for `info` and `result` screens)
+</ParamField>
+
+<ParamField body="style" type="string">
+  `light` or `dark`
+</ParamField>
+
+<ParamField body="order" type="number">
+  Display order. Auto-incremented if omitted.
+</ParamField>
+
+<ParamField body="audio_file" type="file">
+  Audio file upload (multipart)
+</ParamField>
+
+<ParamField body="image_preview_file" type="file">
+  Image file upload (multipart)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/quizzes/4/screens \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Bloating Question",
+    "type": "single_choice",
+    "title": "Do you experience bloating after meals?",
+    "style": "light",
+    "options": [
+      {"label": "Yes, often", "value": "often"},
+      {"label": "Sometimes", "value": "sometimes"},
+      {"label": "Never", "value": "never"}
+    ]
+  }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "quiz": {
+    "id": 10,
+    "code": "screen-abc",
+    "name": "Bloating Question",
+    "type": "single_choice",
+    "order": 3
+  }
+}
+```
+
+<Note>
+  The response key is `"quiz"` even though the value is a screen object. This is a known naming quirk.
+</Note>
+
+</ResponseExample>
+
+### Update Screen
+
+```
+PUT /api/brands/{brand}/quizzes/{quiz}/screens/{screen}
+```
+
+Same body as Create.
+
+### Delete Screen
+
+```
+DELETE /api/brands/{brand}/quizzes/{quiz}/screens/{screen}
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+### Reorder Screens
+
+```
+POST /api/brands/{brand}/quizzes/{quiz}/screens/order
+```
+
+<ParamField body="order" type="object" required>
+  Map of `{ "<screenId>": <integer order>, ... }`
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/quizzes/4/screens/order \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"order": {"10": 0, "11": 1, "12": 2}}'
+```
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+### Duplicate Screen
+
+```
+POST /api/brands/{brand}/quizzes/{quiz}/screens/{screen}/duplicate
+```
+
+Creates an exact copy of the screen with a new code and auto-assigned order.
+
+<ResponseExample>
+```json Response
+{ "success": true }
+```
+</ResponseExample>
+
+---
+
+## Notes
+
+<Info>
+  - `flow_data` is separate from the quiz's `config` and screen definitions — save and retrieve it with the dedicated `/flow` endpoints
+  - Screen `code` values are auto-generated unique identifiers used in the flow graph to connect questions to answer paths
+  - `total_entries` tracks submission count and is incremented automatically when entries are submitted via the public form
+</Info>

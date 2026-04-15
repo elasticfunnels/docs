@@ -7,9 +7,9 @@ Apple Pay and Google Pay are payment options on your existing NMI checkout. They
 
 ## Overview
 
-- **Google Pay** — No configuration required. It appears automatically when your domain uses an NMI merchant with tokenization (Collect.js) and the customer’s browser supports it.
-- **Apple Pay** — Requires enabling in the NMI Merchant Portal, registering your checkout domain(s) with NMI, and completing Apple’s domain verification.
-- Both options appear on the **checkout page** only, in the same payment area where customers choose Card or PayPal. If the wallet is not supported or the customer cancels, they can still pay with card (and PayPal or Klarna if configured).
+- **Apple Pay** — Requires enabling in the NMI Merchant Portal, registering your checkout domain(s) with NMI, and completing Apple's domain verification. Appears on **Safari** (macOS and iOS) when the customer has Apple Pay set up.
+- **Google Pay** — No configuration required. Appears automatically on **Android devices** when your domain uses an NMI merchant with tokenization (Collect.js).
+- Both options appear on the **checkout page** only. By default they render above the card fields inside `<checkout-cc-panel>`, or you can place them separately with `<checkout-apple-pay />`.
 
 ## How to configure / enable
 
@@ -21,7 +21,7 @@ No configuration is required.
 2. Ensure that merchant uses **tokenization** (Collect.js): in the merchant settings, tokenization mode should be **Collect.js** and the **public / tokenization key** should be set.
 3. Assign that NMI merchant to your checkout domain under **Settings** → **Domains** → **Edit Domain** → **Merchant**.
 
-Google Pay will then appear automatically on checkout when the customer’s browser or device supports it. If it is not supported, the option is hidden and the customer can pay with card.
+Google Pay appears automatically on checkout when the customer is on an **Android device** with a supported browser (Chrome). It does not appear on desktop browsers.
 
 ### Apple Pay
 
@@ -37,36 +37,192 @@ Google Pay will then appear automatically on checkout when the customer’s brow
 
 NMI must have a list of domains that are allowed to show Apple Pay. Use the same domain(s) that serve your checkout in ElasticFunnels (e.g. the domain you set under **Settings** → **Domains**).
 
-- In the NMI Merchant Portal, add your checkout domain(s) to the Apple Pay allowed list (see NMI’s Apple Pay / domain registration section).
-- If ElasticFunnels later adds an in-app “Register domains” action for your NMI merchant, you can use that to sync your linked domains; otherwise configure the list in NMI’s portal.
+- In the NMI Merchant Portal, add your checkout domain(s) to the Apple Pay allowed list (see NMI's Apple Pay / domain registration section).
+- If ElasticFunnels later adds an in-app "Register domains" action for your NMI merchant, you can use that to sync your linked domains; otherwise configure the list in NMI's portal.
 
 **Step 3: Apple domain verification**
 
 Apple requires a verification file on your checkout domain.
 
-1. Download the **domain verification file** from NMI (or from Apple’s developer resources, depending on how NMI guides you).
+1. Download the **domain verification file** from NMI (or from Apple's developer resources, depending on how NMI guides you).
 2. Host it at:  
    `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`  
    Replace `<your-checkout-domain>` with the exact domain customers use at checkout (e.g. `checkout.yourstore.com`).
 3. Ensure the file is publicly accessible over HTTPS. **Recommended:** In the app, go to **Domains** → edit the checkout domain → **Apple Pay** tab, and paste the exact contents of the verification file. The offer site will then serve it at `/.well-known/apple-developer-merchantid-domain-association` for that domain. Alternatively, you can set the env var **`APPLE_PAY_DOMAIN_VERIFICATION_CONTENT`** on the offer server as a fallback (same content for all domains on that server). If neither is set, the path returns 404 and you must host the file elsewhere.
 
-After all three steps, Apple Pay can appear on checkout when the customer’s browser or device supports it and the domain is correctly registered and verified.
+After all three steps, Apple Pay can appear on checkout when the customer uses Safari on macOS or iOS and has Apple Pay configured.
 
-## Where the options appear
+## Placement options
 
-- **Page:** The **checkout page** only. Apple Pay and Google Pay do not appear on the cart, product, or other pages unless we add them there in a future update.
-- **Position:** In the **same payment method area** where customers choose Card or PayPal (e.g. above the card form, or in a row with other payment options). They are visible only when:
-  1. The checkout domain uses an **NMI** merchant with **tokenization (Collect.js)** (public key set), and  
-  2. The customer’s browser or device supports the wallet (e.g. Safari/Apple device for Apple Pay, Chrome or supported Android for Google Pay, over HTTPS).
+There are three ways to include Apple Pay / Google Pay on your checkout page:
 
-If the wallet is not supported or the customer cancels the wallet flow, they can still complete the order with a card (and with PayPal or Klarna if you have those configured).
+### Default — wallet buttons inside the card panel
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
+```
+
+Apple Pay and Google Pay buttons appear above the card fields with an "or pay with card" divider. This is the simplest setup.
+
+### Standalone Apple Pay — separate from the card panel
+
+Use `<checkout-apple-pay />` to place the Apple Pay button anywhere on the page, and disable it inside the card panel with `data-applepay="false"`:
+
+```html
+<!-- Apple Pay at the top of the checkout, before the form -->
+<checkout-apple-pay />
+
+<!-- Card-only panel below -->
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+This lets you position Apple Pay prominently (e.g. above the personal details form) while keeping the card panel card-only.
+
+### Separated — Apple Pay above with divider
+
+Use `data-applepay-layout="separated"` to render Apple Pay above the card panel with an "OR PAY ANOTHER WAY" divider between them. This gives Apple Pay top-level prominence without needing a separate `<checkout-apple-pay />` element:
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"
+                   data-applepay-layout="separated"></checkout-cc-panel>
+```
+
+The Apple Pay button appears above the panel. When the customer's device doesn't support Apple Pay, the button and divider are hidden and the card panel shows normally.
+
+### Disable wallet buttons entirely
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+No Apple Pay or Google Pay buttons are shown. Customers can only pay with card (and PayPal/Klarna if configured).
+
+## Conditional display with `checkout.wallet_available`
+
+After the payment form loads, the scope variable `checkout.wallet_available` is updated with:
+
+```json
+{ "applePay": true, "googlePay": false }
+```
+
+Use this to conditionally show or hide parts of your checkout layout based on wallet availability:
+
+```html
+<!-- Show the personal details form only when Apple Pay is NOT available,
+     or after the customer chooses to pay with card instead -->
+<template-if data-condition="!checkout.wallet_available.applePay">
+  <checkout-personal-details>
+    <!-- name, email, address fields -->
+  </checkout-personal-details>
+</template-if>
+
+<!-- Apple Pay section — always visible, button appears when supported -->
+<checkout-apple-pay />
+
+<!-- Divider when both options are available -->
+<template-if data-condition="checkout.wallet_available.applePay">
+  <div class="or-divider">or fill out the form below</div>
+</template-if>
+
+<!-- Card panel (no inline wallet) -->
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+<Note>
+`checkout.wallet_available` is only set after the NMI Collect.js library loads and detects wallet support. It may take 1–2 seconds after page load before the values update. Use `template-if` conditions so the UI adjusts automatically once the value is available.
+</Note>
+
+### Example: wallet-first checkout
+
+This layout shows Apple Pay prominently at the top. When Apple Pay is available, the form fields are hidden until the customer scrolls past or chooses card. When Apple Pay is not available, the standard form shows immediately:
+
+```html
+<template-if data-condition="checkout.wallet_available.applePay">
+  <div style="text-align:center; padding: 24px 0;">
+    <h3>Quick checkout</h3>
+    <checkout-apple-pay />
+    <p style="margin-top: 12px; color: #6b7280; font-size: 14px;">
+      Or scroll down to pay with card
+    </p>
+  </div>
+</template-if>
+
+<checkout-personal-details>
+  <!-- name, email, address fields -->
+</checkout-personal-details>
+
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+
+<button type="submit" data-checkout-submit>Pay now</button>
+```
+
+## How wallet payment works
+
+When a customer taps the Apple Pay or Google Pay button:
+
+1. The native wallet sheet appears (Face ID / Touch ID for Apple Pay, or Google Pay authentication).
+2. The wallet provides the payment token **and** contact data (name, address, email, phone).
+3. The system automatically fills the checkout form fields with the wallet data.
+4. The form auto-submits — no further action from the customer.
+
+This means the customer can skip filling out the checkout form entirely. The wallet provides everything needed for the payment. Personal and shipping fields are only filled if they are currently empty; billing fields are always overwritten with the wallet data for AVS accuracy.
+
+## Wallet contact field auto-detection
+
+The wallet (Apple Pay / Google Pay) automatically detects which contact fields to request based on which checkout fields are on the page. No explicit configuration is needed.
+
+| Page has | Wallet requests |
+|----------|----------------|
+| Shipping address fields (`shipping_address`, `shipping_country`) | Shipping postal address |
+| Billing address fields (`billing_address`, `billing_country`) | Billing postal address |
+| Name fields (`first_name`, `last_name`, or `shipping_first_name`) | Name |
+| `email` field | Email |
+| `phone` field | Phone |
+| None of the above | No contact fields — payment token only |
+
+**Digital product example:** A checkout page with only email and a payment panel (no name or address fields) causes Apple Pay to request only the customer's email. This is ideal for digital goods where shipping details are unnecessary.
+
+```html
+<div class="floating-label-group">
+  <input type="email" name="email" data-template-value="checkout.customer.email" />
+</div>
+<checkout-cc-panel data-applepay-layout="separated"></checkout-cc-panel>
+<button type="submit" data-checkout-submit>Purchase</button>
+```
+
+## Subscriptions and recurring payments
+
+When a customer purchases a **subscription** using Apple Pay or Google Pay, the system creates a **customer vault entry** in NMI during the initial charge. All subsequent subscription charges (renewals, rebills) use this vault entry server-to-server — no additional customer interaction is needed.
+
+The subscription billing schedule is managed entirely on the server. The wallet token is consumed on the first charge, and the vault handles everything after that.
+
+## One-click upsells
+
+When a customer pays with Apple Pay or Google Pay on the main checkout, the payment is stored in the **customer vault**. Subsequent **one-click upsell** charges on the same funnel use this vault token server-to-server — no additional customer interaction is needed. The customer sees upsell pages and clicks "Yes, add this" as usual; the charge happens instantly using the stored vault entry.
+
+This works the same as card-based one-click upsells.
+
+## Billing address handling
+
+When a customer pays with Apple Pay or Google Pay, the wallet provides the **correct billing address** associated with the card. The system uses this wallet billing address automatically for payment verification (AVS), regardless of what the customer entered in the checkout form's billing fields. This prevents address verification mismatches and declined payments.
+
+No configuration is needed — this is handled automatically.
+
+<Note>
+For non-US addresses, Apple Pay may not return a state/region value (many countries don't use states in their address format). The checkout validation automatically skips state validation for wallet payments, so this does not cause errors.
+</Note>
 
 ## Troubleshooting
 
-- **Apple Pay or Google Pay buttons do not show**  
+- **Apple Pay button does not show**  
   - Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.  
-  - Check that the customer is on **HTTPS** and that the browser or device supports the wallet (e.g. Safari for Apple Pay).  
-  - For **Apple Pay** only: confirm the domain is registered with NMI for Apple Pay and that the Apple verification file is reachable at `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`.
+  - Check that the customer is on **Safari** (macOS or iOS) and the page is served over **HTTPS**.  
+  - Confirm the domain is registered with NMI for Apple Pay and that the Apple verification file is reachable at `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`.
+  - If using `<checkout-apple-pay />`, make sure the tag is on the page (it renders a container; the button appears inside it when supported).
+
+- **Google Pay button does not show**  
+  - Google Pay only appears on **Android devices**. It does not show on desktop Chrome or other desktop browsers.
+  - Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.
 
 - **Verification file not found (Apple Pay)**  
   - Ensure the file is at the exact path above and that the domain matches the one used at checkout.  
@@ -75,4 +231,13 @@ If the wallet is not supported or the customer cancels the wallet flow, they can
 - **Wallet payment cancelled or failed**  
   - The customer can pay with card instead; the card form remains available. No page reload is required.
 
-For more on NMI and Apple Pay, see [NMI’s documentation](https://docs.nmi.com/docs/collectjs) and [Adding Apple Pay](https://docs.nmi.com/reference/adding-apple-pay).
+- **State/region error on wallet payment**  
+  - This should be handled automatically. If you see state validation errors after a wallet payment, ensure you are on the latest version of the checkout plugin.
+
+- **Subscription charges fail after initial wallet purchase**  
+  - Verify the payment created a customer vault entry. Check the transaction record for a `customer_vault_id`.
+
+- **One-click upsell charges fail after wallet payment**  
+  - Same as above — ensure the vault entry was created during the initial charge.
+
+For more on NMI and Apple Pay, see [NMI's documentation](https://docs.nmi.com/docs/collectjs) and [Digital Wallet Setup](https://docs.nmi.com/docs/digital-wallet-setup).

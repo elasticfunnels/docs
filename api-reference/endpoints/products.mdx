@@ -500,6 +500,458 @@ Map your ElasticFunnels products to merchant platform product IDs:
 
 ---
 
+## Subscription Tiers
+
+Products can have tiered subscription billing — different prices at different intervals (e.g. monthly then annually). Pass `subscription_tiers` as an array in the Create or Update body.
+
+<ParamField body="is_subscription" type="boolean">
+  Mark product as a subscription product
+</ParamField>
+
+<ParamField body="subscription_frequency" type="number">
+  Default billing interval count (e.g. `1` for every-1-month)
+</ParamField>
+
+<ParamField body="subscription_frequency_unit" type="string">
+  `day`, `week`, `month`, or `year`
+</ParamField>
+
+<ParamField body="subscription_trial_days" type="number">
+  Free trial length in days (min: 0)
+</ParamField>
+
+<ParamField body="subscription_first_charge_free" type="boolean">
+  Waive the first billing charge
+</ParamField>
+
+<ParamField body="subscription_tiers" type="array">
+  Array of tier objects. When provided, overrides the flat `subscription_frequency` / `subscription_frequency_unit` values.
+</ParamField>
+
+<ParamField body="subscription_tiers[].interval" type="string" required>
+  `day`, `week`, `month`, or `year`
+</ParamField>
+
+<ParamField body="subscription_tiers[].interval_count" type="number" required>
+  How many units of `interval` between charges (min: 1)
+</ParamField>
+
+<ParamField body="subscription_tiers[].price" type="number" required>
+  Billing amount for this tier (min: 0)
+</ParamField>
+
+<ParamField body="subscription_tiers[].tier" type="string">
+  Optional tier label (max 64 chars)
+</ParamField>
+
+<ParamField body="subscription_tiers[].label" type="string">
+  Display label shown to the customer (max 255 chars)
+</ParamField>
+
+<ParamField body="subscribe_save_discount_percent" type="number">
+  Discount shown as "subscribe & save" (0–100%)
+</ParamField>
+
+```json Subscription tiers example
+{
+  "is_subscription": true,
+  "subscription_trial_days": 14,
+  "subscribe_save_discount_percent": 15,
+  "subscription_tiers": [
+    {
+      "tier": "monthly",
+      "interval": "month",
+      "interval_count": 1,
+      "price": 29.99,
+      "label": "Monthly — $29.99/mo"
+    },
+    {
+      "tier": "annual",
+      "interval": "year",
+      "interval_count": 1,
+      "price": 249.00,
+      "label": "Annual — $249/yr (save 30%)"
+    }
+  ]
+}
+```
+
+---
+
+## Product Variants & Options
+
+Products can have variants (e.g. size/colour combinations). Variants are managed inline via the `product_fields` and `variants` arrays on Create/Update.
+
+### Product Fields (variant dimensions)
+
+`product_fields` defines the variant dimensions (e.g. "Size", "Colour"):
+
+```json
+{
+  "product_fields": [
+    { "name": "Size",   "type": "select", "options": ["S", "M", "L", "XL"], "position": 0 },
+    { "name": "Colour", "type": "select", "options": ["Red", "Blue"],        "position": 1 }
+  ]
+}
+```
+
+### Variants
+
+Each variant is a combination of field values with an optional per-variant price and SKU:
+
+```json
+{
+  "variants": [
+    { "option1": "S",  "option2": "Red",  "code": "SKU-S-RED",  "price": 29.99 },
+    { "option1": "M",  "option2": "Red",  "code": "SKU-M-RED",  "price": 29.99 },
+    { "option1": "L",  "option2": "Blue", "code": "SKU-L-BLUE", "price": 34.99 }
+  ]
+}
+```
+
+<ParamField body="variants[].id" type="number">
+  Existing variant ID for update (omit to create new)
+</ParamField>
+
+<ParamField body="variants[].code" type="string">
+  Variant SKU/code (max 128 chars)
+</ParamField>
+
+<ParamField body="variants[].option1" type="string">
+  Value for the first product field (max 128 chars)
+</ParamField>
+
+<ParamField body="variants[].option2" type="string">
+  Value for the second product field (max 128 chars)
+</ParamField>
+
+<ParamField body="variants[].option3" type="string">
+  Value for the third product field (max 128 chars)
+</ParamField>
+
+<ParamField body="variants[].price" type="number">
+  Override price for this variant (null = use product base price)
+</ParamField>
+
+<ParamField body="variants[].image" type="string">
+  Variant image URL (max 512 chars)
+</ParamField>
+
+<ParamField body="variants[].currency" type="string">
+  3-letter ISO currency code (e.g. `USD`)
+</ParamField>
+
+---
+
+## Variant Options
+
+Variant options are brand-level reusable option sets (e.g. "Shoe Sizes", "Colours"). They can be attached to multiple products.
+
+### List Variant Options
+
+```
+GET /api/brands/{brand}/variant-options
+```
+
+### Get All Variant Options (unpaginated)
+
+```
+GET /api/brands/{brand}/variant-options/all
+```
+
+### Create Variant Option
+
+```
+POST /api/brands/{brand}/variant-options
+```
+
+<ParamField body="name" type="string" required>
+  Option set name (e.g. `Shirt Sizes`)
+</ParamField>
+
+<ParamField body="values" type="array" required>
+  Array of option value strings (e.g. `["XS", "S", "M", "L", "XL"]`)
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/variant-options \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Shirt Sizes", "values": ["XS", "S", "M", "L", "XL"]}'
+```
+
+### Update Variant Option
+
+```
+PUT /api/brands/{brand}/variant-options/{variant_option}
+```
+
+### Delete Variant Option
+
+```
+DELETE /api/brands/{brand}/variant-options/{variant_option}
+```
+
+---
+
+## Product Categories
+
+Organise products into a two-level category hierarchy (category → subcategory).
+
+### List Categories
+
+```
+GET /api/brands/{brand}/product-categories
+```
+
+### Get All Categories (unpaginated)
+
+```
+GET /api/brands/{brand}/product-categories/all
+```
+
+### Create Category
+
+```
+POST /api/brands/{brand}/product-categories
+```
+
+<ParamField body="name" type="string" required>
+  Category name
+</ParamField>
+
+<ParamField body="parent_id" type="number">
+  Parent category ID — omit for top-level categories, provide for subcategories.
+</ParamField>
+
+```bash cURL — create top-level category
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/product-categories \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Supplements"}'
+```
+
+```bash cURL — create subcategory
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/product-categories \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Weight Loss", "parent_id": 3}'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 4,
+  "name": "Weight Loss",
+  "parent_id": 3,
+  "brand_id": 42,
+  "created_at": "2024-12-11T10:00:00.000000Z"
+}
+```
+</ResponseExample>
+
+### Update Category
+
+```
+PUT /api/brands/{brand}/product-categories/{product_category}
+```
+
+### Delete Category
+
+```
+DELETE /api/brands/{brand}/product-categories/{product_category}
+```
+
+<Warning>
+  When creating a product, `product_category_id` must be a **top-level** category (no `parent_id`). To assign a subcategory, also provide `product_subcategory_id` (which must belong to the category). Providing a subcategory without a category returns a 422.
+</Warning>
+
+---
+
+## Coupons
+
+Create and manage discount codes for products.
+
+### List Coupons
+
+```
+GET /api/brands/{brand}/coupons
+```
+
+<ParamField query="per_page" type="number">
+  Results per page (max 100, default: 25)
+</ParamField>
+
+### Get Coupon
+
+```
+GET /api/brands/{brand}/coupons/{coupon}
+```
+
+### Create Coupon
+
+```
+POST /api/brands/{brand}/coupons
+```
+
+<ParamField body="code" type="string" required>
+  Coupon code (max 64 chars). Must be unique per brand.
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  `percent` — percentage off, or `fixed` — fixed amount off
+</ParamField>
+
+<ParamField body="value" type="number" required>
+  Discount value. For `percent`, clamped to 0–100 automatically.
+</ParamField>
+
+<ParamField body="name" type="string">
+  Internal label (max 128 chars)
+</ParamField>
+
+<ParamField body="status" type="string">
+  `active` (default), `draft`, or `disabled`
+</ParamField>
+
+<ParamField body="product_ids" type="array">
+  Limit discount to specific product IDs. Empty/null means all products.
+</ParamField>
+
+<ParamField body="excluded_product_ids" type="array">
+  Product IDs to exclude from the discount.
+</ParamField>
+
+<ParamField body="applies_on_bump" type="boolean">
+  Whether the coupon applies to order bump products.
+</ParamField>
+
+<ParamField body="valid_from" type="string">
+  ISO 8601 date — coupon becomes active from this date.
+</ParamField>
+
+<ParamField body="valid_until" type="string">
+  ISO 8601 date — coupon expires after this date. Must be on or after `valid_from`.
+</ParamField>
+
+<ParamField body="usage_limit" type="number">
+  Maximum number of redemptions (null = unlimited).
+</ParamField>
+
+```bash cURL — 20% off all products
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/coupons \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "SAVE20",
+    "name": "20% Off Launch Promo",
+    "type": "percent",
+    "value": 20,
+    "status": "active",
+    "valid_from": "2024-12-01",
+    "valid_until": "2024-12-31",
+    "usage_limit": 500
+  }'
+```
+
+```bash cURL — $10 off specific products
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/coupons \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "BOTTLE10",
+    "type": "fixed",
+    "value": 10,
+    "product_ids": [5, 6]
+  }'
+```
+
+<ResponseExample>
+```json 201 Created
+{
+  "id": 12,
+  "code": "SAVE20",
+  "name": "20% Off Launch Promo",
+  "type": "percent",
+  "value": 20,
+  "status": "active",
+  "product_ids": null,
+  "excluded_product_ids": null,
+  "applies_on_bump": false,
+  "valid_from": "2024-12-01",
+  "valid_until": "2024-12-31",
+  "usage_limit": 500,
+  "brand_id": 42,
+  "created_at": "2024-12-11T10:00:00.000000Z"
+}
+```
+
+```json 422 Duplicate code
+{
+  "errors": {
+    "code": ["The code has already been taken."]
+  }
+}
+```
+</ResponseExample>
+
+### Update Coupon
+
+```
+PUT /api/brands/{brand}/coupons/{coupon}
+```
+
+All fields optional on update. Use this to disable an expired coupon:
+
+```bash cURL — disable coupon
+curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/coupons/12 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "disabled"}'
+```
+
+### Delete Coupon
+
+```
+DELETE /api/brands/{brand}/coupons/{coupon}
+```
+
+### Validate Coupon
+
+Check if a coupon code is valid and get its details (useful for frontend validation before applying at checkout).
+
+```
+GET /api/brands/{brand}/coupons/validate?code=SAVE20
+```
+
+<ParamField query="code" type="string" required>
+  Coupon code to validate
+</ParamField>
+
+<ResponseExample>
+```json 200 Valid
+{
+  "valid": true,
+  "coupon": {
+    "id": 12,
+    "code": "SAVE20",
+    "type": "percent",
+    "value": 20,
+    "product_ids": null
+  }
+}
+```
+
+```json 200 Invalid
+{
+  "valid": false,
+  "reason": "Coupon has expired."
+}
+```
+</ResponseExample>
+
+---
+
 ## Notes
 
 <Info>
@@ -508,6 +960,8 @@ Map your ElasticFunnels products to merchant platform product IDs:
   - Subscription products require `subscription_frequency` and `subscription_frequency_unit`
   - All costs (COGS, fulfillment, packaging) are tracked for profit margin calculations
   - Images are returned as both `image` (relative path) and `image_link` (full URL)
+  - `product_category_id` must be a root-level category; use `product_subcategory_id` for sub-level
+  - Coupon `type: "percent"` values are clamped to 0–100 automatically
 </Info>
 
 <Warning>
