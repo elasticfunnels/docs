@@ -1,0 +1,26 @@
+---
+title: 'Security and sensitive data'
+description: 'API keys, payment metadata, permissions, and analytics data availability.'
+---
+
+## API keys
+
+- Use the `EF-Access-Key` header for programmatic access. Store keys in environment variables or a secrets manager, not in client-side code or public repos.
+- Endpoints under `/api/brands/{brand}/api-key` let you inspect, create, or rotate keys. **Treat any key string in a response as secret** — rotate immediately if it is exposed.
+- Rotating a key invalidates the previous key for API access.
+
+## Billing and payment methods
+
+Endpoints under `/api/brands/{brand}/billing/…` and `/payment-cards/…` return **non-sensitive** payment metadata where applicable (for example card **last four digits**, **brand**, **expiry**, status). They do **not** return full card numbers or CVV. Still handle responses according to your compliance requirements.
+
+## Permissions and modules
+
+Many routes require the authenticated identity to have the right **brand** access and **module** permissions (for example conversions, analytics, pages). A `403` response usually means the key or user is not allowed to use that resource for that brand.
+
+## Analytics cards and integrations
+
+Some dashboard analytics **card** responses depend on optional integrations (for example **advertising** spend or **fulfillment / reconciliation** data). If an integration is not connected for the brand, related metrics may be omitted or empty. See [Analytics dashboard cards](/api-reference/endpoints/analytics-cards) for how cards load data.
+
+## MCP (optional)
+
+If you use brand-scoped MCP tooling with ElasticFunnels, see the [MCP server](/api-reference/mcp-server/introduction) section for tools and authentication.

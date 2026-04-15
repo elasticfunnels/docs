@@ -1,0 +1,120 @@
+---
+title: 'Inspect Flow'
+description: 'Retrieve the current flow for pages or funnels to find node codes for split test placement'
+---
+
+Before creating a Mode 2 split test, you need to inspect the flow to find `node_code` values. These endpoints return both machine-readable JSON and optional Mermaid diagrams.
+
+## Inspect Page Events Flow
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="page" type="string" required>
+  The page ID
+</ParamField>
+
+<ParamField query="format" type="string">
+  Set to `mermaid` to receive a Mermaid diagram instead of JSON
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/pages/{page}/inspect-flow
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id}/inspect-flow \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "flow": [
+    {
+      "id": 1,
+      "type": "entry",
+      "node_code": "a1b2c3d4e5f6g7h8",
+      "data": { "value": "456" },
+      "step_id": 1,
+      "next": [
+        {
+          "id": 5,
+          "type": "page",
+          "node_code": "e5f6g7h8i9j0k1l2",
+          "data": { "value": 789 },
+          "step_id": 2,
+          "next": [
+            {
+              "id": 8,
+              "type": "purchase",
+              "node_code": "i9j0k1l2m3n4o5p6",
+              "data": {},
+              "step_id": 3,
+              "next": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    { "node_code": "a1b2c3d4e5f6g7h8", "type": "entry", "step_id": 1, "data": { "value": "456" } },
+    { "node_code": "e5f6g7h8i9j0k1l2", "type": "page", "step_id": 2, "data": { "value": 789 } },
+    { "node_code": "i9j0k1l2m3n4o5p6", "type": "purchase", "step_id": 3, "data": {} }
+  ]
+}
+```
+</ResponseExample>
+
+### Mermaid Format
+
+Add `?format=mermaid` to receive a text diagram you can paste into any Mermaid renderer:
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/pages/{page_id}/inspect-flow?format=mermaid \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```text Response (text/plain)
+flowchart TD
+  a1b2c3d4e5f6g7h8["entry (page 456)"]
+  e5f6g7h8i9j0k1l2["page (789)"]
+  i9j0k1l2m3n4o5p6["purchase"]
+  a1b2c3d4e5f6g7h8 --> e5f6g7h8i9j0k1l2
+  e5f6g7h8i9j0k1l2 --> i9j0k1l2m3n4o5p6
+```
+
+### Understanding the Response
+
+- **`flow`**: Recursive tree structure showing the complete flow with all connections via `next` arrays
+- **`nodes`**: Flat list of every node — use this to quickly find `node_code` values without traversing the tree
+- Each node includes `node_code` (unique identifier), `type`, `step_id`, and `data`
+
+---
+
+## Inspect Funnel Flow
+
+Same response format as page events flow.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="funnel" type="string" required>
+  The funnel ID
+</ParamField>
+
+<ParamField query="format" type="string">
+  Set to `mermaid` to receive a Mermaid diagram instead of JSON
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/funnels/{funnel}/inspect-flow
+```
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel_id}/inspect-flow \
+  -H "EF-Access-Key: your_api_key_here"
+```

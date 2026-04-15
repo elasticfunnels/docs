@@ -135,6 +135,35 @@ Use **`data-template-value="checkout.customer.<field>"`** on each input/select. 
 - Add **`<div class="form-error" data-checkout-error="<id>"></div>`** so the form errors adapter can show validation messages.
 - Use **`checkout.countries`** and **`checkout.usStates`** for select options (each **`{ value, label }`**).
 
+### Enforce country/state restrictions server-side
+
+Use backend code to enforce checkout country/state restrictions on submit. Set `checkout_settings` in `<script scope="backend">` with `setVariable(...)`:
+
+```html
+<script scope="backend">
+setVariable('checkout_settings', {
+  countries: ['US'],
+  usStates: ['CA', 'TX', 'FL']
+});
+</script>
+```
+
+This does two things:
+
+- Restricts the rendered `checkout.countries` / `checkout.usStates` lists.
+- Enforces the same allowlist in `process-checkout` (invalid country/state returns validation errors).
+
+Use code values in options:
+
+```html
+<select name="shipping_country" data-template-value="checkout.customer.shipping_country">
+  <option value="">Select Country</option>
+  <template-foreach data-each="opt in checkout.countries">
+    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+  </template-foreach>
+</select>
+```
+
 ### Shipping same as billing
 
 - Bind the checkbox with **`data-template-value="checkout.shipping_same_as_billing"`**.

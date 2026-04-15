@@ -49,12 +49,12 @@ These apply to the cart as a whole:
 
 | Variable | Description |
 |----------|-------------|
-| **`[[ ef-cart.total ]]`** | Grand total of all items (formatted, e.g. "$138.00") |
-| **`[[ ef-cart.subtotal ]]`** | Same as `ef-cart.total` (alias) |
-| **`[[ ef-cart.count ]]`** | Total quantity across all items (sum of quantities, e.g. "2") — use for an item count badge |
-| **`[[ ef-cart.item_count ]]`** | Number of distinct product lines in the cart |
-| **`[[ ef-cart.discount_total ]]`** | Total savings across all items (formatted) |
-| **`[[ ef-cart.currency ]]`** | Currency code (e.g. "USD") |
+| **`[[ efCart.total ]]`** | Grand total of all items (formatted, e.g. "$138.00") |
+| **`[[ efCart.subtotal ]]`** | Same as `efCart.total` (alias) |
+| **`[[ efCart.count ]]`** | Total quantity across all items (sum of quantities, e.g. "2") — use for an item count badge |
+| **`[[ efCart.item_count ]]`** | Number of distinct product lines in the cart |
+| **`[[ efCart.discount_total ]]`** | Total savings across all items (formatted) |
+| **`[[ efCart.currency ]]`** | Currency code (e.g. "USD") |
 
 ### Per-item row variables
 
@@ -144,11 +144,11 @@ Both the `[[ ]]` placeholder syntax and the **`ef-text`** binding attribute are 
 
 ```html
 <!-- placeholder syntax -->
-<span>[[ ef-cart.total ]]</span>
+<span>[[ efCart.total ]]</span>
 <span>[[ item.price ]]</span>
 
 <!-- ef-text binding (fallback content shown in builder, replaced at runtime) -->
-<span ef-text="ef-cart.total">$0.00</span>
+<span ef-text="efCart.total">$0.00</span>
 <span ef-text="item.price">$0.00</span>
 ```
 
@@ -175,7 +175,7 @@ The **Cart Dropdown** block gives you:
 - A **trigger** (e.g. "Cart" plus the number of items) that visitors click to open the cart.
 - A **panel** that opens below (or in a suitable position) with the full cart inside: same items, quantities, totals, and checkout link.
 
-Show the item count in the trigger with **`[[ ef-cart.count ]]`**.
+Show the item count in the trigger with **`[[ efCart.count ]]`**.
 
 Use it when you want the cart in a fixed spot (e.g. header) without taking space until the visitor opens it.
 
@@ -258,7 +258,7 @@ When these attributes are present, adding to cart stores the price locally, so `
 - **Placement** – Put the cart or cart dropdown where visitors expect it (e.g. top-right for dropdown, above the fold for a full cart block).
 - **Sticky / mobile** – You can place the cart in a sticky bar or in a mobile menu; the same block works anywhere.
 - **Multiple carts** – You can add more than one cart or dropdown on a page; they all show the same cart data and stay in sync when the visitor changes quantity or adds items.
-- **Item count badge** – Use `[[ ef-cart.count ]]` anywhere on the page (e.g. in the header next to "Cart") to show the total number of items in the cart.
-- **Savings display** – Show `[[ ef-cart.discount_total ]]` in the cart footer or `[[ item.retail_price ]]` beside the unit price to highlight discounts when a retail price is set.
+- **Item count badge** – Use `[[ efCart.count ]]` anywhere on the page (e.g. in the header next to "Cart") to show the total number of items in the cart.
+- **Savings display** – Show `[[ efCart.discount_total ]]` in the cart footer or `[[ item.retail_price ]]` beside the unit price to highlight discounts when a retail price is set.
 - **Subscription label** – Use `[[ item.is_subscription ]]` with `template-if` to show billing cadence (e.g. "Every 3 months") only for subscription products.
 - **Bonuses & courses** – Use nested `template-foreach` on `item.bonuses` and `item.courses` to list included free products or digital courses beneath each cart line.
