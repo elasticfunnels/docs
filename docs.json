@@ -44,6 +44,7 @@
               "funnels/create-funnel",
               "guides/how-to-design-a-checkout-page",
               "checkouts/checkout-functionality-reference",
+              "checkouts/checkout-css-variables",
               "funnels/checkout-redirect-behavior",
               "funnels/trigger-pages",
               "funnels/trigger-rules",
@@ -197,6 +198,7 @@
             "pages": [
               "products/buy-links",
               "products/upsells",
+              "products/quickbuy",
               "products/subscription-upsells",
               "products/custom-attributes",
               "products/advanced-purchase-links"

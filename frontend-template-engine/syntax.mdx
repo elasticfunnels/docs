@@ -101,6 +101,22 @@ Use **`(item, i) in array`** or **`item, i in array`** to get a zero-based index
 </template-foreach>
 ```
 
+### Inline `data-each` on regular elements
+
+Instead of wrapping content in a `<template-foreach>` tag, you can place `data-each` directly on the repeated element itself. This is **required** for `<option>` elements inside a `<select>` — Safari and iOS do not allow custom elements like `<template-foreach>` inside `<select>`, so the options will not render.
+
+```html
+<select name="billing_country" data-template-value="checkout.customer.billing_country">
+  <option data-each="opt in checkout.countries" data-ef-value="opt.value" data-ef-cloak>[[ opt.label ]]</option>
+</select>
+```
+
+Use `data-ef-value` to bind the option's `value` attribute and `data-ef-cloak` to hide the template row until the engine expands it.
+
+<Warning>
+**Do not use `<template-foreach>` inside `<select>`.** Safari and iOS strip unknown elements from `<select>`, so `<option>` elements wrapped in `<template-foreach>` will not appear. Always use inline `data-each` on the `<option>` tag directly.
+</Warning>
+
 ### Aliases and fallbacks
 
 - **`data-for`** — Alias for `data-each` (same meaning).

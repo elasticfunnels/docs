@@ -3,14 +3,15 @@ title: 'Showing Order Details'
 description: 'Display order history, products, tracking, and shipping information in your members area'
 ---
 
-ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and backend functions like `getOrders()` / `getOrder()` for code-based pages. Both retrieve data from the customer's purchase history.
+ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and backend functions like `getOrders()` / `getOrder()` / `getSessionOrders()` for code-based pages. Both retrieve data from the customer's purchase history.
 
 ## Two Approaches
 
 | Approach | Best for | Used in |
 |----------|----------|---------|
 | `<order>` tag | Visual builder pages, simple layouts | Drag-and-drop editor |
-| `getOrders()` / `getOrder()` | Code-based pages, complex layouts with full template control | Backend scripts / `.ef` pages |
+| `getOrders()` / `getOrder()` | Code-based pages, full order history | Backend scripts / `.ef` pages |
+| `getSessionOrders()` | Thank-you pages — current purchase only | Backend scripts / `.ef` pages |
 
 ## Using the `<order>` Tag
 
@@ -287,14 +288,48 @@ The key pattern:
 Tracking numbers are auto-linked to [17track.net](https://17track.net) when no carrier URL is provided. The carrier is auto-detected from the number pattern (USPS, UPS, FedEx, DHL, UniUni). You do not need to map carriers yourself.
 </Tip>
 
+## `getSessionOrders()` — Current Session Orders
+
+`getSessionOrders()` returns only the orders that were placed during the current browser session. Unlike `getOrders()`, which returns the full purchase history for a customer, `getSessionOrders()` is scoped to the active checkout session — making it the right choice for thank-you pages where you only want to show what was just bought.
+
+By default it returns **all** orders from the current session. Pass an optional `limit` to cap the count.
+
+### Parameters (`getSessionOrders`)
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sortBy` | `string` | `'newest'` | Sort order: `'newest'` or `'oldest'` |
+| `limit` | `number` | *(all)* | Maximum number of orders to return; omit to return all session orders |
+
+### Basic Usage
+
+```html
+@set(orders = getSessionOrders())
+
+@foreach(order in orders)
+<div class="order-summary">
+  <p>Order #{{ order.order_number }}</p>
+  @foreach(product in order.products)
+  <div>{{ product.name }} — {{ product.price | formatPrice:product.currency_code }}</div>
+  @endforeach
+</div>
+@endforeach
+```
+
+<Tip>
+Prefer `getSessionOrders()` over `getOrders('newest', 1)` on thank-you pages. A customer with an existing purchase history could see a previous order with `getOrders` if the new conversion hasn't been indexed yet. `getSessionOrders()` is scoped to the current session so it only shows what was just purchased.
+</Tip>
+
 ## Thank You Pages
 
 Thank-you pages are a natural place to show order details. Since the customer is auto-authenticated from checkout, order data is available immediately.
 
+Use **`getSessionOrders()`** on thank-you pages so that only the orders from the current checkout session are shown — not the customer's full history.
+
 ### Example: Thank You Page with Order Summary
 
 ```html
-@set(orders = getOrders('newest', 1))
+@set(orders = getSessionOrders())
 
 <h2>Order Confirmed!</h2>
 <p>Thank you for your purchase.</p>
@@ -323,7 +358,7 @@ Thank-you pages are a natural place to show order details. Since the customer is
 ```
 
 <Tip>
-If the order hasn't been indexed yet when the thank-you page loads, the `getOrders()` call may return empty. Add a JavaScript auto-refresh timer so the page retries after a few seconds — the order typically appears within 5–10 seconds.
+If the order hasn't been indexed yet when the thank-you page loads, `getSessionOrders()` may return empty. Add a JavaScript auto-refresh timer so the page retries after a few seconds — the order typically appears within 5–10 seconds.
 </Tip>
 
 ## Customer Data Outside of Orders

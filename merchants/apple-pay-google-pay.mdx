@@ -1,29 +1,70 @@
 ---
 title: 'Apple Pay and Google Pay'
-description: 'Enable and configure Apple Pay and Google Pay on your NMI checkout'
+description: 'Enable and configure Apple Pay and Google Pay on your checkout (NMI or Stripe)'
 ---
 
-Apple Pay and Google Pay are payment options on your existing NMI checkout. They use the same NMI merchant and credentials — no separate merchant is required. Card checkout remains available if a wallet is not shown or the customer cancels.
+Apple Pay and Google Pay are payment options on your checkout. They work with both **NMI** and **Stripe** merchants — no separate merchant account is required. Card checkout remains available if a wallet is not shown or the customer cancels.
 
 ## Overview
 
-- **Apple Pay** — Requires enabling in the NMI Merchant Portal, registering your checkout domain(s) with NMI, and completing Apple's domain verification. Appears on **Safari** (macOS and iOS) when the customer has Apple Pay set up.
-- **Google Pay** — No configuration required. Appears automatically on **Android devices** when your domain uses an NMI merchant with tokenization (Collect.js).
-- Both options appear on the **checkout page** only. By default they render above the card fields inside `<checkout-cc-panel>`, or you can place them separately with `<checkout-apple-pay />`.
+- **Apple Pay** — Appears on **Safari** (macOS and iOS) when the customer has Apple Pay set up. Setup depends on your gateway (see below).
+- **Google Pay** — Appears on supported browsers when a Google Pay wallet is available. With NMI it appears on **Android devices** only. With Stripe it can also appear on **desktop Chrome**.
+- Both options appear on the **checkout page** only. By default they render above the card fields inside `<checkout-cc-panel>`, or you can place them separately with `<checkout-wallet />` or `<checkout-apple-pay />`.
 
 ## How to configure / enable
 
-### Google Pay
+Setup differs by gateway. Choose your gateway below.
+
+---
+
+### Stripe
+
+#### Google Pay (Stripe)
+
+No configuration is required beyond domain registration (see Apple Pay step below). Google Pay appears automatically on checkout when the customer has a Google Pay wallet. With Stripe, Google Pay can appear on **desktop Chrome** in addition to Android devices.
+
+#### Apple Pay (Stripe)
+
+Stripe handles Apple's merchant validation behind the scenes — you do **not** need to create an Apple Merchant ID, CSR, or host a `.well-known` verification file. Follow these steps:
+
+**Step 1: Make sure your Stripe account is in live mode**
+
+<Warning>
+Apple Pay **only works with live Stripe API keys**. If your Stripe merchant is using test-mode keys, Apple Pay will not appear — `canMakePayment()` returns `null` and the button is silently hidden. Switch to **live mode** in the Stripe Dashboard and use your live publishable key on the checkout domain.
+</Warning>
+
+**Step 2: Register your checkout domain(s) with Stripe**
+
+1. In the [Stripe Dashboard](https://dashboard.stripe.com), make sure you are in **live mode** (toggle at the top of the dashboard).
+2. Go to **Settings** → [**Payment method domains**](https://dashboard.stripe.com/settings/payment_method_domains).
+3. Click **Add a new domain**.
+4. Enter the exact domain customers use at checkout (e.g. `checkout.yourstore.com`).
+5. Click **Save and continue**.
+6. Repeat for any additional domains or subdomains (including `www`).
+
+<Note>
+Domains registered in **live mode** are automatically available in sandbox/test mode as well. For local testing, use a tool like [ngrok](https://ngrok.com/) to get an HTTPS domain and register that. However, Apple Pay itself still requires live keys to appear on supported devices.
+</Note>
+
+After registering with live keys, Apple Pay appears on checkout when the customer uses Safari on macOS or iOS and has Apple Pay configured. No verification file is needed — Stripe takes care of it.
+
+For more details, see [Stripe's domain registration guide](https://docs.stripe.com/payments/payment-methods/pmd-registration) and [Apple Pay on the web](https://docs.stripe.com/apple-pay?platform=web).
+
+---
+
+### NMI
+
+#### Google Pay (NMI)
 
 No configuration is required.
 
-1. Ensure the domain uses an **NMI** merchant (not Stripe, PayPal, or another gateway).
+1. Ensure the domain uses an **NMI** merchant.
 2. Ensure that merchant uses **tokenization** (Collect.js): in the merchant settings, tokenization mode should be **Collect.js** and the **public / tokenization key** should be set.
 3. Assign that NMI merchant to your checkout domain under **Settings** → **Domains** → **Edit Domain** → **Merchant**.
 
 Google Pay appears automatically on checkout when the customer is on an **Android device** with a supported browser (Chrome). It does not appear on desktop browsers.
 
-### Apple Pay
+#### Apple Pay (NMI)
 
 **Prerequisites:** NMI merchant with tokenization (Collect.js), and the checkout domain linked to that merchant (as above).
 
@@ -42,9 +83,9 @@ NMI must have a list of domains that are allowed to show Apple Pay. Use the same
 
 **Step 3: Apple domain verification**
 
-Apple requires a verification file on your checkout domain.
+Apple requires a verification file on your checkout domain. NMI provides this file.
 
-1. Download the **domain verification file** from NMI (or from Apple's developer resources, depending on how NMI guides you).
+1. Download the **domain verification file** from NMI (in the NMI Merchant Portal under the Apple Pay settings, or from Apple's developer resources as NMI directs you).
 2. Host it at:  
    `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`  
    Replace `<your-checkout-domain>` with the exact domain customers use at checkout (e.g. `checkout.yourstore.com`).
@@ -129,7 +170,7 @@ Use this to conditionally show or hide parts of your checkout layout based on wa
 ```
 
 <Note>
-`checkout.wallet_available` is only set after the NMI Collect.js library loads and detects wallet support. It may take 1–2 seconds after page load before the values update. Use `template-if` conditions so the UI adjusts automatically once the value is available.
+`checkout.wallet_available` is set after the payment library loads and detects wallet support (NMI Collect.js or Stripe.js). It may take 1–2 seconds after page load before the values update. Use `template-if` conditions so the UI adjusts automatically once the value is available.
 </Note>
 
 ### Example: wallet-first checkout
@@ -192,15 +233,18 @@ The wallet (Apple Pay / Google Pay) automatically detects which contact fields t
 
 ## Subscriptions and recurring payments
 
-When a customer purchases a **subscription** using Apple Pay or Google Pay, the system creates a **customer vault entry** in NMI during the initial charge. All subsequent subscription charges (renewals, rebills) use this vault entry server-to-server — no additional customer interaction is needed.
+When a customer purchases a **subscription** using Apple Pay or Google Pay, the system stores the payment method for future use:
 
-The subscription billing schedule is managed entirely on the server. The wallet token is consumed on the first charge, and the vault handles everything after that.
+- **NMI:** A **customer vault entry** is created during the initial charge. All subsequent subscription charges (renewals, rebills) use this vault entry server-to-server.
+- **Stripe:** The **PaymentMethod** is saved to the Stripe customer with `setup_future_usage: 'off_session'`. All subsequent charges use this stored payment method server-to-server.
+
+No additional customer interaction is needed for renewals. The subscription billing schedule is managed entirely on the server. The wallet token is consumed on the first charge, and the stored method handles everything after that.
 
 ## One-click upsells
 
-When a customer pays with Apple Pay or Google Pay on the main checkout, the payment is stored in the **customer vault**. Subsequent **one-click upsell** charges on the same funnel use this vault token server-to-server — no additional customer interaction is needed. The customer sees upsell pages and clicks "Yes, add this" as usual; the charge happens instantly using the stored vault entry.
+When a customer pays with Apple Pay or Google Pay on the main checkout, the payment method is stored for reuse. Subsequent **one-click upsell** charges on the same funnel use this stored method server-to-server — no additional customer interaction is needed. The customer sees upsell pages and clicks "Yes, add this" as usual; the charge happens instantly.
 
-This works the same as card-based one-click upsells.
+This works the same as card-based one-click upsells for both NMI and Stripe.
 
 ## Billing address handling
 
@@ -214,30 +258,37 @@ For non-US addresses, Apple Pay may not return a state/region value (many countr
 
 ## Troubleshooting
 
-- **Apple Pay button does not show**  
-  - Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.  
-  - Check that the customer is on **Safari** (macOS or iOS) and the page is served over **HTTPS**.  
-  - Confirm the domain is registered with NMI for Apple Pay and that the Apple verification file is reachable at `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`.
-  - If using `<checkout-apple-pay />`, make sure the tag is on the page (it renders a container; the button appears inside it when supported).
+### Apple Pay button does not show
 
-- **Google Pay button does not show**  
-  - Google Pay only appears on **Android devices**. It does not show on desktop Chrome or other desktop browsers.
-  - Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.
+**Stripe:**
+- **Confirm you are using live API keys.** Apple Pay does not appear when the Stripe merchant is in test mode. This is the most common cause of Apple Pay not showing with Stripe. Switch to live mode in the Stripe Dashboard and ensure your checkout domain is using the **live publishable key**.
+- Confirm the domain is registered in the Stripe Dashboard under [Payment method domains](https://dashboard.stripe.com/settings/payment_method_domains) and shows as **Enabled**. Make sure you registered the domain in **live mode**.
+- Check that the customer is on **Safari** (macOS or iOS) and the page is served over **HTTPS**.
+- No `.well-known` verification file is needed for Stripe — Stripe handles merchant validation. If you previously used NMI and have a verification file on the domain, it does not interfere.
+- If using `<checkout-wallet />` or `<checkout-apple-pay />`, make sure the tag is on the page.
 
-- **Verification file not found (Apple Pay)**  
-  - Ensure the file is at the exact path above and that the domain matches the one used at checkout.  
-  - If you use a subdomain for checkout, that subdomain must be the one registered with NMI and Apple and must serve the verification file.
+**NMI:**
+- Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.
+- Check that the customer is on **Safari** (macOS or iOS) and the page is served over **HTTPS**.
+- Confirm the domain is registered with NMI for Apple Pay and that the Apple verification file is reachable at `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`.
+- If using `<checkout-apple-pay />`, make sure the tag is on the page (it renders a container; the button appears inside it when supported).
 
-- **Wallet payment cancelled or failed**  
-  - The customer can pay with card instead; the card form remains available. No page reload is required.
+### Google Pay button does not show
 
-- **State/region error on wallet payment**  
-  - This should be handled automatically. If you see state validation errors after a wallet payment, ensure you are on the latest version of the checkout plugin.
+- **NMI:** Google Pay only appears on **Android devices**. It does not show on desktop Chrome or other desktop browsers. Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.
+- **Stripe:** Google Pay can appear on desktop Chrome as well as Android. Confirm the domain is registered under [Payment method domains](https://dashboard.stripe.com/settings/payment_method_domains).
 
-- **Subscription charges fail after initial wallet purchase**  
-  - Verify the payment created a customer vault entry. Check the transaction record for a `customer_vault_id`.
+### Verification file not found (NMI / Apple Pay)
 
-- **One-click upsell charges fail after wallet payment**  
-  - Same as above — ensure the vault entry was created during the initial charge.
+- Ensure the file is at the exact `.well-known` path and that the domain matches the one used at checkout.
+- If you use a subdomain for checkout, that subdomain must be the one registered with NMI and Apple and must serve the verification file.
+- **This does not apply to Stripe** — Stripe handles verification without a hosted file.
 
-For more on NMI and Apple Pay, see [NMI's documentation](https://docs.nmi.com/docs/collectjs) and [Digital Wallet Setup](https://docs.nmi.com/docs/digital-wallet-setup).
+### Other issues
+
+- **Wallet payment cancelled or failed** — The customer can pay with card instead; the card form remains available. No page reload is required.
+- **State/region error on wallet payment** — This should be handled automatically. If you see state validation errors after a wallet payment, ensure you are on the latest version of the checkout plugin.
+- **Subscription charges fail after initial wallet purchase** — Verify the payment created a stored payment method. For NMI, check the transaction record for a `customer_vault_id`. For Stripe, check for a stored `payment_method` on the customer.
+- **One-click upsell charges fail after wallet payment** — Same as above — ensure the payment method was stored during the initial charge.
+
+For more on NMI and Apple Pay, see [NMI's documentation](https://docs.nmi.com/docs/collectjs) and [Digital Wallet Setup](https://docs.nmi.com/docs/digital-wallet-setup). For Stripe, see [Stripe's Apple Pay guide](https://docs.stripe.com/apple-pay?platform=web) and [domain registration](https://docs.stripe.com/payments/payment-methods/pmd-registration).

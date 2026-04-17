@@ -17,6 +17,7 @@ This page covers **limitations** of the frontend template engine (compared to fu
 | **template-else** not working | Else not a sibling of **template-if** | Put **template-else** / **template-else-if** as immediate siblings after **template-if** |
 | Checkout validation not showing | Missing error container or wrong id | Use **data-checkout-error="&lt;id&gt;"** and **data-template-value** per [Checkout](/frontend-template-engine/checkout#form-fields-and-validation) |
 | Bump toggle/style not working | Missing data attributes | Use **data-bump-code**, **data-bump-checkbox**, **data-bump-toggle**; see [Cart](/frontend-template-engine/cart#order-bumps-on-checkout) |
+| Select options missing on Safari/iOS | **template-foreach** inside **select** | Use inline **data-each** on **option** directly; see [Syntax — Inline data-each](/frontend-template-engine/syntax#inline-data-each-on-regular-elements) |
 
 ---
 
@@ -110,6 +111,31 @@ This page covers **limitations** of the frontend template engine (compared to fu
 **Fix:** Each checkout field needs **id**, **name**, **data-template-value**, and **`<div class="form-error" data-checkout-error="<id>"></div>`**. Use exact ids and paths from the spec. See [Checkout — Form fields](/frontend-template-engine/checkout#form-fields-and-validation).
 </Warning>
 
+<Warning title="template-foreach inside select (Safari / iOS)">
+
+**Mistake:** Wrapping `<option>` elements in `<template-foreach>` inside a `<select>`:
+
+```html
+<select name="billing_country">
+  <template-foreach data-each="c in checkout.countries">
+    <option :value="c.value">[[ c.label ]]</option>
+  </template-foreach>
+</select>
+```
+
+**Why it breaks:** Safari and iOS strip unknown/custom elements from `<select>`. The `<template-foreach>` tag is removed by the browser before the template engine runs, so no options render.
+
+**Fix:** Use inline `data-each` directly on the `<option>` tag:
+
+```html
+<select name="billing_country" data-template-value="checkout.customer.billing_country">
+  <option data-each="opt in checkout.countries" data-ef-value="opt.value" data-ef-cloak>[[ opt.label ]]</option>
+</select>
+```
+
+The server-side processor auto-converts `<template-foreach>` inside `<select>` in page templates, but client-side generated HTML (e.g. plugins) must use the inline form directly.
+</Warning>
+
 <Warning title="Bump checkboxes without data attributes">
 
 **Mistake:** Bump checkboxes/labels without **data-bump-checkbox**, **data-bump-toggle**, or **data-bump-code**, so the bump-products plugin cannot toggle or style them.
@@ -122,6 +148,6 @@ This page covers **limitations** of the frontend template engine (compared to fu
 ## Summary
 
 - **Limitations:** No virtual DOM/component lifecycle; **template-else** needs a sibling **template-if**; **checkout** and **query** are context-specific.
-- **Pitfalls:** Don’t use **formatPrice** on formatted values; use **[[ ]]** not **{{ }}** for frontend; keep data paths aligned with bindings; use **checkout.*** for single-product summary; use **data-ef-cloak** where needed; keep **template-if/else** structure and checkout/bump attributes as specified.
+- **Pitfalls:** Don’t use **formatPrice** on formatted values; use **[[ ]]** not **{{ }}** for frontend; keep data paths aligned with bindings; use **checkout.*** for single-product summary; use **data-ef-cloak** where needed; keep **template-if/else** structure and checkout/bump attributes as specified; never use **template-foreach** inside **select** — use inline **data-each** on **option** instead (Safari/iOS).
 
 Next: [Debugging](/frontend-template-engine/debugging).

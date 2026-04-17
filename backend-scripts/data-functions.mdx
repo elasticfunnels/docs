@@ -376,6 +376,45 @@ var categories = getCategoriesWithCourses();
 setVariable('category_count', categories.length);
 ```
 
+### `getCourseForCustomer(slug)`
+
+Fetch a single course with enrollment data for the current customer. Returns the full module/lesson tree plus `completed_content_ids`, `progress_percent`, `is_assigned`, and `started`.
+
+```javascript
+var course = getCourseForCustomer('javascript-basics');
+if (course && course.is_assigned) {
+  setVariable('progress', course.progress_percent);
+}
+```
+
+### `getCoursesForCustomer()`
+
+Fetch all courses the current customer is enrolled in. Same as `getCourses(true)`.
+
+```javascript
+var myCourses = getCoursesForCustomer();
+```
+
+### `getCompletedLessonsCount(opts?)`
+
+Count completed lessons across all enrolled courses, or for a specific course.
+
+```javascript
+var totalDone = getCompletedLessonsCount();
+var courseDone = getCompletedLessonsCount({ course: 'javascript-basics' });
+```
+
+### `getCourseProgress(opts?)`
+
+Get a structured progress summary with per-course and overall completed/total lesson counts.
+
+```javascript
+var progress = getCourseProgress();
+// progress.completedLessons  → 12
+// progress.totalLessons      → 48
+// progress.courses → [{ slug, title, completedLessons, totalLessons, progressPercent }]
+```
+
 ## Blog
 
 ### `getBlog(blogId?)`

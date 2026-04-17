@@ -1,0 +1,203 @@
+---
+title: 'QuickBuy (Card on File)'
+description: 'Charge returning customers with their stored card in one click, without a checkout page'
+---
+
+QuickBuy lets you charge a returning customer's stored payment method with a single click. Unlike `[UPSELL=]` which requires an active purchase session, QuickBuy works anywhere — even if the customer last purchased days or weeks ago.
+
+This is ideal for unlocking premium features, selling add-ons, or offering upgrades to existing customers on members-area pages, course pages, or any page where the customer is already identified.
+
+## How It Works
+
+When a customer previously purchased with a card (Stripe or NMI), their payment method is securely stored. QuickBuy retrieves that stored card and charges it directly — no checkout form, no redirects.
+
+1. **Customer visits a page** where they're identified (via login, magic link, or prior session)
+2. **Customer clicks the QuickBuy button** → A confirmation modal appears showing the product, price, and their card on file (e.g. "Visa ending in 4242")
+3. **Customer confirms** → Payment is charged instantly using their stored card
+4. **Redirect to thank-you page** → Standard purchase confirmation
+
+<Note>
+QuickBuy requires the customer to be identified on the page (via `?login=email`, course magic link, or an active session). If the customer is not identified or has no stored card, QuickBuy gracefully falls back to a normal checkout flow — identical to a `[BUY=]` link.
+</Note>
+
+## When to Use QuickBuy vs Other Tags
+
+| Tag | Best For | Requires Active Session? |
+|-----|----------|--------------------------|
+| `[BUY=]` | Main sales pages, first-time purchases | No |
+| `[UPSELL=]` / `[DOWNSELL=]` | Post-purchase upsell pages within a funnel | Yes — active purchase session |
+| `[QUICKBUY=]` | Returning customers with a stored card, outside of a funnel | No — just needs customer email in session |
+
+## Gateway Support
+
+QuickBuy's one-click card-on-file charging is supported for:
+
+| Gateway | One-Click Supported | Fallback Behavior |
+|---------|--------------------|--------------------|
+| **Stripe** | Yes | — |
+| **NMI** | Yes | — |
+| ClickBank | No | Renders as `[BUY=]` link → normal checkout |
+| BuyGoods | No | Renders as `[BUY=]` link → normal checkout |
+| Digistore24 | No | Renders as `[BUY=]` link → normal checkout |
+| PayPal | No | Renders as `[BUY=]` link → normal checkout |
+| Other gateways | No | Renders as `[BUY=]` link → normal checkout |
+
+<Note>
+For unsupported gateways, `[QUICKBUY=]` behaves exactly like `[BUY=]` — it generates a normal checkout link. You can safely use the tag on any page regardless of gateway; it will always do the right thing.
+</Note>
+
+## Setting Up QuickBuy
+
+### Step 1: Add the Tag
+
+Place the `[QUICKBUY=]` tag as the `href` of a button or link on your page:
+
+```html
+<a href="[QUICKBUY=BMP-EXT-LIB]" class="btn-purchase">
+  Unlock Extended Sound Library
+</a>
+```
+
+### Step 2: Ensure Customer Is Identified
+
+The customer must have `email` in their session. This happens automatically when:
+
+- **They previously purchased** in the same browser session
+- **They arrived via `?login=email`** query parameter on the page URL
+- **They logged in via magic link** (e.g. course access)
+- **They arrived via `?cemail=email`** query parameter
+
+**Example:** Link to a members-area page with customer identification:
+```
+https://yourdomain.com/premium-features?login=customer@example.com
+```
+
+### Step 3: Customer Has a Stored Card
+
+The customer must have at least one stored payment method from a previous purchase. Cards are automatically stored when a customer completes a purchase through Stripe or NMI.
+
+## Tag Syntax
+
+### Basic QuickBuy
+```
+[QUICKBUY=product_code]
+```
+
+### With Extra Parameters
+```
+[QUICKBUY=product_code extra=campaign_data]
+```
+
+## Use Cases
+
+### Unlock Premium Features
+
+Offer a premium add-on to existing customers inside your members area or course platform:
+
+```html
+<div class="premium-offer">
+  <h2>Unlock the Extended Sound Library</h2>
+  <p>Get 500+ additional premium sounds for your projects.</p>
+  <a href="[QUICKBUY=BMP-EXT-LIB]">Unlock Now — $47</a>
+</div>
+```
+
+### Course Upgrades
+
+Upsell course students to a higher tier directly from the course content page:
+
+```html
+<a href="[QUICKBUY=COURSE-PRO-UPGRADE]">
+  Upgrade to Pro — Includes 1-on-1 Coaching
+</a>
+```
+
+### Members-Area Add-Ons
+
+Sell supplementary products to logged-in members:
+
+```html
+<a href="[QUICKBUY=TEMPLATE-PACK-V2]">
+  Add Template Pack V2 to Your Account — $29
+</a>
+```
+
+### Post-Purchase Email Offers
+
+Include a QuickBuy link on a page that customers access from an email. Pass their email via the `login` query parameter:
+
+```
+https://yourdomain.com/special-offer?login={{customer_email}}
+```
+
+On that page, the `[QUICKBUY=SPECIAL-OFFER]` button will show a confirmation modal with their stored card.
+
+### Subscription Add-Ons
+
+Sell one-time add-ons to active subscribers without interrupting their subscription:
+
+```html
+<a href="[QUICKBUY=BONUS-TRAINING]">
+  Get the Bonus Training Module — One-Time $19
+</a>
+```
+
+## Confirmation Modal
+
+When a customer clicks a QuickBuy link, a confirmation modal appears showing:
+
+- **Product name** and total price (including tax if applicable)
+- **Stored card info** — card brand and last 4 digits (e.g. "Visa ending in 4242")
+- **Confirm** and **Cancel** buttons
+
+The customer must explicitly confirm before any charge is made. If the charge fails (e.g. expired card), the modal shows an error with the option to proceed to normal checkout instead.
+
+## Fallback Behavior
+
+QuickBuy degrades gracefully at every level:
+
+| Scenario | What Happens |
+|----------|-------------|
+| Gateway is not Stripe/NMI | Tag renders as a normal `[BUY=]` link at page build time |
+| Customer not identified (no email in session) | Redirects to normal checkout |
+| Customer has no stored card | Redirects to normal checkout |
+| Stored card charge fails (expired, declined) | Error shown in modal with option to go to full checkout |
+| 3D Secure required (EU cards) | 3DS authentication modal shown automatically, then charge completes |
+
+## Redirect After Purchase
+
+After a successful QuickBuy charge, the customer is always redirected to the **thank-you / purchase page**:
+
+```
+/purchase?c={conversion_code}&p={product_code}&b={brand_id}
+```
+
+QuickBuy does **not** use funnel routing (no next-page navigation, no funnel node IDs). It is a standalone one-off purchase that always lands on the default thank-you page for the product.
+
+## Troubleshooting
+
+### QuickBuy button goes to checkout instead of showing the modal
+
+- **Customer not identified:** Ensure the page URL includes `?login=email` or the customer has an active session.
+- **No stored card:** The customer hasn't purchased before with Stripe or NMI on this brand.
+- **Non-supported gateway:** The domain's merchant is not Stripe or NMI. QuickBuy falls back to `[BUY=]` behavior.
+
+### "No stored payment method found" error
+
+The customer's previous purchase was with a different gateway (e.g. PayPal, Apple Pay) or the stored token has expired. They'll need to go through normal checkout.
+
+### 3D Secure popup appears
+
+This is expected for European cards under PSD2/SCA regulations. The customer completes the bank verification, and the purchase finishes automatically.
+
+### Product not found
+
+Verify the product code in the `[QUICKBUY=]` tag matches the product code in your Products list exactly.
+
+## Related Documentation
+
+- [Buy Links](/products/buy-links) — Standard purchase links for main sales
+- [Upsells](/products/upsells) — Post-purchase one-click upsells within a funnel
+- [Advanced Purchase Links](/products/advanced-purchase-links) — Generated link formats and examples
+- [Members Area](/members-area/overview) — Setting up members-only content
+- [Courses](/courses/overview) — Course platform with magic link login

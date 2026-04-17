@@ -62,12 +62,19 @@ Customers are automatically logged in after checkout, so a customer who just pur
 
 ## Progress tracking
 
-Progress is tracked server-side per customer, per lesson. The course detail page receives the customer's completed lesson IDs via the `course` object. The front-end marks lessons complete by calling the progress API (`/api/course/progress`).
+Progress is tracked server-side per customer, per lesson. All course functions that resolve enrollment (`getCourseForCustomer`, `getCourses`, `getCoursesForCustomer`) include the customer's progress:
 
-The `getCourseForCustomer(slug)` response includes:
+- `completed_content_ids` — array of completed lesson IDs
+- `progress_percent` — 0–100
 
-- `course.progress_percent` — 0–100
-- `course.completed_content_ids` — array of completed lesson IDs
+The front-end marks lessons complete by calling the progress API (`POST /api/course/courses/:courseId/lessons/:contentId/complete`).
+
+For dashboards and aggregate views, two additional functions are available:
+
+- `getCompletedLessonsCount(opts?)` — returns the total number of completed lessons (optionally filtered by course slug)
+- `getCourseProgress(opts?)` — returns a structured summary with per-course and overall lesson counts
+
+See [Template Reference](/courses/template) for full API signatures and examples.
 
 ## Course object structure
 
@@ -91,9 +98,11 @@ All course functions return objects with this shape:
   lesson_count: 24,
   estimated_minutes: 120,
 
-  // Only on list calls (getCourses, getCoursesForCustomer):
-  is_assigned: true,   // customer is enrolled
-  started: false,      // enrollment has progress
+  // Enrollment fields (present when the customer has an enrollment):
+  is_assigned: true,               // customer is enrolled
+  started: false,                  // enrollment has progress
+  completed_content_ids: [101, 105, 108],  // IDs of completed lessons
+  progress_percent: 31,            // 0–100
 
   // Only on detail call (getCourseForCustomer, getCourseBySlug):
   modules: [
@@ -116,8 +125,6 @@ All course functions return objects with this shape:
     }
   ],
   total_lesson_count: 24,
-  progress_percent: 0,
-  completed_content_ids: []
 }
 ```
 

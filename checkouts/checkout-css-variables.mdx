@@ -1,0 +1,204 @@
+---
+title: "Checkout CSS variables"
+description: "CSS custom properties for styling the checkout form, payment panel, bumps, order summary, and more — set once on :root to apply across the entire checkout."
+---
+
+All checkout styles ship with sensible defaults. Override any variable on `:root` (or a scoped selector) to reskin without touching the source CSS.
+
+```css
+:root {
+  --checkout-input-border-color: #your-color;
+  --checkout-btn-border-radius: 4px;
+  /* … */
+}
+```
+
+---
+
+## Form inputs
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-input-bg` | `white` | Input / select background |
+| `--checkout-input-border-color` | `#d1d5db` | Input / select border |
+| `--checkout-input-border-radius` | `6px` | Input / select corner radius |
+| `--checkout-input-padding` | `12px 16px` | Input / select padding |
+| `--checkout-input-font-size` | `16px` | Input / select font size |
+| `--checkout-label-color` | `#374151` | Field label text color |
+| `--checkout-label-font-size` | `14px` | Field label font size |
+| `--checkout-label-font-weight` | `500` | Field label font weight |
+| `--checkout-required-color` | `#dc3545` | Required asterisk color |
+| `--checkout-form-gap` | `16px` | Gap between fields in a row |
+| `--checkout-field-margin` | `24px` | Bottom margin on floating label groups |
+
+---
+
+## Validation states
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-error-color` | `#ef4444` | Error border and shadow |
+| `--checkout-error-text-color` | `#dc3545` | Inline error message text |
+| `--checkout-valid-color` | `#10b981` | Valid border and shadow |
+
+---
+
+## Submit button
+
+The button background defaults to `var(--ef-primary, #3b82f6)` (your brand color). These variables control everything else.
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-btn-border-radius` | `8px` | Button corner radius |
+| `--checkout-btn-padding` | `16px 32px` | Button padding |
+| `--checkout-btn-font-size` | `16px` | Button font size |
+| `--checkout-btn-font-weight` | `600` | Button font weight |
+| `--checkout-btn-hover-bg` | `#2563eb` | Button hover background |
+| `--checkout-btn-disabled-bg` | `#9ca3af` | Button disabled background |
+
+---
+
+## Payment panel
+
+These control the Shopify-style grouped card that wraps Credit Card / PayPal / Klarna / Apple Pay tabs.
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-panel-border-radius` | `10px` | Panel wrapper corner radius |
+| `--checkout-panel-bg` | `#fff` | Panel and tab-body background |
+| `--checkout-panel-border-color` | `#d1d5db` | Panel border and section dividers |
+| `--checkout-panel-active-bg` | `#f8fafc` | Active section background |
+| `--checkout-panel-tab-padding` | `14px 16px` | Tab row padding |
+| `--checkout-panel-tab-hover-bg` | `#f3f4f6` | Tab hover background |
+| `--checkout-panel-label-color` | `#1f2937` | Tab label text color |
+| `--checkout-panel-body-padding` | `16px` | Content area padding inside an open tab |
+
+<Note>
+The radio button accent color inside tabs follows `var(--ef-primary, #3b82f6)` automatically.
+</Note>
+
+---
+
+## Bump products
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-bump-bg` | `white` | Bump card background |
+| `--checkout-bump-border-color` | `#e9ecef` | Bump card border |
+| `--checkout-bump-border-radius` | `8px` | Bump card corner radius |
+| `--checkout-bump-padding` | `16px` | Bump card padding |
+| `--checkout-bump-selected-border-color` | `#10b981` | Selected bump border |
+| `--checkout-bump-selected-bg` | `#f0fdf4` | Selected bump background |
+| `--checkout-bump-title-color` | `#111827` | Bump title text |
+| `--checkout-bump-desc-color` | `#6b7280` | Bump description text |
+| `--checkout-bump-price-color` | `#059669` | Bump price text |
+
+---
+
+## Order summary
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-summary-bg` | `#f8f9fa` | Summary box background |
+| `--checkout-summary-border-color` | `#e9ecef` | Summary box border |
+| `--checkout-summary-border-radius` | `8px` | Summary box corner radius |
+| `--checkout-summary-padding` | `24px` | Summary box padding |
+| `--checkout-summary-heading-color` | `#212529` | Summary heading text |
+| `--checkout-summary-total-border-color` | `#dee2e6` | Divider above the total line |
+
+---
+
+## Security indicator
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-security-bg` | `#f0f9ff` | Security badge background |
+| `--checkout-security-color` | `#0369a1` | Security badge text |
+| `--checkout-security-border-radius` | `6px` | Security badge corner radius |
+
+---
+
+## Checkout messages
+
+Status messages shown after submit (success / error / info).
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-msg-border-radius` | `8px` | Message box corner radius |
+| `--checkout-msg-success-bg` | `#d4edda` | Success background |
+| `--checkout-msg-success-color` | `#155724` | Success text |
+| `--checkout-msg-success-border-color` | `#c3e6cb` | Success border |
+| `--checkout-msg-error-bg` | `#f8d7da` | Error background |
+| `--checkout-msg-error-color` | `#721c24` | Error text |
+| `--checkout-msg-error-border-color` | `#f5c6cb` | Error border |
+| `--checkout-msg-info-bg` | `#d1ecf1` | Info background |
+| `--checkout-msg-info-color` | `#0c5460` | Info text |
+| `--checkout-msg-info-border-color` | `#bee5eb` | Info border |
+
+---
+
+## Tax display
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-tax-color` | `#059669` | Tax amount text (normal) |
+| `--checkout-tax-muted-color` | `#6b7280` | Tax calculating / zero / muted state |
+| `--checkout-tax-error-color` | `#dc2626` | Tax error state |
+| `--checkout-tax-reverse-color` | `#7c3aed` | EU reverse-charge indicator |
+| `--checkout-tax-breakdown-color` | `#6b7280` | Tax breakdown line text |
+| `--checkout-tax-breakdown-border-color` | `#e5e7eb` | Tax breakdown divider |
+| `--checkout-tax-breakdown-total-color` | `#374151` | Tax breakdown total line text |
+
+---
+
+## Address autocomplete
+
+| Variable | Default | Controls |
+|---|---|---|
+| `--checkout-autocomplete-bg` | `white` | Dropdown background |
+| `--checkout-autocomplete-border-color` | `#d1d5db` | Dropdown border |
+| `--checkout-autocomplete-border-radius` | `6px` | Dropdown bottom corner radius |
+| `--checkout-autocomplete-item-color` | `#374151` | Suggestion item text |
+| `--checkout-autocomplete-item-border-color` | `#f0f0f0` | Divider between items |
+| `--checkout-autocomplete-item-hover-bg` | `#f0f7ff` | Item hover background |
+| `--checkout-autocomplete-item-active-bg` | `#dbeafe` | Item active/click background |
+| `--checkout-autocomplete-scrollbar-track-bg` | `#f1f1f1` | Scrollbar track |
+| `--checkout-autocomplete-scrollbar-thumb-bg` | `#cbd5e1` | Scrollbar thumb |
+| `--checkout-autocomplete-scrollbar-thumb-hover-bg` | `#94a3b8` | Scrollbar thumb hover |
+
+---
+
+## Example: dark checkout theme
+
+```css
+:root {
+  /* Inputs */
+  --checkout-input-bg: #1e293b;
+  --checkout-input-border-color: #334155;
+  --checkout-input-border-radius: 4px;
+  --checkout-label-color: #94a3b8;
+
+  /* Button */
+  --checkout-btn-border-radius: 4px;
+  --checkout-btn-hover-bg: #1d4ed8;
+
+  /* Panel */
+  --checkout-panel-bg: #0f172a;
+  --checkout-panel-border-color: #334155;
+  --checkout-panel-active-bg: #1e293b;
+  --checkout-panel-tab-hover-bg: #1e293b;
+  --checkout-panel-label-color: #f1f5f9;
+
+  /* Summary */
+  --checkout-summary-bg: #1e293b;
+  --checkout-summary-border-color: #334155;
+  --checkout-summary-heading-color: #f1f5f9;
+  --checkout-summary-total-border-color: #475569;
+
+  /* Bumps */
+  --checkout-bump-bg: #1e293b;
+  --checkout-bump-border-color: #334155;
+  --checkout-bump-title-color: #f1f5f9;
+  --checkout-bump-desc-color: #94a3b8;
+}
+```

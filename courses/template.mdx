@@ -67,6 +67,43 @@ Returns a single course **without** enrollment check. `is_assigned` and `started
 var course = getCourseBySlug('tinnitus-recovery');
 ```
 
+### `getCompletedLessonsCount(opts?)`
+
+Returns the total number of completed lessons across all enrolled courses, or for a specific course when a slug is provided.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `opts` | object | `undefined` | Optional. Pass `{ course: 'slug' }` to count only a specific course. Omit for all courses. |
+
+```javascript
+var totalDone = getCompletedLessonsCount();           // all courses
+var courseDone = getCompletedLessonsCount({ course: 'tinnitus-recovery' }); // single course
+```
+
+Returns `0` if the customer has no enrollments or no completed lessons.
+
+### `getCourseProgress(opts?)`
+
+Returns a structured progress summary with completed/total lesson counts per course and an overall total. Useful for dashboards.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `opts` | object | `undefined` | Optional. Pass `{ course: 'slug' }` to limit to a single course. Omit for all courses. |
+
+```javascript
+var progress = getCourseProgress();
+// progress.completedLessons  → 12   (total across all courses)
+// progress.totalLessons      → 48   (total across all courses)
+// progress.courses           → [
+//   { slug: 'tinnitus-recovery', title: '...', completedLessons: 5, totalLessons: 16, progressPercent: 31 },
+//   { slug: 'cbt-program', title: '...', completedLessons: 7, totalLessons: 32, progressPercent: 22 }
+// ]
+
+var single = getCourseProgress({ course: 'tinnitus-recovery' });
+// single.completedLessons → 5
+// single.courses          → [ { slug: 'tinnitus-recovery', ... } ]
+```
+
 ### `request.route_params`
 
 For dynamic slug pages (e.g. `guided-course/{course}.ef`), the slug is available via `request.route_params.course`.
@@ -355,18 +392,83 @@ Additional fields on each lesson:
 
 ## Progress API
 
-Mark a lesson complete from the browser:
+All progress routes are prefixed with `/api/course/courses/:courseId/`. Authentication is via the active course session (cookie). `courseId`, `moduleId`, and `contentId` are numeric IDs.
+
+### Mark a lesson complete
 
 ```javascript
-fetch('/api/course/progress', {
+// POST /api/course/courses/:courseId/modules/:moduleId/lessons/:contentId/complete
+fetch(`/api/course/courses/${courseId}/modules/${moduleId}/lessons/${contentId}/complete`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({})
+});
+```
+
+Returns `{ success: true, message, stats: { completed_lessons, total_lessons, completion_percent } }`.
+
+### Save general progress
+
+`courseId`, `moduleId`, and `contentId` go in the URL for the lesson-specific routes. The general `saveProgress` route keeps them in the body — useful when you want to upsert a progress record with a specific `completed` value (e.g. un-completing).
+
+```javascript
+// POST /api/course/courses/:courseId/progress
+fetch(`/api/course/courses/${courseId}/progress`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    course_id: courseId,
-    content_id: lessonId,
-    completed: true
+    module_id: moduleId,      // required
+    content_id: contentId,    // required
+    completed: true,          // boolean
+    progress_percent: 100,    // 0–100
+    video_position: 0,        // seconds
+    video_duration: 0         // seconds
   })
 });
+```
+
+### Save video position
+
+```javascript
+// POST /api/course/courses/:courseId/modules/:moduleId/lessons/:contentId/video-progress
+fetch(`/api/course/courses/${courseId}/modules/${moduleId}/lessons/${contentId}/video-progress`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    video_position: 142,    // seconds elapsed
+    video_duration: 600,    // total duration in seconds
+    progress_percent: 24    // 0–100; auto-completes lesson at ≥ 90%
+  })
+});
+```
+
+### Get all progress for a course
+
+```javascript
+// GET /api/course/courses/:courseId/progress
+const res = await fetch(`/api/course/courses/${courseId}/progress`);
+const { progress, stats } = await res.json();
+// progress → array of per-lesson progress objects
+// stats    → { completed_lessons, total_lessons, completion_percent, last_accessed_at, ... }
+```
+
+### Get progress for a single lesson
+
+```javascript
+// GET /api/course/courses/:courseId/modules/:moduleId/lessons/:contentId/progress
+const res = await fetch(
+  `/api/course/courses/${courseId}/modules/${moduleId}/lessons/${contentId}/progress`
+);
+const { progress } = await res.json();
+// progress → { completed, progress_percent, video_position, video_duration } or null
+```
+
+### Get course stats
+
+```javascript
+// GET /api/course/courses/:courseId/stats
+const res = await fetch(`/api/course/courses/${courseId}/stats`);
+const { stats } = await res.json();
 ```
 
 The page receives the initial completed IDs via `course.completed_content_ids`. Use this array to mark lessons visually on load, then update the UI optimistically when the API call succeeds.
