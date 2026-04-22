@@ -21,10 +21,13 @@ If the brand context is missing or invalid, these functions return **empty resul
 
 ### Fields you can use on a product
 
-Typical fields include **code**, **title**, **checkout_title**, **price**, **retail_price**, **currency**, **image**, **description**, **classification**, **tax_category** (tax provider code), **tax_exempt**, subscription fields when applicable, and merchandising categories:
+Typical fields include **code**, **title**, **checkout_title**, **price**, **retail_price**, **currency**, **image**, **description**, **classification**, **tax_category** (tax provider code), **tax_exempt**, subscription fields when applicable, downloadable files, and merchandising categories:
 
 - **`product_category_id`** / **`product_subcategory_id`** — ids in your **product category** tree (configured in the Products area).
 - **`category_name`** / **`subcategory_name`** — display names for those ids (when set on the product).
+- **`product_files`** — downloadable files attached to the product. Each row includes fields such as **`purpose`** (`digital` or `bonus`), **`title`**, **`description`**, **`image`**, **`file`**, **`is_primary`**, **`sort_order`**, and **`metadata`**.
+- **`bonus_files`** / **`digital_files`** — purpose-filtered views of `product_files`.
+- **`primary_download_url`** — convenience URL for the product’s first primary downloadable file.
 
 Use **`GetProducts`** with **`category_id`** to limit to products in that category or subcategory row (matches either primary or subcategory assignment). Use **`subcategory_id`** to require a specific subcategory id on the product.
 

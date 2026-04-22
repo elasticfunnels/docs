@@ -11,11 +11,7 @@ description: 'Create, read, update, and delete reusable page components via API'
 
 ## List Components
 
-Return all components for a brand with pagination.
-
-```
-GET /api/brands/{brand}/components
-```
+Return all components for a brand with pagination. This endpoint does not include `html`, `css`, or `config` in the response — use [Get Component](#get-component) to retrieve full content for a specific component.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -28,6 +24,10 @@ GET /api/brands/{brand}/components
 <ParamField query="page" type="number">
   Page number (default: 1)
 </ParamField>
+
+```bash Request
+GET /api/brands/{brand}/components
+```
 
 ```bash cURL
 curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components?per_page=100" \
@@ -53,6 +53,7 @@ const { data, total, current_page, last_page } = await res.json();
       "code": "custom-hero-section",
       "type": "editor",
       "html_only": false,
+      "screenshot": null,
       "brand_id": 42,
       "created_at": "2024-11-01T09:00:00.000000Z",
       "updated_at": "2024-12-10T14:30:00.000000Z",
@@ -64,6 +65,7 @@ const { data, total, current_page, last_page } = await res.json();
       "code": "custom-guarantee-badge",
       "type": null,
       "html_only": true,
+      "screenshot": null,
       "brand_id": 42,
       "created_at": "2024-11-05T10:00:00.000000Z",
       "updated_at": "2024-11-05T10:00:00.000000Z",
@@ -81,13 +83,51 @@ const { data, total, current_page, last_page } = await res.json();
 
 ---
 
+## Get All Components (unpaginated)
+
+Return all components for a brand in a single array, without pagination. Only components that have a builder config are included. Does not include `html` or `css`.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField query="type" type="string">
+  Filter by type. Pass `editor` to return only visual-builder components.
+</ParamField>
+
+<ParamField query="short" type="boolean">
+  When `true`, omits `config` from the response — returns only `id`, `name`, `code`, `type`, and `screenshot`. Useful for lightweight dropdowns.
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/components/all
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/all" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 12,
+    "name": "Hero Section",
+    "code": "custom-hero-section",
+    "type": "editor",
+    "config": { "data": { "type": "wrapper", "components": [] }, "styles": [] },
+    "screenshot": null
+  }
+]
+```
+</ResponseExample>
+
+---
+
 ## Get Component
 
-Retrieve a single component. Accepts either a numeric ID or the component's `code` string.
-
-```
-GET /api/brands/{brand}/components/{component}
-```
+Retrieve a single component including its full `html`, `css`, and `config`. Accepts either a numeric ID or the component's `code` string.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -96,6 +136,10 @@ GET /api/brands/{brand}/components/{component}
 <ParamField path="component" type="string" required>
   Numeric ID **or** `code` string (e.g. `custom-hero-section`)
 </ParamField>
+
+```bash Request
+GET /api/brands/{brand}/components/{component}
+```
 
 ```bash cURL (by ID)
 curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/12 \
@@ -135,22 +179,18 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero-
 
 ## Create Component
 
-Create a new reusable component.
-
-```
-POST /api/brands/{brand}/components
-```
+Create a new reusable component. This is the only endpoint that accepts `html`, `css`, and `config` — the [Update Component](#update-component) endpoint is metadata-only.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
 </ParamField>
 
 <ParamField body="name" type="string" required>
-  Display name (shown in the component library)
+  Display name shown in the component library
 </ParamField>
 
 <ParamField body="code" type="string">
-  Unique identifier used to embed the component in pages (e.g. `custom-guarantee-badge`). Auto-generated if omitted. Components not of type `editor` are automatically prefixed with `custom-`.
+  Unique identifier used to embed the component in pages (e.g. `custom-guarantee-badge`). Auto-generated if omitted. Non-`editor` type components are automatically prefixed with `custom-`.
 </ParamField>
 
 <ParamField body="html" type="string">
@@ -162,16 +202,20 @@ POST /api/brands/{brand}/components
 </ParamField>
 
 <ParamField body="html_only" type="boolean">
-  When `true`, the component is plain HTML with no visual builder support. If no `config` is provided, a minimal builder config is auto-generated.
+  When `true`, the component is treated as plain HTML with no visual builder support. If no `config` is provided, a minimal builder config is auto-generated so the component loads correctly in the editor.
 </ParamField>
 
 <ParamField body="type" type="string">
-  Component type. For API-created components this is typically omitted (or set to `editor`).
+  Component type. Must be `editor` if provided. Omit for plain HTML components.
 </ParamField>
 
 <ParamField body="config" type="object">
-  GrapesJS builder config. Relevant only for visual-builder components.
+  GrapesJS builder config. Only relevant for visual-builder components (`type: editor`). When `html_only` is `true` and no config is sent, a minimal config is generated automatically.
 </ParamField>
+
+```bash Request
+POST /api/brands/{brand}/components
+```
 
 ```bash cURL
 curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components \
@@ -256,11 +300,11 @@ const { pageComponent } = await res.json();
 
 ## Update Component
 
-Update an existing component. Only the fields you include are changed.
+Update a component's **metadata only** — name, code slug, and html_only flag. This endpoint does **not** accept or persist `html`, `css`, or `config`. To update a component's content, delete it and re-create it with [Create Component](#create-component).
 
-```
-PUT /api/brands/{brand}/components/{component}
-```
+<Warning>
+  **`html`, `css`, and `config` are silently ignored on PUT.** The endpoint returns `200` even if you include them — but the content is not saved. This is by design: visual-builder component content is managed internally by the editor and not writable through the public API.
+</Warning>
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -274,69 +318,44 @@ PUT /api/brands/{brand}/components/{component}
   Display name. **Required even if you are not changing it** — send the current name.
 </ParamField>
 
-<ParamField body="html" type="string">
-  Updated HTML markup
-</ParamField>
-
-<ParamField body="css" type="string">
-  Updated CSS styles
+<ParamField body="code" type="string">
+  Rename the component's code slug. If changed, **all pages that reference this component are automatically updated** to use the new code.
 </ParamField>
 
 <ParamField body="html_only" type="boolean">
   Toggle raw HTML mode
 </ParamField>
 
-<ParamField body="code" type="string">
-  Rename the component code. If changed, **all pages that reference this component are automatically updated** to use the new code.
-</ParamField>
+```bash Request
+PUT /api/brands/{brand}/components/{component}
+```
 
-<ParamField body="config" type="object">
-  Updated GrapesJS builder config
-</ParamField>
-
-```bash cURL (by ID)
+```bash cURL (rename code)
 curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/components/14 \
   -H "EF-Access-Key: your_api_key_here" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Guarantee Badge",
-    "html": "<div class=\"badge\"><img src=\"https://cdn.elasticfunnels.io/42/assets/media/guarantee-v2.png\" alt=\"60-Day Guarantee\"></div>"
+    "code": "custom-guarantee-v2"
   }'
 ```
 
-```bash cURL (by code)
+```bash cURL (rename by current code)
 curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-guarantee-badge \
   -H "EF-Access-Key: your_api_key_here" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Guarantee Badge",
-    "html": "<div class=\"badge\">Updated content</div>"
+    "name": "Guarantee Badge v2"
   }'
-```
-
-```python Python (upsert pattern)
-def upsert_component(brand_id, code, name, html, css=''):
-    base = f'https://app.elasticfunnels.io/api/brands/{brand_id}/components'
-    headers = {'EF-Access-Key': 'your_api_key_here', 'Content-Type': 'application/json'}
-    payload = {'name': name, 'html': html, 'css': css, 'html_only': True}
-
-    # Try update first
-    r = requests.put(f'{base}/{code}', headers=headers, json=payload)
-    if r.status_code == 404:
-        # Component doesn't exist yet — create it
-        r = requests.post(base, headers=headers, json={**payload, 'code': code})
-    r.raise_for_status()
-    return r.json()
 ```
 
 <ResponseExample>
 ```json 200 Updated
 {
   "id": 14,
-  "name": "Guarantee Badge",
+  "name": "Guarantee Badge v2",
   "code": "custom-guarantee-badge",
-  "html": "<div class=\"badge\">Updated content</div>",
-  "css": ".badge { max-width: 200px; }",
+  "type": null,
   "html_only": true,
   "brand_id": 42,
   "updated_at": "2024-12-11T09:15:00.000000Z"
@@ -364,20 +383,17 @@ def upsert_component(brand_id, code, name, html, css=''):
   | Symptom | Cause | Fix |
   |---------|-------|-----|
   | `422` with `name is required` | `name` is always required by the validator, even if unchanged | Always include `"name"` in the body |
-  | `404` when using code string | Previously only numeric IDs were supported in the authorization layer | Fixed — both ID and `code` are now accepted |
+  | `422` code uniqueness error | The new `code` is already taken by another component in the same brand | Choose a unique code |
   | `401` redirect to login | Missing or invalid `EF-Access-Key` header, or key doesn't belong to this brand | Check header name and key value |
   | `403` module access | Brand user role doesn't have `components` access | Update role permissions in Project Settings |
+  | `html`/`css`/`config` not updating | These fields are not writable via PUT | Use DELETE + POST to replace a component's content |
 </Warning>
 
 ---
 
 ## Delete Component
 
-Permanently delete a component. Pages that reference it by code will have an empty slot where the component was.
-
-```
-DELETE /api/brands/{brand}/components/{component}
-```
+Delete a component. If the component is still referenced on one or more pages, the request returns a `409` error to prevent accidental data loss. Pass `?force=1` to delete regardless.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -387,8 +403,21 @@ DELETE /api/brands/{brand}/components/{component}
   Numeric ID **or** `code` string
 </ParamField>
 
+<ParamField query="force" type="boolean">
+  Pass `1` to delete even if the component is still referenced on pages. Pages that reference the component by code will render an empty slot where the component was.
+</ParamField>
+
+```bash Request
+DELETE /api/brands/{brand}/components/{component}
+```
+
 ```bash cURL
 curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/components/14 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+```bash cURL (force delete)
+curl -X DELETE "https://app.elasticfunnels.io/api/brands/{brand_id}/components/14?force=1" \
   -H "EF-Access-Key: your_api_key_here"
 ```
 
@@ -396,6 +425,14 @@ curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/components/14
 ```json 200 Deleted
 {
   "success": true
+}
+```
+
+```json 409 Component in use
+{
+  "error": "component_in_use",
+  "message": "Component is still used in 3 page(s). Pass force=1 to delete anyway.",
+  "usage_count": 3
 }
 ```
 
@@ -408,13 +445,91 @@ curl -X DELETE https://app.elasticfunnels.io/api/brands/{brand_id}/components/14
 
 ---
 
-## Automated Product Provisioning
+## Get Component Usage
 
-Provision a full set of reusable brand components in one run. The script creates components that don't exist and updates those that do.
+Check how many pages reference a component. Optionally return the list of pages for display in tooling.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string
+</ParamField>
+
+<ParamField query="include" type="string">
+  Pass `pages` to include the list of pages that reference this component (capped at 50).
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/components/{component}/usage
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-guarantee-badge/usage?include=pages" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "component_id": 14,
+  "component_code": "custom-guarantee-badge",
+  "usage_count": 3,
+  "pages": [
+    { "id": 101, "slug": "checkout", "title": "Checkout Page" },
+    { "id": 102, "slug": "upsell-1", "title": "Upsell Step 1" },
+    { "id": 105, "slug": "landing-v2", "title": "Landing Page v2" }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Clone Component
+
+Create a copy of a component within the same brand. The clone gets a new auto-generated code and can optionally receive a new name.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string of the component to clone
+</ParamField>
+
+<ParamField body="name" type="string">
+  Name for the cloned component. If omitted, the trailing number in the original name is auto-incremented (e.g. `Hero 1` → `Hero 2`).
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/components/{component}/clone
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components/14/clone \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "Guarantee Badge (Copy)" }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "component_id": 15
+}
+```
+</ResponseExample>
+
+---
+
+## Automated Component Provisioning
+
+Provision a full set of reusable brand components in one run. Because [PUT does not update content](#update-component), the correct pattern for programmatic provisioning is to check whether each component exists first, then create it if it does not — not an upsert.
 
 ```python Python
 import requests
-from pathlib import Path
 
 BRAND_ID = 42
 BASE = f'https://app.elasticfunnels.io/api/brands/{BRAND_ID}'
@@ -422,15 +537,19 @@ CDN  = f'https://cdn.elasticfunnels.io/{BRAND_ID}/assets/media'
 H    = {'EF-Access-Key': 'your_api_key_here', 'Content-Type': 'application/json'}
 
 
-def upsert_component(code: str, name: str, html: str, css: str = '') -> dict:
-    payload = {'name': name, 'html': html, 'css': css, 'html_only': True}
-    r = requests.put(f'{BASE}/components/{code}', headers=H, json=payload)
-    if r.status_code == 404:
-        r = requests.post(f'{BASE}/components', headers=H, json={**payload, 'code': code})
+def get_existing_codes() -> set:
+    """Fetch all component codes already in the brand."""
+    r = requests.get(f'{BASE}/components/all?short=true', headers=H)
     r.raise_for_status()
-    result = r.json()
-    comp = result.get('pageComponent', result)
-    print(f'  ✓  {code} (id={comp.get("id")})')
+    return {c['code'] for c in r.json()}
+
+
+def create_component(code: str, name: str, html: str, css: str = '') -> dict:
+    payload = {'name': name, 'code': code, 'html': html, 'css': css, 'html_only': True}
+    r = requests.post(f'{BASE}/components', headers=H, json=payload)
+    r.raise_for_status()
+    comp = r.json()['pageComponent']
+    print(f'  ✓  created {code} (id={comp["id"]})')
     return comp
 
 
@@ -461,36 +580,41 @@ COMPONENTS = [
     },
 ]
 
-print(f'Provisioning {len(COMPONENTS)} components for brand {BRAND_ID}…')
+print(f'Provisioning components for brand {BRAND_ID}…')
+existing = get_existing_codes()
+
 for comp in COMPONENTS:
-    upsert_component(**comp)
+    if comp['code'] in existing:
+        print(f'  –  skipped {comp["code"]} (already exists)')
+    else:
+        create_component(**comp)
 
 print('Done.')
 ```
 
 ```javascript Node.js
+const BRAND_ID = 42;
 const BASE = `https://app.elasticfunnels.io/api/brands/${BRAND_ID}`;
 const CDN  = `https://cdn.elasticfunnels.io/${BRAND_ID}/assets/media`;
 const H    = { 'EF-Access-Key': API_KEY, 'Content-Type': 'application/json' };
 
-async function upsertComponent({ code, name, html, css = '' }) {
-  const payload = { name, html, css, html_only: true };
-
-  let res = await fetch(`${BASE}/components/${code}`, {
-    method: 'PUT', headers: H, body: JSON.stringify(payload),
-  });
-
-  if (res.status === 404) {
-    res = await fetch(`${BASE}/components`, {
-      method: 'POST', headers: H, body: JSON.stringify({ ...payload, code }),
-    });
-  }
-
-  if (!res.ok) throw new Error(`${code}: ${res.status} ${await res.text()}`);
+async function getExistingCodes() {
+  const res = await fetch(`${BASE}/components/all?short=true`, { headers: H });
+  if (!res.ok) throw new Error(`Failed to fetch components: ${res.status}`);
   const data = await res.json();
-  const comp = data.pageComponent ?? data;
-  console.log(`  ✓  ${code} (id=${comp.id})`);
-  return comp;
+  return new Set(data.map(c => c.code));
+}
+
+async function createComponent({ code, name, html, css = '' }) {
+  const res = await fetch(`${BASE}/components`, {
+    method: 'POST',
+    headers: H,
+    body: JSON.stringify({ name, code, html, css, html_only: true }),
+  });
+  if (!res.ok) throw new Error(`${code}: ${res.status} ${await res.text()}`);
+  const { pageComponent } = await res.json();
+  console.log(`  ✓  created ${code} (id=${pageComponent.id})`);
+  return pageComponent;
 }
 
 const components = [
@@ -502,5 +626,12 @@ const components = [
     css:  '.trust { display: flex; justify-content: center; }' },
 ];
 
-for (const c of components) await upsertComponent(c);
+const existing = await getExistingCodes();
+for (const c of components) {
+  if (existing.has(c.code)) {
+    console.log(`  –  skipped ${c.code} (already exists)`);
+  } else {
+    await createComponent(c);
+  }
+}
 ```

@@ -47,8 +47,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/products \
       "units": 1,
       "sku": "prod1",
       "classification": "main",
-      "bonus_file": null,
-      "bonus_file_link": null,
+      "product_files": [],
       "unit_cost": null,
       "unit_weight_oz": null,
       "fulfillment_cost": null,
@@ -161,8 +160,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/products/2 \
   "units": 1,
   "sku": "prod1",
   "classification": "main",
-  "bonus_file": null,
-  "bonus_file_link": null,
+  "product_files": [],
   "unit_cost": null,
   "unit_weight_oz": null,
   "fulfillment_cost": null,
@@ -223,8 +221,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/products/2 \
   <Accordion title="Media">
     - `image` - Product image URL
     - `image_link` - Full URL to product image
-    - `bonus_file` - Bonus/digital file URL stored on the product
-    - `bonus_file_link` - Alias of `bonus_file`
+    - `product_files` - Array of downloadable files attached to the product
   </Accordion>
 
   <Accordion title="Subscription Products">
@@ -454,6 +451,53 @@ Products can have associated bonus products. The `bonuses` array contains bonus 
 ```
 
 When a customer purchases a product with bonuses, they automatically receive the bonus products.
+
+---
+
+## Downloadable Files
+
+Digital downloads and bonus downloads are stored in `product_files`.
+
+Each file row can include:
+
+- `purpose` - `digital` or `bonus`
+- `title` - Optional display title
+- `description` - Optional description shown in customer-facing download UIs
+- `image` - Optional thumbnail/cover image URL for this file
+- `file` - File URL
+- `is_primary` - Marks the default file for that purpose
+- `sort_order` - Controls display order
+- `metadata` - Provider/storage metadata for the uploaded file
+
+```json
+{
+  "product_files": [
+    {
+      "purpose": "digital",
+      "title": "Quick Start Guide",
+      "description": "PDF onboarding guide",
+      "image": "https://cdn.example.com/guide-cover.jpg",
+      "file": "https://cdn.example.com/guide.pdf",
+      "is_primary": true,
+      "sort_order": 0,
+      "metadata": {
+        "provider": "bunnycdn",
+        "mime_type": "application/pdf",
+        "size": 182734
+      }
+    },
+    {
+      "purpose": "bonus",
+      "title": "Bonus Audio",
+      "file": "https://cdn.example.com/bonus.mp3",
+      "is_primary": true,
+      "sort_order": 0
+    }
+  ]
+}
+```
+
+Use bonus-product relationships for entitlement, and use `product_files` for the actual downloadable assets those products expose.
 
 ---
 
@@ -960,6 +1004,7 @@ GET /api/brands/{brand}/coupons/validate?code=SAVE20
   - Subscription products require `subscription_frequency` and `subscription_frequency_unit`
   - All costs (COGS, fulfillment, packaging) are tracked for profit margin calculations
   - Images are returned as both `image` (relative path) and `image_link` (full URL)
+- Downloadable assets live in `product_files`, not top-level `bonus_file` / `digital_file` columns
   - `product_category_id` must be a root-level category; use `product_subcategory_id` for sub-level
   - Coupon `type: "percent"` values are clamped to 0–100 automatically
 </Info>

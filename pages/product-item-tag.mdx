@@ -122,6 +122,7 @@ Use `{product.field_name}` to access standard product attributes:
 - `{product.classification}` - Product classification
 - `{product.currency}` - Currency code
 - `{product.status}` - Product status
+- `{product.primary_download_url}` - Primary downloadable file URL
 
 **Example:**
 ```html
@@ -153,6 +154,16 @@ Use `{product.attributes.attribute_name}` to access custom product attributes.
 ```
 
 **Note**: Custom attributes must be defined in your product settings. If an attribute doesn't exist, it will be empty.
+
+### Downloadable Files
+
+Digital and bonus downloads are exposed through `{product.product_files}`. Each file can include `purpose`, `title`, `description`, `image`, `file`, `is_primary`, `sort_order`, and `metadata`.
+
+Use these helper shapes when you want filtered access:
+
+- `{product.digital_files}` - Downloadable files with `purpose: "digital"`
+- `{product.bonus_files}` - Downloadable files with `purpose: "bonus"`
+- `{product.primary_download_url}` - First primary file URL across available product files
 
 ## Filtering Examples
 

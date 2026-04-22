@@ -35,16 +35,23 @@ Set up your products, configure purchase flows, and optimize your sales processe
 4. Connect the "Purchase" node to the next step
 5. Save your funnel and perform a test purchase to ensure redirection works as expected
 
-## How do I add custom attributes (like bonuses) to my product pages?
+## How do I add downloadable files or bonuses to my product pages?
 
-**Description:** Custom attributes let you include additional information (e.g., bonus URLs) on product pages.
+**Description:** Use bonus products for entitlement, and use `product_files` on each product for the actual downloadable assets.
 
-### Create Custom Attributes
+### Add bonus products
 1. In "Products," select or create the product
-2. Scroll to "Custom Attributes" and add a new key-value pair (e.g., "bonus_url" → "https://yourbonuslink")
+2. Use the Bonuses area to attach any bonus products the buyer should receive
 3. Save your changes
+
+### Add downloadable files
+1. Open the product and go to the "Files" tab
+2. Add one or more files with a purpose (`digital` or `bonus`)
+3. Set title, description, image, and upload or assign the file URL
+4. Mark the primary file for each purpose when needed
+5. Save your changes
 
 ### Use in Page Builder
 1. Add a "Product Item" component to your page
 2. In the properties tab, configure fields such as Product Type and Classification (e.g., Bonus)
-3. To display attributes, add text or links using `{product.attributes.[attribute_name]}`, e.g., `{product.attributes.bonus_url}` 
+3. To render downloads, use `{product.primary_download_url}` or loop over `{product.product_files}`
