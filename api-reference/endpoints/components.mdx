@@ -52,7 +52,6 @@ const { data, total, current_page, last_page } = await res.json();
       "name": "Hero Section",
       "code": "custom-hero-section",
       "type": "editor",
-      "html_only": false,
       "screenshot": null,
       "brand_id": 42,
       "created_at": "2024-11-01T09:00:00.000000Z",
@@ -64,7 +63,6 @@ const { data, total, current_page, last_page } = await res.json();
       "name": "Guarantee Badge",
       "code": "custom-guarantee-badge",
       "type": null,
-      "html_only": true,
       "screenshot": null,
       "brand_id": 42,
       "created_at": "2024-11-05T10:00:00.000000Z",
@@ -85,7 +83,11 @@ const { data, total, current_page, last_page } = await res.json();
 
 ## Get All Components (unpaginated)
 
-Return all components for a brand in a single array, without pagination. Only components that have a builder config are included. Does not include `html` or `css`.
+Return all components for a brand in a single array, without pagination. Only components that have a builder config are included.
+
+<Note>
+  This endpoint returns a lightweight shape: `id`, `name`, `code`, `type`, `screenshot`, and (unless `?short=true`) `config`. It does **not** return `html` or `css`. Use [Get Component](#get-component) for the full record of a specific component.
+</Note>
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -161,7 +163,6 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero-
   "html": "<!DOCTYPE html><html><body><section class=\"hero\">...</section></body></html>",
   "css": ".hero { background: #fff; padding: 60px 0; }",
   "config": null,
-  "html_only": false,
   "brand_id": 42,
   "created_at": "2024-11-01T09:00:00.000000Z",
   "updated_at": "2024-12-10T14:30:00.000000Z"
@@ -179,7 +180,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero-
 
 ## Create Component
 
-Create a new reusable component. This is the only endpoint that accepts `html`, `css`, and `config` — the [Update Component](#update-component) endpoint is metadata-only.
+Create a new reusable component. This is the only endpoint that accepts `html`, `css`, and `config` — [Update Component](#update-component) is metadata-only.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -190,7 +191,7 @@ Create a new reusable component. This is the only endpoint that accepts `html`, 
 </ParamField>
 
 <ParamField body="code" type="string">
-  Unique identifier used to embed the component in pages (e.g. `custom-guarantee-badge`). Auto-generated if omitted. Non-`editor` type components are automatically prefixed with `custom-`.
+  Unique identifier used to embed the component in pages (e.g. `custom-guarantee-badge`). Auto-generated if omitted. Components are automatically prefixed with `custom-`.
 </ParamField>
 
 <ParamField body="html" type="string">
@@ -201,16 +202,8 @@ Create a new reusable component. This is the only endpoint that accepts `html`, 
   CSS styles scoped to this component
 </ParamField>
 
-<ParamField body="html_only" type="boolean">
-  When `true`, the component is treated as plain HTML with no visual builder support. If no `config` is provided, a minimal builder config is auto-generated so the component loads correctly in the editor.
-</ParamField>
-
-<ParamField body="type" type="string">
-  Component type. Must be `editor` if provided. Omit for plain HTML components.
-</ParamField>
-
 <ParamField body="config" type="object">
-  GrapesJS builder config. Only relevant for visual-builder components (`type: editor`). When `html_only` is `true` and no config is sent, a minimal config is generated automatically.
+  Builder config object. Required for visual-builder components; omit for plain HTML components.
 </ParamField>
 
 ```bash Request
@@ -224,7 +217,6 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components \
   -d '{
     "name": "Guarantee Badge",
     "code": "custom-guarantee-badge",
-    "html_only": true,
     "html": "<div class=\"badge\"><img src=\"https://cdn.elasticfunnels.io/42/assets/media/guarantee-badge.png\" alt=\"60-Day Guarantee\"></div>",
     "css": ".badge { max-width: 200px; margin: 20px auto; text-align: center; }"
   }'
@@ -239,7 +231,6 @@ r = requests.post(
     json={
         'name': 'Guarantee Badge',
         'code': 'custom-guarantee-badge',
-        'html_only': True,
         'html': '<div class="badge">...</div>',
         'css': '.badge { max-width: 200px; }',
     },
@@ -260,7 +251,6 @@ const res = await fetch(
     body: JSON.stringify({
       name: 'Guarantee Badge',
       code: 'custom-guarantee-badge',
-      html_only: true,
       html: '<div class="badge">...</div>',
       css: '.badge { max-width: 200px; }',
     }),
@@ -279,7 +269,6 @@ const { pageComponent } = await res.json();
     "type": null,
     "html": "<div class=\"badge\">...</div>",
     "css": ".badge { max-width: 200px; margin: 20px auto; text-align: center; }",
-    "html_only": true,
     "brand_id": 42,
     "created_at": "2024-12-10T16:00:00.000000Z",
     "updated_at": "2024-12-10T16:00:00.000000Z"
@@ -300,10 +289,7 @@ const { pageComponent } = await res.json();
 
 ## Update Component
 
-Update a component's **metadata only** — name, code slug, and html_only flag. This endpoint does **not** accept or persist `html`, `css`, or `config`.
-
-- To update the HTML of an **editor-type** component, use [Update Component Content](#update-component-content).
-- To replace the HTML of a plain `html_only` component, delete it and re-create it with [Create Component](#create-component).
+Update a component's **metadata only** — name and code slug. This endpoint does **not** accept or persist `html`, `css`, or `config`. To update a component's HTML content use [Update Component Content](#update-component-content). To replace a component entirely, delete it and re-create it with [Create Component](#create-component).
 
 <Warning>
   **`html`, `css`, and `config` are silently ignored on PUT.** The endpoint returns `200` even if you include them — but the content is not saved.
@@ -323,10 +309,6 @@ Update a component's **metadata only** — name, code slug, and html_only flag. 
 
 <ParamField body="code" type="string">
   Rename the component's code slug. If changed, **all pages that reference this component are automatically updated** to use the new code.
-</ParamField>
-
-<ParamField body="html_only" type="boolean">
-  Toggle raw HTML mode
 </ParamField>
 
 ```bash Request
@@ -359,7 +341,6 @@ curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/components/custo
   "name": "Guarantee Badge v2",
   "code": "custom-guarantee-badge",
   "type": null,
-  "html_only": true,
   "brand_id": 42,
   "updated_at": "2024-12-11T09:15:00.000000Z"
 }
@@ -389,18 +370,14 @@ curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/components/custo
   | `422` code uniqueness error | The new `code` is already taken by another component in the same brand | Choose a unique code |
   | `401` redirect to login | Missing or invalid `EF-Access-Key` header, or key doesn't belong to this brand | Check header name and key value |
   | `403` module access | Brand user role doesn't have `components` access | Update role permissions in Project Settings |
-  | `html`/`css`/`config` not updating | These fields are not writable via PUT | Use `POST /{component}/editor` to update HTML content; use DELETE + POST to replace an `html_only` component |
+  | `html`/`css`/`config` not updating | These fields are not writable via PUT | Use `POST /{component}/editor` to update HTML; use DELETE + POST to replace a component entirely |
 </Warning>
 
 ---
 
 ## Update Component Content
 
-Update the HTML content of an **editor-type** component. This is separate from [Update Component](#update-component), which only handles metadata. Use this endpoint to publish new HTML or save a draft for later review.
-
-<Note>
-  This endpoint is only meaningful for components with `type: editor`. For plain `html_only` components the HTML is set at creation time via [Create Component](#create-component) and is typically replaced by deleting and re-creating the component.
-</Note>
+Update the HTML content of a component. Use this endpoint to publish new HTML or save a draft for later review. This is separate from [Update Component](#update-component), which only handles metadata.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -416,14 +393,6 @@ Update the HTML content of an **editor-type** component. This is separate from [
 
 <ParamField query="draft" type="boolean">
   When `true`, the HTML is saved as a draft revision and the live component is **not** updated. Draft revisions are returned by [Get Component Content](#get-component-content) until discarded or published. When omitted (or `false`), the HTML is published immediately and any existing draft revisions are discarded.
-</ParamField>
-
-<ParamField body="config" type="object">
-  GrapesJS builder config. Only persisted when saving a draft (`draft=true`).
-</ParamField>
-
-<ParamField body="css" type="string">
-  CSS styles. Only persisted when saving a draft (`draft=true`).
 </ParamField>
 
 <ParamField body="revision_id" type="number">
@@ -448,8 +417,7 @@ curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/components/cus
   -H "EF-Access-Key: your_api_key_here" \
   -H "Content-Type: application/json" \
   -d '{
-    "html": "<section class=\"hero\"><h1>Draft headline</h1></section>",
-    "css": ".hero { background: #f5f5f5; }"
+    "html": "<section class=\"hero\"><h1>Draft headline</h1></section>"
   }'
 ```
 
@@ -487,7 +455,7 @@ await fetch(
 
 ## Get Component Content
 
-Read the current content of an editor-type component. If a draft revision exists, the draft HTML is returned along with its `revision_id`. Pass `?published=true` to always get the live published content, ignoring any draft.
+Read the current content of a component. If a draft revision exists, the draft HTML is returned along with its `revision_id`. Pass `?published=true` to always get the live published content, ignoring any draft.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -516,9 +484,7 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero
   "id": 12,
   "name": "Hero Section",
   "code": "custom-hero-section",
-  "html": "<section class=\"hero\"><h1>Published headline</h1></section>",
-  "css": ".hero { background: #fff; }",
-  "config": null
+  "html": "<section class=\"hero\"><h1>Published headline</h1></section>"
 }
 ```
 
@@ -528,8 +494,6 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero
   "name": "Hero Section",
   "code": "custom-hero-section",
   "html": "<section class=\"hero\"><h1>Draft headline</h1></section>",
-  "css": ".hero { background: #fff; }",
-  "config": null,
   "revision_id": 88
 }
 ```
@@ -539,7 +503,7 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero
 
 ## Discard Draft
 
-Discard all draft revisions for a component, reverting the editor view back to the live published content.
+Discard all draft revisions for a component, reverting to the live published content.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -563,6 +527,288 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components/cust
 {
   "success": true
 }
+```
+</ResponseExample>
+
+---
+
+## Get Component Builder Config
+
+Read the full builder config for a component, ready to load into the builder. The server injects brand assets into `config.assets`, normalizes style selectors, and removes empty ID components before returning.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string
+</ParamField>
+
+<ParamField query="revision_id" type="number">
+  Load a specific revision's config instead of the current published state.
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/components/{component}/builder
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/12/builder" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+{
+  "pageComponents": [
+    {
+      "frames": [
+        {
+          "component": {
+            "type": "wrapper",
+            "stylable": ["background", "background-color", "background-image"],
+            "components": [
+              {
+                "type": "text",
+                "attributes": { "id": "c12-hero-heading" },
+                "components": [{ "type": "textnode", "content": "Hello World" }]
+              }
+            ]
+          }
+        }
+      ],
+      "type": "main"
+    }
+  ],
+  "styles": [
+    {
+      "selectors": ["#c12-hero-heading"],
+      "style": { "color": "#333333", "font-size": "32px", "font-weight": "700" }
+    },
+    {
+      "selectors": ["#c12-hero-heading"],
+      "mediaText": "768px",
+      "atRuleType": "media",
+      "style": { "font-size": "22px" }
+    }
+  ],
+  "assets": [
+    { "src": "https://cdn.elasticfunnels.io/42/assets/media/logo.png", "type": "image" }
+  ],
+  "interactions": [],
+  "fonts": []
+}
+```
+</ResponseExample>
+
+---
+
+## Save Component Builder Config
+
+Save a full builder config — component tree, styles, rendered HTML, CSS, and interactions — for a component. The server processes the payload before storing it and returns the processed result. **You must replace your local state with the returned config and HTML** before any subsequent save (see [Server-side processing](#server-side-processing) below).
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string
+</ParamField>
+
+<ParamField body="config" type="string" required>
+  The full builder config as a **JSON string** (not a nested object — stringify it before sending).
+</ParamField>
+
+<ParamField body="html" type="string" required>
+  Rendered HTML output from the builder
+</ParamField>
+
+<ParamField body="css" type="string">
+  Rendered CSS output from the builder
+</ParamField>
+
+<ParamField body="interactions" type="array">
+  Interaction definitions attached to this component
+</ParamField>
+
+<ParamField body="type" type="string">
+  Omit (or any value other than `revision`) to publish immediately. Pass `revision` to save as a draft without touching the live component.
+</ParamField>
+
+<ParamField body="revision_id" type="number">
+  When saving a draft (`type=revision`), pass an existing `revision_id` to update that draft instead of creating a new one. Revisions older than 1 hour are always replaced with a new draft regardless.
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/components/{component}/builder
+```
+
+```bash cURL (publish)
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components/12/builder \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "config": "{\"pageComponents\":[{\"frames\":[{\"component\":{\"type\":\"wrapper\",\"components\":[{\"type\":\"text\",\"attributes\":{\"id\":\"hero-heading\"},\"components\":[{\"type\":\"textnode\",\"content\":\"Hello World\"}]}]}}],\"type\":\"main\"}],\"styles\":[{\"selectors\":[\"#hero-heading\"],\"style\":{\"color\":\"#333\",\"font-size\":\"32px\"}}],\"interactions\":[],\"fonts\":[]}",
+    "html": "<div id=\"hero-heading\">Hello World</div>",
+    "css": "#hero-heading { color: #333; font-size: 32px; }"
+  }'
+```
+
+```bash cURL (save as draft)
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/components/12/builder \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "revision",
+    "config": "...",
+    "html": "...",
+    "css": "..."
+  }'
+```
+
+```javascript JavaScript
+const config = { /* your builder config object */ };
+const res = await fetch(
+  'https://app.elasticfunnels.io/api/brands/{brand_id}/components/12/builder',
+  {
+    method: 'POST',
+    headers: {
+      'EF-Access-Key': 'your_api_key_here',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      config: JSON.stringify(config), // must be a string
+      html: renderedHtml,
+      css: renderedCss,
+      interactions: [],
+    }),
+  }
+);
+
+// IMPORTANT: replace your local state with the server-processed result
+const { config: processedConfig } = await res.json();
+localConfig = processedConfig;
+```
+
+<ResponseExample>
+```json 200 Published
+{
+  "id": 12,
+  "name": "Hero Section",
+  "code": "custom-hero-section",
+  "config": {
+    "pageComponents": [
+      {
+        "frames": [
+          {
+            "component": {
+              "type": "wrapper",
+              "components": [
+                {
+                  "type": "text",
+                  "attributes": { "id": "c12-hero-heading" },
+                  "components": [{ "type": "textnode", "content": "Hello World" }]
+                }
+              ]
+            }
+          }
+        ],
+        "type": "main"
+      }
+    ],
+    "styles": [
+      {
+        "selectors": ["#c12-hero-heading"],
+        "style": { "color": "#333", "font-size": "32px" }
+      }
+    ],
+    "interactions": [],
+    "fonts": []
+  }
+}
+```
+
+```json 200 Saved as draft
+{
+  "id": 12,
+  "name": "Hero Section",
+  "code": "custom-hero-section",
+  "config": { "...": "processed config" },
+  "revision_id": 44
+}
+```
+
+```json 422 Malformed config
+{
+  "message": "Malformed data structure detected. Please refresh the page and try again."
+}
+```
+</ResponseExample>
+
+### Server-side processing
+
+The server modifies the config, HTML, and CSS you send before storing them. The response always contains the **processed** versions. You must store and re-send the returned values — not your original pre-send state — otherwise the next save will be operating on stale data.
+
+What gets modified:
+
+| Field | What happens |
+|-------|-------------|
+| `config.styles[*].selectors` | All `#id` selectors are normalized to `#c{componentId}-{baseId}`. Any existing `c\d+-` prefixes are stripped first, then the current component ID prefix is applied. This makes cloned and imported components safe to save without selector collisions. |
+| `config` component tree `attributes.id` | Same scoping applied recursively to every component node's `id` attribute. |
+| `html` element IDs and anchor hrefs | `id="..."` and `href="#..."` values are rewritten to `c{componentId}-{baseId}` format. |
+| `css` ID selectors | Same prefix normalization. Hex color values (`#fff`, `#333333`, etc.) are left untouched. |
+| `interactions` target/trigger selectors | `#id` references in interaction targets and trigger elements are rewritten to match. |
+| `config.styles` | Empty `state` fields removed; `atRuleType: 'media'` is set automatically when `mediaText` is present. |
+
+**Corruption guard**: If `config.data[0]` has a single key `"0"` (a known serialization artifact), the save is aborted with `422` to prevent data loss. This means the config was malformed before being sent — fetch a fresh copy with `GET /builder` and retry.
+
+**Snapshot on publish**: Before overwriting the live component, the server creates a revision snapshot of the current published state (at most once per hour). These snapshots are accessible via [Get Component Revisions](#get-component-revisions).
+
+---
+
+## Get Component Revisions
+
+List revision history for a component. Revisions are created automatically as hourly snapshots when publishing, and explicitly when saving a draft.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="component" type="string" required>
+  Numeric ID **or** `code` string
+</ParamField>
+
+```bash Request
+GET /api/brands/{brand}/components/{component}/revisions
+```
+
+```bash cURL
+curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/12/revisions" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+<ResponseExample>
+```json Response
+[
+  {
+    "id": 44,
+    "created_at": "2024-12-11T09:00:00.000000Z",
+    "updated_at": "2024-12-11T09:00:00.000000Z",
+    "updated_by": 7,
+    "updated_by_user": {
+      "id": 7,
+      "name": "Jane Smith",
+      "email": "jane@example.com"
+    }
+  },
+  {
+    "id": 43,
+    "created_at": "2024-12-10T14:00:00.000000Z",
+    "updated_at": "2024-12-10T14:00:00.000000Z",
+    "updated_by": null,
+    "updated_by_user": null
+  }
+]
 ```
 </ResponseExample>
 
@@ -722,7 +968,7 @@ def get_existing_codes() -> set:
 
 
 def create_component(code: str, name: str, html: str, css: str = '') -> dict:
-    payload = {'name': name, 'code': code, 'html': html, 'css': css, 'html_only': True}
+    payload = {'name': name, 'code': code, 'html': html, 'css': css}
     r = requests.post(f'{BASE}/components', headers=H, json=payload)
     r.raise_for_status()
     comp = r.json()['pageComponent']
@@ -786,7 +1032,7 @@ async function createComponent({ code, name, html, css = '' }) {
   const res = await fetch(`${BASE}/components`, {
     method: 'POST',
     headers: H,
-    body: JSON.stringify({ name, code, html, css, html_only: true }),
+    body: JSON.stringify({ name, code, html, css }),
   });
   if (!res.ok) throw new Error(`${code}: ${res.status} ${await res.text()}`);
   const { pageComponent } = await res.json();
