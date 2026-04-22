@@ -1,6 +1,6 @@
 ---
 title: 'Variables and filters'
-description: 'Backend template variables {{ path }} and filters: default, slice, raw, upper, lower, truncate, replace.'
+description: 'Backend template variables {{ path }} and filters: default, slice, raw, upper, lower, truncate, replace, currency, join, and more.'
 ---
 
 Backend templates insert values with **`{{ path }}`** and can transform them with **filters** using the pipe character: **`{{ path | filter }}`** or **`{{ path | filter:arg }}`**.
@@ -17,7 +17,7 @@ Values are resolved from the current context (e.g. page data, article, posts, fe
 |-----------|---------|
 | `{{ article.title }}` | Property of the current article |
 | `{{ post.details_url }}` | URL for a post (e.g. in a loop) |
-| `{{ featured[0].title }}` | First featured item’s title |
+| `{{ featured[0].title }}` | First featured item's title |
 | `{{ blog_base_url \| default:'/blog' }}` | URL with fallback |
 
 Paths can use dot notation and array indexing. If a value is missing, it usually renders as empty unless you use the **`default`** filter.
@@ -33,8 +33,8 @@ Filters are applied left to right. You can chain several: **`{{ value | filter1 
 Use `:arg` when a filter needs one parameter.
 
 ```html
-{{ product.price | formatPrice:product.currency_code }}
-{{ product.price | formatPrice:'USD' }}
+{{ product.price | currency:product.currency_code }}
+{{ product.price | currency:'USD' }}
 ```
 
 In the first example, `product.currency_code` is resolved from context (for example, `USD`).  
@@ -42,56 +42,311 @@ In the second example, `'USD'` is a fixed literal.
 
 If you want text to always be treated as literal, quote it.
 
+---
+
+## Fallback filters
+
 ### `default` — fallback when value is empty
 
-If the value is empty (null, undefined, or empty string), the filter returns the argument instead. The argument can be **another variable** or a **quoted string**.
+If the value is empty (null, undefined, or empty string), the filter returns the argument instead.
 
 ```html
 {{ article.date_short | default:article.published_at | default:article.created_at }}
 ```
 
-This shows `date_short` if present; otherwise `published_at`; otherwise `created_at`. So you can chain multiple fallbacks.
-
-Literal fallback:
+Chain multiple fallbacks — the first non-empty value wins.
 
 ```html
 {{ article.author_name | default:'Author' }}
 {{ article.reading_time | default:'5' }} min read
 ```
 
-### `slice` — substring or first character
+### `default_if_none` — fallback only for null/undefined
 
-Use **`slice:start:length`** (e.g. `slice:0:1` for the first character). Helpful for things like avatar initials.
+Like `default`, but only triggers when the value is `null` or `undefined`. An **empty string** passes through unchanged.
+
+```html
+{{ score | default_if_none:'0' }}
+```
+
+---
+
+## String filters
+
+### `upper` / `lower` / `capitalize` / `title`
+
+```html
+{{ customer.first_name | upper }}       <!-- JOHN -->
+{{ customer.first_name | lower }}       <!-- john -->
+{{ customer.first_name | capitalize }}  <!-- John -->
+{{ product.name | title }}              <!-- My Product Name -->
+```
+
+### `trim`
+
+Strip leading and trailing whitespace.
+
+```html
+{{ var.label | trim }}
+```
+
+### `first` / `last`
+
+Return the first or last character of a string (or first/last element of an array).
+
+```html
+{{ customer.first_name | default:'A' | upper | first }}  <!-- initial letter -->
+{{ items | last }}
+```
+
+### `slice` — substring
+
+Use **`slice:start:end`** (e.g. `slice:0:1` for the first character, `slice:0:3` for the first 3).
 
 ```html
 {{ (article.author_name | default:'A') | slice:0:1 }}
 ```
 
-Parentheses ensure the whole expression `article.author_name | default:'A'` is evaluated first, then `slice:0:1` is applied to the result.
+Parentheses ensure the whole expression is evaluated first, then `slice` is applied to the result.
+
+### `replace` — find and replace
+
+Replace all occurrences of a substring. Arg format: `'old':'new'`. Plain string replacement — no regex.
+
+```html
+{{ product.sku | replace:'-':' ' }}
+{{ phone | replace:'(':'') | replace:')':'' | replace:' ':'' }}
+```
+
+### `truncate` — limit character length
+
+Truncate to N characters, appending `...` if the value was cut.
+
+```html
+{{ article.excerpt | truncate:160 }}
+```
+
+### `truncatewords` — limit word count
+
+Truncate to N words, appending `...` if cut.
+
+```html
+{{ article.body | truncatewords:30 }}
+```
+
+### `nl2br` — newlines to `<br>`
+
+Convert newline characters to `<br>` tags. The value is HTML-escaped first, so user content is safe. Chain with `| raw` to render the output as HTML.
+
+```html
+{{ customer.notes | nl2br | raw }}
+```
+
+### `strip_tags` — remove HTML tags
+
+Strip all HTML tags from a string. Useful for getting plain text from rich content.
+
+```html
+{{ article.body | strip_tags | truncate:200 }}
+```
+
+### `url_encode` — percent-encode for URLs
+
+Encode a value for safe use in a URL query string.
+
+```html
+<a href="/search?q={{ query | url_encode }}">Search</a>
+```
+
+### `length` / `size`
+
+Return the number of characters in a string, or the number of elements in an array. `size` is an alias.
+
+```html
+{{ customer.bio | length }}
+{{ order.items | size }}
+```
+
+---
+
+## Number filters
+
+### `round`
+
+Round to the nearest integer, or to N decimal places.
+
+```html
+{{ price | round }}       <!-- 42 -->
+{{ price | round:2 }}     <!-- 41.99 -->
+```
+
+### `floor` / `ceil`
+
+Round down or up to the nearest integer.
+
+```html
+{{ price | floor }}
+{{ price | ceil }}
+```
+
+### `abs`
+
+Absolute value.
+
+```html
+{{ order.balance | abs }}
+```
+
+### `number_format`
+
+Format a number with thousands separator and fixed decimal places (default 2).
+
+```html
+{{ revenue | number_format }}     <!-- 1,234.56 -->
+{{ count | number_format:0 }}     <!-- 1,235 -->
+```
+
+### `currency`
+
+Format a number as currency. Optional arg is the ISO 4217 currency code (default `USD`).
+
+```html
+{{ price | currency }}          <!-- $1,234.56 -->
+{{ price | currency:'EUR' }}    <!-- €1,234.56 -->
+{{ price | currency:order.currency_code }}
+```
+
+---
+
+## Boolean / conditional filters
+
+### `yesno`
+
+Return a string based on whether the value is truthy or falsy. Arg format: `'yes':'no'` or `'yes':'no':'maybe'` (the third value is used for `null`/`undefined`).
+
+```html
+{{ order.active | yesno:'Active':'Inactive' }}
+{{ member.verified | yesno:'✓':'✗' }}
+{{ score | yesno:'Pass':'Fail':'No score yet' }}
+```
+
+---
+
+## Array filters
+
+### `join`
+
+Join an array into a string with a separator.
+
+```html
+{{ tags | join:', ' }}
+{{ order.skus | join:' | ' }}
+```
+
+### `sort`
+
+Sort an array alphabetically (strings) or numerically.
+
+```html
+{{ categories | sort | join:', ' }}
+```
+
+### `reverse`
+
+Reverse a string or array.
+
+```html
+{{ items | reverse }}
+{{ 'hello' | reverse }}  <!-- olleh -->
+```
+
+### `unique`
+
+Remove duplicate values from an array.
+
+```html
+{{ tags | unique | join:', ' }}
+```
+
+---
+
+## Date filters
+
+### `date` — format a date
+
+Format a `Date` object, timestamp (ms), or the string `'now'` using format tokens.
+
+| Token | Meaning | Example |
+|-------|---------|---------|
+| `yyyy` | 4-digit year | 2024 |
+| `yy` | 2-digit year | 24 |
+| `MMMM` | Full month name | January |
+| `MMM` | Short month name | Jan |
+| `MM` | 2-digit month | 01 |
+| `M` | Month (no padding) | 1 |
+| `dd` | 2-digit day | 05 |
+| `d` | Day (no padding) | 5 |
+| `HH` / `H` | Hour 24h (padded / not) | 09 / 9 |
+| `hh` / `h` | Hour 12h (padded / not) | 09 / 9 |
+| `mm` / `m` | Minute (padded / not) | 04 / 4 |
+| `ss` / `s` | Second (padded / not) | 07 / 7 |
+
+```html
+{{ order.created_at | date:'MMM d, yyyy' }}    <!-- Jan 5, 2024 -->
+{{ 'now' | date:'yyyy' }}                       <!-- current year -->
+{{ order.created_at | date:'dd/MM/yyyy' }}
+```
+
+### `date_add` — add days to a date
+
+Add N days to a date value. Returns a `Date` object — chain with `| date` to format.
+
+```html
+{{ order.created_at | date_add:30 | date:'MMM d, yyyy' }}
+{{ subscription.start_date | date_add:365 | date:'MMM d, yyyy' }}
+```
+
+Use a negative number to subtract days.
+
+```html
+{{ 'now' | date_add:-7 | date:'MMM d, yyyy' }}   <!-- 7 days ago -->
+```
+
+### `timeago` — relative time
+
+Render a date as a human-readable relative string.
+
+```html
+{{ order.created_at | timeago }}       <!-- 3 days ago -->
+{{ event.starts_at | timeago }}        <!-- in 2 hours -->
+```
+
+---
+
+## Output / serialization filters
 
 ### `raw` — output HTML unescaped
 
-By default, output is escaped for safety. Use **`raw`** only when the value is trusted HTML (e.g. stored rich content like article body or excerpt).
+By default, output is HTML-escaped for safety. Use **`raw`** only for trusted HTML (e.g. stored rich content like article body or excerpt).
 
 ```html
 {{ article.body | raw }}
 {{ (post.excerpt | default:post.summary | default:'') | raw }}
+{{ customer.notes | nl2br | raw }}
 ```
 
-### Other common filters
+### `json` — serialize to JSON
 
-| Filter | Purpose | Example |
-|--------|---------|---------|
-| **`upper`** | Uppercase | `{{ title \| upper }}` |
-| **`lower`** | Lowercase | `{{ title \| lower }}` |
-| **`truncate`** | Limit length | `{{ text \| truncate:100 }}` |
-| **`replace`** | Replace text | `{{ text \| replace:"old","new" }}` |
+Serialize any value to a JSON string. Safe: uses `JSON.stringify`, no code is executed. Chain with `| raw` to embed the output in HTML attributes or `<script>` tags without double-escaping.
+
+```html
+<div data-config="{{ settings | json | raw }}"></div>
+<script>var config = {{ settings | json | raw }};</script>
+```
 
 ---
 
 ## Patterns from real templates
-
-These patterns are used in built-in blog and content templates.
 
 **Date with fallbacks:**
 
@@ -109,6 +364,36 @@ These patterns are used in built-in blog and content templates.
 
 ```html
 {{ (featured[0].excerpt | default:featured[0].summary | default:'') | raw }}
+```
+
+**First initial from full name:**
+
+```html
+{{ customer.first_name | default:'F' | upper | first }}
+```
+
+**Price formatted as currency:**
+
+```html
+{{ product.price | currency:'USD' }}
+```
+
+**Trial end date:**
+
+```html
+Your trial ends on {{ subscription.start_date | date_add:14 | date:'MMM d, yyyy' }}.
+```
+
+**Multi-line user notes:**
+
+```html
+{{ customer.notes | nl2br | raw }}
+```
+
+**Embed data as JSON:**
+
+```html
+<div data-product="{{ product | json | raw }}"></div>
 ```
 
 **Optional category:**
@@ -162,12 +447,52 @@ Strings are **literal** — there is no variable interpolation inside quotes. Wr
 
 ---
 
+## Filter reference
+
+| Filter | Category | Arg | Example |
+|--------|----------|-----|---------|
+| `default` | Fallback | `'fallback'` | `{{ name \| default:'Anonymous' }}` |
+| `default_if_none` | Fallback | `'fallback'` | `{{ score \| default_if_none:'0' }}` |
+| `upper` | String | — | `{{ name \| upper }}` |
+| `lower` | String | — | `{{ name \| lower }}` |
+| `capitalize` | String | — | `{{ name \| capitalize }}` |
+| `title` | String | — | `{{ name \| title }}` |
+| `trim` | String | — | `{{ label \| trim }}` |
+| `first` | String/Array | — | `{{ name \| first }}` |
+| `last` | String/Array | — | `{{ name \| last }}` |
+| `slice` | String/Array | `start:end` | `{{ name \| slice:0:1 }}` |
+| `replace` | String | `'old':'new'` | `{{ sku \| replace:'-':' ' }}` |
+| `truncate` | String | `N` | `{{ text \| truncate:100 }}` |
+| `truncatewords` | String | `N` | `{{ text \| truncatewords:20 }}` |
+| `nl2br` | String | — | `{{ notes \| nl2br \| raw }}` |
+| `strip_tags` | String | — | `{{ body \| strip_tags }}` |
+| `url_encode` | String | — | `{{ query \| url_encode }}` |
+| `length` / `size` | String/Array | — | `{{ items \| length }}` |
+| `round` | Number | `decimals` | `{{ price \| round:2 }}` |
+| `floor` | Number | — | `{{ price \| floor }}` |
+| `ceil` | Number | — | `{{ price \| ceil }}` |
+| `abs` | Number | — | `{{ balance \| abs }}` |
+| `number_format` | Number | `decimals` | `{{ revenue \| number_format:2 }}` |
+| `currency` | Number | `'USD'` | `{{ price \| currency:'USD' }}` |
+| `yesno` | Boolean | `'yes':'no'` | `{{ active \| yesno:'Yes':'No' }}` |
+| `join` | Array | `','` | `{{ tags \| join:', ' }}` |
+| `sort` | Array | — | `{{ items \| sort }}` |
+| `reverse` | String/Array | — | `{{ items \| reverse }}` |
+| `unique` | Array | — | `{{ tags \| unique }}` |
+| `date` | Date | `'format'` | `{{ date \| date:'MMM d, yyyy' }}` |
+| `date_add` | Date | `N days` | `{{ date \| date_add:30 }}` |
+| `timeago` | Date | — | `{{ date \| timeago }}` |
+| `raw` | Output | — | `{{ html \| raw }}` |
+| `json` | Output | — | `{{ obj \| json \| raw }}` |
+
+---
+
 ## Summary
 
 - Use **`{{ path }}`** to output a value; use **`| filter`** or **`| filter:arg`** to transform it.
 - **Chained `default`** — `a | default:b | default:c` gives the first non-empty value.
 - **`slice:0:1`** — First character; combine with `(expression | default:'X')` for safe initials.
-- **`raw`** — Use only for trusted HTML (e.g. article body, excerpt).
+- **`raw`** — Use only for trusted HTML (e.g. article body, nl2br output, json).
 - **Parentheses** — `{{ (expression) | filter }}` so the filter applies to the whole expression.
 - **Concatenation** — `"text" + variable + "more text"` joins values. No interpolation inside strings; use `+` instead.
 
