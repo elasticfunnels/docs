@@ -1,0 +1,352 @@
+---
+title: 'Postback URLs'
+description: 'Send a standardized JSON payload to your own URL whenever a merchant lifecycle event happens — independent of the underlying payment gateway.'
+---
+
+ElasticFunnels can fire an outbound HTTP POST to a URL you control whenever a merchant event happens — a purchase, a refund, a subscription renewal, a chargeback, and so on. The payload is **the same regardless of which gateway** (Stripe, NMI, PayPal, ClickBank, BuyGoods, Digistore24, Klarna, Shop Pay, Shopify Checkout) actually processed the transaction, so you only have to integrate once.
+
+This is intentionally simpler than building a full automation graph in the **Automations** module. Use postback URLs when you just need to forward a clean, predictable JSON event to your own backend, your data warehouse, an internal CRM, or a third-party partner.
+
+<Note>
+Postback URLs do not replace the [Automations](/integrations/automations) module — they are complementary. Automations are great for branching logic, retries with conditions, and connecting many third-party services. Postback URLs are great for "fire-and-forget" event forwarding.
+</Note>
+
+## Where to configure
+
+In your brand:
+
+1. Go to **Settings** → **Merchants** → pick a merchant → **Edit**.
+2. Open the **Postback URLs** tab.
+3. For each event you care about, set:
+   - **Postback URL** — `https://your-app.example.com/webhooks/elasticfunnels`
+   - **Bearer Token** *(optional)* — sent as `Authorization: Bearer <token>` so you can do basic auth from a reverse proxy.
+   - **Enabled** — must be checked for the URL to fire.
+4. Use the **Send test** button next to each URL to deliver a sample payload right away.
+5. The **Recent deliveries** section shows status, HTTP code, attempts, the exact payload that was sent, and lets you retry failed deliveries manually.
+
+The same tab also exposes the **Signing secret** that we use to sign every outbound request. Reveal it once when you wire up your verifier, and you can rotate it at any time.
+
+## Supported events
+
+| Event key                      | Fires when                                                                 |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `purchase`                     | A new approved purchase / order is recorded                                |
+| `refund`                       | A refund (full or partial) is recorded                                     |
+| `chargeback`                   | A chargeback is recorded                                                   |
+| `subscription_renewal`         | A recurring charge succeeds                                                |
+| `subscription_renewal_failed`  | A recurring charge fails (decline, processor error, etc.)                  |
+| `subscription_cancel`          | A subscription is cancelled (by the customer, the merchant, or dunning)    |
+| `subscription_change`          | A subscription is upgraded / downgraded / paused                           |
+| `abandon`                      | Cart abandonment is recorded                                               |
+| `failed_payment`               | An initial payment attempt fails (not a renewal — see above)               |
+| `shipped`                      | A tracking number is assigned to an order for the first time               |
+
+You can configure a different URL per event, or use the same URL for every event — your handler can branch on the `event` field and on the `X-EF-Event` header.
+
+## Request format
+
+Every request looks like this:
+
+```http
+POST /your/handler HTTP/1.1
+Host: your-app.example.com
+Content-Type: application/json
+User-Agent: ElasticFunnels-Postback/1.0
+X-EF-Event: purchase
+X-EF-Delivery-Id: 01HXYZ...
+X-EF-Timestamp: 1755555555
+X-EF-Signature: sha256=8c0e...
+X-EF-Brand-Id: 42
+X-EF-Merchant-Id: 17
+Authorization: Bearer <only if you set one>
+```
+
+| Header                | Purpose                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------- |
+| `X-EF-Event`          | The event name (same as `event` in the body).                                                 |
+| `X-EF-Delivery-Id`    | Unique ID for this delivery attempt (use it for idempotency on your side).                    |
+| `X-EF-Timestamp`      | Unix timestamp of when the signature was computed.                                            |
+| `X-EF-Signature`      | `sha256=` + HMAC-SHA256 of `<timestamp>.<raw_body>` using your merchant's signing secret.     |
+| `X-EF-Brand-Id`       | The brand the merchant belongs to.                                                            |
+| `X-EF-Merchant-Id`    | The merchant the postback came from.                                                          |
+| `Authorization`       | Optional bearer token, only sent if you configured one for that URL.                          |
+
+### Verifying the signature
+
+Reject any request whose recomputed signature does not match `X-EF-Signature`. Always compare with a constant-time function (`hash_equals` in PHP, `crypto.timingSafeEqual` in Node, etc.). It is also a good idea to reject requests whose `X-EF-Timestamp` is more than a few minutes in the past or future.
+
+<CodeGroup>
+```php PHP
+$secret    = getenv('EF_POSTBACK_SECRET');
+$body      = file_get_contents('php://input');
+$timestamp = $_SERVER['HTTP_X_EF_TIMESTAMP'] ?? '';
+$signature = $_SERVER['HTTP_X_EF_SIGNATURE'] ?? '';
+
+$expected = 'sha256=' . hash_hmac('sha256', $timestamp . '.' . $body, $secret);
+
+if (! hash_equals($expected, $signature)) {
+    http_response_code(401);
+    exit('invalid signature');
+}
+
+if (abs(time() - (int) $timestamp) > 300) {
+    http_response_code(401);
+    exit('timestamp too old');
+}
+
+$payload = json_decode($body, true);
+```
+
+```js Node.js
+import crypto from 'crypto';
+
+export function verify(req, rawBody, secret) {
+  const timestamp = req.headers['x-ef-timestamp'];
+  const signature = req.headers['x-ef-signature'];
+
+  const expected =
+    'sha256=' +
+    crypto
+      .createHmac('sha256', secret)
+      .update(`${timestamp}.${rawBody}`)
+      .digest('hex');
+
+  const ok =
+    signature &&
+    expected.length === signature.length &&
+    crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+
+  const fresh = Math.abs(Date.now() / 1000 - Number(timestamp)) < 300;
+
+  return ok && fresh;
+}
+```
+
+```python Python
+import hmac, hashlib, time
+
+def verify(secret: str, raw_body: bytes, headers: dict) -> bool:
+    timestamp = headers.get('x-ef-timestamp', '')
+    signature = headers.get('x-ef-signature', '')
+
+    expected = 'sha256=' + hmac.new(
+        secret.encode(),
+        f"{timestamp}.".encode() + raw_body,
+        hashlib.sha256,
+    ).hexdigest()
+
+    if not hmac.compare_digest(expected, signature):
+        return False
+
+    return abs(int(time.time()) - int(timestamp)) < 300
+```
+</CodeGroup>
+
+### Response handling
+
+- Return any `2xx` status to acknowledge the delivery. The body is ignored (but stored in the deliveries log for debugging — keep it under a few KB).
+- Any non-2xx response, timeout, or connection error counts as a failure.
+- Failed deliveries are retried automatically with exponential backoff: `1m → 5m → 30m → 2h → 12h` (up to 5 attempts). After the final failure the delivery is marked **dead** and stops retrying. You can re-queue it manually from the Postback URLs tab.
+- Each delivery has a unique `X-EF-Delivery-Id`. Use it to dedupe on your end.
+
+## Standardized payload
+
+All events share the same envelope. Fields that don't apply to a given event are present but `null`. The full schema:
+
+```json
+{
+  "event": "purchase",
+  "event_id": "ef_evt_01HXYZ...",
+  "occurred_at": "2026-04-18T13:45:21+00:00",
+  "test": false,
+
+  "brand_id": 42,
+  "merchant": {
+    "id": 17,
+    "gateway": "stripe",
+    "name": "Acme Stripe (Live)"
+  },
+
+  "order": {
+    "order_id": "OFF-1234",
+    "public_order_id": "EF-1234",
+    "transaction_id": "ch_3PXyz...",
+    "conversion_code": "abc123def456",
+    "original_conversion_code": null,
+    "status": "approved",
+    "is_subscription": true,
+    "subscription": {
+      "cycle_number": 2,
+      "status": "active",
+      "next_charge_at": "2026-05-18T13:45:21+00:00",
+      "retry_count": 0,
+      "max_retries": 6,
+      "cancel_reason": null,
+      "decline_reason": null,
+      "recovered_from_dunning": null
+    }
+  },
+
+  "customer": {
+    "email": "jane@example.com",
+    "first_name": "Jane",
+    "last_name": "Doe",
+    "name": "Jane Doe",
+    "phone": "+15555550100",
+    "country": "US",
+    "address": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "ip": "203.0.113.42"
+  },
+
+  "billing": {
+    "address": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "country": "US"
+  },
+
+  "shipping": {
+    "address": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "country": "US",
+    "tracking_number": null,
+    "tracking_url": null,
+    "carrier": null,
+    "shipping_method": null
+  },
+
+  "amounts": {
+    "currency": "USD",
+    "total": 49.0,
+    "subtotal": 45.0,
+    "taxes": 4.0,
+    "shipping": 0.0,
+    "discount": 0.0,
+    "cogs": 12.0,
+    "merchant_commission": 0.0,
+    "affiliate_commission": 0.0,
+    "refunded_total": 0.0
+  },
+
+  "products": [
+    {
+      "code": "SKU-MAIN-1",
+      "sku": "SKU-MAIN-1",
+      "product_id": 901,
+      "name": "Acme Widget",
+      "quantity": 1,
+      "price": 45.0,
+      "unit_price": 45.0,
+      "total": 45.0,
+      "currency": "USD",
+      "type": "main",
+      "is_bonus": false,
+      "image_url": null,
+      "tracking_number": null,
+      "tracking_url": null,
+      "carrier": null
+    }
+  ],
+
+  "tracking": {
+    "click_code": "ck_abc123",
+    "session_id": "sess_xyz",
+    "utm_source": "google",
+    "utm_medium": "cpc",
+    "utm_campaign": "spring",
+    "utm_term": null,
+    "utm_content": null,
+    "gclid": null,
+    "fbclid": null,
+    "subid": null,
+    "subid2": null,
+    "subid3": null,
+    "subid4": null,
+    "vtid": null
+  },
+
+  "affiliate": {
+    "id": null,
+    "source": null,
+    "merchant_affiliate_id": null,
+    "merchant_affiliate_name": null
+  },
+
+  "funnel": {
+    "funnel_id": 7,
+    "page_id": 21,
+    "domain_id": 3
+  },
+
+  "coupon": {
+    "code": null,
+    "discount": 0.0
+  },
+
+  "meta": {
+    "payment_method": "card",
+    "payment_status": "completed",
+    "last4": "4242",
+    "gateway": "stripe"
+  }
+}
+```
+
+### Event-specific notes
+
+- **`refund` / `chargeback`** — `amounts.total` is **negative** for the refunded portion, and `order.original_conversion_code` references the original purchase row.
+- **`subscription_renewal_failed`** — `order.subscription.retry_count` and `order.subscription.next_charge_at` reflect the dunning schedule, and `meta.payment_status` will typically be `failed` with a populated `order.subscription.decline_reason`.
+- **`subscription_cancel`** — `order.subscription.status` is `cancelled` and `order.subscription.cancel_reason` is filled when available.
+- **`shipped`** — fires the **first time** a tracking number is set on an order. `shipping.tracking_number`, `shipping.tracking_url`, and `shipping.carrier` are populated. We dedupe per order so you only get one `shipped` event.
+- **`abandon`** — `order.status` is `abandoned` and `customer` may be partially populated depending on how far the visitor got in checkout.
+- **`test`** — Postbacks fired from the **Send test** button or originating from a sandbox merchant set `test: true`. Use it to gate side effects in your handler.
+
+## Example: minimal Express.js handler
+
+```js
+import express from 'express';
+import crypto from 'crypto';
+
+const app = express();
+const SECRET = process.env.EF_POSTBACK_SECRET;
+
+app.post(
+  '/webhooks/elasticfunnels',
+  express.raw({ type: 'application/json' }),
+  (req, res) => {
+    const raw = req.body.toString('utf8');
+    const ts = req.header('x-ef-timestamp') || '';
+    const sig = req.header('x-ef-signature') || '';
+
+    const expected =
+      'sha256=' + crypto.createHmac('sha256', SECRET).update(`${ts}.${raw}`).digest('hex');
+
+    const valid =
+      sig.length === expected.length &&
+      crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig)) &&
+      Math.abs(Date.now() / 1000 - Number(ts)) < 300;
+
+    if (!valid) return res.status(401).end();
+
+    const evt = JSON.parse(raw);
+    console.log(`[${evt.event}] order=${evt.order.public_order_id} total=${evt.amounts.total}`);
+
+    res.status(200).end();
+  }
+);
+
+app.listen(3000);
+```
+
+## Operational details
+
+- Deliveries are processed asynchronously so they do not block the gateway request that triggered them.
+- Failed deliveries are retried automatically after the configured backoff window has elapsed.
+- The Postback URLs tab shows recent deliveries, including the URL, payload, headers, response body, attempts, and final status.
+- The signing secret is stored encrypted at rest. Rotating it invalidates all previous signatures immediately — only do it if you can update your verifier in lockstep.

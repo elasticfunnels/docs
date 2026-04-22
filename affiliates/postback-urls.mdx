@@ -1,0 +1,279 @@
+---
+title: Affiliate Postback URLs
+description: Send signed JSON postbacks to your affiliates' endpoints on commission-relevant lifecycle events.
+---
+
+ElasticFunnels can POST a small, **standardized JSON payload** to a URL on your
+affiliate's side every time a commission-relevant event happens — independent of
+which gateway processed the order.
+
+This is the *outbound* side of affiliate tracking. The payload is intentionally
+**lean**: it contains only what an affiliate needs to reconcile a conversion in
+their own system. **Customer details, billing addresses, and product line items
+are deliberately excluded.**
+
+If you need rich gateway-aware payloads (with customer info, products, etc.) for
+your *own* systems, use the [Merchant Postback URLs](/merchants/postback-urls)
+instead.
+
+## How it differs from the legacy macro postback
+
+Affiliates have an existing single-URL **GET** mechanism with macros like
+`{subid}`, `{amount}`, `{txn_id}` — that one is unchanged and still works.
+
+The system documented here is **additive**:
+
+| | Legacy `postback_url` | Outbound Postback URLs (this page) |
+|---|---|---|
+| Method | `GET` with query macros | `POST` with JSON body |
+| URLs | One per affiliate | One per **event** |
+| Auth | None | HMAC `X-EF-Signature` (+ optional Bearer token) |
+| Retries | Best-effort, no log | Queued + exponential backoff + delivery log |
+| Events | Purchase only | Purchase, refund, chargeback, renewal, cancel |
+| Affiliate types | `affcenter` only | All affiliate types |
+
+You can use either, both, or neither.
+
+## Configuration
+
+In **Affiliates → Edit affiliate → Postback URLs** you'll find:
+
+1. **HMAC Signing Secret** — auto-generated per affiliate. Used to verify each
+   request. Keep it secret. You can rotate it at any time; old endpoints will
+   start failing signature checks until they pick up the new secret.
+2. **Per-event Postback URLs** — one row per supported event. Each row has:
+   - `URL` — `https://example.com/webhooks/affiliate-purchase`
+   - `Bearer Token (optional)` — sent as `Authorization: Bearer …` if set
+   - `Enabled` — toggle without losing the URL
+3. **Send test** — fires a synthetic payload (with `"test": true`) for that event.
+4. **Recent Deliveries** — log of every attempt with HTTP status, payload, response
+   body, and a manual retry button.
+
+## Supported events
+
+| Event key | When it fires |
+|---|---|
+| `purchase` | A purchase conversion is approved for this affiliate. |
+| `refund` | An order or order line is refunded. |
+| `chargeback` | A chargeback is recorded against the order. |
+| `subscription_renewal` | A recurring subscription is successfully billed. |
+| `subscription_renewal_failed` | A recurring billing attempt fails. |
+| `subscription_cancel` | The subscription is cancelled or stopped. |
+
+Affiliate postbacks intentionally do **not** include `shipped`, `abandon`, or
+`failed_payment` — those aren't commission-bearing events.
+
+## Request format
+
+### HTTP
+
+```
+POST https://your-endpoint.example.com/webhooks/affiliate-purchase
+Content-Type: application/json
+User-Agent: ElasticFunnels-AffiliatePostback/1.0
+X-EF-Event: purchase
+X-EF-Delivery-Id: 01HXYZ...
+X-EF-Timestamp: 1735689600
+X-EF-Signature: sha256=<hex hmac>
+X-EF-Brand-Id: 42
+X-EF-Affiliate-Id: 123
+Authorization: Bearer <optional-token-if-configured>
+```
+
+### Signature verification
+
+The signature is `HMAC_SHA256(secret, "<X-EF-Timestamp>.<raw_body>")`, hex-encoded
+and prefixed with `sha256=`.
+
+Always verify both the signature **and** the timestamp (reject anything older
+than ~5 minutes to defeat replays).
+
+<CodeGroup>
+
+```php PHP
+$secret = getenv('EF_AFFILIATE_POSTBACK_SECRET');
+$payload = file_get_contents('php://input');
+$timestamp = $_SERVER['HTTP_X_EF_TIMESTAMP'] ?? '';
+$received = $_SERVER['HTTP_X_EF_SIGNATURE'] ?? '';
+
+if (abs(time() - (int)$timestamp) > 300) {
+    http_response_code(400);
+    exit('Timestamp too old');
+}
+
+$expected = 'sha256=' . hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
+
+if (!hash_equals($expected, $received)) {
+    http_response_code(401);
+    exit('Bad signature');
+}
+
+$event = json_decode($payload, true);
+// process $event...
+http_response_code(200);
+echo 'ok';
+```
+
+```javascript Node.js (Express)
+import crypto from 'node:crypto';
+
+app.post('/webhooks/affiliate', express.raw({ type: 'application/json' }), (req, res) => {
+  const secret = process.env.EF_AFFILIATE_POSTBACK_SECRET;
+  const ts = req.get('X-EF-Timestamp') || '';
+  const sig = req.get('X-EF-Signature') || '';
+
+  if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) {
+    return res.status(400).send('Timestamp too old');
+  }
+
+  const expected = 'sha256=' + crypto
+    .createHmac('sha256', secret)
+    .update(`${ts}.${req.body.toString()}`)
+    .digest('hex');
+
+  if (!crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) {
+    return res.status(401).send('Bad signature');
+  }
+
+  const event = JSON.parse(req.body.toString());
+  // process event...
+  res.sendStatus(200);
+});
+```
+
+```python Python
+import hmac, hashlib, time, json
+from flask import Flask, request, abort
+
+SECRET = os.environ['EF_AFFILIATE_POSTBACK_SECRET'].encode()
+
+@app.post('/webhooks/affiliate')
+def webhook():
+    body = request.get_data()
+    ts = request.headers.get('X-EF-Timestamp', '')
+    sig = request.headers.get('X-EF-Signature', '')
+
+    if abs(time.time() - int(ts)) > 300:
+        abort(400, 'Timestamp too old')
+
+    expected = 'sha256=' + hmac.new(SECRET, f'{ts}.'.encode() + body, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, sig):
+        abort(401, 'Bad signature')
+
+    event = json.loads(body)
+    # process event...
+    return '', 200
+```
+
+</CodeGroup>
+
+## Response handling
+
+Return any **2xx** response to acknowledge delivery. Anything else (timeouts,
+non-2xx, network errors) is recorded as a failure and retried with exponential
+backoff at **1m, 5m, 30m, 2h, 12h** (5 attempts total) before being marked
+`dead`. Dead deliveries can be manually retried from the Recent Deliveries log.
+
+## Payload schema
+
+Every event uses the same envelope. Numeric amounts may be **negative** for
+clawback events (`refund`, `chargeback`, `subscription_renewal_failed`).
+
+```json
+{
+  "event": "purchase",
+  "event_id": "ef_aff_evt_01HXYZABC...",
+  "occurred_at": "2026-04-18T15:32:01+00:00",
+  "test": false,
+  "brand_id": 42,
+
+  "affiliate": {
+    "id": 123,
+    "type": "affcenter",
+    "merchant_account_id": 8801,
+    "default_subid": "spring_promo"
+  },
+
+  "offer": {
+    "funnel_id": 17,
+    "funnel_code": "vip-funnel",
+    "name": "VIP Funnel"
+  },
+
+  "amount": 49.00,
+  "currency": "USD",
+  "commission": 12.00,
+
+  "transaction": {
+    "order_id": "GW-ORDER-1001",
+    "public_order_id": "EF-1001",
+    "transaction_id": "ch_3PXyz",
+    "conversion_code": "cv_01HXYZ...",
+    "original_conversion_code": null,
+    "type": "purchase",
+    "status": "approved",
+    "is_subscription": false
+  },
+
+  "tracking": {
+    "click_code": "ck_AbCdEf",
+    "session_id": "sess_01HXY...",
+    "subid": "campaign_a",
+    "subid2": "creative_1",
+    "subid3": null,
+    "subid4": null,
+    "subid5": null,
+    "utm_source": "facebook",
+    "utm_medium": "paid",
+    "utm_campaign": "spring_2026",
+    "utm_term": null,
+    "utm_content": "ad_set_3",
+    "gclid": null,
+    "fbclid": "fb.1.1700000000.AbCdEf",
+    "vtid": null
+  }
+}
+```
+
+### Field reference
+
+| Field | Notes |
+|---|---|
+| `event` | One of the supported event keys above. |
+| `event_id` | Unique, prefixed `ef_aff_evt_…`. Use it to dedupe on your side. |
+| `occurred_at` | ISO-8601, server time of the underlying conversion event. |
+| `test` | `true` for "Send test" payloads, `false` for live events. |
+| `affiliate.*` | Identifies the affiliate the conversion is attributed to. |
+| `offer.name` | The funnel title — typically what you see as your "offer name". |
+| `offer.funnel_code` | Stable, URL-safe slug of the funnel. |
+| `amount` | Order amount in the currency below. Negative for clawbacks. |
+| `commission` | The affiliate's calculated commission for this event. |
+| `transaction.transaction_id` | Gateway transaction id when available. |
+| `transaction.conversion_code` | ElasticFunnels conversion identifier. |
+| `transaction.original_conversion_code` | For refunds/chargebacks: the original purchase's conversion code. |
+| `tracking.subid` … `subid5` | Affiliate-defined subids captured from the click. |
+| `tracking.click_code` | EF's click identifier; correlate with your own click logs. |
+
+### What's deliberately **not** in the payload
+
+- Customer name, email, phone, address, IP — affiliates don't need PII to reconcile.
+- Product-level details (SKUs, line items, shipping/billing).
+- Anything specific to the underlying gateway.
+
+If you need that data for your own systems, use the
+[Merchant Postback URLs](/merchants/postback-urls) — those are signed by the
+merchant secret and contain the full conversion record.
+
+## Operational details
+
+- Deliveries are processed asynchronously.
+- Failed deliveries are retried automatically after their backoff window has elapsed.
+- The Recent Deliveries section in the affiliate form shows delivery attempts and outcomes.
+- Rotating the signing secret immediately invalidates the old one. Coordinate
+  the change with your affiliate before rotating in production.
+
+## Testing locally
+
+Point a URL at [webhook.site](https://webhook.site) or `ngrok`, hit **Send
+test** for the event you want, and you'll see the payload + headers arrive
+within seconds.
