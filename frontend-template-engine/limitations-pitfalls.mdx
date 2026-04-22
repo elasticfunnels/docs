@@ -26,8 +26,7 @@ This page covers **limitations** of the frontend template engine (compared to fu
 ### Not a full framework
 
 - **No virtual DOM** — Updates are reactive and path-scoped, but this is not a component framework with diffed virtual DOM.
-- **No built-in lifecycle hooks** — No “mounted”, “updated”, or “destroyed” callbacks. You can listen for **`ef-scope-updated`** or use normal DOM/script logic.
-- **Limited framework-style API** — You now have `window.ef.template.watch(...)` and `window.ef.template.computed(...)`, but not full component lifecycle/composition APIs.
+- **Element-level lifecycle only** — You have **`@mounted`**, **`@unmounted`**, and **`@visible`** per element (see [Bindings & Events](/frontend-template-engine/bindings-forms-events#lifecycle--visibility-directives)), plus **`window.ef.template.watch(...)`** and **`window.ef.template.computed(...)`** for scope-driven reactions. There is no full component composition API (no slots, no scoped components, no `props`).
 - **No standalone template-else** — A **`<template-else>`** must be a **sibling** of a **`<template-if>`** (or follow **template-else-if**). You cannot have “else only” without an if.
 
 ### Reactivity model

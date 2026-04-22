@@ -164,11 +164,94 @@ When you need **custom @click** logic, you can use **`window.ef.addToCart(code, 
 
 ---
 
+## Lifecycle & visibility directives
+
+Element-level handlers that run when an element enters the DOM, leaves the DOM, or scrolls into the viewport. They share the same expression model and alias families as **`@click`** — the expression runs in the current scope and can read **`$el`** (the element itself).
+
+### `@mounted="expression"`
+
+Runs **once** after the element is inserted into the live DOM. Useful for initializing third-party widgets, setting focus, or kicking off animations on elements rendered by **`template-if`** or **`template-foreach`**.
+
+```html
+<div @mounted="initSlider($el)">…</div>
+
+<template-foreach data-each="card in cards">
+  <article @mounted="trackImpression(card.id)">[[ card.title ]]</article>
+</template-foreach>
+```
+
+Notes:
+
+- Fires **once per element instance**. Re-renders of the same element do not re-fire it.
+- Hiding a **`template-if`** branch and showing it again creates a new element instance, so **`@mounted`** runs again.
+- Deferred to the next animation frame so layout has settled before the handler runs.
+
+### `@unmounted="expression"`
+
+Runs just **before** the element is removed from the DOM (e.g. when a **`template-if`** condition flips false or a **`template-foreach`** item drops out).
+
+```html
+<div @mounted="player = createPlayer($el)" @unmounted="player.destroy()">
+  …
+</div>
+```
+
+Use it to dispose timers, observers, or third-party instances created in **`@mounted`**.
+
+### `@visible="expression"`
+
+Runs when the element scrolls into the viewport, backed by an **`IntersectionObserver`** under the hood.
+
+```html
+<section @visible="seen = true">…</section>
+
+<div @visible.every="trackImpression($el)">…</div>
+```
+
+Modifiers:
+
+- **`@visible.once`** *(default)* — Fires only the first time the element enters the viewport, then disconnects.
+- **`@visible.every`** — Fires every time the element re-enters the viewport.
+
+Optional fine-tuning attributes (apply to the same element):
+
+- **`data-ef-visible-threshold="0..1"`** — Fraction of the element that must be visible to fire (default **`0`**: any pixel).
+- **`data-ef-visible-margin="100px 0px"`** — **`rootMargin`** passed to the observer; positive values fire earlier (before the element actually scrolls into view).
+
+```html
+<div @visible="impressionTracked = true"
+     data-ef-visible-threshold="0.5"
+     data-ef-visible-margin="0px 0px -100px 0px">
+  Fires when 50% visible, with the bottom 100px shaved off the viewport.
+</div>
+```
+
+The expression receives **`$event`** as the **`IntersectionObserverEntry`** when fired.
+
+### Aliases
+
+All three directives accept the same alias families as **`@click`**:
+
+| Short | `data-ef-on:` | `data-ef-on-` | `data-ef-` |
+|--------|---------------|---------------|-------------|
+| **`@mounted`** | **`data-ef-on:mounted`** | **`data-ef-on-mounted`** | **`data-ef-mounted`** |
+| **`@unmounted`** | **`data-ef-on:unmounted`** | **`data-ef-on-unmounted`** | **`data-ef-unmounted`** |
+| **`@visible`** | **`data-ef-on:visible`** | **`data-ef-on-visible`** | **`data-ef-visible`** |
+
+Modifier forms also accept dash variants for environments where dots in attribute names are awkward — e.g. **`data-ef-on:visible.once`**, **`data-ef-on-visible-once`**, **`data-ef-visible-every`**.
+
+### When to prefer the JS API
+
+For watchers tied to **scope paths** rather than DOM elements, use **`window.ef.template.watch(path, fn, { immediate, deep })`** — see [Scope & Data](/frontend-template-engine/scope-and-data#runtime-api-watch-and-computed). Use the markup directives when the trigger is **DOM lifecycle or viewport visibility** of a specific element.
+
+---
+
 ## Reactivity summary
 
 - **`[[ expression ]]`** — Re-evaluated automatically after relevant scope changes.
 - **Mounted `template-if` and `template-foreach`** — Re-render automatically when dependencies change.
 - **`ef-value` / aliases** — Scope → element on updates; element → scope on **input** / **change**.
 - **`ef-text` / `ef-html` / `ef-src` / `ef-href` / `ef-title` / `ef-alt` / `ef-placeholder` / `:checked` / `:disabled` / `:value`** — Applied on reactive updates.
+- **`@mounted` / `@unmounted` / `@visible`** — Run when the element is inserted into / removed from the DOM, or first scrolls into the viewport.
 
 Next: [Functions](/frontend-template-engine/built-in-functions).

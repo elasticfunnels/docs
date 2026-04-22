@@ -168,9 +168,47 @@ Send 70% of traffic to the control and 30% to the challenger:
 
 Weights must sum to 100.
 
+### Saving pages through the API
+
+When you create or update a coded page through the public Pages API:
+
+- Send the full `<inline-split-test>...</inline-split-test>` block inside the `html` field.
+- The Pages API stores that source HTML as provided.
+- The create/update response does **not** replace the tag with the winning variant's runtime HTML.
+- The public Pages API also does **not** inject the auto-managed `id` attribute as part of `POST /api/brands/{brand}/pages` or `PUT /api/brands/{brand}/pages/{page}`.
+
+Example source HTML sent to the API:
+
+```html
+<inline-split-test>
+    <variant name="control" weight="70">
+        <h1>Original Headline</h1>
+    </variant>
+    <variant name="challenger" weight="30">
+        <h1>New Headline</h1>
+    </variant>
+</inline-split-test>
+```
+
+That block is the page source. It is **not** replaced in the API response with rendered output.
+
+At runtime, when a visitor loads the page, the server renders only the chosen variant and replaces the entire block with:
+
+```html
+<div data-sid="[split_test_id]" data-cid="[variant_code]">
+    <!-- Full HTML of the chosen variant -->
+</div>
+```
+
+If the page is saved through the editor save flow instead of the public Pages API, the server can normalize the tag, inject the generated `id`, and return the updated HTML.
+
+<Warning>
+If an API or editor save response returns normalized inline split test HTML with an injected `id`, persist that returned HTML and use it for future updates. This matters only when you send `html` again on a later save or update. If `html` is omitted because nothing changed, the existing stored HTML remains unchanged. If you do send `html` again and keep using the original `<inline-split-test>` block without the server-generated `id`, the server can treat it as a new inline split test and create a new split test record on every save.
+</Warning>
+
 ### How it works
 
-1. **On save**, the system validates the tag structure (minimum 2 variants, each with a name). It creates a split test database record and injects an `id` attribute into the tag. The editor updates automatically to show the assigned ID.
+1. **On editor save**, the system validates the tag structure (minimum 2 variants, each with a name). It creates a split test database record and injects an `id` attribute into the tag. The editor updates automatically to show the assigned ID.
 
 2. **At runtime**, when a visitor loads the page the server:
    - Checks for an existing cookie (`st_res_{id}`) to maintain consistency for returning visitors

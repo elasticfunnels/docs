@@ -18,6 +18,10 @@ This pattern lets you attach structured data to customers, orders, or custom ref
 
 ## Concepts
 
+<Note>
+**Entries vs. Fields**: An **entry** is a single record or document stored in the CRM (like a row in a database, representing e.g. a specific check-in for a customer). A **field** is a specific piece of data that lives inside an entry (like a column, e.g. "current_weight" or "deal_value").
+</Note>
+
 ### Entities
 
 An **entity** defines a type of CRM record (e.g. "Deals", "Contacts", "Tracker"). Each entity has:
@@ -89,6 +93,7 @@ The following functions are available in both the template engine and backend sc
 |----------|-------------|
 | `getCrmEntries({ slug, ... })` | Fetch all entries for one entity **slug** + reference |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field value (`slug` + `fieldKey` required) |
+| `getCrmFields({ slug, fieldKeys, ... })` | Get multiple field values (`slug` + `fieldKeys` required) |
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field value — upserts a single value per key |
 | `setCrmFields({ slug, fields, ... })` | Set multiple field values in one read/write cycle |
 | `addCrmFieldValue({ slug, fieldKey, value, ... })` | Append a new entry with a field value — enables multiple values per key |
@@ -123,6 +128,14 @@ Use `setCrmField` / `getCrmField` for fields that hold one value per key (e.g. w
 ```javascript
 setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182 });
 var weight = getCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight' });
+```
+
+When you need to read multiple fields at once, use `getCrmFields` and pass an array of `fieldKeys`:
+
+```javascript
+var fields = getCrmFields({ slug: 'weight-tracker', fieldKeys: ['current_weight', 'goal_weight'] });
+var weight = fields.current_weight;
+var goal = fields.goal_weight;
 ```
 
 When writing multiple fields in one script, prefer `setCrmFields` so all values are merged in one read/write cycle:

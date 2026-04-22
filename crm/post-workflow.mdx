@@ -120,8 +120,9 @@ On any page (e.g. `/dashboard`), read the CRM data:
   requireCustomer();
 
   var entitySlug = 'pattern-tracker';
-  var weight = getCrmField({ slug: entitySlug, fieldKey: 'current_weight' });
-  var goal   = getCrmField({ slug: entitySlug, fieldKey: 'goal_weight' });
+  var fields = getCrmFields({ slug: entitySlug, fieldKeys: ['current_weight', 'goal_weight'] });
+  var weight = fields.current_weight;
+  var goal   = fields.goal_weight;
   setVariable('current_weight', weight || 'Not logged yet');
   setVariable('goal_weight', goal || 'Not set');
   setVariable('on_track', weight && goal && Number(weight) <= Number(goal));
@@ -151,6 +152,7 @@ fetch('/weight/checkin', {     → request.method = 'POST'
 |----------|-------------|
 | `getCrmEntries({ slug, ... })` | Fetch entries — **`slug` required** ([Data Functions](/backend-scripts/data-functions#crm-data)) |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field |
+| `getCrmFields({ slug, fieldKeys, ... })` | Get multiple fields at once |
 | `setCrmField({ slug, fieldKey, value, ... })` | Set one field |
 | `setCrmFields({ slug, fields, ... })` | Set multiple fields in one call |
 | `moveCrmToStage({ slug, stageId \| stageSlug, ... })` | Move an entry to a specific stage |

@@ -112,7 +112,7 @@ Create a new page.
 </ParamField>
 
 <ParamField body="html" type="string">
-  Raw HTML content (automatically sets page_type to `editor`)
+  Raw HTML content (automatically sets page_type to `editor`). If this HTML contains `<inline-split-test>`, the Pages API stores that source markup as provided.
 </ParamField>
 
 <ParamField body="domain_id" type="number">
@@ -232,6 +232,7 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/pages \
   - When you provide `html` in the request, `page_type` is automatically set to `editor`, so you don't need to specify it
   - The API only supports **editor** type pages. The visual drag-and-drop builder is available only through the web dashboard
   - On update, providing `html` will automatically convert the page to `editor` type if it isn't already
+  - If your `html` contains `<inline-split-test>`, the create/update response returns stored source HTML, not the runtime-resolved winning variant HTML
 </Note>
 
 <ResponseExample>
@@ -247,6 +248,52 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/pages \
 }
 ```
 </ResponseExample>
+
+### Inline Split Test HTML in Pages API
+
+When you send `<inline-split-test>` markup through `POST /api/brands/{brand}/pages` or `PUT /api/brands/{brand}/pages/{page}`:
+
+- The endpoint stores the full source HTML you send in `html`
+- The response does **not** replace the tag with the chosen runtime variant
+- The public Pages API does **not** inject the auto-managed `id` attribute during create/update
+
+Example request body:
+
+```json
+{
+  "title": "Split Test Page",
+  "slug": "split-test-page",
+  "status": "published",
+  "html": "<inline-split-test><variant name=\"control\" weight=\"70\"><h1>Original Headline</h1></variant><variant name=\"challenger\" weight=\"30\"><h1>New Headline</h1></variant></inline-split-test>"
+}
+```
+
+Example create response shape:
+
+```json Response
+{
+  "page": {
+    "id": 12,
+    "title": "Split Test Page",
+    "slug": "split-test-page",
+    "status": "published",
+    "page_type": "editor",
+    "html": "<inline-split-test><variant name=\"control\" weight=\"70\"><h1>Original Headline</h1></variant><variant name=\"challenger\" weight=\"30\"><h1>New Headline</h1></variant></inline-split-test>"
+  }
+}
+```
+
+Runtime rendering is different from the API response. When a visitor loads the page, the server replaces the entire block with the chosen variant wrapped like this:
+
+```html
+<div data-sid="[split_test_id]" data-cid="[variant_code]">
+  <!-- Full HTML of the chosen variant -->
+</div>
+```
+
+<Warning>
+If you use a save flow that returns normalized inline split test HTML with a server-generated `id`, replace your local/source HTML with that returned HTML before the next update. This only matters when your next request includes `html` again. If `html` is omitted because nothing changed, the existing stored HTML stays unchanged. Re-sending the original `<inline-split-test>` markup without the injected `id` in a later `html` update can cause the server to create a new split test record on every save.
+</Warning>
 
 ---
 
@@ -298,7 +345,7 @@ Update an existing page. Only include the fields you want to change.
 </ParamField>
 
 <ParamField body="html" type="string">
-  Raw HTML content (automatically sets page_type to `editor`)
+  Raw HTML content (automatically sets page_type to `editor`). If this HTML contains `<inline-split-test>`, the Pages API stores that source markup as provided.
 </ParamField>
 
 <ParamField body="css" type="string">

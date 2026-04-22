@@ -11,50 +11,81 @@ This page covers all backend functions for courses and shows how to use them in 
 
 All functions are available in `<script scope="backend">` blocks and in `.ef` files.
 
-### `getCourses(assignedOnly?)`
+### `getCourses(opts?)`
 
 Returns all courses for the brand, each with `is_assigned` and `started` for the current customer.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `assignedOnly` | boolean | `false` | `false` — all courses (use `is_assigned` to show "Get access" vs content). `true` — only courses the customer is enrolled in. |
+| `opts` | object | `{}` | Preferred: `{ assignedOnly, sort, preferredOrder }` |
 
 ```javascript
-var allCourses    = getCourses(false);   // all, with is_assigned per course
-var myCourses     = getCourses(true);    // enrolled only
+// Preferred object style
+var allCourses = getCourses({ assignedOnly: false, sort: 'enrollment_oldest_unfinished_first' });
+var myCourses = getCourses({ assignedOnly: true });
+
+// Legacy positional style (still supported for backward compatibility)
+var allCoursesLegacy = getCourses(false);
+var myCoursesLegacy = getCourses(true);
 ```
 
-### `getCategoriesWithCourses(assignedOnly?)`
+`sort` supports:
+- `enrollment_oldest_unfinished_first` (default)
+- `title_asc`
+- `title_desc`
+- `preferred` (when used, pass `preferredOrder: ['slug-or-title', ...]`)
+
+### `getCategoriesWithCourses(opts?)`
 
 Same as `getCourses` but grouped by category. Returns an array of `{ category_slug, category_name, courses[] }`.
 
 ```javascript
-var categories = getCategoriesWithCourses(false);
+var categories = getCategoriesWithCourses({ assignedOnly: false, sort: 'enrollment_oldest_unfinished_first' });
 // categories[0].category_name  → "Daily Practices"
 // categories[0].courses        → [ { title, slug, is_assigned, ... } ]
+
+// Legacy positional style still supported:
+var categoriesLegacy = getCategoriesWithCourses(false);
 ```
 
-### `getCoursesByCategorySlug(categorySlug, assignedOnly?)`
+### `getCoursesByCategorySlug(opts)`
 
 Returns courses in a single category. Useful for "Daily practices" or "Advanced" sections on a dashboard.
 
 ```javascript
-var daily = getCoursesByCategorySlug('daily-practices', false);
+var daily = getCoursesByCategorySlug({
+  category: 'daily-practices',
+  assignedOnly: false,
+  sort: 'enrollment_oldest_unfinished_first'
+});
+
+// Legacy positional style still supported:
+var dailyLegacy = getCoursesByCategorySlug('daily-practices', false);
 ```
 
-### `getCoursesForCustomer()`
+### `getCoursesForCustomer(opts?)`
 
-Returns only courses the current customer is enrolled in (same as `getCourses(true)`). Returns `[]` if no session or no enrollments.
+Returns only courses the current customer is enrolled in (same as `getCourses({ assignedOnly: true })`). Returns `[]` if no session or no enrollments.
 
-### `getCourseForCustomer(slug)`
+```javascript
+var enrolled = getCoursesForCustomer({ sort: 'enrollment_oldest_unfinished_first' });
+
+// Legacy style still supported:
+var enrolledLegacy = getCoursesForCustomer();
+```
+
+### `getCourseForCustomer(opts)`
 
 Returns a single course **with** enrollment check — `is_assigned` and `started` are set for the current customer. Also returns the full `modules[]` and `contents[]` tree, plus `progress_percent` and `completed_content_ids`. Use this on the course detail page.
 
 ```javascript
-var course = getCourseForCustomer('tinnitus-recovery');
+var course = getCourseForCustomer({ slug: 'tinnitus-recovery' });
 // course.is_assigned  → true / false
 // course.modules      → full module/lesson tree
 // course.progress_percent → 0–100
+
+// Legacy positional style still supported:
+var courseLegacy = getCourseForCustomer('tinnitus-recovery');
 ```
 
 Returns `null` if no course with that slug exists.
@@ -65,6 +96,21 @@ Returns a single course **without** enrollment check. `is_assigned` and `started
 
 ```javascript
 var course = getCourseBySlug('tinnitus-recovery');
+```
+
+### `getCourseLesson(opts)`
+
+Returns the resolved current lesson payload for lesson-player pages, including `currentLesson`, `prevLessonUrl`, `nextLessonUrl`, and progress stats.
+
+```javascript
+var lessonSeed = getCourseLesson({
+  course: 'tinnitus-recovery',
+  module: 12,
+  lesson: 77
+});
+
+// Legacy positional style still supported:
+var lessonSeedLegacy = getCourseLesson('tinnitus-recovery', 12, 77);
 ```
 
 ### `getCompletedLessonsCount(opts?)`
@@ -78,6 +124,9 @@ Returns the total number of completed lessons across all enrolled courses, or fo
 ```javascript
 var totalDone = getCompletedLessonsCount();           // all courses
 var courseDone = getCompletedLessonsCount({ course: 'tinnitus-recovery' }); // single course
+
+// Legacy shorthand still supported:
+var courseDoneLegacy = getCompletedLessonsCount('tinnitus-recovery');
 ```
 
 Returns `0` if the customer has no enrollments or no completed lessons.
@@ -102,6 +151,9 @@ var progress = getCourseProgress();
 var single = getCourseProgress({ course: 'tinnitus-recovery' });
 // single.completedLessons → 5
 // single.courses          → [ { slug: 'tinnitus-recovery', ... } ]
+
+// Legacy shorthand still supported:
+var singleLegacy = getCourseProgress('tinnitus-recovery');
 ```
 
 ### `request.route_params`
@@ -120,7 +172,7 @@ Show all courses, sorted so enrolled courses appear first. Use `is_assigned` and
     redirect('/members-login');
   }
 
-  var allCourses = getCourses(false);
+  var allCourses = getCourses({ assignedOnly: false, sort: 'enrollment_oldest_unfinished_first' });
 
   // Sort: enrolled first, then among enrolled put started (Continue) before not started
   allCourses = allCourses.slice().sort(function(a, b) {
@@ -165,7 +217,7 @@ Show all courses, sorted so enrolled courses appear first. Use `is_assigned` and
 <script scope="backend">
   if (!is_customer) { redirect('/members-login'); }
 
-  var categories = getCategoriesWithCourses(false);
+  var categories = getCategoriesWithCourses({ assignedOnly: false, sort: 'enrollment_oldest_unfinished_first' });
 
   // Sort courses within each category: assigned first
   categories = categories.map(function(cat) {
@@ -220,7 +272,7 @@ Resolve the slug from the URL, check enrollment with `getCourseForCustomer`, and
   // For a fixed page reading slug from query string:
   // var slug = request.query.course;
 
-  var course = getCourseForCustomer(slug);
+  var course = getCourseForCustomer({ slug: slug });
 
   if (!course) {
     redirect('/courses');
@@ -321,7 +373,7 @@ Then each course page:
 @block("content")
 
 <script scope="backend">
-  var courses = getCourses(false);
+  var courses = getCourses({ assignedOnly: false });
   setVariable('courses', courses);
 </script>
 
@@ -342,7 +394,7 @@ If you want to gate course access by checking whether the customer bought a spec
 <script scope="backend">
   if (!is_customer) { redirect('/members-login'); }
 
-  var course = getCourseForCustomer(request.route_params.course);
+  var course = getCourseForCustomer({ slug: request.route_params.course });
   if (!course) { redirect('/courses'); }
 
   // Fallback: check order history for a product by name

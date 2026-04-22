@@ -197,6 +197,126 @@ setVariable('all_bonus_skus', catalogBonuses);
 For the same filter but **raw** product fields (`bonus_file`, merchant fields, etc.), use `getProducts({ classification: 'bonus' })` instead.
 </Tip>
 
+## Subscriptions
+
+Customer-scoped recurring billing functions. All operations are restricted to subscriptions belonging to the **current session customer** (matched by email) — a script can never read or modify another customer's subscription.
+
+Write functions return `{ ok: boolean, error?: string, ...rest }` and **never throw** on validation failure. They enforce status transitions automatically (e.g. only `active` can be paused or skipped, only `paused` can be resumed, already-canceled cannot be canceled again).
+
+For full request/response shapes and ready-to-use page-based examples, see [Subscriptions (backend template engine)](/backend-template-engine/subscriptions).
+
+### `getSubscriptions(status?, limit?)`
+
+List the current customer's subscriptions, newest first.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `status` | string | — | Optional filter: `active`, `paused`, `canceled`, `past_due`, or `trial`. Empty / unknown values return all. |
+| `limit` | number | `50` | Max subscriptions to return (1–200). |
+
+```javascript
+var all = getSubscriptions();
+var active = getSubscriptions('active', 25);
+
+setVariable('subscriptions', all);
+setVariable('has_active_subscription', active.length > 0);
+```
+
+Each subscription object contains:
+
+```javascript
+{
+  id: 'sub_abc123',
+  status: 'active',                      // active | paused | canceled | past_due | trial
+  customer_email: 'jane@example.com',
+  customer_name: 'Jane Doe',
+  products: [
+    { code: 'monthly-plan', name: 'Monthly Plan', price: 29.99, quantity: 1, type: 'main' }
+  ],
+  amount: 29.99,
+  currency_code: 'USD',
+  tax_amount: 0,
+  shipping_amount: 0,
+  discount_amount: 0,
+  frequency: 1,
+  frequency_unit: 'month',               // day | week | month | year
+  next_charge_at: '2026-05-12T00:00:00Z',
+  started_at: '2026-04-12T00:00:00Z',
+  paused_at: null,
+  resume_at: null,
+  canceled_at: null,
+  cancel_reason: null,
+  cycle_number: 2,
+  trial_days: 0,
+  first_charge_free: false,
+  original_transaction_id: 'txn_xyz789',
+  gateway: 'stripe',
+  card_last4: '4242',
+  card_brand: 'visa',
+  created_at: '2026-04-12T00:00:00Z',
+  updated_at: '2026-05-01T00:00:00Z'
+}
+```
+
+### `getSubscription(transactionId)`
+
+Fetch a single subscription by its **original transaction ID** (`original_transaction_id` on the subscription record). Returns `null` if not found or if the subscription does not belong to the current customer.
+
+```javascript
+var sub = getSubscription(request.query.id);
+if (sub) {
+  setVariable('subscription', sub);
+}
+```
+
+### `cancelSubscription(transactionId, reason?)`
+
+Cancel an active or paused subscription. Fires the `subscription_cancel` event.
+
+```javascript
+var result = cancelSubscription('txn_xyz789', 'Too expensive');
+if (!result.ok) {
+  setVariable('error_message', result.error);
+}
+```
+
+### `pauseSubscription(transactionId, resumeAt?)`
+
+Pause an `active` subscription. Optional `resumeAt` is an ISO date string for an automatic resume — invalid dates return `{ ok: false, error: 'Invalid resume_at date' }`.
+
+```javascript
+pauseSubscription('txn_xyz789');
+pauseSubscription('txn_xyz789', '2026-08-01T00:00:00Z');
+```
+
+### `resumeSubscription(transactionId)`
+
+Resume a `paused` subscription. If the stored `next_charge_at` is in the past, it is automatically advanced based on the subscription's frequency.
+
+```javascript
+resumeSubscription('txn_xyz789');
+```
+
+### `skipSubscription(transactionId)`
+
+Skip the next billing cycle on an `active` subscription. Returns the new next charge date on success.
+
+```javascript
+var result = skipSubscription('txn_xyz789');
+if (result.ok) {
+  setVariable('next_charge', result.next_charge_at);
+}
+```
+
+### `changeSubscriptionFrequency(transactionId, interval, intervalCount)`
+
+Change the billing cadence on an `active` or `paused` subscription. `interval` must be one of `day`, `week`, `month`, `year`. `intervalCount` must be a positive integer.
+
+```javascript
+var result = changeSubscriptionFrequency('txn_xyz789', 'month', 2);
+// → { ok: true, frequency_unit: 'month', frequency: 2, next_charge_at: '2026-06-12T...' }
+```
+
 ## Conversions
 
 ### `getConversions(email)`
@@ -313,11 +433,15 @@ setVariable('display_price', formatted);
 
 ## Courses
 
-### `getCourse(courseId)`
+### `getCourse(courseIdOrOpts)`
 
 Fetch a course by ID, including modules and contents.
 
 ```javascript
+// Preferred object style
+var course = getCourse({ id: 42 });
+
+// Legacy positional style still supported
 var course = getCourse(42);
 if (course) {
   setVariable('course_title', course.title);
@@ -325,49 +449,70 @@ if (course) {
 }
 ```
 
-### `getCourseBySlug(slug)`
+### `getCourseBySlug(slugOrOpts)`
 
 Fetch a course by its URL slug.
 
 ```javascript
+// Preferred object style
+var course = getCourseBySlug({ slug: 'javascript-basics' });
+
+// Legacy positional style still supported
 var course = getCourseBySlug('javascript-basics');
 ```
 
-### `getModuleBySlug(courseSlug, moduleSlug)`
+### `getModuleBySlug(courseSlugOrOpts, moduleSlug?)`
 
 Fetch a single module with its contents.
 
 ```javascript
+// Preferred object style
+var module = getModuleBySlug({ course: 'javascript-basics', module: 'variables' });
+
+// Legacy positional style still supported
 var module = getModuleBySlug('javascript-basics', 'variables');
 if (module) {
   setVariable('module_title', module.title);
 }
 ```
 
-### `getCourses()`
+### `getCourses(opts?)`
 
 Fetch all courses for the brand with lesson and module counts.
 
 ```javascript
-var courses = getCourses();
+// Preferred object style
+var courses = getCourses({ assignedOnly: false, sort: 'enrollment_oldest_unfinished_first' });
+
+// Legacy positional style still supported
+var coursesLegacy = getCourses();
 setVariable('course_count', courses.length);
 ```
 
-### `getCoursesByCategorySlug(categorySlug)`
+### `getCoursesByCategorySlug(categoryOrOpts, assignedOnly?)`
 
 Filter courses by category slug.
 
 ```javascript
-var marketingCourses = getCoursesByCategorySlug('marketing');
+// Preferred object style
+var marketingCourses = getCoursesByCategorySlug({
+  category: 'marketing',
+  assignedOnly: false,
+  sort: 'enrollment_oldest_unfinished_first'
+});
+
+// Legacy positional style still supported
+var marketingCoursesLegacy = getCoursesByCategorySlug('marketing');
 setVariable('marketing_course_count', marketingCourses.length);
 ```
 
-### `getCategoriesWithCourses()`
+### `getCategoriesWithCourses(opts?)`
 
 Get all course categories with their courses grouped together.
 
 ```javascript
-var categories = getCategoriesWithCourses();
+var categories = getCategoriesWithCourses({ assignedOnly: false });
+var categoriesLegacy = getCategoriesWithCourses();
 // [
 //   { category_slug: 'marketing', category_name: 'Marketing', courses: [...] },
 //   { category_slug: 'design', category_name: 'Design', courses: [...] },
@@ -376,23 +521,62 @@ var categories = getCategoriesWithCourses();
 setVariable('category_count', categories.length);
 ```
 
-### `getCourseForCustomer(slug)`
+### `getCourseForCustomer(slugOrOpts)`
 
 Fetch a single course with enrollment data for the current customer. Returns the full module/lesson tree plus `completed_content_ids`, `progress_percent`, `is_assigned`, and `started`.
 
 ```javascript
-var course = getCourseForCustomer('javascript-basics');
+var course = getCourseForCustomer({ slug: 'javascript-basics' });
+var courseLegacy = getCourseForCustomer('javascript-basics');
 if (course && course.is_assigned) {
   setVariable('progress', course.progress_percent);
 }
 ```
 
-### `getCoursesForCustomer()`
+### `getCoursesForCustomer(opts?)`
 
-Fetch all courses the current customer is enrolled in. Same as `getCourses(true)`.
+Fetch all courses the current customer is enrolled in. Same as `getCourses({ assignedOnly: true })`.
 
 ```javascript
-var myCourses = getCoursesForCustomer();
+var myCourses = getCoursesForCustomer({ sort: 'enrollment_oldest_unfinished_first' });
+var myCoursesLegacy = getCoursesForCustomer();
+```
+
+Each course includes `module_count`, `lesson_count`, `progress_percent`, `completed_content_ids`, and `is_assigned`.
+
+### `getCourseLesson(courseOrOpts, moduleId?, lessonId?)`
+
+Resolve a lesson-player payload in one call (course + modules + current lesson + prev/next URLs + progress stats).
+
+```javascript
+// Preferred object style
+var seed = getCourseLesson({ course: 'javascript-basics', module: 12, lesson: 77 });
+
+// Legacy positional style still supported
+var seedLegacy = getCourseLesson('javascript-basics', 12, 77);
+```
+
+### `getCoursesForCustomerByCategorySlug(categoryOrOpts)`
+
+Fetch the current customer's enrolled courses, filtered by category slug. Returns an empty array if the category has no enrolled courses.
+
+```javascript
+var marketing = getCoursesForCustomerByCategorySlug({ category: 'marketing' });
+var marketingLegacy = getCoursesForCustomerByCategorySlug('marketing');
+setVariable('marketing_courses', marketing);
+```
+
+### `getCategoriesWithCoursesForCustomer(opts?)`
+
+Get all course categories that contain at least one course the current customer is enrolled in, with the enrolled courses grouped per category. Useful for category-tab navigation on a member-facing courses page.
+
+```javascript
+var categories = getCategoriesWithCoursesForCustomer({ sort: 'enrollment_oldest_unfinished_first' });
+var categoriesLegacy = getCategoriesWithCoursesForCustomer();
+// [
+//   { category_slug: 'marketing', category_name: 'Marketing', courses: [...] },
+//   { category_slug: 'design',    category_name: 'Design',    courses: [...] }
+// ]
 ```
 
 ### `getCompletedLessonsCount(opts?)`
@@ -402,6 +586,7 @@ Count completed lessons across all enrolled courses, or for a specific course.
 ```javascript
 var totalDone = getCompletedLessonsCount();
 var courseDone = getCompletedLessonsCount({ course: 'javascript-basics' });
+var courseDoneLegacy = getCompletedLessonsCount('javascript-basics');
 ```
 
 ### `getCourseProgress(opts?)`
@@ -413,6 +598,7 @@ var progress = getCourseProgress();
 // progress.completedLessons  → 12
 // progress.totalLessons      → 48
 // progress.courses → [{ slug, title, completedLessons, totalLessons, progressPercent }]
+var singleLegacy = getCourseProgress('javascript-basics');
 ```
 
 ## Blog
@@ -625,6 +811,10 @@ For raw session access (without the `custom_` prefix and base64 encoding), use `
 
 ## CRM Data
 
+<Note>
+**Entries vs. Fields**: An **entry** is a single record or document stored in the CRM (like a row in a database, representing e.g. a specific check-in for a customer). A **field** (`fieldKey`) is a specific piece of data that lives inside an entry (like a column, e.g. "current_weight").
+</Note>
+
 CRM entries are stored per brand. Every read/write is scoped by:
 
 - **`brand_id`** — from the session (always applied server-side)
@@ -640,6 +830,8 @@ Write functions (`setCrmField`, `setCrmFields`, `addCrmFieldValue`, `clearCrmEnt
 ```javascript
 getCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight' });
 
+getCrmFields({ slug: 'weight-tracker', fieldKeys: ['current_weight', 'goal_weight'] });
+
 setCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight', value: 182, force: true });
 
 setCrmFields({
@@ -653,6 +845,57 @@ setCrmFields({
 // Another record type / id
 setCrmField({ slug: 'weight-tracker', referenceType: 'order', referenceId: '12345', fieldKey: 'status', value: 'shipped' });
 ```
+
+### `ensureCrmEntity({ slug, name?, fields?, ... })`
+
+Idempotently provisions a CRM entity (and optionally seeds its field schema). Safe to call on every page render — existing entities and fields are never overwritten, only missing keys are inserted.
+
+Use this at the top of a backend script in templates that ship to many brands so the CRM entity is auto-created on first use, without requiring an admin to pre-configure it.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | Machine name for the entity (e.g. `member-settings`). Must match `^[a-z0-9][a-z0-9_-]*$`. |
+| `name` | string | slug | Human-readable entity name shown in the admin UI. |
+| `singularName` | string | `null` | Singular label (e.g. "Member Setting"). Alias: `singular_name`. |
+| `pluralName` | string | `null` | Plural label (e.g. "Member Settings"). Alias: `plural_name`. |
+| `icon` | string | `null` | Icon name (Lucide icon, admin UI). |
+| `color` | string | `null` | Accent color (CSS color string). |
+| `fields` | array | `[]` | Optional field schema. Each item: `{ key, label?, type?, options?, validation_rules?, visible_to_team_ids? }`. |
+
+Field `type` values: `text`, `textarea`, `email`, `tel`, `url`, `number`, `integer`, `decimal`, `currency`, `date`, `datetime`, `time`, `select`, `multiselect`, `checkbox`, `boolean`, `radio`, `json`, `rich_text`. For `select`/`multiselect`/`radio` pass `options: ['a','b']` or `[{ value: 'a', label: 'A' }]`.
+
+Returns:
+
+```javascript
+{
+  id: 42,
+  slug: 'member-settings',
+  created: true,        // false if entity already existed
+  fields_added: 3,      // newly inserted fields
+  fields_skipped: 2     // already existed (left untouched)
+}
+```
+
+Example:
+
+```javascript
+ensureCrmEntity({
+  slug: 'member-settings',
+  name: 'Member Settings',
+  icon: 'settings',
+  fields: [
+    { key: 'preferred_name', label: 'Preferred name', type: 'text' },
+    { key: 'time_zone',      label: 'Time zone',      type: 'select',
+      options: ['UTC', 'Europe/London', 'America/New_York'] },
+    { key: 'marketing_opt_in', label: 'Marketing opt-in', type: 'checkbox' },
+  ],
+});
+
+// Now safe to read/write — the entity definitely exists.
+var name = getCrmField({ slug: 'member-settings', fieldKey: 'preferred_name' });
+```
+
+**Limits**: max 5 `ensureCrmEntity` calls per page execution. Exceeding the limit returns `{ id: null, created: false, error: 'rate_limited' }`.
 
 ### `getCrmEntries({ slug, referenceType?, referenceId?, limit? })`
 
@@ -705,6 +948,25 @@ Reads one field from the first matching entry for that **slug** + reference.
 var weight = getCrmField({ slug: 'weight-tracker', fieldKey: 'current_weight' });
 
 if (weight && Number(weight) <= 165) {
+  setVariable('show_goal_reached', true);
+}
+```
+
+### `getCrmFields({ slug, fieldKeys, referenceType?, referenceId? })`
+
+Reads multiple fields from the first matching entries for that **slug** + reference. Returns an object mapping `fieldKey` -> `value`.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `slug` | string | **required** | CRM entity slug |
+| `fieldKeys` | array | **required** | Array of field keys (e.g. `['current_weight', 'goal_weight']`) |
+| `referenceType` | string | `'customer'` | Linked record type |
+| `referenceId` | string | session `customer_id` | Linked record id |
+
+```javascript
+var fields = getCrmFields({ slug: 'weight-tracker', fieldKeys: ['current_weight', 'goal_weight'] });
+
+if (fields.current_weight && Number(fields.current_weight) <= 165) {
   setVariable('show_goal_reached', true);
 }
 ```

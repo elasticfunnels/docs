@@ -52,7 +52,7 @@ See [Courses — Template Reference](/courses/template) for complete backend scr
 
 Enrollment is created automatically by `BrandCourseEnrollment` when a purchase conversion is recorded for a product that is linked to a course.
 
-The `is_assigned` flag is resolved per-customer when you call `getCourseForCustomer(slug)` or `getCourses(false)`. It is `true` if the currently logged-in customer has an enrollment record for the course.
+The `is_assigned` flag is resolved per-customer when you call `getCourseForCustomer({ slug })` or `getCourses({ assignedOnly: false })`. It is `true` if the currently logged-in customer has an enrollment record for the course.
 
 `started` is `true` when the enrollment has any progress (at least one lesson completed or in progress).
 
@@ -66,6 +66,9 @@ Progress is tracked server-side per customer, per lesson. All course functions t
 
 - `completed_content_ids` — array of completed lesson IDs
 - `progress_percent` — 0–100
+- `is_completed` — `true` when the course reaches 100%
+- `current_unfinished_lesson` — object with module/lesson ids, titles, and resume URL when in progress
+- `resume_url` — direct resume link when available
 
 The front-end marks lessons complete by calling the progress API (`POST /api/course/courses/:courseId/lessons/:contentId/complete`).
 
