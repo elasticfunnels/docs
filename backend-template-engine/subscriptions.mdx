@@ -1,6 +1,6 @@
 ---
 title: 'Subscriptions (backend)'
-description: 'Backend template functions for listing and managing customer subscriptions — with ready-to-use page-based API examples.'
+description: 'Backend template functions for listing, querying, and managing customer subscriptions — with content gating and ready-to-use page-based API examples.'
 ---
 
 These functions let you **query and manage** recurring subscriptions from backend templates and backend scripts. All operations are scoped to the current customer's email — a customer can only access their own subscriptions.
@@ -14,7 +14,9 @@ The internal `/api/subscription-*` routes are used by the call center and subscr
 | Function | Returns | Description |
 |----------|---------|-------------|
 | **`getSubscriptions(status?, limit?)`** | array | List current customer's subscriptions. Optional `status` filter (`active`, `paused`, `canceled`, `past_due`, `trial`). Default limit 50, max 200. |
-| **`getSubscription(transactionId)`** | object \| null | Single subscription by original transaction ID. Returns `null` if not found or not owned by the customer. |
+| **`getSubscription(arg)`** | object \| null | Single subscription by transaction ID string, or by filter object `{ code?, status? }`. Returns `null` if not found. |
+| **`hasSubscription(filter?)`** | boolean | Check whether the customer has a subscription matching the filter. Pass `{ code }` for product-specific gating or `{ date }` for point-in-time checks. |
+| **`countSubscriptions(filter?)`** | number | Count subscriptions matching the filter. Same filter shape as `hasSubscription` (excluding `date`). |
 | **`cancelSubscription(transactionId, reason?)`** | `{ ok, error? }` | Cancel a subscription. Must not already be canceled. |
 | **`pauseSubscription(transactionId, resumeAt?)`** | `{ ok, error? }` | Pause an active subscription. Optional `resumeAt` ISO date for auto-resume. |
 | **`resumeSubscription(transactionId)`** | `{ ok, error? }` | Resume a paused subscription. Recalculates next charge if past due. |
@@ -37,7 +39,7 @@ Invalid operations return `{ ok: false, error: '...' }` without modifying the su
 ```javascript
 {
   id: 'abc123',
-  status: 'active',
+  status: 'active',               // active | paused | canceled | past_due | trial
   customer_email: 'john@example.com',
   customer_name: 'John Doe',
   products: [
@@ -67,6 +69,94 @@ Invalid operations return `{ ok: false, error: '...' }` without modifying the su
 
 Sensitive fields (`vault_id`, `billing_id`, `merchant_id`, `customer_address`, `tax_report`, `metadata`) are never exposed.
 
+---
+
+## Gating content
+
+Use `hasSubscription` to show or hide content based on subscription state. All read helpers share a per-request cache — the database is only queried once no matter how many times you call them.
+
+### Active subscription gate
+
+```html
+@if(hasSubscription())
+  <p>You have an active subscription.</p>
+@else
+  <p><a href="/upgrade">Subscribe to access premium content.</a></p>
+@endif
+```
+
+### Gate by product code
+
+```html
+@if(hasSubscription({ code: 'premium-plan' }))
+  <div class="premium-content">
+    <!-- exclusive content -->
+  </div>
+@endif
+```
+
+### Point-in-time gate (date-based)
+
+Check whether the customer was subscribed **on a specific date** — useful for gating content that was published while a subscription was active, even if the subscription has since been canceled.
+
+```html
+@if(hasSubscription({ code: 'premium-plan', date: '2026-01-01' }))
+  <p>This article was available to you when it was published.</p>
+@endif
+```
+
+Date logic: a subscription is considered active on the given date if `started_at ≤ date` and `canceled_at` is either `null` or after the date. The current `status` field is not used — only the raw timestamps.
+
+### Status-specific checks
+
+```html
+@if(hasSubscription({ status: 'past_due' }))
+  <div class="billing-warning">
+    Your payment failed. Please update your billing info.
+  </div>
+@endif
+
+@if(hasSubscription({ status: 'trial' }))
+  <p>You're on a free trial.</p>
+@endif
+```
+
+### Subscription count
+
+```html
+<script scope="backend">
+var count = countSubscriptions();
+setVariable('sub_count', count);
+var canceledCount = countSubscriptions({ status: 'canceled' });
+setVariable('canceled_count', canceledCount);
+</script>
+
+@if(var.sub_count > 1)
+  <p>You have {{ var.sub_count }} active subscriptions.</p>
+@endif
+```
+
+### Win-back flow (recently canceled)
+
+```html
+<script scope="backend">
+var sub = getSubscription({ code: 'monthly-plan', status: 'canceled' });
+if (sub) {
+  setVariable('canceled_at', sub.canceled_at);
+  setVariable('show_winback', true);
+}
+</script>
+
+@if(var.show_winback)
+  <div class="winback-banner">
+    Your subscription ended on {{ var.canceled_at | date:'MMM D, YYYY' }}.
+    <a href="/resubscribe">Reactivate and save 20%</a>
+  </div>
+@endif
+```
+
+---
+
 ## Displaying subscriptions in templates
 
 Use `getSubscriptions()` in a backend script and render with `@foreach`:
@@ -91,6 +181,8 @@ setVariable('subscriptions', subs);
   <p>No active subscriptions.</p>
 @endif
 ```
+
+---
 
 ## Building page-based APIs
 
@@ -280,6 +372,8 @@ var result = changeSubscriptionFrequency(body.transactionId, body.interval, body
 response.json(result);
 </script>
 ```
+
+---
 
 ## Calling from frontend JavaScript
 

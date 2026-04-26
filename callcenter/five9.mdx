@@ -21,7 +21,7 @@ Before configuring the Five9 phone switch for a brand, gather:
 - **Screen pop**: Webhook URL and shared secret (if used) configured on the telephony side to POST inbound events to ElasticFunnels
 
 <Tip>
-Complete the general phone switch flow first: **Call Center** → **Call Centers** → open the center → **Brand Settings** → **Phone Switch** → select Five9, then save.
+Complete the general phone switch flow first: **Call Center** → **Setup** → **Call Centers** tab → open the center → **Brand Settings** → **Phone Switch** → select Five9, then save.
 </Tip>
 
 ## Configuration fields
@@ -63,7 +63,7 @@ Use this when Five9 or your tenant exposes (or you host) REST endpoints at `api_
     In **Brand Settings** → **Phone Switch**, select Five9 and fill `api_base_url` plus either `api_key` or `username` and `password`. Add `campaign_name` and `skill_id` if required.
   </Step>
   <Step title="Align agent extensions">
-    Ensure each agent’s extension in **Call Center** → **Agents** matches the identifier your API uses for `agent_extension` on make-call.
+    Ensure each agent’s extension in **Call Center** → **Setup** → **Agents** tab matches the identifier your API uses for `agent_extension` on make-call.
   </Step>
   <Step title="Save and verify">
     Save the brand config. Use connect / health behavior in the product (or a test dial) to confirm reachability and auth.

@@ -96,6 +96,10 @@ Dunning is the process of retrying failed subscription charges. When a renewal f
 | **Callcenter Escalation After Retry #** | Escalate to callcenter after this many retries | 3 (set to 0 to disable) |
 | **Send to Callcenter on Cancel** | Route cancellation events to callcenter | Off |
 
+<Info>
+The **Callcenter Escalation After Retry #** and **Send to Callcenter on Cancel** settings are **merchant-level gates** — they decide *whether* to attempt a call-center send. *Which* providers receive the event, *when* (delay), and *for which decline codes* is configured on the integration itself. See [External Call Center Integrations](/integrations/callcenters) for the per-event configuration.
+</Info>
+
 ### How the Retry Schedule Works
 
 The retry schedule defines the number of days after the initial failure for each retry attempt. With the default schedule `1, 3, 5, 7, 10, 14`:
@@ -120,3 +124,11 @@ Pre-renewal emails are sent automatically **3 days** before the next scheduled c
 <Info>
 Pre-renewal emails are recommended for legal compliance in some jurisdictions (e.g., FTC negative-option guidelines in the US).
 </Info>
+
+## Where Events Go
+
+When a dunning event fires (renewal failed, cancel, winback), it's routed through three layers:
+
+1. **Subscription emails** — the templates described above, sent to the customer directly.
+2. **Merchant-level callcenter gate** — the **Callcenter Escalation After Retry #** / **Send to Callcenter on Cancel** settings decide if a call-center send is attempted.
+3. **Per-integration event config** — each [external call-center integration](/integrations/callcenters) decides which events it actually receives, how long to wait before sending, and which decline codes to filter.

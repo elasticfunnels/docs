@@ -1,0 +1,168 @@
+---
+title: 'Cross-domain session handoff'
+description: 'Carry an authenticated customer session from one brand-owned domain to another without losing tracking, attribution, or cart state.'
+---
+
+When your funnel spans multiple brand-owned domains — for example `offers.example.com` for marketing and `app.example.com` for the logged-in experience — you need a way to carry the customer's identity across the hop without forcing them to log in again and without losing UTM parameters, affiliate IDs, or cart state.
+
+ElasticFunnels ships a stateless, encrypted **session-handoff** primitive you can use from backend scripts. The source domain mints a short-lived token; the destination domain verifies it and establishes the session.
+
+---
+
+## When to use it
+
+- Redirecting from a marketing site to a logged-in app on a different subdomain.
+- Returning a visitor to a different brand-owned domain after an external redirect (payment gateway, SSO, etc.).
+- Bridging a custom login flow that runs on one domain but needs to deposit the session on another.
+
+Don't use it when:
+
+- Both domains share the same parent and you can use a shared-domain cookie.
+- You already have the customer's credentials and can log them in on the destination via [`session.setCustomer()`](/backend-scripts/actions#session-setcustomer-fields).
+- The hop is to an entirely unrelated brand — tokens are **brand-scoped** and will not decrypt under a different brand's configuration.
+
+---
+
+## How it works
+
+```
+Source domain                                    Destination domain
+─────────────                                    ──────────────────
+session.getToken()   ──── 303 redirect ─────►   ?ef_session=<token>
+(mints token)          with ?ef_session=<token>         │
+                                                        ▼
+                                               Runtime middleware
+                                               auto-consumes token,
+                                               regenerates session,
+                                               writes customer,
+                                               303 to clean URL.
+```
+
+### 1. Mint a token (source domain)
+
+In a backend script on the source page:
+
+```javascript
+var token = await session.getToken();
+if (!token) {
+  redirect('/login');          // no customer in session
+}
+
+var destination = 'https://app.example.com/welcome';
+redirect(destination + '?ef_session=' + encodeURIComponent(token));
+```
+
+Token details:
+
+- Default TTL: **60 seconds**. Override with `session.getToken(ttlSeconds)`. Max `600`.
+- Single-use. Replaying a consumed token is rejected.
+- `v1.<base64url>` format — opaque, URL-safe.
+
+### 2. Consume the token (destination domain)
+
+**Nothing to do.** The EF runtime mounts a global middleware that inspects every request for `?ef_session=<token>` (alias: `?setSessionToken=<token>`). On a valid token it:
+
+1. Decrypts and verifies the envelope using the destination brand's key.
+2. Regenerates `session.id` (prevents session fixation).
+3. Preserves non-identity session keys — `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `attribution`, `affiliate_id`, `aff_id`, `subid`, `click_id`, `visitor_id`, `first_visit_at`, `cart`, `locale`, `theme_preview`, `flash`.
+4. Writes the customer identity via `setCustomer()`.
+5. Saves the session and 303-redirects to the same URL with the token param stripped so it never lands in browser history or server logs.
+
+On any failure (tamper, expiry, replay, wrong brand, missing `APP_KEY`) the middleware **silently falls through** — the request continues unauthenticated. Nothing 500s; your marketing pages still render for anonymous visitors.
+
+### 3. Consume manually (optional)
+
+If the token arrives somewhere other than the query string — for example a form submission, custom header, or webhook body — consume it yourself:
+
+```javascript
+var token = getVariable('submitted_token');
+var ok = await session.setFromToken(token);
+if (ok) {
+  redirect('/dashboard');
+}
+```
+
+`setFromToken` returns `false` on every failure mode; never throws.
+
+---
+
+## Security model
+
+### Brand isolation
+
+Each brand's encryption key is derived at runtime:
+
+```
+key = HKDF-SHA256(
+        ikm    = base64decode(process.env.APP_KEY),
+        salt   = utf8(brandId),
+        info   = utf8("ef-session-handoff-v1"),
+        length = 32 bytes
+      )
+```
+
+Two brands sharing the same `APP_KEY` still end up with **disjoint keys** because the HKDF salt is the brand id. A token minted for `brand-a` cannot be decrypted by `brand-b`'s runtime: AEAD authentication fails before any plaintext is exposed. The `brand` field in the payload is re-checked after decryption as a second gate.
+
+<Note>
+There is no per-brand `handoff_app_key` column, no admin UI, and no rotation dance. Rotating `APP_KEY` is a platform-wide operation; per-brand separation comes from the HKDF salt.
+</Note>
+
+### Envelope
+
+```
+v1.<base64url( nonce(12) || ciphertext || tag(16) )>
+```
+
+- AEAD: **AES-256-GCM**
+- Nonce: 12 random bytes per token
+- Tag: 16 bytes, verified before payload JSON is parsed
+
+### Replay protection
+
+Every token carries a UUIDv4 `jti`. The receiver records it in an in-memory LRU (capped at 10,000 entries) for the duration of the token's TTL. A second attempt to consume the same token is rejected.
+
+<Warning>
+Replay state is process-local. In a clustered deployment, a token stolen mid-flight can be replayed once per worker. Keep `ttlSeconds` as short as possible (the default of `60` is recommended for redirect-driven flows).
+</Warning>
+
+### Session fixation
+
+On every successful consume, the runtime calls `session.regenerate()` before writing the customer. The old session id is invalidated, so a pre-planted session cookie cannot be hijacked by presenting a handoff URL to the victim.
+
+---
+
+## Environment
+
+Session handoff requires `APP_KEY` to be set — the same 32-byte base64 value used for Laravel-compatible encryption. No other environment variables are needed.
+
+```bash
+APP_KEY=base64:W+JbESji8ituHR0lgUSbfUsledQzaiMLp317S/ejHLo=
+```
+
+If `APP_KEY` is empty or not base64-encoded, `session.getToken()` returns `null` and the middleware silently skips every token.
+
+---
+
+## Full example — cross-domain login bridge
+
+**Source** (`offers.example.com/app-bridge`) — customer has just verified their identity via a 4-digit code, session is authenticated, now send them to the app:
+
+```html
+<script scope="backend">
+  if (!is_customer) redirect('/login');
+
+  var token = await session.getToken(90);   // 90-second window
+  if (!token) redirect('/login');
+
+  redirect('https://app.example.com/dashboard?ef_session=' + encodeURIComponent(token));
+</script>
+```
+
+**Destination** (`app.example.com/dashboard`) — no code needed. The global handoff middleware consumes `?ef_session=` before your page renders. Your page sees a fresh session with `is_customer: true`, the visitor's email, and the preserved UTM/attribution keys from their original landing.
+
+---
+
+## Related
+
+- [`session.setCustomer()`](/backend-scripts/actions#session-setcustomer-fields) — establish a customer session from a custom login flow without cross-domain handoff.
+- [Backend script actions](/backend-scripts/actions) — full reference for `session.*`, `cookie.*`, `redirect()`, `setVariable()`.

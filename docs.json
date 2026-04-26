@@ -260,7 +260,8 @@
               "backend-template-engine/overview",
               "backend-template-engine/directives",
               "backend-template-engine/variables-and-filters",
-              "backend-template-engine/products-and-shipping"
+              "backend-template-engine/products-and-shipping",
+              "backend-template-engine/subscriptions"
             ]
           },
           {
@@ -282,10 +283,14 @@
                   "backend-scripts/actions",
                   "backend-scripts/data-functions",
                   "backend-scripts/validation",
-                  "backend-scripts/http"
+                  "backend-scripts/http",
+                  "backend-scripts/cache",
+                  "backend-scripts/queue",
+                  "backend-scripts/on-purchase-hook"
                 ]
               },
-              "backend-scripts/examples"
+              "backend-scripts/examples",
+              "guides/cross-domain-session-handoff"
             ]
           }
         ]

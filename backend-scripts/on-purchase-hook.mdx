@@ -1,0 +1,98 @@
+---
+title: 'On-Purchase Hook'
+description: 'Run a backend script automatically after every purchase.'
+---
+
+The on-purchase hook lets you run custom logic immediately after a customer completes a purchase. If a brand has a backend script named `ef-on-purchase`, it fires automatically — no extra configuration needed.
+
+The hook is **fire-and-forget**: it runs asynchronously and never blocks the purchase redirect. Errors are logged but do not affect the customer's checkout experience.
+
+## Convention
+
+Create a backend script at `scripts/ef-on-purchase.js`. The script must export a default function that receives a purchase context object:
+
+```javascript
+// scripts/ef-on-purchase.js
+export default function onPurchase(purchase) {
+  // purchase contains all the context you need
+  console.log('Purchase by', purchase.email, 'for', purchase.product_code);
+}
+```
+
+## Purchase context object
+
+The exported function receives a single object with the following fields:
+
+| Field            | Type   | Description                                         |
+|------------------|--------|-----------------------------------------------------|
+| `email`          | string | Customer email address                              |
+| `customer_name`  | string | Customer's full name                                |
+| `order_id`       | string | Order reference ID                                  |
+| `product_code`   | string | Product code that was purchased                     |
+| `product_name`   | string | Product display name                                |
+| `amount`         | number | Purchase amount                                     |
+| `currency`       | string | Currency code (e.g. `'USD'`)                        |
+| `brand_id`       | number | Brand ID                                            |
+| `quiz_visitor_id`| string | Quiz visitor ID from session (if available)         |
+
+## Available APIs
+
+The on-purchase hook runs in a restricted sandbox. The following APIs are available:
+
+- `cache.get`, `cache.set`, `cache.del`, `cache.has`, `cache.setIfAbsent`, `cache.increment`
+- `queue.push`, `queue.cancel`
+- CRM functions: `getCrmField`, `getCrmFields`, `setCrmField`, `setCrmFields`, etc.
+- `session.get` (read-only)
+- `console.log`
+- `import` (other backend scripts)
+
+## Disabled APIs
+
+These APIs are no-ops in the purchase hook to prevent interference with the purchase flow:
+
+- `redirect()`
+- `response.json()`, `response.send()`, `response.status()`
+- `http.get()`, `http.post()`
+
+## Example: Cancel abandon email on purchase
+
+```javascript
+export default function onPurchase(purchase) {
+  var visitorId = purchase.quiz_visitor_id;
+  if (visitorId) {
+    queue.cancel('abandon:' + visitorId);
+  }
+}
+```
+
+## Example: Record purchase in CRM
+
+```javascript
+export default function onPurchase(purchase) {
+  if (purchase.email) {
+    setCrmField({
+      slug: 'quiz-leads',
+      fieldKey: 'purchased_at',
+      value: new Date().toISOString(),
+      referenceType: 'customer_email',
+      referenceId: purchase.email,
+      force: true,
+      async: true,
+    });
+
+    setCrmField({
+      slug: 'quiz-leads',
+      fieldKey: 'order_value',
+      value: purchase.amount,
+      referenceType: 'customer_email',
+      referenceId: purchase.email,
+      force: true,
+      async: true,
+    });
+  }
+}
+```
+
+<Warning>
+The on-purchase hook is fire-and-forget. Errors are logged to the console but **never block** the purchase flow or redirect. Keep your hook logic fast — avoid long-running operations.
+</Warning>

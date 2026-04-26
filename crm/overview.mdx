@@ -39,8 +39,11 @@ Fields define what data can be stored on entries. Each field has:
 | `label` | Human-readable label |
 | `key` | Machine-readable key (used in API and templates) |
 | `type` | `text`, `number`, `date`, `boolean`, or `select` |
+| `reporting_config` | Optional analytics metadata for CRM reports |
 
 The **type** in CRM settings controls how the field appears and behaves in the admin UI (and related validation). It does **not** change what you pass from code: `setCrmField` always sends a JavaScript **value** — a **string**, **number**, **boolean**, or a **JSON object**. For fields you configure as **date** in the CRM, still pass a **date-time string** from scripts, typically **ISO 8601** (e.g. `new Date().toISOString()` or `'2026-03-15'`). That matches JSON over HTTP, where there is no native `Date` type. `getCrmField` returns the stored scalar (often a string for timestamps).
+
+Use `reporting_config` to mark fields as reportable and suggest how the Reports tab should aggregate and chart them. Supported values include `reportable`, `aggregation_type` (`numeric`, `categorical`, `date`, `boolean`), `baseline` (`min`/`max`), `bucket_size`, and `preferred_chart` (`kpi`, `histogram`, `pie`, `bar`, `line`).
 
 ### Pipelines & Stages
 

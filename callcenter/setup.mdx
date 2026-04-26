@@ -8,16 +8,17 @@ This page walks through the recommended setup order for the in-house Call Center
 ## Recommended setup order
 
 1. Open **Call Center** in the main sidebar.
-2. Go to **Setup** first.
+2. Go to **Setup** first. The Setup hub has four tabs: **Call Centers**, **Agents**, **Routing Rules**, and **Callbacks**.
 3. Review the setup checklist and use **Apply Defaults** if you want ElasticFunnels to create the starter records for you.
 4. Then finish the manual steps in this order:
-   - Create at least one call center
-   - Create or confirm your organization teams
-   - Add agents
-   - Create dispositions
-   - Connect brands to the center
-   - Configure the phone switch
-   - Add sales scripts
+   - Create at least one call center (Setup → Call Centers)
+   - Create or confirm your organization teams (Settings → Organization → Teams)
+   - Add agents (Setup → Agents — backed by users with the **Call Agent** role)
+   - Create dispositions (per-center, on the center detail page)
+   - Connect brands to the center (per-center, **Brand Settings** tab)
+   - Configure the phone switch (per-center, **Phone Switch** tab)
+   - Add sales scripts (per-center, **Scripts** tab)
+   - Optional: Routing Rules and Callbacks (Setup hub tabs)
 
 <Info>
 The **Setup** page is the fastest way to see what is still missing. It checks your real configuration state and is the best first stop for a new organization. Steps that depend on a previous step (e.g. teams require a call center) are disabled until their prerequisites are met.
@@ -25,8 +26,9 @@ The **Setup** page is the fastest way to see what is still missing. It checks yo
 
 ## Step 1: Create the call center
 
-1. In the sidebar, click **Call Center** → **Call Centers**.
-2. Click **Add Call Center**.
+1. In the sidebar, click **Call Center** → **Setup**.
+2. Open the **Call Centers** tab.
+3. Click **Add Call Center**.
 3. Fill in:
    - **Name**: the internal name your agents will see
    - **Type**: usually `sales`, `cs`, or `retention`
@@ -44,7 +46,7 @@ Teams are organization-level records, not center-only records.
    - Sales
    - Customer Service
    - Retention
-3. Return to **Call Center** → **Call Centers**.
+3. Return to **Call Center** → **Setup** → **Call Centers** tab.
 4. Open your call center.
 5. Use the **Teams** tab to link the center to the appropriate organization teams.
 
@@ -58,17 +60,17 @@ Agents are organization users who have the **Call Agent** role assigned.
 
 1. Go to **Settings** → **Organization** → **Users**.
 2. Assign the **Call Agent** role to users who should work in the call center.
-3. Once a user has the role, they appear in **Call Center** → **Agents** automatically.
+3. Once a user has the role, they appear in **Call Center** → **Setup** → **Agents** tab automatically.
 
 <Info>
-The Agents list shows a guidance banner when no agents are found, linking directly to the organization users page.
+The Agents tab shows a guidance banner when no agents are found, linking directly to the organization users page.
 </Info>
 
 ## Step 4: Create dispositions
 
 Dispositions are the outcomes agents pick when they finish a call.
 
-1. Open **Call Center** → **Call Centers**.
+1. Open **Call Center** → **Setup** → **Call Centers** tab.
 2. Click a center name.
 3. Open the **Dispositions** tab.
 4. Click **Add Disposition**.
@@ -190,12 +192,17 @@ This is important when one organization shares a single center across multiple b
 
 Use this map when onboarding a new organization:
 
-- **Call Center** → **Setup**: progress checklist, default creation
-- **Call Center** → **Call Centers**: create and edit centers
-- **Call Center** → **Agents**: assign users to centers and teams
-- **Call Center** → **Customer Service**: support workflow after setup
+- **Call Center** → **Dashboard**: live metrics overview
+- **Call Center** → **Workstation**: live agent station
 - **Call Center** → **Order Entry**: MOTO order workflow after setup
+- **Call Center** → **Customer Service**: support workflow after setup
+- **Call Center** → **Call Logs**: searchable list of every recorded call
+- **Call Center** → **Setup** → **Call Centers** tab: create and edit centers
+- **Call Center** → **Setup** → **Agents** tab: assign users to centers and teams
+- **Call Center** → **Setup** → **Routing Rules** tab: configure call routing
+- **Call Center** → **Setup** → **Callbacks** tab: review and reschedule pending callbacks
 - **Call Center** → **Commissions**: review and export commission totals
+- **Call Center** → **Billing**: cascade profiles, MID metadata, fraud filters, dunning, chargeback alerts, and routing logs
 - **Settings** → **Organization** → **Teams**: create the shared team records first
 - **Settings** → **Organization** → **Roles**: grant callcenter permissions
 

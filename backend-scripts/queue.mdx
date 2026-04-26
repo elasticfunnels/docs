@@ -1,0 +1,109 @@
+---
+title: 'Queue'
+description: 'Deferred background script execution with tag-based cancellation.'
+---
+
+Backend scripts can schedule other scripts to run in the background after a delay using the `queue` global. Jobs are stored in Redis and processed by a background worker. This is useful for sending follow-up emails, scheduling reminders, or any task that should happen later without blocking the current request.
+
+## `queue.push(scriptCode, payload, opts?)`
+
+Enqueue a backend script for deferred execution.
+
+```javascript
+// Send an email in 15 minutes
+queue.push('mailgun', {
+  type: 'abandon',
+  email: 'user@example.com',
+  quizProfile: quizProfile,
+  visitorId: visitorId,
+}, { delay: 900, tag: 'abandon:' + visitorId });
+```
+
+| Parameter    | Type   | Description                              |
+|--------------|--------|------------------------------------------|
+| `scriptCode` | string | The backend script code to execute (e.g. `'mailgun'`) |
+| `payload`    | object | Data passed to the script's exported function |
+| `opts`       | object | Optional configuration (see below)       |
+
+### Options
+
+| Key     | Type   | Default     | Description                                           |
+|---------|--------|-------------|-------------------------------------------------------|
+| `fn`    | string | `'default'` | Name of the exported function to call                 |
+| `delay` | number | `0`         | Seconds to wait before executing (max 86,400 = 24h)  |
+| `tag`   | string | —           | Logical group for cancellation (max 200 chars)        |
+
+**Returns:** `{ ok: true, jobId: '...' }` on success, or `{ ok: false, error: '...' }` on failure.
+
+### How the target script is called
+
+The queued script's exported function receives the `payload` object as its only argument:
+
+```javascript
+// scripts/mailgun.js
+function handleQueuedEmail(data) {
+  if (data.type === 'abandon') {
+    sendAbandonEmail(data.email, data.quizProfile, data.visitorId);
+  } else {
+    sendResultsEmail(data.email, data.quizProfile);
+  }
+}
+export default handleQueuedEmail;
+```
+
+If you specify `opts.fn`, a named export is called instead of the default export:
+
+```javascript
+queue.push('my-script', { userId: 123 }, { fn: 'processUser', delay: 60 });
+// → calls my-script.processUser({ userId: 123 }) after 60 seconds
+```
+
+## `queue.cancel(tag)`
+
+Cancel all pending jobs with the given tag for the current brand.
+
+```javascript
+var result = queue.cancel('abandon:' + visitorId);
+console.log('Cancelled', result.cancelled, 'jobs');
+```
+
+| Parameter | Type   | Description              |
+|-----------|--------|--------------------------|
+| `tag`     | string | The tag to cancel        |
+
+**Returns:** `{ ok: true, cancelled: N }` where N is the number of jobs removed.
+
+## Example: Abandon email flow
+
+```javascript
+// On email capture (quiz-save.ef):
+// 1. Send results email immediately
+handleMailgun({ email: leadEmail, quizProfile: quizProfile });
+
+// 2. Queue abandon email for 15 minutes later
+queue.push('mailgun', {
+  type: 'abandon',
+  email: leadEmail,
+  quizProfile: quizProfile,
+  visitorId: visitorId,
+}, { delay: 900, tag: 'abandon:' + visitorId });
+
+// On purchase (ef-on-purchase.js):
+// Cancel the pending abandon email
+queue.cancel('abandon:' + visitorId);
+```
+
+<Note>
+**Limits per brand:**
+- **100 pending jobs** maximum per brand
+- **64 KB** maximum payload size
+- **24-hour** maximum delay
+- **5 pushes** per script execution
+- **5 cancel calls** per script execution
+- **3 retries** with exponential backoff on failure
+- Jobs expire after **24 hours** if not processed
+</Note>
+
+<Warning>
+Queued scripts run in a background worker **without session or customer context**. They have access to `cache`, `queue`, and CRM functions, but **not** `request`, `session`, `redirect`, or `response`. Design your scripts to receive all needed data in the `payload`.
+</Warning>

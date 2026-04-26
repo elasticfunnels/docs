@@ -1,0 +1,119 @@
+---
+title: 'Cache'
+description: 'Brand-scoped key-value cache for backend scripts.'
+---
+
+Backend scripts have access to a Redis-backed key-value cache via the `cache` global. Every key is automatically scoped to the current brand — scripts can never read or write keys belonging to another brand.
+
+Values are JSON-serialised, so you can store strings, numbers, booleans, arrays, and plain objects.
+
+## `cache.get(key)`
+
+Retrieve a value from the cache.
+
+```javascript
+var count = cache.get('page_views');
+if (count !== null) {
+  setVariable('views', count);
+}
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| `key`     | string | Cache key   |
+
+**Returns:** The stored value, or `null` if the key does not exist or has expired.
+
+## `cache.set(key, value, ttlSeconds?)`
+
+Store a value in the cache with an optional TTL.
+
+```javascript
+cache.set('last_visit', new Date().toISOString(), 3600);
+```
+
+| Parameter    | Type   | Default | Description                     |
+|--------------|--------|---------|---------------------------------|
+| `key`        | string | —       | Cache key                       |
+| `value`      | any    | —       | Value to store (JSON-serialised)|
+| `ttlSeconds` | number | 3600    | Time-to-live in seconds         |
+
+**Returns:** `true` on success, `false` if the brand key limit was reached or an error occurred.
+
+## `cache.del(key)`
+
+Delete a key from the cache.
+
+```javascript
+cache.del('last_visit');
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| `key`     | string | Cache key   |
+
+**Returns:** `true` on success.
+
+## `cache.has(key)`
+
+Check whether a key exists in the cache.
+
+```javascript
+if (cache.has('onboarding_complete')) {
+  redirect('/dashboard');
+}
+```
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| `key`     | string | Cache key   |
+
+**Returns:** `true` if the key exists, `false` otherwise.
+
+## `cache.setIfAbsent(key, value, ttlSeconds?)`
+
+Write a value only if the key does **not** already exist. Useful for debouncing and deduplication.
+
+```javascript
+var isNew = cache.setIfAbsent('email_sent:' + email, true, 86400);
+if (isNew) {
+  // First time — send the email
+}
+```
+
+| Parameter    | Type   | Default | Description                     |
+|--------------|--------|---------|---------------------------------|
+| `key`        | string | —       | Cache key                       |
+| `value`      | any    | —       | Value to store                  |
+| `ttlSeconds` | number | 3600    | Time-to-live in seconds         |
+
+**Returns:** `true` if the value was written (key was absent), `false` if the key already existed.
+
+## `cache.increment(key, amount?, ttlSeconds?)`
+
+Atomically increment a numeric value. Creates the key with the given amount if it doesn't exist.
+
+```javascript
+var views = cache.increment('page:home:views', 1, 86400);
+setVariable('view_count', views);
+```
+
+| Parameter    | Type   | Default | Description                            |
+|--------------|--------|---------|----------------------------------------|
+| `key`        | string | —       | Cache key                              |
+| `amount`     | number | 1       | Value to add (can be negative or float)|
+| `ttlSeconds` | number | —       | Optional TTL to set/refresh            |
+
+**Returns:** The new numeric value after incrementing.
+
+<Note>
+**Limits per brand:**
+- **50,000 keys** maximum per brand
+- **512 bytes** maximum value size
+- **1-hour** maximum TTL
+- **20 cache operations** per script execution
+</Note>
+
+<Warning>
+Cache keys must match the pattern `[a-zA-Z0-9_.:-]` and be at most 200 characters long. Keys that don't match will throw an error.
+</Warning>

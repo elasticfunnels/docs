@@ -203,7 +203,11 @@ Customer-scoped recurring billing functions. All operations are restricted to su
 
 Write functions return `{ ok: boolean, error?: string, ...rest }` and **never throw** on validation failure. They enforce status transitions automatically (e.g. only `active` can be paused or skipped, only `paused` can be resumed, already-canceled cannot be canceled again).
 
-For full request/response shapes and ready-to-use page-based examples, see [Subscriptions (backend template engine)](/backend-template-engine/subscriptions).
+For full request/response shapes, content-gating examples, and ready-to-use page-based API examples, see [Subscriptions (backend template engine)](/backend-template-engine/subscriptions).
+
+<Note>
+**Per-request cache:** All read helpers (`getSubscriptions`, `getSubscription` with an object arg, `hasSubscription`, `countSubscriptions`) share a per-request cache. The database is queried only once per request — subsequent calls with different filters read from memory.
+</Note>
 
 ### `getSubscriptions(status?, limit?)`
 
@@ -258,15 +262,86 @@ Each subscription object contains:
 }
 ```
 
-### `getSubscription(transactionId)`
+### `getSubscription(arg)`
 
-Fetch a single subscription by its **original transaction ID** (`original_transaction_id` on the subscription record). Returns `null` if not found or if the subscription does not belong to the current customer.
+Fetch a single subscription. Accepts either a **transaction ID string** or a **filter object**.
+
+**String form** — fetch by original transaction ID (existing behavior):
 
 ```javascript
 var sub = getSubscription(request.query.id);
 if (sub) {
   setVariable('subscription', sub);
 }
+```
+
+**Object form** — fetch the first matching subscription from the per-request cache:
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `code` | string | — | Filter by product code in the subscription's `products` array. |
+| `status` | string | `'active'` | Filter by status. Use `'any'` to skip status filtering. |
+
+```javascript
+// First active subscription for a specific product
+var sub = getSubscription({ code: 'monthly-plan' });
+
+// Most recent canceled subscription (win-back flow)
+var canceled = getSubscription({ code: 'monthly-plan', status: 'canceled' });
+if (canceled) {
+  setVariable('canceled_at', canceled.canceled_at);
+  setVariable('show_winback', true);
+}
+
+// First subscription regardless of code, any status
+var any = getSubscription({ status: 'any' });
+```
+
+### `hasSubscription(filter?)`
+
+Returns `true` if the customer has at least one subscription matching the filter, `false` otherwise. All fields are optional.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `code` | string | — | Match by product code. |
+| `status` | string | `'active'` | Match by status. Use `'any'` to skip. |
+| `date` | string | — | ISO date string. When set, ignores `status` and instead checks whether the subscription was active on that date (`started_at ≤ date` and `canceled_at` is null or after the date). |
+
+```javascript
+// Does the customer have any active subscription?
+var isSubscribed = hasSubscription();
+
+// Active subscription for a specific product (content gate)
+if (hasSubscription({ code: 'premium-plan' })) {
+  setVariable('show_premium', true);
+}
+
+// Was the customer subscribed on a specific date? (date-based gate)
+if (hasSubscription({ code: 'premium-plan', date: '2026-01-01' })) {
+  setVariable('can_view_jan_content', true);
+}
+
+// Does the customer have a past-due subscription? (dunning banner)
+if (hasSubscription({ status: 'past_due' })) {
+  setVariable('show_billing_warning', true);
+}
+```
+
+### `countSubscriptions(filter?)`
+
+Returns the number of subscriptions matching the filter. Same filter shape as `hasSubscription`, excluding `date`.
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `code` | string | — | Filter by product code. |
+| `status` | string | `'active'` | Filter by status. Use `'any'` for all statuses. |
+
+```javascript
+var activeCount = countSubscriptions();
+setVariable('active_sub_count', activeCount);
+
+var totalCount = countSubscriptions({ status: 'any' });
+var canceledCount = countSubscriptions({ status: 'canceled' });
 ```
 
 ### `cancelSubscription(transactionId, reason?)`
@@ -433,15 +508,11 @@ setVariable('display_price', formatted);
 
 ## Courses
 
-### `getCourse(courseIdOrOpts)`
+### `getCourse(courseId)`
 
 Fetch a course by ID, including modules and contents.
 
 ```javascript
-// Preferred object style
-var course = getCourse({ id: 42 });
-
-// Legacy positional style still supported
 var course = getCourse(42);
 if (course) {
   setVariable('course_title', course.title);
@@ -449,70 +520,49 @@ if (course) {
 }
 ```
 
-### `getCourseBySlug(slugOrOpts)`
+### `getCourseBySlug(slug)`
 
 Fetch a course by its URL slug.
 
 ```javascript
-// Preferred object style
-var course = getCourseBySlug({ slug: 'javascript-basics' });
-
-// Legacy positional style still supported
 var course = getCourseBySlug('javascript-basics');
 ```
 
-### `getModuleBySlug(courseSlugOrOpts, moduleSlug?)`
+### `getModuleBySlug(courseSlug, moduleSlug)`
 
 Fetch a single module with its contents.
 
 ```javascript
-// Preferred object style
-var module = getModuleBySlug({ course: 'javascript-basics', module: 'variables' });
-
-// Legacy positional style still supported
 var module = getModuleBySlug('javascript-basics', 'variables');
 if (module) {
   setVariable('module_title', module.title);
 }
 ```
 
-### `getCourses(opts?)`
+### `getCourses()`
 
 Fetch all courses for the brand with lesson and module counts.
 
 ```javascript
-// Preferred object style
-var courses = getCourses({ assignedOnly: false, sort: 'enrollment_oldest_unfinished_first' });
-
-// Legacy positional style still supported
-var coursesLegacy = getCourses();
+var courses = getCourses();
 setVariable('course_count', courses.length);
 ```
 
-### `getCoursesByCategorySlug(categoryOrOpts, assignedOnly?)`
+### `getCoursesByCategorySlug(categorySlug)`
 
 Filter courses by category slug.
 
 ```javascript
-// Preferred object style
-var marketingCourses = getCoursesByCategorySlug({
-  category: 'marketing',
-  assignedOnly: false,
-  sort: 'enrollment_oldest_unfinished_first'
-});
-
-// Legacy positional style still supported
-var marketingCoursesLegacy = getCoursesByCategorySlug('marketing');
+var marketingCourses = getCoursesByCategorySlug('marketing');
 setVariable('marketing_course_count', marketingCourses.length);
 ```
 
-### `getCategoriesWithCourses(opts?)`
+### `getCategoriesWithCourses()`
 
 Get all course categories with their courses grouped together.
 
 ```javascript
-var categories = getCategoriesWithCourses({ assignedOnly: false });
-var categoriesLegacy = getCategoriesWithCourses();
+var categories = getCategoriesWithCourses();
 // [
 //   { category_slug: 'marketing', category_name: 'Marketing', courses: [...] },
 //   { category_slug: 'design', category_name: 'Design', courses: [...] },
@@ -521,58 +571,42 @@ var categoriesLegacy = getCategoriesWithCourses();
 setVariable('category_count', categories.length);
 ```
 
-### `getCourseForCustomer(slugOrOpts)`
+### `getCourseForCustomer(slug)`
 
 Fetch a single course with enrollment data for the current customer. Returns the full module/lesson tree plus `completed_content_ids`, `progress_percent`, `is_assigned`, and `started`.
 
 ```javascript
-var course = getCourseForCustomer({ slug: 'javascript-basics' });
-var courseLegacy = getCourseForCustomer('javascript-basics');
+var course = getCourseForCustomer('javascript-basics');
 if (course && course.is_assigned) {
   setVariable('progress', course.progress_percent);
 }
 ```
 
-### `getCoursesForCustomer(opts?)`
+### `getCoursesForCustomer()`
 
-Fetch all courses the current customer is enrolled in. Same as `getCourses({ assignedOnly: true })`.
+Fetch all courses the current customer is enrolled in. Same as `getCourses(true)`.
 
 ```javascript
-var myCourses = getCoursesForCustomer({ sort: 'enrollment_oldest_unfinished_first' });
-var myCoursesLegacy = getCoursesForCustomer();
+var myCourses = getCoursesForCustomer();
 ```
 
 Each course includes `module_count`, `lesson_count`, `progress_percent`, `completed_content_ids`, and `is_assigned`.
 
-### `getCourseLesson(courseOrOpts, moduleId?, lessonId?)`
-
-Resolve a lesson-player payload in one call (course + modules + current lesson + prev/next URLs + progress stats).
-
-```javascript
-// Preferred object style
-var seed = getCourseLesson({ course: 'javascript-basics', module: 12, lesson: 77 });
-
-// Legacy positional style still supported
-var seedLegacy = getCourseLesson('javascript-basics', 12, 77);
-```
-
-### `getCoursesForCustomerByCategorySlug(categoryOrOpts)`
+### `getCoursesForCustomerByCategorySlug(categorySlug)`
 
 Fetch the current customer's enrolled courses, filtered by category slug. Returns an empty array if the category has no enrolled courses.
 
 ```javascript
-var marketing = getCoursesForCustomerByCategorySlug({ category: 'marketing' });
-var marketingLegacy = getCoursesForCustomerByCategorySlug('marketing');
+var marketing = getCoursesForCustomerByCategorySlug('marketing');
 setVariable('marketing_courses', marketing);
 ```
 
-### `getCategoriesWithCoursesForCustomer(opts?)`
+### `getCategoriesWithCoursesForCustomer()`
 
 Get all course categories that contain at least one course the current customer is enrolled in, with the enrolled courses grouped per category. Useful for category-tab navigation on a member-facing courses page.
 
 ```javascript
-var categories = getCategoriesWithCoursesForCustomer({ sort: 'enrollment_oldest_unfinished_first' });
-var categoriesLegacy = getCategoriesWithCoursesForCustomer();
+var categories = getCategoriesWithCoursesForCustomer();
 // [
 //   { category_slug: 'marketing', category_name: 'Marketing', courses: [...] },
 //   { category_slug: 'design',    category_name: 'Design',    courses: [...] }
@@ -586,7 +620,6 @@ Count completed lessons across all enrolled courses, or for a specific course.
 ```javascript
 var totalDone = getCompletedLessonsCount();
 var courseDone = getCompletedLessonsCount({ course: 'javascript-basics' });
-var courseDoneLegacy = getCompletedLessonsCount('javascript-basics');
 ```
 
 ### `getCourseProgress(opts?)`
@@ -598,7 +631,6 @@ var progress = getCourseProgress();
 // progress.completedLessons  → 12
 // progress.totalLessons      → 48
 // progress.courses → [{ slug, title, completedLessons, totalLessons, progressPercent }]
-var singleLegacy = getCourseProgress('javascript-basics');
 ```
 
 ## Blog
@@ -860,9 +892,19 @@ Use this at the top of a backend script in templates that ship to many brands so
 | `pluralName` | string | `null` | Plural label (e.g. "Member Settings"). Alias: `plural_name`. |
 | `icon` | string | `null` | Icon name (Lucide icon, admin UI). |
 | `color` | string | `null` | Accent color (CSS color string). |
-| `fields` | array | `[]` | Optional field schema. Each item: `{ key, label?, type?, options?, validation_rules?, visible_to_team_ids? }`. |
+| `fields` | array | `[]` | Optional field schema. Each item: `{ key, label?, type?, options?, validation_rules?, visible_to_team_ids?, reporting_config? }`. |
 
 Field `type` values: `text`, `textarea`, `email`, `tel`, `url`, `number`, `integer`, `decimal`, `currency`, `date`, `datetime`, `time`, `select`, `multiselect`, `checkbox`, `boolean`, `radio`, `json`, `rich_text`. For `select`/`multiselect`/`radio` pass `options: ['a','b']` or `[{ value: 'a', label: 'A' }]`.
+
+`reporting_config` marks a field for CRM reports and controls the default chart behavior. Supported keys:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `reportable` | boolean | Include this field in the entity Reports tab. |
+| `aggregation_type` | string | One of `numeric`, `categorical`, `date`, or `boolean`. |
+| `baseline` | object | Optional `{ min, max }` numeric bounds for KPI/progress displays. |
+| `bucket_size` | number | Positive numeric histogram bucket size. |
+| `preferred_chart` | string | One of `kpi`, `histogram`, `pie`, `bar`, or `line`. |
 
 Returns:
 
@@ -888,6 +930,18 @@ ensureCrmEntity({
     { key: 'time_zone',      label: 'Time zone',      type: 'select',
       options: ['UTC', 'Europe/London', 'America/New_York'] },
     { key: 'marketing_opt_in', label: 'Marketing opt-in', type: 'checkbox' },
+    {
+      key: 'current_score',
+      label: 'Current Score',
+      type: 'number',
+      reporting_config: {
+        reportable: true,
+        aggregation_type: 'numeric',
+        baseline: { min: 0, max: 100 },
+        bucket_size: 10,
+        preferred_chart: 'kpi'
+      }
+    },
   ],
 });
 

@@ -1,0 +1,263 @@
+---
+title: 'Customer Care Portal'
+description: 'Let customers manage their subscriptions and request refunds directly from the members area.'
+---
+
+The Customer Care portal adds two self-service features to the members area:
+
+- **Manage** — Customers can pause, skip, or cancel a subscription (with optional retention offers). The manage page also shows a list of orders eligible for a refund.
+- **Self-refund** — Customers can submit a refund request for eligible orders (one-time purchases or subscription first charges).
+
+Both features are configured per merchant in **Merchant settings → Customer care** and are completely optional.
+
+---
+
+## Brand-level settings
+
+Before configuring individual merchants, set the brand-wide customer support details in **Brand Settings → General** under the **Customer support** section:
+
+| Setting | Purpose |
+|---------|---------|
+| **Support email** | Displayed to customers in error messages (e.g. "Please contact us at support@yourbrand.com"). |
+| **Support phone** | Optional phone number displayed alongside the support email. |
+| **Money-back guarantee (days)** | A brand-wide refund window. Orders older than this many days are automatically ineligible for a refund, regardless of per-merchant rules. Set to 0 or leave blank to disable. |
+
+These values are stored as brand variables and are accessible in templates as `{{ brand.support_email }}`, `{{ brand.support_phone }}`, and `{{ brand.mbg_days }}`.
+
+<Tip>
+When a refund request is denied, the error message automatically includes your support email and phone so customers know how to reach you. Make sure to fill these in.
+</Tip>
+
+---
+
+## Enabling Customer Care
+
+1. Navigate to **Merchants** and open a merchant configured with Stripe or NMI.
+2. Click the **Customer care** tab.
+3. Enable the features you want:
+   - **Subscription management** — turns on the Manage page for active subscriptions.
+   - **Self-refund** — allows customers to request a refund on eligible orders.
+4. Save the merchant.
+
+### Subscription management
+
+When enabled, an active subscription card on `/members/subscription` will show a **Manage** button. Clicking it opens `/members/manage?tx=<transactionId>`.
+
+<Note>
+Configure the exit survey reasons and retention offers in the **Retention offers** tab. The Customer care tab controls the feature toggle; the Retention offers tab controls which offers are shown.
+</Note>
+
+### Self-refund — eligibility rules
+
+Eligibility is checked at two levels:
+
+**Brand level** (checked first):
+
+| Rule | What it checks |
+|------|---------------|
+| **Money-back guarantee (days)** | If set and the order is older than this window, it's automatically ineligible. |
+
+**Merchant level** (checked second):
+
+| Rule | What it checks |
+|------|---------------|
+| **Max days since purchase** | The order must have been placed within N days. |
+| **Require not fulfilled** | Orders that have already been shipped, fulfilled, or delivered are excluded. |
+| **Max order amount** | Orders above this dollar threshold are excluded. |
+
+If an order passes both levels, a **Request refund** link appears on its card in `/members/orders` and in the refund candidates section on `/members/manage`.
+
+### Self-refund — on-request action
+
+When a customer submits a refund request, one of three things happens (your choice):
+
+| Action | What happens |
+|--------|-------------|
+| **Process refund automatically** | The refund is applied immediately via the payment gateway. The customer sees a confirmation that the refund will appear in 3–5 business days. |
+| **Send email notification** | An email is sent to the configured **Notification email** address with order and customer details. The customer sees a "request received" message. |
+| **Create support ticket** | A support ticket is created on behalf of the customer. The customer receives the ticket number. This option is only available when the brand has the Tickets module enabled. |
+
+### Error messages
+
+All customer-facing error messages are friendly and non-technical. When a refund is denied, the message includes your brand's support contact information automatically:
+
+> "The refund window for this order has closed. Please contact us at support@yourbrand.com or call +1 800 555 0100."
+
+If no support email or phone is configured, it falls back to:
+
+> "Please contact our support team."
+
+---
+
+## The Manage page (`/members/manage`)
+
+The manage page is a multi-step flow. Customers land here from the **Manage** button on their subscription card.
+
+**Step 1 — Subscription summary + refund candidates**  
+Shows the product name, current status, and next charge date with a "I want to cancel" action. Below the subscription card, any orders eligible for a refund are displayed with a "Request refund" link.
+
+**Step 2 — Exit survey**  
+Displays the exit survey reasons configured in the Retention offers tab. The customer selects the reason that applies.
+
+**Step 3 — Retention offer** *(optional)*  
+If a retention offer is configured for the selected reason, the customer is shown the offer (discount, pause, or downgrade). They can accept it or proceed to cancel.
+
+**Step 4 — Outcome**  
+Shows the result: cancelled, offer accepted, or an error.
+
+### Refund candidates on the manage page
+
+The manage page automatically shows refund-eligible orders below the subscription card. An order appears in this list when:
+
+- `refund_eligible` is `true` (merchant rules pass)
+- The order is not fully refunded
+- The order is within the brand's money-back guarantee window (if configured)
+
+Each candidate card displays the order number, date, how many days ago the order was placed, the total amount, and a link to the refund page.
+
+### Customising the manage page
+
+The built-in `members/manage` page is a starting point. You can build a fully custom version using the `getManageData()` backend function, `getOrders()`, and the `window.ef.customerCare` JavaScript API.
+
+```liquid
+<script scope="backend">
+  var data = getManageData(query.tx);
+  if (!data) { redirect('/members/subscription'); }
+  setVariable('manage', data);
+
+  // Refund candidates
+  var orders = getOrders('newest', 50);
+  var mbgDays = brand.mbg_days || 0;
+  var refundOrders = orders.filter(function(o) {
+    if (!o.refund_eligible || o.refund.fully_refunded) return false;
+    if (mbgDays > 0 && o.days_since_order != null && o.days_since_order >= mbgDays) return false;
+    return true;
+  });
+  setVariable('refund_orders', refundOrders);
+</script>
+```
+
+The `getManageData()` function returns `null` if the subscription doesn't exist, doesn't belong to the current customer, or manage is not enabled on the merchant. Use this to redirect before rendering the page.
+
+---
+
+## The Refund page (`/members/refund`)
+
+The refund page lets a customer submit a refund request for a specific order. They arrive here from the **Request refund** link on an order card or from the manage page.
+
+**What the customer sees:**
+- A summary of the order (order number, date, amount).
+- The refund amount (the full remaining balance — read-only).
+- A text area for a reason.
+- A submit button.
+
+**Outcome states after submitting:**
+
+| Outcome | Message shown |
+|---------|--------------|
+| Auto refunded | "Your refund has been processed and will appear within 3–5 business days." |
+| Queued for review | "Your refund request has been received. Our team will review it shortly." |
+| Ticket created | "A support ticket has been created (#XXXXXXXX). We'll be in touch soon." |
+
+### Customising the refund page
+
+Build a custom page using `getRefundEligibility()` and `window.ef.customerCare.requestRefund()`:
+
+```liquid
+<script scope="backend">
+  var elig = getRefundEligibility(query.order);
+  if (!elig or !elig.eligible) { redirect('/members/orders'); }
+  setVariable('elig', elig);
+</script>
+```
+
+The `getRefundEligibility()` function returns `null` if the order is not found, doesn't belong to the current customer, or is not eligible for a refund. The `eligible` flag is `false` when rules are not met (the `reasons` array describes why).
+
+---
+
+## Brand variables (`brand.*`)
+
+The following brand-level variables are available in all templates:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `brand.name` | string | Brand display name |
+| `brand.code` | string | Brand code |
+| `brand.currency` | string | Default currency code (e.g. `USD`) |
+| `brand.timezone` | string | Brand timezone (e.g. `America/New_York`) |
+| `brand.support_email` | string | Customer support email (from Brand Settings) |
+| `brand.support_phone` | string | Customer support phone (from Brand Settings) |
+| `brand.mbg_days` | number | Money-back guarantee window in days (0 = disabled) |
+
+Use these in your templates:
+
+```liquid
+@if(brand.support_email)
+  <p>Need help? Email us at {{ brand.support_email }}</p>
+@endif
+```
+
+---
+
+## Template variables reference
+
+### `getManageData(transactionId)`
+
+Returns an object (or `null`):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `manage_enabled` | boolean | Always `true` when returned (null if disabled) |
+| `retention_offers_enabled` | boolean | Whether retention offers are configured |
+| `exit_survey_reasons` | string[] | Exit survey reason keys |
+| `offers` | object[] | Retention offer rules |
+| `subscription` | object | Subscription details (id, status, amount, frequency, etc.) |
+
+### `getRefundEligibility(orderCode)`
+
+Returns an object (or `null`):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `eligible` | boolean | Whether the order can be refunded |
+| `reasons` | string[] | Why the order is ineligible (empty when eligible) |
+| `on_request_action` | string | `auto_refund`, `send_email`, or `create_ticket` |
+| `order.conversion_code` | string | Conversion code (use as `order_id` in `requestRefund`) |
+| `order.order_number` | string | Display order number |
+| `order.total` | number | Order total |
+| `order.remaining` | number | Remaining refundable amount |
+| `order.currency` | string | Currency code |
+| `order.created_at` | string | ISO date of purchase |
+
+### Order fields (from `getOrders()`)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `order.refund_eligible` | boolean | Whether the order passes merchant-level refund rules |
+| `order.conversion_code` | string | Conversion code (use as the order identifier for refund links) |
+| `order.days_since_order` | number \| null | Number of full days since the order was placed |
+| `order.fulfillment_status` | string \| null | Current fulfillment status (e.g. `shipped`, `fulfilled`, `delivered`) |
+
+### `sub.manage_enabled` (subscriptions list)
+
+The `getSubscriptions()` function includes `manage_enabled` on each subscription object. Use this to conditionally show the Manage button:
+
+```liquid
+@if(sub.manage_enabled and sub.status eq 'active')
+  <a href="/members/manage?tx={{ sub.original_transaction_id }}">Manage</a>
+@endif
+```
+
+### Showing refund-eligible orders
+
+Use `refund_eligible`, `days_since_order`, and `brand.mbg_days` together for the most accurate display:
+
+```liquid
+@foreach(order in orders)
+  @if(order.refund_eligible and not order.refund.fully_refunded)
+    @if(brand.mbg_days lte 0 or order.days_since_order lt brand.mbg_days)
+      <a href="/members/refund?order={{ order.conversion_code }}">Request refund</a>
+    @endif
+  @endif
+@endforeach
+```

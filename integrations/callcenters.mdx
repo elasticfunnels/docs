@@ -1,9 +1,9 @@
 ---
 title: 'External Call Center Integrations'
-description: 'Push abandoned cart, sales, and subscription event data to third-party call center providers'
+description: 'Push abandoned cart, sales, failed payment, and subscription-lifecycle events to third-party call center providers'
 ---
 
-ElasticFunnels integrates with external call center providers to automatically push data for abandoned cart recovery, sales follow-ups, subscription dunning escalation, and cancellation routing.
+ElasticFunnels integrates with external call center providers to automatically push data for abandoned cart recovery, sales follow-ups, failed payment calls, subscription dunning escalation, cancellation routing, and winback (re-engagement) leads.
 
 <Info>
 These are **outbound data pushes** to third-party providers. If you want to run your **own** call center with agent tools, phone orders, and commission tracking, see the [Call Center Suite](/callcenter/overview).
@@ -13,19 +13,19 @@ These are **outbound data pushes** to third-party providers. If you want to run 
 
 <CardGroup cols={2}>
   <Card title="HelpGrid" icon="headphones">
-    Abandoned cart recovery and customer support postbacks.
-  </Card>
-  <Card title="SalesBound" icon="chart-line-up">
-    Sales follow-ups, subscription failed payment escalation, and cancellation routing.
-  </Card>
-  <Card title="Committed Coaches" icon="users">
-    High-touch coaching, subscription failed payment escalation, and cancellation routing.
+    Full suite: abandoned carts, new sales, failed payments, subscription dunning, cancellations, and winback leads.
   </Card>
   <Card title="Logicall" icon="phone">
-    Enterprise-grade abandoned cart recovery for high-volume sales.
+    Full suite: enterprise abandoned-cart recovery plus sales, failed payment, and full subscription-lifecycle support.
+  </Card>
+  <Card title="SalesBound" icon="chart-line-up">
+    Sales follow-ups, failed payments, subscription dunning, cancellation, and winback routing. Does not receive abandoned carts.
+  </Card>
+  <Card title="Committed Coaches" icon="users">
+    High-touch coaching, failed payments, subscription dunning, cancellation, and winback routing. Does not receive abandoned carts.
   </Card>
   <Card title="Nuyu" icon="phone-volume">
-    Sales and subscription management. Phone number is not required for sales.
+    Sales, failed payments, subscription dunning, cancellations, and winback. Phone number is **not** required for sales.
   </Card>
 </CardGroup>
 
@@ -34,33 +34,45 @@ These are **outbound data pushes** to third-party providers. If you want to run 
 | Event Type | HelpGrid | Logicall | SalesBound | Committed Coaches | Nuyu |
 |------------|----------|----------|------------|-------------------|------|
 | **Abandoned carts** | Yes | Yes | — | — | — |
-| **New sales** | — | — | Yes | Yes | Yes |
-| **Failed payments** | — | — | Yes | Yes | Yes |
-| **Subscription failed** | — | — | Yes | Yes | Yes |
-| **Subscription cancel** | — | — | Yes | Yes | Yes |
-| **Subscription winback** | — | — | Yes | Yes | Yes |
+| **New sales** | Yes | Yes | Yes | Yes | Yes |
+| **Failed payments** | Yes | Yes | Yes | Yes | Yes |
+| **Subscription renewal failed** | Yes | Yes | Yes | Yes | Yes |
+| **Subscription cancel** | Yes | Yes | Yes | Yes | Yes |
+| **Subscription winback** | Yes | Yes | Yes | Yes | Yes |
 
 <Info>
-**Committed Coaches** and **Nuyu** are purchase-endpoint providers — subscription events are sent via their sales webhook, not an abandon webhook. **Nuyu** is outbound-only (no incoming postbacks from the provider back to ElasticFunnels). **HelpGrid** and **Logicall** only handle abandoned cart data.
+A "Yes" in the matrix only declares **what the provider can technically receive**. Each event still has to be explicitly enabled on your integration — see [Per-Event Configuration](#per-event-configuration) below. By default only **Abandoned carts** is enabled for HelpGrid / Logicall. All other events are off until you turn them on.
+</Info>
+
+<Info>
+**Committed Coaches** and **Nuyu** are purchase-endpoint providers — subscription events are sent via their sales webhook. **Nuyu** is outbound-only (no incoming postbacks from the provider back to ElasticFunnels).
 </Info>
 
 ## Common Use Cases
 
 ### Abandoned Cart Recovery
 
-When a customer enters their email but doesn't complete the purchase, their data is sent to HelpGrid or Logicall. A call center agent can then reach out to help them complete the sale.
+When a customer enters their email but doesn't complete the purchase, their data is sent to HelpGrid or Logicall after a short delay. A call center agent can then reach out to help them complete the sale. If the customer comes back and buys within the delay window, the pending abandoned-cart call is **automatically cancelled**.
 
 ### New Order Follow-Up
 
-After a successful purchase, order data is sent to SalesBound, Committed Coaches, or Nuyu. Ideal for high-ticket offers where a "welcome call" or "upsell call" is part of the flow.
+After a successful purchase, order data is sent to SalesBound, Committed Coaches, Nuyu, HelpGrid, or Logicall. Ideal for high-ticket offers where a "welcome call" or "upsell call" is part of the flow.
+
+### Failed Payment Calls
+
+When a first-time charge fails (bad card, fraud decline, AVS mismatch, etc.), the customer data — plus the full decline context — is sent to the provider after a configurable delay. If a successful sale for the same customer lands inside that delay window, the pending call is **automatically cancelled**, so you never call a customer who just recovered themselves.
 
 ### Subscription Dunning Escalation
 
-When a subscription renewal fails and the retry count reaches your configured threshold, the failed payment data is sent to providers with subscription support. Agents can call the customer to update their payment method.
+When a subscription renewal fails and the retry count reaches your configured escalation threshold, the failed payment data — including the gateway decline code and message — is sent to providers with subscription support. Agents can call the customer to update their payment method. If the next retry succeeds inside the delay window, the pending call is cancelled.
 
 ### Cancellation Routing
 
-When a subscription is canceled, the data can be sent to providers for a retention call attempt.
+When a subscription is cancelled (voluntarily or because dunning was exhausted), the data can be routed to providers for a retention call attempt.
+
+### Winback / Re-engagement
+
+30 days after a subscription cancels, a `subscription_winback` event is fired with the cancel reason, original purchase details, and contact info. Providers can use this as a re-engagement lead ("we miss you, here's X% off to come back").
 
 ## Setup
 
@@ -71,8 +83,11 @@ When a subscription is canceled, the data can be sent to providers for a retenti
   <Step title="Configure merchant filtering">
     Set the integration to listen to **All Merchants** or a specific **Whitelist**. Use the whitelist if you have different call centers for different products or regions.
   </Step>
+  <Step title="Configure per-event behavior">
+    In the **Events** table on the integration form, toggle on each event you want the provider to receive and — for failed-payment / subscription-failed events — set a delay and an optional decline-code filter. See [Per-Event Configuration](#per-event-configuration) below.
+  </Step>
   <Step title="Enable subscription escalation (optional)">
-    Go to **Settings** → **Merchants**, edit your merchant, and open the **Email** tab. In **Dunning Configuration**, set **Callcenter Escalation After Retry #** and enable **Send to Callcenter on Cancel** if needed.
+    Go to **Settings** → **Merchants**, edit your merchant, and open the **Email** tab. In **Dunning Configuration**, set **Callcenter Escalation After Retry #** and enable **Send to Callcenter on Cancel** if needed. These are **merchant-level gates** on top of the per-event integration config — the integration still has to have the corresponding event enabled for anything to be sent.
   </Step>
   <Step title="Test the connection">
     Use the **Test Webhook** button (available for most providers) to send a sample payload and verify the connection is active.
@@ -83,6 +98,51 @@ When a subscription is canceled, the data can be sent to providers for a retenti
 Always verify your Webhook URL with a test before going live to ensure your data is being captured correctly.
 </Tip>
 
+## Per-Event Configuration
+
+Each integration exposes an **Events** table with one row per supported event type. For each row you can configure:
+
+| Option | What it does |
+|--------|--------------|
+| **Enabled** | Master on/off for this event on this integration. When off, no sends of this event will go to this provider — even if the merchant-level dunning gate fires. |
+| **Delay (seconds)** | How long to wait before actually sending the event. Lets counter-events (e.g. a successful sale) cancel the pending call. Default `60` for `abandon` / `failed_payment` / `subscription_failed`; `0` for immediate-fire events (`sale`, `subscription_cancel`, `subscription_winback`). |
+| **Decline-code filter** | Only applies to `failed_payment` and `subscription_failed`. A comma-separated list of decline codes combined with a **Whitelist** (only these) or **Blacklist** (skip these) mode. Lets you avoid calling customers whose card was declined for a reason they can't fix (e.g. `do_not_honor` hard fails) or only call for actionable decline reasons. |
+
+## Delays & Auto-Cancellation
+
+Delays are the mechanism that makes the system **self-correcting**. Two high-value cancellation flows happen automatically:
+
+- **Purchase cancels abandoned-cart and failed-payment calls.** If a customer's email or phone matches a pending `abandon` or `failed_payment` call and a successful sale comes in inside the delay window, the pending call is marked `cancelled` and the provider is never contacted.
+- **Successful renewal cancels pending subscription-failed calls.** If a `subscription_renewal_failed` was queued for a customer and the next retry succeeds before the delay elapses, the pending call is cancelled.
+
+You can monitor this in the **Logs** section — cancelled dispatches are labelled with the counter-event that triggered the cancellation.
+
+## Decline Code Filtering
+
+For `failed_payment` and `subscription_failed` events, each failed charge is enriched with the full decline context from the gateway:
+
+- `decline_reason` — human-readable reason (e.g. "insufficient funds")
+- `decline_code` — gateway-normalized short code (e.g. `insufficient_funds`, `generic_decline`, `lost_card`)
+- `error_code` — top-level error class (e.g. `card_declined`)
+- `gateway_response_code` / `gateway_response_message` — raw gateway output
+
+Use the **Decline-code filter** on the event row to control which failures reach the call center:
+
+- **Blacklist** (default mode, empty list) — send every decline except the codes you list. Useful for excluding hard fails (`lost_card`, `stolen_card`, `fraudulent`, `do_not_honor`).
+- **Whitelist** — only send declines with the codes you list. Useful when you only want to call for specific recoverable reasons (`insufficient_funds`, `expired_card`, `card_declined`).
+
+The exact code values depend on the gateway. Stripe codes are listed in [Stripe's decline_code docs](https://stripe.com/docs/declines/codes); NMI returns the response text as both `responsetext` and `response_code`.
+
 ## Monitoring
 
-You can see all outbound postbacks to your call centers in the **Logs** section of your dashboard. If a postback fails, the system logs the error response from the provider so you can troubleshoot.
+You can see all outbound postbacks to your call centers in the **Logs** section of your dashboard. Each dispatch shows:
+
+- Integration + event type
+- Scheduled time and actual send time
+- Status (`pending`, `sent`, `cancelled`, `failed`)
+- If cancelled — which counter-event triggered the cancellation
+- If failed — the error response from the provider
+
+<Tip>
+If a `failed_payment` call is never being dispatched, check (in order): (1) the provider's global capability in the matrix above, (2) the **Enabled** toggle for that event on your integration, (3) the decline-code filter mode + list, and (4) the merchant-level **Callcenter Escalation After Retry #** gate if this is a subscription renewal.
+</Tip>

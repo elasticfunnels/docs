@@ -1,0 +1,310 @@
+---
+title: 'window.ef.customerCare'
+description: 'JavaScript API for the Customer Care portal — refund requests, subscription management, and retention offers.'
+---
+
+`window.ef.customerCare` is the client-side JavaScript API for the Customer Care self-service features. It is loaded automatically on pages that have the `data-ef-customer-care` attribute.
+
+---
+
+## requestRefund(params)
+
+Request a refund for an order. Eligibility rules are re-evaluated on the server.
+
+```javascript
+const result = await window.ef.customerCare.requestRefund({
+  order_id: 'CONV123',   // conversion code (from getRefundEligibility().order.conversion_code)
+  amount: 49.00,          // amount to refund (optional — defaults to full remaining balance)
+  reason: 'Product arrived damaged',
+});
+```
+
+### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `order_id` | string | Yes | The conversion code for the order. Use the `conversion_code` field returned by `getRefundEligibility()`. |
+| `amount` | number | No | Amount to refund. Defaults to the full remaining balance. |
+| `reason` | string | Yes | Customer-provided reason for the refund. |
+
+### Return value
+
+```javascript
+// Refund processed automatically
+{ ok: true, auto_refunded: true }
+
+// Request queued for review (send_email action)
+{ ok: true, queued: true, message: 'Your refund request has been received. Our team will review it shortly.' }
+
+// Support ticket created
+{ ok: true, ticket_created: true, ticket_code: 'ABCD1234' }
+
+// Error (includes brand support contact info when configured)
+{ ok: false, error: 'The refund window for this order has closed. Please contact us at support@example.com.' }
+```
+
+### Usage example
+
+```javascript
+document.getElementById('refund-btn').addEventListener('click', async function () {
+  const reason = document.getElementById('reason').value;
+  const result = await window.ef.customerCare.requestRefund({
+    order_id: 'CONV123',
+    reason,
+  });
+  if (result.ok && result.auto_refunded) {
+    showMessage('Refund processed. It will appear in 3–5 business days.');
+  } else if (result.ok && result.queued) {
+    showMessage('Request received. Our team will review it shortly.');
+  } else if (result.ok && result.ticket_created) {
+    showMessage('Ticket created: #' + result.ticket_code);
+  } else {
+    showMessage('Error: ' + (result.error || 'Please try again.'));
+  }
+});
+```
+
+---
+
+## getManageData(transactionId)
+
+Fetch manage data for a subscription — exit survey reasons, retention offers, and subscription details. Used to build a custom manage flow.
+
+```javascript
+const data = await window.ef.customerCare.getManageData(transactionId);
+```
+
+### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `transactionId` | string | Yes | The `original_transaction_id` of the subscription. |
+
+### Return value
+
+```javascript
+{
+  ok: true,
+  manage_enabled: true,
+  retention_offers_enabled: true,
+  exit_survey_reasons: ['too_expensive', 'not_using', 'other'],
+  offers: [
+    {
+      cancel_reason: 'too_expensive',
+      offer_type: 'discount',
+      offer_value: 20,
+      offer_label: 'Get 20% off for 3 months',
+      offer_duration_cycles: 3,
+    }
+  ],
+  subscription: {
+    id: '...',
+    status: 'active',
+    amount: 49.00,
+    currency_code: 'USD',
+    frequency: 1,
+    frequency_unit: 'month',
+    next_charge_at: '2026-05-22T00:00:00Z',
+    original_transaction_id: 'TXN_ABC123',
+    products: [{ name: 'Premium Plan', ... }],
+  }
+}
+```
+
+Returns `null` (network 4xx) if the subscription is not found, doesn't belong to the current customer, or manage is not enabled.
+
+---
+
+## applyOffer(params)
+
+Accept a retention offer (discount, pause, or downgrade) for a subscription.
+
+```javascript
+const result = await window.ef.customerCare.applyOffer({
+  transactionId: 'TXN_ABC123',
+  offerType: 'discount',
+  offerValue: 20,
+  cancelReason: 'too_expensive',
+  durationCycles: 3,
+});
+```
+
+### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `transactionId` | string | Yes | The `original_transaction_id` of the subscription. |
+| `offerType` | `'discount'` \| `'pause'` \| `'downgrade'` | Yes | Type of offer. |
+| `offerValue` | number | Depends | Percentage (discount) or days (pause). Not required for downgrade. |
+| `cancelReason` | string | No | The exit survey reason selected by the customer. |
+| `durationCycles` | number | No | Number of billing cycles for a discount offer. |
+| `productCode` | string | No | Product code for a downgrade offer. |
+
+### Return value
+
+```javascript
+// Discount applied
+{ ok: true, offer_type: 'discount', discount_percentage: 20 }
+
+// Subscription paused
+{ ok: true, offer_type: 'pause', resume_at: '2026-08-22T00:00:00Z' }
+
+// Plan downgraded
+{ ok: true, offer_type: 'downgrade', product_code: 'plan-basic' }
+
+// Error
+{ ok: false, error: 'Subscription is not active' }
+```
+
+---
+
+## cancelSubscription(params)
+
+Cancel a subscription with an optional survey reason.
+
+```javascript
+const result = await window.ef.customerCare.cancelSubscription({
+  transactionId: 'TXN_ABC123',
+  reason: 'too_expensive',
+});
+```
+
+### Parameters
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `transactionId` | string | Yes | The `original_transaction_id` of the subscription. |
+| `reason` | string | No | Cancel reason (from exit survey). |
+
+### Return value
+
+```javascript
+// Cancelled
+{ ok: true }
+
+// Error
+{ ok: false, error: 'Subscription is already canceled' }
+```
+
+---
+
+## Error messages
+
+All error messages returned by the Customer Care API are customer-friendly. They never expose technical details, internal IDs, or configuration values.
+
+When a request fails, the error string automatically appends the brand's support contact information (configured in **Brand Settings → General → Customer support**):
+
+| Scenario | Error message |
+|----------|---------------|
+| Refund not enabled | "We're unable to process your refund request online. Please contact us at {email} or call {phone}." |
+| Already fully refunded | "This order has already been fully refunded. Please contact us at {email}." |
+| MBG window expired | "The refund window for this order has closed. Please contact us at {email}." |
+| Order already shipped | "Orders that have already shipped cannot be refunded online. Please contact us at {email}." |
+| Over max amount | "This order is not eligible for an online refund. Please contact us at {email}." |
+| Internal error | "We're unable to process your refund right now. Please contact our support team." |
+
+If no support email or phone is configured, all messages fall back to "Please contact our support team."
+
+---
+
+## Full example — Custom refund flow
+
+```html
+<div data-ef-customer-care>
+  <form id="refund-form">
+    <textarea id="reason" placeholder="Why are you requesting a refund?"></textarea>
+    <button type="submit">Submit</button>
+  </form>
+  <div id="result" style="display:none;"></div>
+</div>
+
+<script>
+document.getElementById('refund-form').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const reason = document.getElementById('reason').value;
+  // order_id comes from your backend template: elig.order.conversion_code
+  const orderId = '{{ elig.order.conversion_code }}';
+  const result = await window.ef.customerCare.requestRefund({ order_id: orderId, reason });
+  document.getElementById('refund-form').style.display = 'none';
+  const div = document.getElementById('result');
+  div.style.display = '';
+  if (result.ok && result.auto_refunded) {
+    div.textContent = 'Refund processed! You'll see it in 3–5 business days.';
+  } else if (result.ok && result.queued) {
+    div.textContent = 'Request received. We'll review it shortly.';
+  } else if (result.ok && result.ticket_created) {
+    div.textContent = 'Ticket #' + result.ticket_code + ' created. We'll be in touch.';
+  } else {
+    div.textContent = result.error || 'Something went wrong.';
+  }
+});
+</script>
+```
+
+---
+
+## Full example — Custom manage flow
+
+```html
+<div data-ef-customer-care>
+  <div id="survey" style="display:none;">
+    <p>Why do you want to cancel?</p>
+    <!-- Reasons populated from template: manage.exit_survey_reasons -->
+    <select id="reason">
+      @foreach(r in manage.exit_survey_reasons)
+        <option value="{{ r }}">{{ r | replace:'_':' ' | title }}</option>
+      @endforeach
+    </select>
+    <button onclick="submitReason()">Continue</button>
+  </div>
+  <div id="offer" style="display:none;"></div>
+  <div id="done" style="display:none;"></div>
+</div>
+
+<script>
+var tx = '{{ manage.subscription.original_transaction_id }}';
+var offers = {{ manage.offers | json }};
+
+// Show survey on page load
+document.getElementById('survey').style.display = '';
+
+async function submitReason() {
+  var reason = document.getElementById('reason').value;
+  var offer = offers.find(function (o) { return o.cancel_reason === reason; });
+  if (offer) {
+    document.getElementById('offer').innerHTML = '<p>' + offer.offer_label + '</p>'
+      + '<button onclick="acceptOffer(\'' + reason + '\')">Accept</button>'
+      + '<button onclick="confirmCancel(\'' + reason + '\')">Cancel anyway</button>';
+    document.getElementById('survey').style.display = 'none';
+    document.getElementById('offer').style.display = '';
+  } else {
+    await confirmCancel(reason);
+  }
+}
+
+async function acceptOffer(reason) {
+  var offer = offers.find(function (o) { return o.cancel_reason === reason; });
+  var r = await window.ef.customerCare.applyOffer({
+    transactionId: tx,
+    offerType: offer.offer_type,
+    offerValue: offer.offer_value,
+    cancelReason: reason,
+    durationCycles: offer.offer_duration_cycles,
+    productCode: offer.offer_product_code,
+  });
+  showDone(r.ok ? 'Offer applied!' : (r.error || 'Failed.'));
+}
+
+async function confirmCancel(reason) {
+  var r = await window.ef.customerCare.cancelSubscription({ transactionId: tx, reason });
+  showDone(r.ok ? 'Subscription cancelled.' : (r.error || 'Failed.'));
+}
+
+function showDone(msg) {
+  document.querySelectorAll('#survey, #offer').forEach(function (el) { el.style.display = 'none'; });
+  var done = document.getElementById('done');
+  done.textContent = msg;
+  done.style.display = '';
+}
+</script>
+```

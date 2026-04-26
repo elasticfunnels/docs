@@ -402,6 +402,10 @@ POST /api/brands/{brand}/crm/entities/{entity}/fields
   Display order
 </ParamField>
 
+<ParamField body="reporting_config" type="object">
+  Optional reporting metadata. Supported keys: `reportable` (boolean), `aggregation_type` (`numeric`, `categorical`, `date`, `boolean`), `baseline` (`min`/`max` numbers), `bucket_size` (positive number), and `preferred_chart` (`kpi`, `histogram`, `pie`, `bar`, `line`).
+</ParamField>
+
 ```bash cURL
 curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/fields \
   -H "EF-Access-Key: your_api_key_here" \
@@ -411,6 +415,11 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/
     "key": "lead_source",
     "type": "select",
     "options": ["Facebook", "Google", "Organic", "Referral"],
+    "reporting_config": {
+      "reportable": true,
+      "aggregation_type": "categorical",
+      "preferred_chart": "bar"
+    },
     "required": false,
     "position": 2
   }'
@@ -424,6 +433,11 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/
   "key": "lead_source",
   "type": "select",
   "options": ["Facebook", "Google", "Organic", "Referral"],
+  "reporting_config": {
+    "reportable": true,
+    "aggregation_type": "categorical",
+    "preferred_chart": "bar"
+  },
   "required": false,
   "position": 2,
   "crm_entity_id": 1,
@@ -437,6 +451,8 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/1/
 ```
 PUT /api/brands/{brand}/crm/fields/{field}
 ```
+
+Accepts the same editable field properties as Create Field, including `reporting_config`.
 
 ### Delete Field
 

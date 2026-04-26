@@ -27,6 +27,57 @@ Session keys and values should be simple types (strings, numbers, booleans). Com
 For security, some session keys are reserved and cannot be read or written via `session.get()` / `session.set()`. Use your own key names (e.g. `my_key`, `visit_count`) for custom data.
 </Note>
 
+### `session.setCustomer(fields)`
+
+Establish an authenticated customer session from a custom login flow — magic link, external OTP, SSO callback, or any mechanism outside the built-in purchase pipeline. Writes the runtime's canonical customer fields (`is_customer`, `email`, `customer_id`, `customer`) so downstream pages, template variables, and access rules see the visitor as logged in.
+
+```javascript
+// Verify a one-time code your app generated...
+var code = getVariable('submitted_code');
+var email = getVariable('submitted_email');
+var ok = verifyMyOtp(email, code);
+
+if (ok) {
+  session.setCustomer({ email: email, name: 'Jane Doe' });
+  redirect('/dashboard');
+}
+```
+
+| Field         | Type    | Required | Description |
+|---------------|---------|----------|-------------|
+| `email`       | string  | yes      | The customer's email (must contain `@`). |
+| `name`        | string  | no       | Full display name. If omitted, derived from `first_name` + `last_name`. |
+| `first_name`  | string  | no       | First name. Merged into `session.customer.first_name`. |
+| `last_name`   | string  | no       | Last name. Merged into `session.customer.last_name`. |
+| `id`          | any     | no       | Internal customer id. When set, also writes `session.customer_id`. |
+
+Returns `true` on success, `false` on invalid input or quota exhaustion.
+
+<Note>
+`setCustomer` merges over any existing `session.customer` object, so tracking fields such as `total`, `currency`, or `order_ids` set by earlier checkout flows are preserved.
+</Note>
+
+### `session.getToken(ttlSeconds?)` / `session.setFromToken(token)`
+
+Mint and consume short-lived encrypted tokens that carry the current customer identity across brand-owned domains. Used for cross-domain session continuity — see [Cross-domain session handoff](/guides/cross-domain-session-handoff) for the full protocol and a worked example.
+
+```javascript
+// On the source domain: mint a 60-second token
+var token = await session.getToken();        // null if no customer
+var url = 'https://app.example.com/welcome?ef_session=' + encodeURIComponent(token);
+redirect(url);
+
+// On the destination domain: most of the time you don't need this — the
+// EF runtime auto-consumes `?ef_session=<token>` on every request. Call
+// setFromToken() manually only if you need to consume a token from a
+// header, body, or non-query-string location.
+var ok = await session.setFromToken(headerToken);
+```
+
+`session.getToken(ttlSeconds?)` returns the token string (or `null` if the session has no customer). `ttlSeconds` defaults to `60` and is capped at `600`.
+
+`session.setFromToken(token)` returns `true` on success, `false` on any failure (tamper, expiry, replay, wrong brand). It never throws.
+
 ## Cookies
 
 Set or delete cookies on the visitor's browser.
