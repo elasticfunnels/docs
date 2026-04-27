@@ -1,0 +1,91 @@
+---
+title: 'Product Management'
+description: 'Create and manage products with full e-commerce data including SEO, gallery, inventory, and dimensions'
+---
+
+ElasticFunnels products support a full e-commerce data model. Each product can be configured with detailed information for checkout pages, storefront display, SEO, and fulfillment.
+
+## Product Detail Page
+
+Click any product code or title in the Products list to open the **Product Detail Page**. This dedicated full-page editor uses a tabbed layout:
+
+### General Tab
+- **Title** — The product name
+- **Checkout Title** — Override name shown at checkout (optional)
+- **Description** — Rich text product description
+- **Short Description** — Brief summary for product cards and search results
+- **Product Code** — Unique identifier (read-only after creation)
+- **Type** — Physical, Digital, or Service
+- **Classification** — Main, Upsell, Downsell, Bump, or Bonus
+- **SKU** — Stock keeping unit
+- **Barcode** — UPC/EAN barcode
+- **Status** — Draft, Active, or Archived
+- **Product Image** — Primary product image
+- **Gallery** — Additional product images
+
+### Pricing Tab
+- **Price** — Selling price
+- **Retail Price** — Compare-at price for showing savings
+- **Currency** — Product currency (3-letter code)
+- **Unit Cost**, **Fulfillment Cost**, **COGS** — Cost tracking
+- **Tax Category** — TaxJar TIC or Avalara tax code
+- **Tax Exempt** — Exempt from tax calculations
+
+### Subscription Tab
+Visible only when the product is marked as a subscription. See [Subscriptions Overview](/subscriptions/overview) for full details.
+
+- **Frequency** and **Frequency Unit** — Billing interval
+- **Trial Days** — Free trial period
+- **First Charge Free** — Customer only pays shipping on first order
+- **Prepaid Options** — 3, 6, 12-month prepaid discounts
+- **Stepped Pricing** — Price changes across billing cycles
+
+### Fulfillment Tab
+- **Fulfillment Provider** — ShipOffers, JetPack, FullStack, BuyGoods, or Other
+- **Average Shipping Cost** — Expected shipping cost per order
+- **Unit Weight (oz)** — Product weight
+- **Dimensions** — Length, width, height in cm
+- **Units per Product** — Physical units in one product (for "per bottle" pricing)
+
+### Variants Tab
+Manage product variants (size, color, etc.) with individual pricing and SKUs.
+
+## SEO Fields
+
+Each product includes SEO metadata for storefront product pages:
+
+| Field | Description |
+|-------|-------------|
+| **SEO Title** | Page title for search engines (max 191 chars) |
+| **SEO Description** | Meta description (max 500 chars) |
+| **SEO Slug** | URL-friendly slug for product pages |
+
+## Inventory
+
+- **Inventory Quantity** — Current stock count
+- **Inventory Policy** — `deny` (prevent overselling) or `allow` (accept orders even when out of stock)
+
+When `inventory_policy` is set to `deny` and `inventory_quantity` reaches 0, checkout will prevent purchasing the product.
+
+## Product Gallery
+
+Products support a primary image plus a gallery of additional images. Gallery images are stored as an array of URLs and are available in checkout and storefront templates via `product.gallery` and `product.has_gallery`.
+
+## Template Access
+
+All product fields are available in the template engine:
+
+```
+{product.title}
+{product.description}
+{product.short_description}
+{product.price | formatPrice:product.currency}
+{product.sku}
+{product.barcode}
+{product.gallery}
+{product.has_gallery}
+{product.in_stock}
+{product.seo_title}
+{product | savings}
+{product | subscriptionLabel}
+```

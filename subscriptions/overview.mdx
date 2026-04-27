@@ -141,6 +141,30 @@ Products can expose **multiple subscription tiers** (different intervals and pri
    - **Label** — Customer-facing name for checkout
 4. Save the product.
 
+#### Stepped Pricing (optional)
+
+Subscription products can have **stepped pricing** — the recurring charge changes after a set number of billing cycles. This is useful for introductory pricing, loyalty discounts, or tiered retention strategies.
+
+1. Open the product under **Settings** → **Products**.
+2. Ensure **Is Subscription** is enabled.
+3. In the **Stepped Pricing** section, toggle it on.
+4. Click **Add Step** for each pricing tier. For each step, set:
+   - **From Cycle** — The cycle number this price starts at
+   - **To Cycle** — The cycle number this price ends at (leave empty for "forever")
+   - **Price** — The recurring charge amount during these cycles
+5. Save the product.
+
+Example: Charge $19.99/mo for cycles 1–3, then $14.99/mo from cycle 4 onward.
+
+#### Prepaid Options (optional)
+
+Subscription products can offer **prepaid discounts** where customers pay upfront for 3, 6, or 12 months at a reduced rate:
+
+1. Open the product under **Settings** → **Products**.
+2. Ensure **Is Subscription** is enabled.
+3. Set the **3-Month Discount (%)**, **6-Month Discount (%)**, and/or **12-Month Discount (%)** fields.
+4. Save. Checkout will offer these prepaid options to customers.
+
 #### Subscribe & Save (optional)
 
 Subscription products can show a **Subscribe & Save** discount so the recurring price is lower than the one-time purchase price:
@@ -149,3 +173,64 @@ Subscription products can show a **Subscribe & Save** discount so the recurring 
 2. Ensure **Is Subscription** is enabled.
 3. Set **Subscribe & save discount (%)** to the percentage off the one-time price you want for subscribers (for example `10` for 10% off).
 4. Save the product. Checkout can display the savings versus the one-time price based on this field.
+
+## Recurring Coupons
+
+Coupons can be configured to apply to recurring subscription charges, not just the initial purchase:
+
+1. Go to **Settings** → **Products** → **Coupons** tab.
+2. Create or edit a coupon.
+3. Under **Recurring Subscription Mode**, choose:
+   - **First purchase only** — Discount applies only to the initial order (default).
+   - **All recurring charges** — Discount applies to every renewal indefinitely.
+   - **Limited recurring cycles** — Discount applies for a set number of renewals. Set the **Number of cycles** field.
+4. Save.
+
+The recurring coupon logic is enforced during billing. The subscription detail drawer shows the applied coupon info, including the recurring mode.
+
+## Brand Subscription Settings
+
+Global subscription policies are configured under **Settings** → **Subscriptions**:
+
+| Setting | Description |
+|---------|-------------|
+| **Cancellation Policy** | Immediate, end of period, or admin only |
+| **Grace Period (days)** | Days after failed payment before cancellation |
+| **Max Billing Cycles** | Automatically cancel after N cycles (0 = unlimited) |
+| **Allow Pause** | Let customers pause their subscription |
+| **Allow Skip** | Let customers skip the next charge |
+| **Allow Swap Product** | Let customers switch to a different subscription product |
+| **Allow Change Date** | Let customers change their next billing date |
+| **Customer Self-Service** | Enable the customer-facing subscription management portal |
+
+### Default Email Templates
+
+On the same settings page, assign default email templates for subscription events. These serve as fallbacks when a merchant-specific template is not configured:
+
+- Purchase confirmation
+- Renewal success
+- Renewal failed / dunning
+- Subscription paused
+- Subscription canceled
+
+Merchant-level email template assignments (on the Merchant detail page → Email tab) override these brand-level defaults.
+
+## Subscription Analytics
+
+Two new analytics cards are available on dashboards:
+
+- **Net Revenue Retention (NRR)** — Tracks MRR growth from existing subscribers over time, including expansion, contraction, and churn.
+- **Subscription KPIs** — A summary card showing Active Subscriptions, MRR, Churn Rate, and Average LTV with period-over-period deltas.
+
+Add these cards via the dashboard builder under the **Subscriptions** category.
+
+## Export & Bulk Operations
+
+### Export
+From the Subscriptions list, click **Export** to generate a CSV file. You can export all filtered results or just selected rows. You'll receive an email with a download link when the export is ready.
+
+### Bulk Actions
+Select multiple subscriptions and use:
+- **Cancel Selected** — Cancel with an optional reason
+- **Pause Selected** — Pause billing for all selected
+- **Force Bill Selected** — Trigger immediate charge attempts

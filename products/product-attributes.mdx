@@ -1,0 +1,48 @@
+---
+title: 'Product Attributes'
+description: 'Define reusable, brand-level product attributes like Color, Size, or Material across all products'
+---
+
+Product Attributes are brand-level definitions that allow you to create a consistent set of properties (like Color, Size, Material, Flavor) that can be assigned to any product. Unlike [Custom Attributes](/products/custom-attributes), which are free-form key-value pairs per product, Product Attributes are structured, typed, and reusable.
+
+## Creating Attributes
+
+1. Go to **Settings** → **Products** → **Product Attributes** (available via the API).
+2. Click **Add Attribute**.
+3. Configure:
+
+| Field | Description |
+|-------|-------------|
+| **Name** | Human-readable label (e.g., "Color", "Material") |
+| **Type** | `text`, `select`, `number`, `boolean`, or `color` |
+| **Options** | For `select` type: predefined values customers can choose from |
+| **Required** | Whether every product must have this attribute filled in |
+| **Filterable** | Whether this attribute can be used as a storefront filter |
+| **Visible on Product Page** | Whether this attribute is shown to customers |
+
+## Assigning Values to Products
+
+Once defined, attributes appear on the product edit page. Fill in the value for each attribute per product. For `select` type attributes, choose from the predefined options.
+
+## Using in Templates
+
+Access product attribute values in page templates:
+
+```
+{product.attributes.color}
+{product.attributes.material}
+```
+
+## API Reference
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/brands/{brand}/product-attributes` | List all attributes |
+| POST | `/api/brands/{brand}/product-attributes` | Create an attribute |
+| GET | `/api/brands/{brand}/product-attributes/{id}` | Get single attribute |
+| PUT | `/api/brands/{brand}/product-attributes/{id}` | Update an attribute |
+| DELETE | `/api/brands/{brand}/product-attributes/{id}` | Delete an attribute |
+
+<Note>
+Deleting an attribute also removes all assigned values from products. This action cannot be undone.
+</Note>

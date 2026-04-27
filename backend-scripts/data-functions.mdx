@@ -460,6 +460,40 @@ Look up a product by merchant gateway code and the merchant-specific product cod
 var product = getProductByCode('stripe', 'price_1234');
 ```
 
+### Product files and download URLs
+
+Catalog products can include attached downloads. Products from **`getProduct`**, **`getAllProducts`**, **`getProductByCode`**, and **`getProducts()`** (unfiltered list path) are loaded through the same cache layer as templates and include the **normalized** fields below. If you call **`getProducts`** with **type**, **classification**, or **codes** filters, you still get **`product_files`** plus primary **`bonus_file`** and **`digital_file`** from the database; iterate **`product_files`** and check **`purpose`** (`digital` / `bonus`) when you need consistent behavior in every case.
+
+Use these fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`product_files`** | array | All file rows. Each item includes **`purpose`** (`digital` or `bonus`), **`title`**, **`description`**, **`image`**, **`file`** (URL), **`sort_order`**, **`is_primary`**, and optional **`metadata`**. |
+| **`bonus_file`** | string | URL of the **primary** bonus-purpose file, when one is set. |
+| **`digital_file`** | string | URL of the **primary** digital-purpose file, when one is set. |
+| **`bonus_files`** / **`digital_files`** | array | **Purpose-filtered** lists cut from `product_files` (same object shape; convenient for looping one type). |
+| **`primary_download_url`** | string | First primary downloadable file in sort order, any purpose. |
+
+**Example** — first bonus file for a product:
+
+```javascript
+var p = getProduct('my-sku');
+if (p && p.bonus_file) {
+  setVariable('bonus_href', p.bonus_file);
+}
+
+if (p && p.product_files && p.product_files.length) {
+  for (var i = 0; i < p.product_files.length; i++) {
+    var row = p.product_files[i];
+    if (row.purpose === 'digital' && row.file) {
+      console.log(row.title, row.file);
+    }
+  }
+}
+```
+
+For the same field names in **backend** page templates (`GetProduct` / `GetProducts` / `GetAllProducts`), see [Products, categories & shipping (backend)](/backend-template-engine/products-and-shipping).
+
 ### `productSavings(product)`
 
 Compute savings info from a product's `price` and `retail_price`. Returns an object:
@@ -892,19 +926,9 @@ Use this at the top of a backend script in templates that ship to many brands so
 | `pluralName` | string | `null` | Plural label (e.g. "Member Settings"). Alias: `plural_name`. |
 | `icon` | string | `null` | Icon name (Lucide icon, admin UI). |
 | `color` | string | `null` | Accent color (CSS color string). |
-| `fields` | array | `[]` | Optional field schema. Each item: `{ key, label?, type?, options?, validation_rules?, visible_to_team_ids?, reporting_config? }`. |
+| `fields` | array | `[]` | Optional field schema. Each item: `{ key, label?, type?, options?, validation_rules?, visible_to_team_ids? }`. |
 
 Field `type` values: `text`, `textarea`, `email`, `tel`, `url`, `number`, `integer`, `decimal`, `currency`, `date`, `datetime`, `time`, `select`, `multiselect`, `checkbox`, `boolean`, `radio`, `json`, `rich_text`. For `select`/`multiselect`/`radio` pass `options: ['a','b']` or `[{ value: 'a', label: 'A' }]`.
-
-`reporting_config` marks a field for CRM reports and controls the default chart behavior. Supported keys:
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `reportable` | boolean | Include this field in the entity Reports tab. |
-| `aggregation_type` | string | One of `numeric`, `categorical`, `date`, or `boolean`. |
-| `baseline` | object | Optional `{ min, max }` numeric bounds for KPI/progress displays. |
-| `bucket_size` | number | Positive numeric histogram bucket size. |
-| `preferred_chart` | string | One of `kpi`, `histogram`, `pie`, `bar`, or `line`. |
 
 Returns:
 
@@ -930,18 +954,6 @@ ensureCrmEntity({
     { key: 'time_zone',      label: 'Time zone',      type: 'select',
       options: ['UTC', 'Europe/London', 'America/New_York'] },
     { key: 'marketing_opt_in', label: 'Marketing opt-in', type: 'checkbox' },
-    {
-      key: 'current_score',
-      label: 'Current Score',
-      type: 'number',
-      reporting_config: {
-        reportable: true,
-        aggregation_type: 'numeric',
-        baseline: { min: 0, max: 100 },
-        bucket_size: 10,
-        preferred_chart: 'kpi'
-      }
-    },
   ],
 });
 

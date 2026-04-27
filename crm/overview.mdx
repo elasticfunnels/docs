@@ -3,7 +3,7 @@ title: 'CRM Overview'
 description: 'Build custom data applications on top of ElasticFunnels with the CRM module.'
 ---
 
-The CRM module lets you define custom entity types, fields, pipelines, and stages — then store structured data entries linked to any record in the system. The most common use case is storing custom data per customer, but entries can reference any record type (orders, leads, etc.).
+The CRM module lets you define custom entity types, fields, pipelines, and stages — then store structured data entries linked to any record in the system. Think of it as both a **customer relations management** tool and a **general-purpose data platform** (like Webflow CMS Collections). You can create traditional pipeline-based entities (deals, contacts) or standalone data collections (properties, inventory, cities).
 
 ## How entries attach to records
 
@@ -22,13 +22,25 @@ This pattern lets you attach structured data to customers, orders, or custom ref
 **Entries vs. Fields**: An **entry** is a single record or document stored in the CRM (like a row in a database, representing e.g. a specific check-in for a customer). A **field** is a specific piece of data that lives inside an entry (like a column, e.g. "current_weight" or "deal_value").
 </Note>
 
+### Entity Modes
+
+Entities operate in one of two modes:
+
+| Mode | Description |
+|------|-------------|
+| **CRM** (default) | Traditional pipeline-based entity with stages, suitable for deals, leads, contacts |
+| **Data** | Standalone data collection without pipelines — ideal for storing structured records like properties, inventory items, cities, products |
+
+When creating an entity, choose "Data Collection" to skip pipelines entirely. Data-mode entities focus purely on fields and entries.
+
 ### Entities
 
-An **entity** defines a type of CRM record (e.g. "Deals", "Contacts", "Tracker"). Each entity has:
+An **entity** defines a type of CRM record (e.g. "Deals", "Contacts", "Properties"). Each entity has:
 
 - A **name** and **slug** (machine-readable identifier)
+- An **entity mode** (`crm` or `data`)
 - **Fields** that define the data structure
-- **Pipelines** with **stages** for workflow tracking
+- **Pipelines** with **stages** for workflow tracking (CRM mode only)
 
 ### Fields
 
@@ -38,16 +50,72 @@ Fields define what data can be stored on entries. Each field has:
 |----------|-------------|
 | `label` | Human-readable label |
 | `key` | Machine-readable key (used in API and templates) |
-| `type` | `text`, `number`, `date`, `boolean`, or `select` |
+| `type` | See supported types below |
+| `ui_editable` | Whether this field can be edited in the admin UI (default `true`) |
 | `reporting_config` | Optional analytics metadata for CRM reports |
 
-The **type** in CRM settings controls how the field appears and behaves in the admin UI (and related validation). It does **not** change what you pass from code: `setCrmField` always sends a JavaScript **value** — a **string**, **number**, **boolean**, or a **JSON object**. For fields you configure as **date** in the CRM, still pass a **date-time string** from scripts, typically **ISO 8601** (e.g. `new Date().toISOString()` or `'2026-03-15'`). That matches JSON over HTTP, where there is no native `Date` type. `getCrmField` returns the stored scalar (often a string for timestamps).
+#### Supported field types
+
+| Type | Renders as | Notes |
+|------|-----------|-------|
+| `text` | Text input | Default type |
+| `textarea` | Multi-line text | |
+| `rich_text` | WYSIWYG editor | Stores HTML |
+| `email` | Email input | Rendered as mailto link |
+| `phone` | Phone input | Rendered as tel link |
+| `url` | URL input | Rendered as clickable link |
+| `number` | Numeric input | Stored as double |
+| `date` | Date picker | ISO 8601 string |
+| `datetime` | Date+time picker | ISO 8601 string |
+| `boolean` | Toggle switch | true/false |
+| `select` | Dropdown | Requires `options` array |
+| `multiselect` | Multi-select tags | Requires `options` array |
+| `color` | Color picker | Hex color code |
+| `image` | Image URL / uploader | Renders as thumbnail |
+| `file` | File URL / uploader | Renders as download link |
+| `json` | JSON editor | Renders as collapsible tree |
+| `reference` | Entity reference | Links to single entry in another entity |
+| `multi_reference` | Multi-reference | Links to multiple entries in another entity |
+
+The **type** in CRM settings controls how the field appears and behaves in the admin UI. It does **not** change what you pass from code: `setCrmField` always sends a JavaScript **value** — a **string**, **number**, **boolean**, or a **JSON object**. For fields configured as **date** in the CRM, pass a **date-time string** from scripts, typically **ISO 8601** (e.g. `new Date().toISOString()` or `'2026-03-15'`).
+
+#### UI-editable fields
+
+Set `ui_editable: false` on fields that should only be updated programmatically (via backend scripts). These fields display with a lock icon in the admin UI and cannot be inline-edited.
 
 Use `reporting_config` to mark fields as reportable and suggest how the Reports tab should aggregate and chart them. Supported values include `reportable`, `aggregation_type` (`numeric`, `categorical`, `date`, `boolean`), `baseline` (`min`/`max`), `bucket_size`, and `preferred_chart` (`kpi`, `histogram`, `pie`, `bar`, `line`).
 
+### Relations
+
+Relations link entries across entities. A field of type `reference` or `multi_reference` creates a relation between the current entity and a target entity. Relations are stored in Elasticsearch alongside the entry data.
+
+#### Configuring reference fields
+
+When creating a reference field, specify:
+- **Target entity**: Which entity the reference points to
+- **Display field**: Which field from the target entity to show as the label (defaults to title)
+
+#### Working with relations programmatically
+
+Use `SetCrmRelation` and `RemoveCrmRelation` to manage relations from backend scripts:
+
+```javascript
+SetCrmRelation({
+  slug: 'properties',
+  relationKey: 'city',
+  targetEntryId: 'abc123'
+});
+
+RemoveCrmRelation({
+  slug: 'properties',
+  relationKey: 'city',
+  targetEntryId: 'abc123'
+});
+```
+
 ### Pipelines & Stages
 
-Pipelines represent workflows. Each pipeline contains ordered stages with optional colors and semantic statuses (e.g. `won`, `lost`, `active`). Entries move through stages as they progress.
+Pipelines represent workflows (CRM mode only). Each pipeline contains ordered stages with optional colors and semantic statuses (e.g. `won`, `lost`, `active`). Entries move through stages as they progress.
 
 ## Customer CRM Data
 
@@ -90,10 +158,12 @@ Customer CRM entries are visible in the **Customer Details** page under the **CR
 
 ## Functions
 
-The following functions are available in both the template engine and backend scripts. Write functions (`setCrmField`, `setCrmFields`, `addCrmFieldValue`, `clearCrmEntries`, `moveCrmLead`, `moveCrmToStage`, `moveCrmToPipeline`, `moveCrmToEntity`) accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
+The following functions are available in both the template engine and backend scripts. Write functions accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
 
 | Function | Description |
 |----------|-------------|
+| `EnsureCrmEntity({ slug, ... })` | Idempotently create an entity with fields (returns `{ id, slug, created, fields_added }`) |
+| `CreateCrmEntry({ slug, title?, values?, ... })` | Create a new entry and return its ID |
 | `getCrmEntries({ slug, ... })` | Fetch all entries for one entity **slug** + reference |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field value (`slug` + `fieldKey` required) |
 | `getCrmFields({ slug, fieldKeys, ... })` | Get multiple field values (`slug` + `fieldKeys` required) |
@@ -102,6 +172,8 @@ The following functions are available in both the template engine and backend sc
 | `addCrmFieldValue({ slug, fieldKey, value, ... })` | Append a new entry with a field value — enables multiple values per key |
 | `getCrmFieldValues({ slug, fieldKey, ... })` | Get all values for a field key across entries (returns array) |
 | `clearCrmEntries({ slug, ... })` | Delete all entries for an entity slug + reference |
+| `SetCrmRelation({ slug, relationKey, targetEntryId, ... })` | Add a relation from entry to another entry |
+| `RemoveCrmRelation({ slug, relationKey, targetEntryId, ... })` | Remove a specific relation |
 | `moveCrmLead({ slug, pipelineId/pipelineSlug, stageId/stageSlug, ... })` | Move entry to a specific pipeline + stage |
 | `moveCrmToStage({ slug, stageId/stageSlug, ... })` | Move entry to a stage (pipeline resolved from stage) |
 | `moveCrmToPipeline({ slug, pipelineId/pipelineSlug, ... })` | Move entry to a pipeline (lands on first stage) |
@@ -228,6 +300,76 @@ moveCrmToEntity({
 Returns `{ ok, moved, removed_from_old }`.
 
 Pass `allEntries: true` to any move function to update all matching entries instead of just the newest one.
+
+### Ensuring entities programmatically
+
+Use `EnsureCrmEntity` at the top of a backend script to idempotently provision an entity. Re-runs never overwrite admin edits — only missing fields are added.
+
+```javascript
+EnsureCrmEntity({
+  slug: 'properties',
+  name: 'Properties',
+  singularName: 'Property',
+  pluralName: 'Properties',
+  entityMode: 'data',  // 'crm' (default) or 'data'
+  icon: 'building',
+  fields: [
+    { key: 'address', label: 'Address', type: 'text' },
+    { key: 'price', label: 'Price', type: 'number' },
+    { key: 'bedrooms', label: 'Bedrooms', type: 'number' },
+    { key: 'photo', label: 'Photo', type: 'image', ui_editable: false },
+    { key: 'city', label: 'City', type: 'reference', options: { target_entity_id: 5 } },
+    { key: 'status', label: 'Status', type: 'select', options: ['available', 'sold', 'pending'] },
+    {
+      key: 'listing_date',
+      label: 'Listing Date',
+      type: 'date',
+      reportingConfig: { reportable: true, aggregationType: 'date' }
+    }
+  ]
+});
+```
+
+### Creating entries
+
+Use `CreateCrmEntry` to create a new entry and get back its ID (useful for setting relations):
+
+```javascript
+var result = CreateCrmEntry({
+  slug: 'properties',
+  title: '123 Main St',
+  values: {
+    address: '123 Main Street, Springfield',
+    price: 450000,
+    bedrooms: 3,
+    status: 'available'
+  }
+});
+// result = { ok: true, id: 'abc123' }
+```
+
+### Managing relations
+
+Use `SetCrmRelation` to link entries:
+
+```javascript
+// Link a property to a city
+SetCrmRelation({
+  slug: 'properties',
+  relationKey: 'city',
+  targetEntryId: 'city-entry-id-here'
+});
+```
+
+Use `RemoveCrmRelation` to unlink:
+
+```javascript
+RemoveCrmRelation({
+  slug: 'properties',
+  relationKey: 'city',
+  targetEntryId: 'city-entry-id-here'
+});
+```
 
 ### Async writes
 
