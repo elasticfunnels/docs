@@ -1,91 +1,192 @@
 ---
 title: 'Product Management'
-description: 'Create and manage products with full e-commerce data including SEO, gallery, inventory, and dimensions'
+description: 'Create and manage products with full e-commerce data: SEO, gallery, inventory, variants, attributes, fulfillment, subscriptions and more'
 ---
 
-ElasticFunnels products support a full e-commerce data model. Each product can be configured with detailed information for checkout pages, storefront display, SEO, and fulfillment.
+ElasticFunnels products use a comprehensive e-commerce data model. Each product is edited through the **Product Detail Page** — a full-page editor with dedicated tabs for every area of configuration.
+
+## Creating a Product
+
+Click **Add Product** in the Products list to open the quick-create modal. Enter the essential fields (Title, Code, Type, Classification, Price) and click **Create product**. You are automatically taken to the full Product Detail Page to complete configuration.
 
 ## Product Detail Page
 
-Click any product code or title in the Products list to open the **Product Detail Page**. This dedicated full-page editor uses a tabbed layout:
+Navigate to the Product Detail Page by clicking any product code or title in the Products list.
+
+The page uses a persistent tab layout. Changes are saved by clicking **Save** in the top toolbar.
+
+---
 
 ### General Tab
-- **Title** — The product name
-- **Checkout Title** — Override name shown at checkout (optional)
-- **Description** — Rich text product description
-- **Short Description** — Brief summary for product cards and search results
-- **Product Code** — Unique identifier (read-only after creation)
-- **Type** — Physical, Digital, or Service
-- **Classification** — Main, Upsell, Downsell, Bump, or Bonus
-- **SKU** — Stock keeping unit
-- **Barcode** — UPC/EAN barcode
-- **Status** — Draft, Active, or Archived
-- **Product Image** — Primary product image
-- **Gallery** — Additional product images
 
-### Pricing Tab
-- **Price** — Selling price
-- **Retail Price** — Compare-at price for showing savings
-- **Currency** — Product currency (3-letter code)
-- **Unit Cost**, **Fulfillment Cost**, **COGS** — Cost tracking
-- **Tax Category** — TaxJar TIC or Avalara tax code
-- **Tax Exempt** — Exempt from tax calculations
-
-### Subscription Tab
-Visible only when the product is marked as a subscription. See [Subscriptions Overview](/subscriptions/overview) for full details.
-
-- **Frequency** and **Frequency Unit** — Billing interval
-- **Trial Days** — Free trial period
-- **First Charge Free** — Customer only pays shipping on first order
-- **Prepaid Options** — 3, 6, 12-month prepaid discounts
-- **Stepped Pricing** — Price changes across billing cycles
-
-### Fulfillment Tab
-- **Fulfillment Provider** — ShipOffers, JetPack, FullStack, BuyGoods, or Other
-- **Average Shipping Cost** — Expected shipping cost per order
-- **Unit Weight (oz)** — Product weight
-- **Dimensions** — Length, width, height in cm
-- **Units per Product** — Physical units in one product (for "per bottle" pricing)
-
-### Variants Tab
-Manage product variants (size, color, etc.) with individual pricing and SKUs.
-
-## SEO Fields
-
-Each product includes SEO metadata for storefront product pages:
+Core product identity, titles, images, descriptions, category assignment, and SEO metadata.
 
 | Field | Description |
 |-------|-------------|
-| **SEO Title** | Page title for search engines (max 191 chars) |
-| **SEO Description** | Meta description (max 500 chars) |
-| **SEO Slug** | URL-friendly slug for product pages |
+| **Type** | Physical, Digital, or Service |
+| **Code** | Unique identifier used in buy links (read-only after creation) |
+| **Classification** | Main, Upsell, Downsell, Bump, or Bonus |
+| **Status** | Active, Draft, or Archived |
+| **Title** | Primary display name |
+| **Checkout Title** | Overrides Title at checkout (optional) |
+| **Product Image** | Primary product image — upload directly from this tab |
+| **Gallery** | Additional images (one URL per line) |
+| **Short Description** | Brief summary for product cards and search results |
+| **Full Description** | Rich text or plain text description |
+| **Category / Subcategory** | Assign from brand-level product categories |
+| **SEO Title** | Page title for search engines |
+| **SEO Slug** | URL slug for storefront product pages |
+| **SEO Description** | Meta description (max 160 chars) |
 
-## Inventory
+---
 
-- **Inventory Quantity** — Current stock count
-- **Inventory Policy** — `deny` (prevent overselling) or `allow` (accept orders even when out of stock)
+### Pricing Tab
 
-When `inventory_policy` is set to `deny` and `inventory_quantity` reaches 0, checkout will prevent purchasing the product.
+Selling price, retail (compare-at) price, currency, and tax settings.
 
-## Product Gallery
+| Field | Description |
+|-------|-------------|
+| **Retail Price** | Compare-at price shown as strikethrough |
+| **Discounted Price** | Actual selling price |
+| **Currency** | 3-letter currency code (e.g. USD) |
+| **Tax Exempt** | When enabled, no tax is calculated at checkout |
+| **Tax Category** | TaxJar TIC or Avalara tax code |
 
-Products support a primary image plus a gallery of additional images. Gallery images are stored as an array of URLs and are available in checkout and storefront templates via `product.gallery` and `product.has_gallery`.
+---
+
+### Subscription Tab
+
+Visible only when **This is a subscription product** is enabled. See [Subscriptions Overview](/subscriptions/overview) for full billing documentation.
+
+| Field | Description |
+|-------|-------------|
+| **Is Subscription** | Toggle to enable recurring billing |
+| **Build-a-Box** | Customers select multiple items for their subscription box |
+| **Billing Frequency** | How often to bill (e.g. 1) |
+| **Frequency Unit** | Day / Week / Month / Year |
+| **Trial Days** | Free trial days before first charge |
+| **First Charge Free** | Customer pays shipping only on first order |
+| **Subscription Tiers** | Multiple billing frequencies at different prices (toggle to enable) |
+| **Subscribe & Save (%)** | Discount when customer chooses subscription over one-time purchase |
+| **Stepped Pricing** | Different prices at specific billing cycles (toggle to enable) |
+| **Prepaid Options** | 3, 6, 12-month prepaid discounts |
+
+---
+
+### Fulfillment Tab
+
+Warehousing, inventory, cost breakdown, SKU categorisation, product specifications, and shipping profile.
+
+| Section | Fields |
+|---------|--------|
+| **Identity & Structure** | SKU, Barcode, Units per Package, Weight (oz), Dimensions (L/W/H cm) |
+| **Integration** | Fulfillment Integration override, Multiply SKU toggle |
+| **Inventory** | Stock Quantity, Out-of-Stock Policy (continue/deny) |
+| **Cost Breakdown** | Product Cost, Fulfillment Cost, Packaging Cost, Avg. Shipping, Fuel Surcharge, Auto-calculated COGS |
+| **SKU Categorisation** | SKU Category, SKU Subcategory (for internal reporting) |
+| **Product Specifications** | Repeater: Name / Value / Unit pairs (e.g. Dimensions: 10×5×3 cm) |
+| **Shipping Profile** | Assign a brand-level shipping profile |
+
+---
+
+### Merchants Tab
+
+Configure product identifiers per payment gateway integration.
+
+For each active payment gateway (NMI, Stripe, BuyGoods, ClickBank, etc.) enter the product ID used on that gateway. These are exposed as `product | merchantPriceId:'stripe'` in templates.
+
+---
+
+### Bonuses Tab
+
+Assign bonus products that customers receive when purchasing this product. Select from products with `classification = bonus`.
+
+---
+
+### Files Tab
+
+Visible when product type is **Digital** or classification is **Bonus**.
+
+Add one or more downloadable files:
+- **Purpose** — Digital or Bonus
+- **Title** — File display name
+- **Description** — Optional description
+- **Image** — Thumbnail image
+- **File** — Upload or URL
+- **Primary** — Mark as primary file for this purpose
+
+---
+
+### Courses Tab
+
+Assign courses that customers are automatically enrolled in after purchase.
+
+---
+
+### Attributes Tab
+
+Fill in values for brand-level Product Attributes defined under **Settings → Products → Product Attributes**.
+
+Supports all field types: text, textarea, rich text, number, boolean, date, select, multiselect, color, image URL, file URL, and JSON.
+
+Attributes with `applies_to = variant` are managed per variant in the Variants tab, not here.
+
+---
+
+### Custom Attributes Tab
+
+Legacy unstructured key/value pairs for ad-hoc product metadata (e.g. a download URL or custom flag).
+
+> **Note:** For structured, typed attributes, use the Attributes tab with Product Attribute definitions instead. Custom Attributes are a legacy system.
+
+---
+
+### Variants Tab
+
+Define product variants (e.g. Color, Size) with individual pricing.
+
+1. **Select variant options** — Check which brand-level variant options apply to this product (managed under Settings → Variant Options)
+2. **Add variants** — Each row shows one field per selected option plus Code and Price
+
+---
 
 ## Template Access
 
-All product fields are available in the template engine:
+All product fields are available in templates:
 
 ```
-{product.title}
-{product.description}
-{product.short_description}
-{product.price | formatPrice:product.currency}
-{product.sku}
-{product.barcode}
-{product.gallery}
-{product.has_gallery}
-{product.in_stock}
-{product.seo_title}
-{product | savings}
-{product | subscriptionLabel}
+{{ product.title }}
+{{ product.description }}
+{{ product.short_description }}
+{{ product.price | formatPrice:product.currency }}
+{{ product.sku }}
+{{ product.barcode }}
+{{ product.gallery }}
+{{ product.has_gallery }}
+{{ product.in_stock }}
+{{ product.seo_title }}
+{{ product | savings }}
+{{ product | savings:'percent' }}
+{{ product | compareAt }}
+{{ product | subscriptionLabel }}
+{{ product | merchantPriceId:'stripe' }}
+```
+
+### Structured Attributes in Templates
+
+Use `GetProductAttributes()` and `GetProductAttributeValues(product)` to access brand-level attribute definitions and values:
+
+```
+{% set attrDefs = GetProductAttributes({ visible: true }) %}
+{% set attrVals = GetProductAttributeValues(product) %}
+{% for attr in attrDefs %}
+  {{ attr.name }}: {{ attrVals[attr.slug] }}
+{% endfor %}
+```
+
+Or use shorthand filters (when the product was loaded via `GetProduct`):
+
+```
+{{ product | attr:'material' }}
+{{ product | attrLabel:'material' }}
 ```

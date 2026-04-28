@@ -10,13 +10,13 @@ Backend scripts can schedule other scripts to run in the background after a dela
 Enqueue a backend script for deferred execution.
 
 ```javascript
-// Send an email in 15 minutes
+// Send an abandon email 1 hour after quiz completion
 queue.push('mailgun', {
   type: 'abandon',
   email: 'user@example.com',
   quizProfile: quizProfile,
   visitorId: visitorId,
-}, { delay: 900, tag: 'abandon:' + visitorId });
+}, { delay: 3600, tag: 'abandon:' + visitorId });
 ```
 
 | Parameter    | Type   | Description                              |
@@ -27,11 +27,11 @@ queue.push('mailgun', {
 
 ### Options
 
-| Key     | Type   | Default     | Description                                           |
-|---------|--------|-------------|-------------------------------------------------------|
-| `fn`    | string | `'default'` | Name of the exported function to call                 |
-| `delay` | number | `0`         | Seconds to wait before executing (max 86,400 = 24h)  |
-| `tag`   | string | —           | Logical group for cancellation (max 200 chars)        |
+| Key     | Type   | Default     | Description                                                         |
+|---------|--------|-------------|---------------------------------------------------------------------|
+| `fn`    | string | `'default'` | Name of the exported function to call                               |
+| `delay` | number | `0`         | Seconds to wait before executing. Minimum **60s** when non-zero, maximum **7 days** (604,800s) |
+| `tag`   | string | —           | Logical group for cancellation (max 200 chars)                      |
 
 **Returns:** `{ ok: true, jobId: '...' }` on success, or `{ ok: false, error: '...' }` on failure.
 
@@ -73,35 +73,40 @@ console.log('Cancelled', result.cancelled, 'jobs');
 
 **Returns:** `{ ok: true, cancelled: N }` where N is the number of jobs removed.
 
-## Example: Abandon email flow
+## Example: Multi-step abandon email sequence
+
+Queue 3–4 emails spaced over a few days. Cancel the whole sequence on purchase using the shared tag prefix.
 
 ```javascript
-// On email capture (quiz-save.ef):
-// 1. Send results email immediately
-handleMailgun({ email: leadEmail, quizProfile: quizProfile });
+// On email capture — queue the abandon sequence
+var tag = 'abandon:' + visitorId;
 
-// 2. Queue abandon email for 15 minutes later
-queue.push('mailgun', {
-  type: 'abandon',
-  email: leadEmail,
-  quizProfile: quizProfile,
-  visitorId: visitorId,
-}, { delay: 900, tag: 'abandon:' + visitorId });
+queue.push('mailgun', { type: 'abandon_1', email: leadEmail, quizProfile: quizProfile, visitorId: visitorId },
+  { delay: 3600,  tag: tag }); // 1 hour
 
-// On purchase (ef-on-purchase.js):
-// Cancel the pending abandon email
-queue.cancel('abandon:' + visitorId);
+queue.push('mailgun', { type: 'abandon_2', email: leadEmail, quizProfile: quizProfile, visitorId: visitorId },
+  { delay: 86400, tag: tag }); // 24 hours
+
+queue.push('mailgun', { type: 'abandon_3', email: leadEmail, quizProfile: quizProfile, visitorId: visitorId },
+  { delay: 172800, tag: tag }); // 48 hours
+
+queue.push('mailgun', { type: 'abandon_4', email: leadEmail, quizProfile: quizProfile, visitorId: visitorId },
+  { delay: 259200, tag: tag }); // 72 hours
+
+// On purchase — cancel all pending emails in one call
+queue.cancel(tag);
 ```
 
 <Note>
 **Limits per brand:**
-- **100 pending jobs** maximum per brand
+- **25,000 pending jobs** maximum per brand
 - **64 KB** maximum payload size
-- **24-hour** maximum delay
+- **7-day** maximum delay (604,800 seconds)
+- **60-second** minimum delay when a non-zero delay is set
 - **5 pushes** per script execution
 - **5 cancel calls** per script execution
 - **3 retries** with exponential backoff on failure
-- Jobs expire after **24 hours** if not processed
+- Jobs expire after **8 days** if not processed
 </Note>
 
 <Warning>

@@ -1,0 +1,109 @@
+---
+title: 'Product Variants'
+description: 'Manage product variants: define variant axes (Color, Size), configure option values, set per-variant pricing, and assign variant attributes'
+---
+
+Product variants let you sell multiple versions of a product (e.g., different sizes or colors) under a single product record, each with its own price and code.
+
+---
+
+## How Variants Work
+
+Variants are built from **Variant Options** — brand-level axis definitions (e.g., "Color", "Size"). On the product, you select which options apply, then define each combination as an individual variant row.
+
+---
+
+## Setting Up Variant Options
+
+Before adding variants to a product, create the variant option definitions:
+
+1. Go to **Settings → Products → Variant Options**
+2. Create a new option (e.g., `Color` with values: Red, Blue, Green)
+3. Repeat for each dimension (e.g., `Size` with values: S, M, L, XL)
+
+---
+
+## Adding Variants to a Product
+
+1. Open the product and go to the **Variants** tab
+2. In **Variant Options**, check the options that apply to this product (e.g., Color and Size)
+3. In **Product Variants**, click **Add Variant** for each combination
+4. For each variant row, fill in:
+   - **Code** — Unique variant identifier
+   - **Price** — Variant-specific price
+   - One field per selected option (e.g., Color, Size)
+
+---
+
+## Per-Variant Pricing
+
+Each variant has its own **Price** field. If left blank, the product's base price is used at checkout.
+
+---
+
+## Variant Option Values (`option_values`)
+
+Each variant stores its option selections as `option_values` — a map of option slug to selected value:
+
+```json
+{
+  "color": "Blue",
+  "size": "M"
+}
+```
+
+This map is available in the template engine as `variant.option_values`.
+
+---
+
+## Variant Attributes
+
+Product Attributes with `applies_to = variant` or `applies_to = both` can store values per variant. These appear in each variant row in the Variants tab and are managed independently.
+
+To set up variant-scoped attributes:
+1. Go to **Settings → Products → Product Attributes**
+2. Create or edit an attribute and set **Applies To** to `Variant` or `Both`
+3. Open any product → Variants tab — variant rows will include inputs for these attributes
+
+See [Product Attributes](/products/product-attributes) for full documentation on the attribute system.
+
+---
+
+## Template Access
+
+Variants are available on the product object:
+
+```
+{{ product.variants }}
+```
+
+Each variant object:
+
+```
+{{ variant.code }}
+{{ variant.price | formatPrice:product.currency }}
+{{ variant.option_values.color }}
+{{ variant.option_values.size }}
+```
+
+### Displaying All Variants
+
+```
+{% for variant in product.variants %}
+  <option value="{{ variant.id }}" data-price="{{ variant.price }}">
+    {{ variant.option_values.color }} / {{ variant.option_values.size }}
+    — {{ variant.price | formatPrice:product.currency }}
+  </option>
+{% endfor %}
+```
+
+### Accessing Variant Attributes
+
+```
+{% set variantAttrDefs = GetProductAttributes({ applies_to: 'variant' }) %}
+{% for variant in product.variants %}
+  {% for def in variantAttrDefs %}
+    {{ def.name }}: {{ variant | attr:def.slug }}
+  {% endfor %}
+{% endfor %}
+```

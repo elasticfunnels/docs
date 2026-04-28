@@ -208,6 +208,7 @@
               "products/subscription-upsells",
               "products/custom-attributes",
               "products/product-attributes",
+              "products/variants",
               "products/advanced-purchase-links"
             ]
           },

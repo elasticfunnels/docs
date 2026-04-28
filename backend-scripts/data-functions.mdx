@@ -194,7 +194,7 @@ setVariable('all_bonus_skus', catalogBonuses);
 ```
 
 <Tip>
-For the same filter but **raw** product fields (`bonus_file`, merchant fields, etc.), use `getProducts({ classification: 'bonus' })` instead.
+For the same filter but the **full product** shape (price, currency, `merchant_product_ids`, the normalized `product_files` array, etc.), use `getProducts({ classification: 'bonus' })` instead.
 </Tip>
 
 ## Subscriptions
@@ -462,33 +462,58 @@ var product = getProductByCode('stripe', 'price_1234');
 
 ### Product files and download URLs
 
-Catalog products can include attached downloads. Products from **`getProduct`**, **`getAllProducts`**, **`getProductByCode`**, and **`getProducts()`** (unfiltered list path) are loaded through the same cache layer as templates and include the **normalized** fields below. If you call **`getProducts`** with **type**, **classification**, or **codes** filters, you still get **`product_files`** plus primary **`bonus_file`** and **`digital_file`** from the database; iterate **`product_files`** and check **`purpose`** (`digital` / `bonus`) when you need consistent behavior in every case.
+Catalog products can include attached downloads. **`getProduct`**, **`getAllProducts`**, **`getProductByCode`**, and **`getProducts`** (with **or without** filters) all return the same normalized shape, so you can rely on the same fields in every code path.
 
 Use these fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| **`product_files`** | array | All file rows. Each item includes **`purpose`** (`digital` or `bonus`), **`title`**, **`description`**, **`image`**, **`file`** (URL), **`sort_order`**, **`is_primary`**, and optional **`metadata`**. |
-| **`bonus_file`** | string | URL of the **primary** bonus-purpose file, when one is set. |
-| **`digital_file`** | string | URL of the **primary** digital-purpose file, when one is set. |
-| **`bonus_files`** / **`digital_files`** | array | **Purpose-filtered** lists cut from `product_files` (same object shape; convenient for looping one type). |
-| **`primary_download_url`** | string | First primary downloadable file in sort order, any purpose. |
+| **`product_files`** | array | All file rows attached to the product (always an array — never a JSON string). Each item: `{ id, purpose, title, description, image, file, sort_order, is_primary, metadata }`. `purpose` is `'digital'` or `'bonus'` (defaults to `'digital'` when missing). Rows with no `file` URL are filtered out. |
+| **`digital_files`** | array | Subset of `product_files` where `purpose === 'digital'`. Same row shape. |
+| **`bonus_files`** | array | Subset of `product_files` where `purpose === 'bonus'`. Same row shape. |
+| **`digital_file`** | string | URL of the **primary** digital file (the `is_primary` row with the lowest `sort_order` whose `purpose` is `'digital'`). Falls back to the legacy `digital_file` column on the product if set. Empty string when none. |
+| **`bonus_file`** | string | URL of the **primary** bonus file (the `is_primary` row with the lowest `sort_order` whose `purpose` is `'bonus'`). Falls back to the legacy `bonus_file` column, then to any primary file. Empty string when none. |
+| **`primary_download_url`** | string | URL of the overall primary file across all purposes (`is_primary DESC`, then `sort_order ASC`). Empty string when none. |
 
-**Example** — first bonus file for a product:
+Inside each `product_files` row:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | number \| null | Internal file id. |
+| `purpose` | string | `'digital'` or `'bonus'`. |
+| `title` | string | Display title. |
+| `description` | string | Optional description. |
+| `image` | string | Optional preview image URL. |
+| `file` | string | Download URL. Always present (rows without a URL are dropped). |
+| `sort_order` | number | Display / primary-selection order (defaults to position in the array if not stored). |
+| `is_primary` | boolean | Whether this row is the primary file for its purpose. |
+| `metadata` | object | Optional metadata object. Always an object (parsed from JSON when stored that way). |
+
+**Example** — pick the primary bonus URL with a safe fallback, then list all digital files:
 
 ```javascript
 var p = getProduct('my-sku');
-if (p && p.bonus_file) {
-  setVariable('bonus_href', p.bonus_file);
+
+if (p && (p.bonus_file || p.primary_download_url)) {
+  setVariable('bonus_href', p.bonus_file || p.primary_download_url);
 }
 
-if (p && p.product_files && p.product_files.length) {
-  for (var i = 0; i < p.product_files.length; i++) {
-    var row = p.product_files[i];
-    if (row.purpose === 'digital' && row.file) {
-      console.log(row.title, row.file);
-    }
+if (p && p.digital_files && p.digital_files.length) {
+  for (var i = 0; i < p.digital_files.length; i++) {
+    var row = p.digital_files[i];
+    console.log(row.title, row.file, 'primary?', row.is_primary);
   }
+}
+```
+
+**Example** — list every bonus across a filtered product set:
+
+```javascript
+var bonuses = getProducts({ classification: 'bonus' });
+
+for (var i = 0; i < bonuses.length; i++) {
+  var b = bonuses[i];
+  console.log(b.title, '→', b.bonus_file || b.primary_download_url);
 }
 ```
 
@@ -928,7 +953,7 @@ Use this at the top of a backend script in templates that ship to many brands so
 | `color` | string | `null` | Accent color (CSS color string). |
 | `fields` | array | `[]` | Optional field schema. Each item: `{ key, label?, type?, options?, validation_rules?, visible_to_team_ids? }`. |
 
-Field `type` values: `text`, `textarea`, `email`, `tel`, `url`, `number`, `integer`, `decimal`, `currency`, `date`, `datetime`, `time`, `select`, `multiselect`, `checkbox`, `boolean`, `radio`, `json`, `rich_text`. For `select`/`multiselect`/`radio` pass `options: ['a','b']` or `[{ value: 'a', label: 'A' }]`.
+Field `type` values: `text`, `textarea`, `email`, `tel`, `url`, `number`, `integer`, `decimal`, `currency`, `date`, `datetime`, `time`, `select`, `multiselect`, `checkbox`, `boolean`, `radio`, `json`, `rich_text`, `wysiwyg` (rich text fields: values are HTML strings). For `select`/`multiselect`/`radio` pass `options: ['a','b']` or `[{ value: 'a', label: 'A' }]`.
 
 Returns:
 

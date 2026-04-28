@@ -1,48 +1,129 @@
 ---
 title: 'Product Attributes'
-description: 'Define reusable, brand-level product attributes like Color, Size, or Material across all products'
+description: 'Create reusable, typed brand-level attributes (Color, Material, Scent, etc.) and assign values per product or variant'
 ---
 
-Product Attributes are brand-level definitions that allow you to create a consistent set of properties (like Color, Size, Material, Flavor) that can be assigned to any product. Unlike [Custom Attributes](/products/custom-attributes), which are free-form key-value pairs per product, Product Attributes are structured, typed, and reusable.
+Product Attributes are brand-level, reusable field definitions that you can apply across all products. Unlike [Custom Attributes](/products/custom-attributes) (legacy unstructured key/value pairs), Product Attributes support rich field types, filtering, storefront visibility, and variant-level scoping.
 
-## Creating Attributes
+## Managing Attribute Definitions
 
-1. Go to **Settings** → **Products** → **Product Attributes** (available via the API).
-2. Click **Add Attribute**.
-3. Configure:
+Go to **Settings → Products → Product Attributes** to create, edit, and reorder attribute definitions.
+
+Each attribute definition has:
 
 | Field | Description |
 |-------|-------------|
-| **Name** | Human-readable label (e.g., "Color", "Material") |
-| **Type** | `text`, `select`, `number`, `boolean`, or `color` |
-| **Options** | For `select` type: predefined values customers can choose from |
-| **Required** | Whether every product must have this attribute filled in |
-| **Filterable** | Whether this attribute can be used as a storefront filter |
-| **Visible on Product Page** | Whether this attribute is shown to customers |
+| **Name** | Display label (e.g. "Material", "Scent") |
+| **Slug** | Auto-generated URL-safe key used in templates (e.g. `material`) |
+| **Field Type** | See full type list below |
+| **Applies To** | Where values are stored: Product, Variant, or Both |
+| **Options** | For `select` and `multiselect` types: the allowed values |
+| **Required** | Whether a value must be set before saving |
+| **Filterable** | Available as a storefront/catalog filter |
+| **Visible on Product Page** | Shown in the product page details section |
+
+---
+
+## Field Types
+
+Product Attributes support the full set of CRM-style field types:
+
+| Type | Input | Use Case |
+|------|-------|----------|
+| `text` | Single-line text | Short values (colour name, size label) |
+| `textarea` | Multi-line text | Longer descriptions without formatting |
+| `rich_text` | Rich text | Formatted content |
+| `wysiwyg` | WYSIWYG editor | Full rich text editing |
+| `email` | Email input | Contact or support email |
+| `phone` | Phone input | Contact number |
+| `url` | URL input | Product page, demo link |
+| `number` | Number input | Weight, volume, count |
+| `date` | Date picker | Release date, expiry date |
+| `datetime` | Date & time picker | Event datetime |
+| `boolean` | Checkbox (Yes/No) | Organic, Vegan, In stock |
+| `select` | Dropdown | Single value from predefined options |
+| `multiselect` | Checkboxes | Multiple values from predefined options |
+| `color` | Color picker + text | Hex colour value |
+| `image` | URL text input | Image URL |
+| `file` | URL text input | File URL |
+| `json` | Monospace textarea | Structured JSON data |
+
+---
+
+## Applies To Scoping
+
+The `applies_to` field controls where attribute values are stored and edited:
+
+| Value | Behaviour |
+|-------|-----------|
+| `product` | Value is stored at the product level. Edited in the **Attributes** tab of the Product Detail Page. |
+| `variant` | Value is stored per variant. Edited in the **Variants** tab per variant row (coming soon). |
+| `both` | Product-level default, but can be overridden per variant. |
+
+---
 
 ## Assigning Values to Products
 
-Once defined, attributes appear on the product edit page. Fill in the value for each attribute per product. For `select` type attributes, choose from the predefined options.
+Open any product and go to the **Attributes** tab. You will see all brand-level attribute definitions that apply to the product level. Fill in values and save.
 
-## Using in Templates
+Attributes with `applies_to = variant` are managed in the Variants tab, not the Attributes tab.
 
-Access product attribute values in page templates:
+---
+
+## Template Access
+
+### List Definitions
 
 ```
-{product.attributes.color}
-{product.attributes.material}
+{% set attrs = GetProductAttributes() %}
+{% for attr in attrs %}
+  {{ attr.slug }}: {{ attr.name }} ({{ attr.type }})
+{% endfor %}
 ```
 
-## API Reference
+Filter by scope or visibility:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/brands/{brand}/product-attributes` | List all attributes |
-| POST | `/api/brands/{brand}/product-attributes` | Create an attribute |
-| GET | `/api/brands/{brand}/product-attributes/{id}` | Get single attribute |
-| PUT | `/api/brands/{brand}/product-attributes/{id}` | Update an attribute |
-| DELETE | `/api/brands/{brand}/product-attributes/{id}` | Delete an attribute |
+```
+{% set visibleAttrs = GetProductAttributes({ visible: true, applies_to: 'product' }) %}
+```
 
-<Note>
-Deleting an attribute also removes all assigned values from products. This action cannot be undone.
-</Note>
+### Get Product Values
+
+```
+{% set vals = GetProductAttributeValues(product) %}
+{{ vals.material }}
+{{ vals.scent }}
+```
+
+### Shorthand Filters
+
+When a product is loaded via `GetProduct()`, attribute values and definitions are pre-loaded:
+
+```
+{{ product | attr:'material' }}        — value by slug
+{{ product | attrLabel:'material' }}   — display label by slug
+```
+
+### Full Display Example
+
+```
+{% set attrDefs = GetProductAttributes({ visible: true }) %}
+{% set attrVals = GetProductAttributeValues(product) %}
+<dl>
+{% for def in attrDefs %}
+  {% set val = attrVals[def.slug] %}
+  {% if val %}
+    <dt>{{ def.name }}</dt>
+    <dd>{{ val }}</dd>
+  {% endif %}
+{% endfor %}
+</dl>
+```
+
+---
+
+## Relationship to Custom Attributes
+
+[Custom Attributes](/products/custom-attributes) are legacy unstructured key/value pairs stored directly on the product. Product Attributes are the preferred system — typed, reusable, filterable, and scoped to product or variant level.
+
+Both systems can coexist. Custom Attributes are available under the **Custom Attributes** tab; Product Attributes under the **Attributes** tab.
