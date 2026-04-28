@@ -3,7 +3,7 @@ title: 'Showing Order Details'
 description: 'Display order history, products, tracking, and shipping information in your members area'
 ---
 
-ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and backend functions like `getOrders()` / `getOrder()` / `getSessionOrders()` for code-based pages. Both retrieve data from the customer's purchase history.
+ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and backend functions like `getOrders()` / `getOrder()` / `getSessionOrders()` / `getPurchasedProducts()` for code-based pages. Both retrieve data from the customer's purchase history.
 
 ## Two Approaches
 
@@ -12,6 +12,11 @@ ElasticFunnels provides two ways to display order information on your pages: the
 | `<order>` tag | Visual builder pages, simple layouts | Drag-and-drop editor |
 | `getOrders()` / `getOrder()` | Code-based pages, full order history | Backend scripts / `.ef` pages |
 | `getSessionOrders()` | Thank-you pages — current purchase only | Backend scripts / `.ef` pages |
+| `getPurchasedProducts()` | Member-area "library" pages — purchased products with their bonuses + downloads | Backend scripts / `.ef` pages |
+
+<Tip>
+For a member-area page that needs **each purchased product with its included bonuses and download links**, prefer `getPurchasedProducts()` over manually joining `getOrders()` + `getAllProducts()` + `getBonusProducts()` on the client. It returns a flat list with same-order bonuses already attached and a pre-rolled-up `downloads[]` array (each entry tagged with `kind`). See the [data-functions reference](/backend-scripts/data-functions#getpurchasedproducts) and the ["My Library" pattern](/members-area/overview) for examples.
+</Tip>
 
 ## Using the `<order>` Tag
 

@@ -183,6 +183,64 @@ Every members page extends it — no auth logic needed per page:
 @endblock
 ```
 
+### "My Library" pattern — `getPurchasedProducts()`
+
+For member-area pages that show **everything the customer owns** (purchased products + the bonuses they came with + download links), use `getPurchasedProducts()`. It returns a flat list with full catalog data, same-order bonuses already attached under `included_bonuses[]`, and a pre-rolled-up `downloads[]` array tagged by `kind` (`'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`).
+
+```html
+{{-- members-library.ef --}}
+@extends("members-layout")
+@block("title") My Library @endblock
+@block("content")
+<script scope="backend">
+  var library = getPurchasedProducts('newest');
+  setVariable('library', library);
+</script>
+
+<h1>My Library</h1>
+@foreach(item in var.library)
+  <article class="library-card">
+    <img src="{{ item.image }}" alt="{{ item.title }}" />
+    <h2>{{ item.title }}</h2>
+    <p class="meta">Order #{{ item.order_number }} — {{ item.created_at | date:'dd MMM yyyy' }}</p>
+
+    {{-- Downloads (pre-rolled-up, deduped, kind-tagged) --}}
+    @if(item.downloads.length > 0)
+      <ul class="downloads">
+        @foreach(d in item.downloads)
+          <li>
+            <a href="{{ d.url }}">
+              <span class="kind">{{ d.kind }}</span> {{ d.title | default:'Download' }}
+              @if(d.extension)<small>.{{ d.extension }}</small>@endif
+            </a>
+          </li>
+        @endforeach
+      </ul>
+    @endif
+
+    {{-- Included bonuses (attached to THIS order — every is_bonus line) --}}
+    @if(item.included_bonuses.length > 0)
+      <section class="bonuses">
+        <h3>Included Bonuses</h3>
+        @foreach(b in item.included_bonuses)
+          <div class="bonus">
+            <h4>{{ b.title }}</h4>
+            @if(b.bonus_url)
+              <a href="{{ b.bonus_url }}">Download</a>
+            @endif
+          </div>
+        @endforeach
+      </section>
+    @endif
+  </article>
+@endforeach
+@endblock
+```
+
+<Tip>
+Use `getPurchasedProducts()` for a member-area "library" view that needs to know **which bonuses came with which purchase**. It joins orders → catalog → bonuses on the server and returns ready-to-render data. For a flat list of bonuses the customer is entitled to (no parent product context), `getBonusProducts()` is still the right call.
+</Tip>
+
 ### For page builder pages — shared script block
 
 Paste the same backend script at the top of every protected page. Because it always does the same work, any change only needs to happen in one shared spot (consider using a page component for the header/nav):

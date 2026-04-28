@@ -25,9 +25,11 @@ Typical fields include **code**, **title**, **checkout_title**, **price**, **ret
 
 - **`product_category_id`** / **`product_subcategory_id`** — ids in your **product category** tree (configured in the Products area).
 - **`category_name`** / **`subcategory_name`** — display names for those ids (when set on the product).
-- **`product_files`** — downloadable files attached to the product. Each row includes fields such as **`purpose`** (`digital` or `bonus`), **`title`**, **`description`**, **`image`**, **`file`**, **`is_primary`**, **`sort_order`**, and **`metadata`**.
+- **`product_files`** — downloadable files attached to the product. Each row includes **`purpose`** (`digital` or `bonus`), **`title`**, **`description`**, **`image`**, **`file`**, **`kind`** (one of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'` — derived from extension/mime so you don't have to classify yourself), **`is_primary`**, **`sort_order`**, and **`metadata`** (`mime_type`, `size`, `checksum`, `extension`).
 - **`bonus_files`** / **`digital_files`** — purpose-filtered views of `product_files`.
 - **`primary_download_url`** — convenience URL for the product’s first primary downloadable file.
+
+Use **`ProductDownloads(product)`** when you want a single rolled-up array of everything the customer can download — `digital_files` then `bonus_files` then anything else in `product_files`, with the legacy `digital_file` / `bonus_file` scalars filled in only when no file rows exist, deduplicated by URL. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`.
 
 Use **`GetProducts`** with **`category_id`** to limit to products in that category or subcategory row (matches either primary or subcategory assignment). Use **`subcategory_id`** to require a specific subcategory id on the product.
 
@@ -37,6 +39,7 @@ Use **`GetProducts`** with **`category_id`** to limit to products in that catego
 |-------------------|---------|
 | **`ProductSavings(product)`** | Object with savings **amount**, **percent**, and formatted strings for marketing copy. |
 | **`SubscriptionSummary(product)`** | Short human-readable subscription line (trial, billing interval). |
+| **`ProductDownloads(product)`** | Flat, deduplicated array of every downloadable file for the product. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`. `kind` is one of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`. |
 | **`formatPrice`** filter | Format a number with currency (e.g. `{{ product.price \| formatPrice:product.currency }}`). |
 | **`savings`**, **`compareAt`**, **`pricePerUnit`**, **`subscriptionLabel`**, **`merchantPriceId`** filters | Convenience formatting on a product object. |
 
@@ -88,6 +91,23 @@ Shipping profiles do **not** store a tax code themselves. **`tax_categories`** i
 ```html
 @foreach(c in GetProductCategories())
   <p style="padding-left: {{ c.depth * 12 }}px">{{ c.name }}</p>
+@endforeach
+```
+
+**List a product's downloads with type-aware icons** (no URL parsing required):
+
+```html
+@foreach(file in ProductDownloads(GetProduct('my-sku')))
+  <a href="{{ file.url }}" target="_blank">
+    @if(file.kind eq 'audio')🎧
+    @elseif(file.kind eq 'video')🎬
+    @elseif(file.kind eq 'document')📄
+    @elseif(file.kind eq 'image')🖼️
+    @elseif(file.kind eq 'archive')📦
+    @else📁
+    @endif
+    {{ file.title }} ({{ file.extension }})
+  </a>
 @endforeach
 ```
 

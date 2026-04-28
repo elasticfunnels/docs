@@ -197,6 +197,102 @@ setVariable('all_bonus_skus', catalogBonuses);
 For the same filter but the **full product** shape (price, currency, `merchant_product_ids`, the normalized `product_files` array, etc.), use `getProducts({ classification: 'bonus' })` instead.
 </Tip>
 
+### `getPurchasedProducts(sortBy?, limit?)`
+
+Customer-scoped helper for **member-area "My Library" pages**. Returns every product the current customer has purchased, fully catalog-enriched, with **same-order bonuses already attached** under `included_bonuses[]` and a pre-rolled-up `downloads[]` array (each entry tagged with `kind`).
+
+This replaces the manual recipe of:
+- calling `getSessionOrders` + `getAllProducts` + `getBonusProducts` separately,
+- joining order lines back to the catalog by code,
+- guessing which bonuses go with which product by matching strings in titles.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sortBy` | string | `'newest'` | `'newest'` or `'oldest'` — controls which purchase wins when the same product appears in multiple orders. |
+| `limit` | number | `50` | Max orders considered when scanning the customer's history (max 1000). |
+
+```javascript
+var purchasedProducts = getPurchasedProducts('newest');
+setVariable('purchased_products', purchasedProducts);
+```
+
+Each purchased product contains:
+
+```javascript
+{
+  id: 100,
+  code: 'theta-clear',
+  title: 'Theta Clear',           // checkout_title preferred when present
+  checkout_title: '',
+  description: '...',
+  image: 'https://cdn/theta.png',
+  type: 'digital',
+  classification: 'main',
+  price: 39,                       // catalog price
+  retail_price: 99,
+  currency: 'USD',
+
+  // Decorated catalog fields (same shape as getProducts)
+  product_files: [ /* normalized file rows with `kind` */ ],
+  digital_files: [ /* product_files filtered by type='digital' */ ],
+  bonus_files:   [ /* product_files filtered by type='bonus' */ ],
+  bonus_file: 'https://cdn/...',
+  digital_file: 'https://cdn/...',
+  primary_download_url: 'https://cdn/...',
+
+  // Pre-rolled-up downloads — one flat list, deduped by URL, each tagged
+  // with kind ('audio' | 'video' | 'document' | 'image' | 'archive' | 'file').
+  // Use this instead of walking product_files / digital_files / bonus_files
+  // by hand. See the productDownloads helper section above.
+  downloads: [
+    { url: '...', title: 'Theta Clear Vocal Guidance', kind: 'audio',
+      purpose: 'digital', extension: 'mp3', mime_type: 'audio/mpeg',
+      size: null, is_primary: true, sort_order: 0 },
+  ],
+
+  // Purchase context (flat — matches the fields used in member-area templates)
+  order_number: 'A0FZ2V0A',
+  conversion_code: 'CONV-1',
+  created_at: '2026-04-28T10:00:00Z',
+  line_price: 39,                  // amount paid for this line
+  line_currency: 'USD',
+  quantity: 1,
+  has_shipping: false,             // true if the order has a shipping address
+
+  // Bonuses received in the SAME order — every is_bonus line, no string
+  // filtering. Each entry is catalog-enriched and carries its own
+  // `downloads[]` rollup plus a direct `bonus_url`.
+  included_bonuses: [
+    {
+      id: 200,
+      code: 'integration-journal',
+      title: 'The Theta Clear Integration Journal',
+      classification: 'bonus',
+      bonus_url: 'https://cdn/journal.pdf',
+      downloads: [ /* same shape as above */ ],
+      // ...full catalog fields
+    },
+    // ... all other bonus lines from the same order
+  ]
+}
+```
+
+**Bonus attribution rule:** every `is_bonus` line in an order is attached to every main line of that same order. This matches how funnels actually deliver bonuses (the bonuses come with the offer, not with one specific catalog item). It also avoids the silent-drop bug of older recipes that filtered bonuses by title keywords.
+
+**Dedup rule:** one entry per product (keyed by id, then code). When the same product appears in multiple orders, the order matching the `sortBy` direction wins (newest purchase for `'newest'`). Bonuses come from the kept order.
+
+```javascript
+// Member-area library — render every purchased product with its bonuses
+// and downloads already prepared. No string heuristics, no manual joins.
+var library = getPurchasedProducts('newest');
+
+setVariable('library', library);
+setVariable('library_count', library.length);
+setVariable('has_library', library.length > 0);
+```
+
+Scoped to the **current session**: returns `[]` when the visitor is not identified.
+
 ## Subscriptions
 
 Customer-scoped recurring billing functions. All operations are restricted to subscriptions belonging to the **current session customer** (matched by email) — a script can never read or modify another customer's subscription.
@@ -485,11 +581,27 @@ Inside each `product_files` row:
 | `description` | string | Optional description. |
 | `image` | string | Optional preview image URL. |
 | `file` | string | Download URL. Always present (rows without a URL are dropped). |
+| `kind` | string | Coarse classification derived from `metadata.extension` and `metadata.mime_type`. One of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`. Use this to branch on file type without re-parsing the URL. |
 | `sort_order` | number | Display / primary-selection order (defaults to position in the array if not stored). |
 | `is_primary` | boolean | Whether this row is the primary file for its purpose. |
-| `metadata` | object | Optional metadata object. Always an object (parsed from JSON when stored that way). |
+| `metadata` | object | Public metadata object (always an object, parsed from JSON when stored that way). See **Metadata fields** below. Internal storage pointers are intentionally not exposed. |
 
-**Example** — pick the primary bonus URL with a safe fallback, then list all digital files:
+#### Metadata fields
+
+The `metadata` object on each `product_files` row only exposes the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mime_type` | string \| null | MIME type of the file (e.g. `'audio/mpeg'`, `'application/pdf'`). |
+| `size` | number \| null | Size in bytes. |
+| `checksum` | string \| null | Optional checksum, when one was recorded at upload. |
+| `extension` | string | Lowercase extension without the dot (e.g. `'mp3'`, `'pdf'`, `'docx'`). Derived from the `file` URL when possible, with a small mime-type fallback for opaque/signed URLs. Empty string when neither source can produce one. |
+
+<Tip>
+Internal storage pointers (`provider`, `storage_path`, `brand_file_id`) used to be present on this object and are now intentionally hidden — they were only useful to the platform itself and should not be relied on by scripts or templates.
+</Tip>
+
+**Example** — pick the primary bonus URL with a safe fallback, then list all digital files with their type:
 
 ```javascript
 var p = getProduct('my-sku');
@@ -501,7 +613,13 @@ if (p && (p.bonus_file || p.primary_download_url)) {
 if (p && p.digital_files && p.digital_files.length) {
   for (var i = 0; i < p.digital_files.length; i++) {
     var row = p.digital_files[i];
-    console.log(row.title, row.file, 'primary?', row.is_primary);
+    console.log(
+      row.title,
+      row.file,
+      'kind:', row.kind,
+      'ext:', row.metadata && row.metadata.extension,
+      'mime:', row.metadata && row.metadata.mime_type
+    );
   }
 }
 ```
@@ -518,6 +636,52 @@ for (var i = 0; i < bonuses.length; i++) {
 ```
 
 For the same field names in **backend** page templates (`GetProduct` / `GetProducts` / `GetAllProducts`), see [Products, categories & shipping (backend)](/backend-template-engine/products-and-shipping).
+
+### `productDownloads(product)`
+
+Roll up everything a member-area UI normally needs to render "what can the customer actually download for this product" into a single flat array. Replaces the recurring `extractFiles` / "classify by extension" gymnastics — every entry already carries `kind`, so you can `switch` on it without parsing URLs.
+
+Source order, deduplicated by URL (first occurrence wins):
+
+1. `digital_files` (purpose=`'digital'`)
+2. `bonus_files` (purpose=`'bonus'`)
+3. anything left in `product_files` not already picked up
+4. legacy scalar `digital_file` / `bonus_file` columns — surfaced **only when no file rows exist**, so you never get duplicates of a row that's already in `product_files`
+
+Each entry:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `url` | string | Download URL (always present). |
+| `title` | string | Display title. Falls back to `'Download'`. |
+| `kind` | string | One of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`. |
+| `purpose` | string | `'digital'` or `'bonus'`. |
+| `extension` | string | Lowercase extension without the dot (e.g. `'mp3'`). |
+| `mime_type` | string \| null | MIME type when known. |
+| `size` | number \| null | Size in bytes when known. |
+| `is_primary` | boolean | Whether this row is the primary file for its purpose. |
+| `sort_order` | number | Display order. |
+
+**Example** — render a member's library entry without any classify-by-URL logic:
+
+```javascript
+var p = getProduct('my-sku');
+var files = productDownloads(p);
+
+for (var i = 0; i < files.length; i++) {
+  var f = files[i];
+  switch (f.kind) {
+    case 'audio':    console.log('🎧', f.title, f.url); break;
+    case 'video':    console.log('🎬', f.title, f.url); break;
+    case 'document': console.log('📄', f.title, f.url); break;
+    case 'image':    console.log('🖼️', f.title, f.url); break;
+    case 'archive':  console.log('📦', f.title, f.url); break;
+    default:         console.log('📁', f.title, f.url);
+  }
+}
+```
+
+The same helper is available in backend page templates as `ProductDownloads(product)` — see [Products, categories & shipping (backend)](/backend-template-engine/products-and-shipping).
 
 ### `productSavings(product)`
 

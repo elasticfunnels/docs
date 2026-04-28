@@ -465,9 +465,16 @@ Each file row can include:
 - `description` - Optional description shown in customer-facing download UIs
 - `image` - Optional thumbnail/cover image URL for this file
 - `file` - File URL
+- `kind` - Coarse classification derived from the file extension and `metadata.mime_type`. One of `audio`, `video`, `document`, `image`, `archive`, `file`. Lets clients branch on file type without re-parsing the URL.
 - `is_primary` - Marks the default file for that purpose
 - `sort_order` - Controls display order
-- `metadata` - Provider/storage metadata for the uploaded file
+- `metadata` - Public file metadata. Only the following fields are exposed:
+  - `mime_type` - MIME type of the file (e.g. `"audio/mpeg"`, `"application/pdf"`)
+  - `size` - Size in bytes
+  - `checksum` - Optional checksum recorded at upload (may be `null`)
+  - `extension` - Lowercase extension without the dot (e.g. `"pdf"`, `"mp3"`). Derived from the file URL when possible, with a small mime-type fallback for opaque/signed URLs. Empty string when neither source can produce one.
+
+  Internal storage pointers (`provider`, `storage_path`, `brand_file_id`) are intentionally not returned.
 
 ```json
 {
@@ -478,20 +485,29 @@ Each file row can include:
       "description": "PDF onboarding guide",
       "image": "https://cdn.example.com/guide-cover.jpg",
       "file": "https://cdn.example.com/guide.pdf",
+      "kind": "document",
       "is_primary": true,
       "sort_order": 0,
       "metadata": {
-        "provider": "bunnycdn",
         "mime_type": "application/pdf",
-        "size": 182734
+        "size": 182734,
+        "checksum": null,
+        "extension": "pdf"
       }
     },
     {
       "purpose": "bonus",
       "title": "Bonus Audio",
       "file": "https://cdn.example.com/bonus.mp3",
+      "kind": "audio",
       "is_primary": true,
-      "sort_order": 0
+      "sort_order": 0,
+      "metadata": {
+        "mime_type": "audio/mpeg",
+        "size": 10876045,
+        "checksum": null,
+        "extension": "mp3"
+      }
     }
   ]
 }
