@@ -30,7 +30,7 @@ Core product identity, titles, images, descriptions, category assignment, and SE
 | **Title** | Primary display name |
 | **Checkout Title** | Overrides Title at checkout (optional) |
 | **Product Image** | Primary product image — upload directly from this tab |
-| **Gallery** | Additional images (one URL per line) |
+| **Gallery** | Additional product images — upload files directly or remove existing images via the visual thumbnail picker |
 | **Short Description** | Brief summary for product cards and search results |
 | **Full Description** | Rich text or plain text description |
 | **Category / Subcategory** | Assign from brand-level product categories |
@@ -150,43 +150,371 @@ Define product variants (e.g. Color, Size) with individual pricing.
 
 ---
 
-## Template Access
+## Template Reference
 
-All product fields are available in templates:
+All product data is available in ElasticFunnels templates via data functions and filters. Functions are called with `{% set x = FunctionName(args) %}` or inline. Filters are applied with `{{ value | filterName:arg }}`.
+
+---
+
+### Product Object Shape
+
+Every product returned by a data function has the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `number` | Unique product ID |
+| `brand_id` | `number` | Brand this product belongs to |
+| `title` | `string` | Display title — uses `checkout_title` when set, otherwise `title` |
+| `checkout_title` | `string \| null` | Raw checkout title (before effective resolution) |
+| `code` | `string` | Unique product code used in buy links |
+| `type` | `"physical" \| "digital" \| "service"` | Product type |
+| `classification` | `"main" \| "upsell" \| "downsell" \| "bump" \| "bonus"` | Role in the funnel |
+| `status` | `"active" \| "draft" \| "archived"` | Visibility status |
+| `price` | `number` | Selling price |
+| `retail_price` | `number \| null` | Compare-at (strikethrough) price |
+| `currency` | `string \| null` | 3-letter currency code (e.g. `"USD"`); `null` = brand default |
+| `sku` | `string \| null` | Stock-keeping unit |
+| `barcode` | `string \| null` | UPC / EAN barcode |
+| `units` | `number \| null` | Package quantity |
+| `physical_units_per_product` | `number \| null` | Individual units inside one package (for per-unit pricing) |
+| `description` | `string \| null` | Full product description (HTML) |
+| `short_description` | `string \| null` | Brief summary |
+| `image` | `string \| null` | Primary image CDN URL |
+| `gallery` | `string[]` | Additional image CDN URLs — **always an array**, never `null` |
+| `has_gallery` | `boolean` | `true` when `gallery.length > 0` |
+| `has_description` | `boolean` | `true` when `description` is non-empty |
+| `in_stock` | `boolean` | `true` when `inventory_quantity` is `null` or `> 0` |
+| `inventory_quantity` | `number \| null` | Current stock count; `null` = unlimited |
+| `inventory_policy` | `"continue" \| "deny"` | Behaviour when out of stock |
+| `is_subscription` | `boolean` | Whether recurring billing is enabled |
+| `subscription_frequency` | `number \| null` | Billing interval value (e.g. `1`) |
+| `subscription_frequency_unit` | `"day" \| "week" \| "month" \| "year" \| null` | Billing interval unit |
+| `subscription_trial_days` | `number \| null` | Free trial days before first charge |
+| `subscription_first_charge_free` | `boolean` | First order ships free (customer pays shipping only) |
+| `is_build_a_box` | `boolean` | Build-a-Box subscription mode |
+| `seo_title` | `string \| null` | SEO page title |
+| `seo_slug` | `string \| null` | URL slug for storefront product pages |
+| `seo_description` | `string \| null` | Meta description |
+| `product_category_id` | `number \| null` | Assigned category ID |
+| `product_subcategory_id` | `number \| null` | Assigned subcategory ID |
+| `category_name` | `string \| null` | Category display name (denormalised) |
+| `subcategory_name` | `string \| null` | Subcategory display name (denormalised) |
+| `product_files` | `ProductFile[]` | All attached files |
+| `digital_files` | `ProductFile[]` | Subset: digital download files |
+| `bonus_files` | `ProductFile[]` | Subset: bonus files |
+| `primary_download_url` | `string \| null` | URL of the primary digital file |
+| `merchant_product_ids` | `Record<string, string>` | Gateway → merchant product ID map (e.g. `{ stripe: "price_xxx" }`) |
+
+#### ProductFile shape
+
+Each item in `product_files`, `digital_files`, and `bonus_files`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `url` | `string` | CDN URL of the file |
+| `title` | `string \| null` | File display name |
+| `description` | `string \| null` | File description |
+| `image` | `string \| null` | Thumbnail image URL |
+| `purpose` | `"digital" \| "bonus"` | Whether this is a digital or bonus file |
+| `kind` | `"audio" \| "video" \| "document" \| "image" \| "archive" \| "file"` | Inferred from MIME type |
+| `mime_type` | `string \| null` | MIME type |
+| `size` | `number \| null` | File size in bytes |
+| `extension` | `string \| null` | File extension (e.g. `"pdf"`) |
+| `is_primary` | `boolean` | Whether this is the primary file for its purpose |
+| `sort_order` | `number` | Display order |
+
+---
+
+### Data Functions
+
+#### `GetProduct(code)` {#fn-getproduct}
+
+Loads a single product by its **code** for the current brand. Also pre-loads structured attribute values so the `attr` and `attrLabel` filters work immediately on the returned object.
 
 ```
-{{ product.title }}
-{{ product.description }}
-{{ product.short_description }}
-{{ product.price | formatPrice:product.currency }}
-{{ product.sku }}
-{{ product.barcode }}
-{{ product.gallery }}
-{{ product.has_gallery }}
-{{ product.in_stock }}
-{{ product.seo_title }}
-{{ product | savings }}
-{{ product | savings:'percent' }}
-{{ product | compareAt }}
-{{ product | subscriptionLabel }}
-{{ product | merchantPriceId:'stripe' }}
+{% set product = GetProduct('PROD-001') %}
+{{ product.title }} — {{ product.price | formatPrice:product.currency }}
 ```
 
-### Structured Attributes in Templates
+**Returns:** `ProductObject | null`
 
-Use `GetProductAttributes()` and `GetProductAttributeValues(product)` to access brand-level attribute definitions and values:
+---
+
+#### `GetProducts(filters?)` {#fn-getproducts}
+
+Returns all active products for the brand, with optional filters.
+
+| Filter key | Type | Description |
+|------------|------|-------------|
+| `type` | `string` | `"physical"`, `"digital"`, or `"service"` |
+| `classification` | `string` | `"main"`, `"upsell"`, `"downsell"`, `"bump"`, or `"bonus"` |
+| `codes` | `string` | Comma-separated list of product codes |
+| `category_id` | `number \| string` | Filter by product category ID |
+| `subcategory_id` | `number \| string` | Filter by subcategory ID |
 
 ```
-{% set attrDefs = GetProductAttributes({ visible: true }) %}
-{% set attrVals = GetProductAttributeValues(product) %}
-{% for attr in attrDefs %}
-  {{ attr.name }}: {{ attrVals[attr.slug] }}
+{% set upsells = GetProducts({ classification: 'upsell' }) %}
+{% for p in upsells %}
+  <div>{{ p.title }} — {{ p.price | formatPrice:p.currency }}</div>
 {% endfor %}
 ```
 
-Or use shorthand filters (when the product was loaded via `GetProduct`):
+**Returns:** `ProductObject[]`
+
+---
+
+#### `GetAllProducts()` {#fn-getallproducts}
+
+Returns every product for the brand without filters. Fastest when you need to iterate all products and filter in the template.
 
 ```
+{% set all = GetAllProducts() %}
+{% for p in all %}{% if p.status == 'active' %}
+  {{ p.title }}
+{% endif %}{% endfor %}
+```
+
+**Returns:** `ProductObject[]`
+
+---
+
+#### `GetProductCategories(filters?)` {#fn-getproductcategories}
+
+Returns product categories. By default returns a full tree ordered by position, then name, with a `depth` field.
+
+| Filter key | Type | Description |
+|------------|------|-------------|
+| `top_level` | `boolean` | Only root categories (no parent) |
+| `parent_id` | `number \| string` | Only direct children of this category |
+| `flat` | `boolean` | Return flat list instead of tree |
+| `tree` | `boolean` | Set `false` to force flat list |
+
+Each item: `{ id, name, position, parent_id, depth? }`
+
+```
+{% set cats = GetProductCategories({ top_level: true }) %}
+{% for cat in cats %}
+  <h3>{{ cat.name }}</h3>
+  {% set subs = GetProductCategories({ parent_id: cat.id }) %}
+  {% for sub in subs %}<span>{{ sub.name }}</span>{% endfor %}
+{% endfor %}
+```
+
+**Returns:** `CategoryObject[]`
+
+---
+
+#### `ProductDownloads(product)` {#fn-productdownloads}
+
+Flattens all downloadable files attached to a product into a single deduplicated array. Useful for rendering download lists on digital product pages.
+
+```
+{% set files = ProductDownloads(product) %}
+{% for f in files %}
+  <a href="{{ f.url }}">{{ f.title or f.extension | upper }} — {{ f.kind }}</a>
+{% endfor %}
+```
+
+Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`
+
+**Returns:** `DownloadObject[]`
+
+---
+
+#### `ProductSavings(product)` {#fn-productsavings}
+
+Returns a structured savings breakdown comparing `retail_price` to `price`. Returns `null` if there is no saving.
+
+```
+{% set savings = ProductSavings(product) %}
+{% if savings and savings.amount > 0 %}
+  You save {{ savings.amountFormatted }} ({{ savings.percent }}% off)
+{% endif %}
+```
+
+**Returns:** `{ amount: number, percent: number, amountFormatted: string, percentFormatted: string } | null`
+
+---
+
+#### `SubscriptionSummary(product)` {#fn-subscriptionsummary}
+
+Generates a human-readable billing summary string for a subscription product (e.g. `"7-day free trial · Every 1 month"`).
+
+```
+{% if product.is_subscription %}
+  <p>{{ SubscriptionSummary(product) }}</p>
+{% endif %}
+```
+
+**Returns:** `string`
+
+---
+
+#### `GetProductAttributes(filters?)` {#fn-getproductattributes}
+
+Returns the brand's structured attribute definitions. See [Product Attributes](/products/product-attributes) for details on attribute types and scoping.
+
+| Filter key | Type | Description |
+|------------|------|-------------|
+| `visible` | `boolean` | Only attributes with `visible_on_product_page = true` |
+| `filterable` | `boolean` | Only attributes marked as filterable |
+| `applies_to` | `"product" \| "variant"` | Filter by scope |
+
+Each item: `{ id, name, slug, type, applies_to, options, filterable, visible_on_product_page, required }`
+
+**Returns:** `AttributeDefinition[]`
+
+---
+
+#### `GetProductAttributeValues(product)` {#fn-getproductattributevalues}
+
+Returns all attribute values for a product as a `{ slug: value }` map.
+
+```
+{% set defs = GetProductAttributes({ visible: true }) %}
+{% set vals = GetProductAttributeValues(product) %}
+{% for attr in defs %}
+  <dt>{{ attr.name }}</dt>
+  <dd>{{ vals[attr.slug] }}</dd>
+{% endfor %}
+```
+
+**Returns:** `Record<string, string | number | boolean>`
+
+---
+
+### Filters
+
+#### `formatPrice` {#filter-formatprice}
+
+Formats a numeric price using the brand's active currency locale.
+
+```
+{{ product.price | formatPrice:product.currency }}
+{# → "$49.00" #}
+
+{{ 9.99 | formatPrice:'EUR' }}
+{# → "€9.99" #}
+```
+
+---
+
+#### `savings` {#filter-savings}
+
+Computes the saving between `retail_price` and `price` and returns a formatted string.
+
+| Format | Example output |
+|--------|----------------|
+| *(default)* | `"Save $20"` |
+| `'percent'` | `"Save 25%"` |
+| `'both'` | `"Save $20 (25% off)"` |
+
+```
+{{ product | savings }}
+{{ product | savings:'percent' }}
+{{ product | savings:'both' }}
+```
+
+Returns `""` when `retail_price` is not set or not greater than `price`.
+
+---
+
+#### `compareAt` {#filter-compareat}
+
+Formats `retail_price` as a "Was $X" string.
+
+```
+{{ product | compareAt }}
+{# → "Was $99.00" #}
+```
+
+Returns `""` when `retail_price` is not set.
+
+---
+
+#### `pricePerUnit` {#filter-priceperunit}
+
+Divides `price` by `physical_units_per_product` to give the per-unit price. Useful for "per bottle" or "per capsule" displays.
+
+```
+{{ product | pricePerUnit }}
+{# → "33.00" (for a 6-pack at $198) #}
+```
+
+**Returns:** `string` (float formatted to 2 decimal places)
+
+---
+
+#### `subscriptionLabel` {#filter-subscriptionlabel}
+
+Short-form billing label. Returns trial info if present, otherwise the billing frequency.
+
+```
+{{ product | subscriptionLabel }}
+{# → "7-day free trial"  or  "Every 1 month" #}
+```
+
+Returns `""` for non-subscription products.
+
+---
+
+#### `merchantPriceId` {#filter-merchantpriceid}
+
+Looks up the merchant-specific product identifier from `merchant_product_ids` (configured in the Merchants tab).
+
+```
+{{ product | merchantPriceId:'stripe' }}
+{# → "price_1abc..." #}
+
+{{ product | merchantPriceId:'nmi' }}
+```
+
+---
+
+#### `attr` {#filter-attr}
+
+Returns the value of a structured attribute by its slug. Only works on products loaded via `GetProduct` (which pre-loads attribute values).
+
+```
+{% set product = GetProduct('MY-PRODUCT') %}
 {{ product | attr:'material' }}
+{# → "Organic Cotton" #}
+```
+
+Returns `""` when the attribute is not set.
+
+---
+
+#### `attrLabel` {#filter-attrlabel}
+
+Returns the human-readable **label** (name) of a structured attribute definition by slug.
+
+```
 {{ product | attrLabel:'material' }}
+{# → "Material" #}
+```
+
+---
+
+### Gallery {#gallery}
+
+`product.gallery` is a `string[]` — an array of CDN image URLs. It is always an array (never `null` or a JSON string). `product.has_gallery` is `true` when the array has at least one entry.
+
+```html
+{% if product.has_gallery %}
+<div class="product-gallery">
+  {% for url in product.gallery %}
+  <img src="{{ url }}" alt="{{ product.title }}" />
+  {% endfor %}
+</div>
+{% endif %}
+```
+
+Show the primary image with gallery fallback:
+
+```html
+{% set mainImage = product.image or (product.gallery[0] if product.has_gallery) %}
+{% if mainImage %}
+<img src="{{ mainImage }}" alt="{{ product.title }}" />
+{% endif %}
 ```

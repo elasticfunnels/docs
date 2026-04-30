@@ -1,0 +1,81 @@
+---
+title: "Course Emails"
+description: "Course enrollment, magic link, and comment notification email templates."
+---
+
+## Overview
+
+Course emails are sent to students and course participants. They cover enrollment confirmations, secure login links, and engagement notifications.
+
+## Course Enrollment
+
+**Trigger:** Sent when a student is enrolled in a course (after purchase or manual enrollment).
+
+**Template:** `course-enrollment`
+
+**Key sections:**
+- Indigo banner with graduation cap icon and course name
+- Welcome message with student's first name
+- "Open Course" CTA linking to the course login URL
+- Fallback plain-text URL for email clients that don't support buttons
+
+**Variables:**
+
+| Variable | Description |
+|---|---|
+| `course.name` | Name of the course |
+| `course.login_url` | Direct login URL for the course |
+| `student.first_name` | Student's first name |
+
+## Course Magic Link
+
+**Trigger:** Sent when a student requests a magic link to sign into their course.
+
+**Template:** `course-magic-link`
+
+**Key sections:**
+- Indigo banner with secure login messaging
+- Course name in bold
+- "Sign In" CTA with the magic link
+- Expiration notice
+
+**Variables:**
+
+| Variable | Description |
+|---|---|
+| `course.name` | Name of the course |
+| `magic_link_url` | One-time login URL |
+| `student.first_name` | Student's first name |
+
+<Warning>
+Magic links are one-time use and expire quickly. The email should be opened promptly.
+</Warning>
+
+## Course Comment Notification
+
+**Trigger:** Sent when someone comments on a lesson the student is enrolled in.
+
+**Template:** `course-comment-notification`
+
+**Key sections:**
+- Dark banner with lesson name
+- Commenter's name and their comment in a styled blockquote
+- "View Lesson" CTA
+
+**Variables:**
+
+| Variable | Description |
+|---|---|
+| `lesson.name` | Name of the lesson |
+| `lesson.url` | Direct URL to the lesson |
+| `commenter.name` | Name of the person who commented |
+| `comment.text` | The comment content |
+
+## Customizing course emails
+
+Course email templates are **brand-level** templates — they're shared across all courses in your brand. To customize:
+
+1. Navigate to **Emails** in your brand dashboard
+2. Find the course template (e.g., "Course Enrollment")
+3. Open in the Visual Builder or Code Editor
+4. Customize the design while keeping variables intact

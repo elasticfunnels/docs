@@ -1,0 +1,121 @@
+---
+title: "Template Variables"
+description: "Complete reference for all email template variables available in ElasticFunnels."
+---
+
+## How variables work
+
+Template variables use double curly braces: `{{ variable.path }}`. When an email is sent, each variable is replaced with the actual value from the transaction.
+
+Variables are grouped by **scope** — each email type has access to different scopes depending on the data available at send time.
+
+## Brand variables (all emails)
+
+Every email template has access to these brand-level variables:
+
+| Variable | Example | Description |
+|---|---|---|
+| `brand_name` | Acme Health | Your brand name |
+| `current_year` | 2026 | Current year (for copyright footers) |
+| `brand.support_email` | support@example.com | Support email from Brand Settings |
+| `brand.support_phone` | +1 800 555 0100 | Support phone from Brand Settings |
+
+## Purchase variables
+
+Available in: purchase, refund, shipped, cancelled, renewal-success, renewal-failed, pre-renewal, subscription-paused, subscription-canceled, payment-method-expiring, dunning-final.
+
+| Variable | Example | Description |
+|---|---|---|
+| `purchase.customer_email` | jane@example.com | Customer email |
+| `purchase.customer_name` | Jane Smith | Full name |
+| `purchase.customer_first_name` | Jane | First name |
+| `purchase.customer_last_name` | Smith | Last name |
+| `purchase.customer_phone` | +1 555 0100 | Phone number |
+| `purchase.public_order_id` | ORD-1234 | Public order number |
+| `purchase.total` | 99.00 | Order total |
+| `purchase.total_shipping_cost` | 5.99 | Shipping cost |
+| `purchase.total_taxes` | 8.50 | Tax amount |
+| `purchase.currency_code` | USD | Currency |
+| `purchase.purchased_at` | Apr 28, 2026 | Formatted order date |
+| `purchase.purchased_at_time` | 3:45 PM | Formatted order time |
+| `purchase.payment_method` | Visa ending in 4242 | Payment method |
+| `purchase.tracking_number` | 1Z999AA10123456784 | Tracking number |
+| `purchase.tracking_url` | https://... | Tracking URL |
+| `purchase.carrier` | UPS | Shipping carrier |
+| `purchase.domain` | shop.example.com | Purchase domain |
+| `purchase.card_charge_name` | ACME HEALTH | Statement descriptor |
+
+### Shipping / billing address fields
+
+| Variable | Description |
+|---|---|
+| `purchase.shipping_address` | Street address |
+| `purchase.shipping_city` | City |
+| `purchase.shipping_state` | State / province |
+| `purchase.shipping_zip` | Postal code |
+| `purchase.shipping_country` | Country |
+| `purchase.billing_address` | Billing street |
+| `purchase.billing_city` | Billing city |
+| `purchase.billing_state` | Billing state |
+| `purchase.billing_zip` | Billing postal code |
+| `purchase.billing_country` | Billing country |
+
+## Product variables (inside `@each`)
+
+Available inside `@each(product in products)` loops:
+
+| Variable | Example | Description |
+|---|---|---|
+| `product.name` | Monthly Membership | Product display name |
+| `product.product_sku` | SKU-001 | Product SKU |
+| `product.price` | 49.99 | Unit price |
+| `product.quantity` | 1 | Quantity |
+| `product.total` | 49.99 | Line total |
+| `product.currency_code` | USD | Currency |
+| `product.image_url` | https://... | Product image |
+
+## Subscription variables
+
+Available in subscription-related emails (renewal-success, renewal-failed, pre-renewal, subscription-paused, subscription-canceled, payment-method-expiring, dunning-final):
+
+| Variable | Example | Description |
+|---|---|---|
+| `subscription.product_name` | Monthly Membership | Subscription product |
+| `subscription.amount` | 49.99 | Recurring amount |
+| `subscription.cycle_number` | 3 | Current billing cycle |
+| `subscription.next_charge_date` | 2026-05-01 | Next charge date |
+| `subscription.next_retry_date` | 2026-05-03 | Next retry date (failed payments) |
+| `subscription.card_last4` | 4242 | Last 4 digits of card |
+| `subscription.card_exp` | 12/2026 | Card expiration |
+| `subscription.resume_date` | 2026-06-01 | Resume date (paused subscriptions) |
+| `subscription.retry_count` | 3 | Number of failed payment retries |
+
+## Course variables
+
+Available in course enrollment, course magic link, and course comment notification emails:
+
+| Variable | Example | Description |
+|---|---|---|
+| `course.name` | Marketing 101 | Course name |
+| `course.login_url` | https://... | Course login URL |
+| `student.first_name` | Jane | Student first name |
+| `lesson.name` | Lesson 3: Funnels | Lesson name |
+| `lesson.url` | https://... | Lesson URL |
+| `commenter.name` | John | Comment author name |
+| `comment.text` | Great lesson! | Comment content |
+
+## Login variables
+
+Available in member login verification code and magic link emails:
+
+| Variable | Example | Description |
+|---|---|---|
+| `code` | 482910 | Verification code |
+| `magic_link_url` | https://... | Magic link URL |
+| `expires_in_minutes` | 15 | Expiration time |
+
+## Refund request variables
+
+Available in the refund request received email:
+
+Uses `purchase.*` variables (see above) plus `brand.support_email` and `brand.support_phone`.

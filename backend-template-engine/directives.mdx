@@ -91,9 +91,11 @@ The engine looks up the component by name and renders it with the given argument
 
 ---
 
-## Inheritance: `@extends` and `@block`
+## Inheritance: `@extends`, `@block`, and `@yield`
 
 Use a **base template** and override only certain regions.
+
+`@yield("name")` and `@block("name")…@endblock` both define named regions in a base layout that child templates can fill. The difference: `@yield` has no default content (renders empty if not overridden), while `@block` can include default content as a fallback.
 
 ### Base template (e.g. layout)
 
@@ -126,7 +128,39 @@ The child declares which base it extends and redefines one or more blocks:
 ```
 
 - **`@extends("pageSlug")`** — Must be at the top; use the base page’s slug.
-- **`@block("name")` … `@endblock`** — Replaces the same-named block in the base. Only the blocks you define are overridden; the rest of the base layout is used as-is.
+- **`@block("name")` … `@endblock`** in the child — Replaces the same-named `@block` or `@yield` in the base. Only the blocks you define are overridden; the rest of the base layout is used as-is.
+
+### `@yield` vs `@block` — when to use which
+
+`@yield("name")` is a slot with **no default content** — nothing renders if the child does not provide an override. `@block("name") default @endblock` has **optional default content** that renders when no child override is provided.
+
+| | `@block("name") default @endblock` | `@yield("name")` |
+|-|---|---|
+| Default content | Yes — rendered when child doesn't override | No — renders empty |
+| Typical use | Optional sections (header, sidebar, scripts) | Required slots (title, main content, page-level style) |
+
+Example base layout using `@yield` for required slots and `@block` for optional ones:
+
+```html
+<head>
+  <title>@yield("title") · My Site</title>
+  <style>@yield("style")</style>
+</head>
+<body>
+  @block("header")<header><a href="/">Home</a></header>@endblock
+  <main>@yield("content")</main>
+  @block("scripts")@endblock
+</body>
+```
+
+Child template:
+
+```html
+@extends("layout")
+@block("title")About@endblock
+@block("style").about { padding: 80px 0; }@endblock
+@block("content")<h1>About us</h1>@endblock
+```
 
 In the **page builder**, inheritance is supported with a read-only base layer: only the block regions are editable, and on save only the child source (extends + blocks) is stored.
 

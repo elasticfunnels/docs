@@ -1,0 +1,71 @@
+---
+title: "Email Templates"
+description: "Create, customize, and send branded transactional emails from ElasticFunnels."
+---
+
+## What are email templates?
+
+Email templates are the transactional emails your brand sends to customers — order confirmations, shipping notifications, renewal reminders, and more. ElasticFunnels provides **system templates** for every transaction type and lets you create **custom templates** to match your brand.
+
+## System vs custom templates
+
+| Type | Description | Editable? |
+|---|---|---|
+| **System** | Auto-created when you enable a merchant or subscription feature. Covers all standard transaction types (purchase, refund, shipped, etc.) | Content and design only — cannot be deleted |
+| **Custom** | Templates you create from scratch for specific use cases | Fully editable and deletable |
+
+System templates are marked with a **Locked** badge in the email list.
+
+## Two ways to edit
+
+After creating or opening an email template, you can choose between two editors:
+
+### Visual Builder (GrapesJS)
+
+A drag-and-drop editor that lets you design emails visually. Ideal for non-technical users who want to build responsive emails without writing HTML.
+
+- Drag blocks like text, images, buttons, and dividers
+- Style elements with a visual properties panel
+- Preview desktop and mobile layouts side by side
+- Insert template variables from the Variables panel
+
+### Code Editor (Monaco)
+
+A full HTML code editor for users who prefer writing markup directly. The code editor gives you complete control over the email HTML.
+
+- Syntax highlighting for HTML/CSS
+- Auto-completion and error detection
+- Save with `Cmd+S` / `Ctrl+S`
+- Switch to the Visual Builder at any time
+
+## Template variables
+
+Every email template has access to **variables** — dynamic data that gets replaced when the email is sent. For example, `{{ purchase.customer_first_name }}` is replaced with the customer's actual first name.
+
+Variables are organized by **scope** (purchase, subscription, brand, etc.). See the [Template Variables](/emails/template-variables) reference for the complete list.
+
+## Conditional content
+
+Use `@if` / `@endif` directives to show or hide sections based on available data:
+
+```html
+@if(purchase.tracking_url)
+<a href="{{ purchase.tracking_url }}">Track Your Package</a>
+@endif
+```
+
+Use `@each` / `@endeach` to loop over collections like products:
+
+```html
+@each(product in products)
+<p>{{ product.name }} — ${{ product.total }}</p>
+@endeach
+```
+
+## Related docs
+
+- [Template Variables](/emails/template-variables) — Complete variable reference
+- [Order Emails](/emails/order-emails) — Purchase, refund, shipped, cancelled
+- [Subscription Emails](/emails/subscription-emails) — Renewals, paused, canceled, dunning
+- [Course Emails](/emails/course-emails) — Enrollment, magic links, comments
+- [Login Emails](/emails/login-emails) — Verification codes and magic links

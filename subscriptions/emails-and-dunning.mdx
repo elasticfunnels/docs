@@ -132,3 +132,12 @@ When a dunning event fires (renewal failed, cancel, winback), it's routed throug
 1. **Subscription emails** — the templates described above, sent to the customer directly.
 2. **Merchant-level callcenter gate** — the **Callcenter Escalation After Retry #** / **Send to Callcenter on Cancel** settings decide if a call-center send is attempted.
 3. **Per-integration event config** — each [external call-center integration](/integrations/callcenters) decides which events it actually receives, how long to wait before sending, and which decline codes to filter.
+
+## Further reading
+
+For detailed documentation on email template design, available variables, and editing, see the dedicated [Emails](/emails/overview) section:
+
+- [Email Templates Overview](/emails/overview) — How to create and edit emails
+- [Template Variables](/emails/template-variables) — Complete variable reference
+- [Subscription Emails](/emails/subscription-emails) — Detailed guide for all subscription templates
+- [Dunning](/emails/dunning) — Deep dive on dunning configuration and escalation

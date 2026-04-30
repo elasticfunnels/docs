@@ -1,0 +1,111 @@
+---
+title: "Subscription Emails"
+description: "Renewal, pre-renewal, paused, canceled, payment expiring, and dunning email templates."
+---
+
+## Overview
+
+Subscription emails keep customers informed about their recurring billing status. They cover the full lifecycle: successful renewals, upcoming charges, payment issues, paused/canceled states, and dunning.
+
+## Renewal Success
+
+**Trigger:** Sent after a successful subscription renewal charge.
+
+**Template:** `renewal-success`
+
+**Key sections:**
+- Green success banner
+- Order details (order number, date, billing cycle number, next charge date)
+- Product list with totals
+- Card statement descriptor note
+
+## Renewal Failed
+
+**Trigger:** Sent when a subscription renewal payment fails.
+
+**Template:** `renewal-failed`
+
+This template uses **escalating urgency** based on the retry count:
+
+| Retry Count | Banner Color | Heading |
+|---|---|---|
+| 1–2 | Yellow | "We had trouble with your payment" |
+| 3–4 | Orange | "Your payment could not be processed" |
+| 5+ | Red | "Your subscription will be canceled" |
+
+The body text also escalates, becoming more urgent with each retry. The template includes:
+
+- Subscription details (product, amount, card on file, next retry date)
+- Support contact box with phone and email
+- "Update Payment Method" CTA
+
+Use the `subscription.retry_count` variable with `@if` directives to customize urgency levels further.
+
+## Pre-Renewal Reminder
+
+**Trigger:** Sent 3 days before an upcoming subscription renewal.
+
+**Template:** `pre-renewal`
+
+**Key sections:**
+- Indigo banner with bell icon
+- Subscription details (product, amount, charge date)
+- Product list
+- "Manage Subscription" CTA
+
+## Subscription Paused
+
+**Trigger:** Sent when a subscription is paused.
+
+**Template:** `subscription-paused`
+
+**Key sections:**
+- Amber banner with pause icon
+- Product name and resume date (or "No date set")
+- "Resume Subscription" CTA
+
+## Subscription Canceled
+
+**Trigger:** Sent when a subscription is canceled.
+
+**Template:** `subscription-canceled`
+
+**Key sections:**
+- Red banner
+- Product and order details
+- "We're sorry to see you go" message with green reactivation CTA
+- Encourages the customer to return
+
+## Payment Method Expiring
+
+**Trigger:** Sent when a customer's card on file is about to expire.
+
+**Template:** `payment-method-expiring`
+
+**Key sections:**
+- Orange banner with credit card icon
+- Card details (last 4 digits, expiration date highlighted in orange)
+- Next charge date
+- Support contact box (amber) explaining how to update payment
+- "Manage Subscription" CTA
+
+## Dunning Final Notice
+
+**Trigger:** Sent as the last dunning attempt before subscription cancellation.
+
+**Template:** `dunning-final`
+
+For a deep dive on dunning configuration, see [Dunning](/emails/dunning).
+
+**Key sections:**
+- Red banner with warning icon
+- Amount due and card on file
+- "Pending Cancellation" status in red
+- Support contact box (red) with instructions
+- "Update Payment Method" CTA
+
+## Configuring subscription emails
+
+Subscription email templates are configured in **Brand Settings > Subscriptions**. Each subscription event has a dropdown to select which email template to use.
+
+See also: [Emails & Dunning settings](/subscriptions/emails-and-dunning)

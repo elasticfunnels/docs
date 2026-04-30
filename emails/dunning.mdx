@@ -1,0 +1,75 @@
+---
+title: "Dunning"
+description: "Configure payment retry schedules, dunning emails, and callcenter escalation for failed subscription payments."
+---
+
+## What is dunning?
+
+Dunning is the process of retrying failed subscription payments and communicating with customers about payment issues. ElasticFunnels automates this with configurable retry schedules and escalating email notifications.
+
+## Retry schedule
+
+When a subscription payment fails, ElasticFunnels automatically retries based on your configured schedule. The default schedule is:
+
+| Attempt | Timing | Email Sent |
+|---|---|---|
+| 1 | Immediately | Renewal Failed (yellow — gentle) |
+| 2 | 2 days later | Renewal Failed (yellow) |
+| 3 | 3 days later | Renewal Failed (orange — more urgent) |
+| 4 | 5 days later | Renewal Failed (orange) |
+| 5 | 7 days later | Renewal Failed (red — final warning) |
+| Final | 10 days later | Dunning Final Notice |
+
+After the final notice, if payment is still unsuccessful, the subscription is automatically canceled and the [Subscription Canceled](/emails/subscription-emails#subscription-canceled) email is sent.
+
+## Configuring the retry schedule
+
+The retry schedule is configured in **Brand Settings > Subscriptions**. You can adjust:
+
+- **Number of retries** — How many times to retry before canceling
+- **Retry intervals** — Days between each retry attempt
+- **Final grace period** — Days after the last retry before cancellation
+
+## Escalating email urgency
+
+The `renewal-failed` template uses the `subscription.retry_count` variable to escalate urgency:
+
+```html
+@if(subscription.retry_count)
+  @if(subscription.retry_count gte 5)
+    <!-- Red: Final warning -->
+    <p>Your subscription will be canceled unless you update your payment.</p>
+  @elseif(subscription.retry_count gte 3)
+    <!-- Orange: Getting serious -->
+    <p>We've tried multiple times. Please update your card.</p>
+  @else
+    <!-- Yellow: First notice -->
+    <p>We had trouble processing your payment. We'll try again soon.</p>
+  @endif
+@endif
+```
+
+## Dunning final notice
+
+The `dunning-final` template is sent as a last resort before cancellation. It features:
+
+- A red "Final Notice" banner
+- Bold "Pending Cancellation" status
+- Support contact information (phone and email from Brand Settings)
+- An "Update Payment Method" CTA
+
+## Callcenter escalation
+
+If you have the Callcenter module enabled, failed payments can be escalated to your support team automatically. When a payment fails beyond a configurable threshold, a task is created in the callcenter queue for an agent to call the customer.
+
+Configure escalation in **Brand Settings > Subscriptions > Callcenter Escalation**.
+
+## Support contact in emails
+
+The `brand.support_phone` and `brand.support_email` variables (from Brand Settings > General) are shown in dunning emails to give customers a way to resolve payment issues. Make sure these are configured before enabling dunning.
+
+## Related
+
+- [Subscription Emails](/emails/subscription-emails) — All subscription email templates
+- [Emails & Dunning settings](/subscriptions/emails-and-dunning) — Subscription settings reference
+- [Template Variables](/emails/template-variables) — Variable reference

@@ -1,0 +1,78 @@
+---
+title: "Order Emails"
+description: "Purchase confirmation, refund, shipping notification, and cancellation email templates."
+---
+
+## Overview
+
+Order emails are sent automatically when key events happen in your store. Each email type has a corresponding system template that you can customize.
+
+## Purchase Confirmation
+
+**Trigger:** Sent immediately after a successful purchase.
+
+**Template:** `purchase`
+
+**Key sections:**
+- Green success banner with customer greeting
+- Order details (order number, date, payment method)
+- Product list with quantities and prices
+- Shipping/tax/total summary with prominent total highlight
+- Shipping address (if physical goods)
+- Card statement descriptor note (if configured)
+- "View Your Order" CTA linking to the members area
+
+**Available variables:** All [purchase variables](/emails/template-variables#purchase-variables) and [product loop](/emails/template-variables#product-variables-inside-each).
+
+## Refund Processed
+
+**Trigger:** Sent when a refund is processed for an order.
+
+**Template:** `refund`
+
+**Key sections:**
+- Blue banner confirming the refund
+- Order number and refund amount (highlighted in blue)
+- List of refunded items
+- Info box explaining the 5–10 business day refund timeline
+- Card charge name (if configured) so customers know what to look for on their statement
+
+## Shipping Notification
+
+**Trigger:** Sent when an order is marked as shipped.
+
+**Template:** `shipped`
+
+**Key sections:**
+- Teal banner with shipping confirmation
+- Carrier and tracking number (if available)
+- "Track Your Package" CTA linking to the tracking URL
+- List of items in the package
+- Shipping address
+
+If no tracking URL is provided, the CTA falls back to "View Order Details".
+
+## Order Cancelled
+
+**Trigger:** Sent when an order is cancelled.
+
+**Template:** `cancelled`
+
+**Key sections:**
+- Red banner indicating cancellation
+- Order number and total
+- List of cancelled items
+- Refund timeline info box (if card charge name is configured)
+- "Visit Our Store" CTA
+
+## Customizing order emails
+
+1. Navigate to **Emails** in your brand dashboard
+2. Find the system template you want to customize
+3. Click **Builder** (visual editor) or **Code** (HTML editor)
+4. Edit the content, keeping the template variables intact
+5. Save your changes
+
+<Tip>
+System templates cannot be deleted, but you can fully customize their content and design. Changes apply to all future emails of that type.
+</Tip>

@@ -200,6 +200,18 @@
             ]
           },
           {
+            "group": "Emails",
+            "pages": [
+              "emails/overview",
+              "emails/template-variables",
+              "emails/order-emails",
+              "emails/subscription-emails",
+              "emails/dunning",
+              "emails/course-emails",
+              "emails/login-emails"
+            ]
+          },
+          {
             "group": "Products & Sales",
             "pages": [
               "products/product-management",

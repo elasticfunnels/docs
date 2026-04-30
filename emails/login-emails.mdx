@@ -1,0 +1,67 @@
+---
+title: "Login Emails"
+description: "Member login verification code and magic link email templates."
+---
+
+## Overview
+
+Login emails are sent to members accessing your members area. They provide secure authentication through verification codes or magic links.
+
+## Verification Code
+
+**Trigger:** Sent when a member requests a verification code to log in.
+
+**Template:** `member-login-verification-code`
+
+**Key sections:**
+- Dark banner with lock icon
+- Large monospaced verification code in a bordered card
+- Expiration notice (configurable minutes)
+- Security notice for unrequested codes
+
+**Variables:**
+
+| Variable | Description |
+|---|---|
+| `code` | The 6-digit verification code |
+| `expires_in_minutes` | Minutes until the code expires |
+
+The verification code is displayed in a prominent, easy-to-read format with wide letter spacing for clarity.
+
+## Magic Link
+
+**Trigger:** Sent when a member requests a magic link to log in.
+
+**Template:** `member-login-magic-link`
+
+**Key sections:**
+- Dark banner with link icon
+- "Access Members Area" CTA button
+- Expiration notice
+- Security notice for unrequested links
+
+**Variables:**
+
+| Variable | Description |
+|---|---|
+| `magic_link_url` | One-time secure login URL |
+| `expires_in_minutes` | Minutes until the link expires |
+
+<Warning>
+Magic links are single-use. Once clicked, they cannot be used again. If the link expires, the member needs to request a new one.
+</Warning>
+
+## Security considerations
+
+- Both verification codes and magic links expire after a configurable number of minutes
+- Both methods include a notice telling recipients to ignore the email if they didn't request it
+- Links are single-use to prevent sharing or replay attacks
+
+## Customizing login emails
+
+Login templates are configured at the brand level. To customize:
+
+1. Navigate to **Emails** in your brand dashboard
+2. Find "Member Login Verification Code" or "Member Login Magic Link"
+3. Edit in the Visual Builder or Code Editor
+4. Keep the `{{ code }}` or `{{ magic_link_url }}` variables — removing them will break authentication
