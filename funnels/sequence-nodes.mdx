@@ -6,6 +6,7 @@ description: 'Organize complex page event flows with sequence nodes for better c
 Sequence nodes help you organize complex page event flows by ensuring actions execute in the correct order. Think of them as "for each" loops that process connected nodes one by one.
 
 ## Understanding Sequence Nodes
+{/* SCREENSHOT: Understanding Sequence Nodes · funnel builder, page events, or published flow · desktop */}
 
 A sequence node acts as an **organizational container** that executes all connected nodes in a specific order before proceeding to the next step in your flow.
 
@@ -22,6 +23,7 @@ A sequence node acts as an **organizational container** that executes all connec
 - **Better visual organization** - Makes page event flows cleaner and more readable
 
 ## Basic Sequence Usage
+{/* SCREENSHOT: Basic Sequence Usage · funnel builder, page events, or published flow · desktop */}
 
 ### Creating a Sequence
 1. Go to **Page Events** for your page
@@ -46,6 +48,7 @@ Query Parameter Condition → Sequence → Whitelist Visitor
 ```
 
 ## Advanced Sequence Patterns
+{/* SCREENSHOT: Advanced Sequence Patterns · funnel builder, page events, or published flow · desktop */}
 
 ### Multi-Step Whitelisting
 Ensure visitors are properly whitelisted before showing content:
@@ -82,6 +85,7 @@ Process visitor data in a specific order:
 3. **Continue** to page display
 
 ## Best Practices
+{/* SCREENSHOT: Best Practices · funnel builder, page events, or published flow · desktop */}
 
 ### When to Use Sequences
 - **Multiple dependent actions** - When action B depends on action A completing
@@ -102,6 +106,7 @@ Process visitor data in a specific order:
 - **Document complex flows** - Add comments explaining what each sequence does
 
 ## Integration with Other Features
+{/* SCREENSHOT: Integration with Other Features · funnel builder, page events, or published flow · desktop */}
 
 ### Whitelisting Workflows
 Sequences are perfect for complex whitelisting scenarios:
@@ -139,6 +144,7 @@ Script Rule (check user type) → Sequence:
 ```
 
 ## Common Sequence Patterns
+{/* SCREENSHOT: Common Sequence Patterns · funnel builder, page events, or published flow · desktop */}
 
 ### Authentication Flow
 ```
@@ -177,6 +183,7 @@ Script Rule (error detected) → Sequence:
 ```
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · funnel builder, page events, or published flow · desktop */}
 
 ### Common Issues
 - **Sequence not executing** - Check that nodes are properly connected to the sequence
@@ -198,6 +205,7 @@ Script Rule (error detected) → Sequence:
 - **Consider parallel execution** - Some actions might be better executed in parallel
 
 ## Advanced Usage
+{/* SCREENSHOT: Advanced Usage · funnel builder, page events, or published flow · desktop */}
 
 ### Nested Sequences
 You can connect sequences to other sequences for complex workflows:
@@ -228,6 +236,7 @@ Sequence → Process Data Chunk 1
 ```
 
 ## Real-World Examples
+{/* SCREENSHOT: Real-World Examples · funnel builder, page events, or published flow · desktop */}
 
 ### E-commerce Flow
 ```
@@ -260,5 +269,5 @@ Page Load → Sequence:
 ```
 
 <Note>
-Sequences are powerful organizational tools, but they should be used judiciously. Overuse can make your flows unnecessarily complex. Focus on using sequences where execution order truly matters or where you need to group related actions for clarity.
+Use sequences where execution order matters or where grouping related actions makes the flow easier to read. Too many sequences can make a flow harder to debug.
 </Note> 

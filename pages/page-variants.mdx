@@ -3,7 +3,9 @@ title: 'Page Variants'
 description: 'Create and manage multiple versions of your pages for split testing and optimization'
 ---
 
-Page variants allow you to create multiple versions of the same page for split testing, optimization, or different marketing campaigns.
+{/* SCREENSHOT: Page variants panel or page settings · list of V1 V2 variants and active badge · desktop */}
+
+Page variants let you run multiple versions of the same page for split tests, fresh angles, or different campaigns.
 
 ## Creating Page Variants
 
@@ -14,7 +16,7 @@ Page variants allow you to create multiple versions of the same page for split t
 4. Edit the new variant with your desired changes
 
 ### Variant Naming System
-Elastic Funnels uses a **numerical system** instead of letters:
+ElasticFunnels uses a **numerical system** instead of letters:
 - **V1** - First variant (original)
 - **V2** - Second variant  
 - **V3** - Third variant
@@ -30,13 +32,14 @@ Elastic Funnels uses a **numerical system** instead of letters:
 ### Set Active Variant
 1. **Select the variant** you want to make active
 2. **Click "Set as Active"** or toggle the active status
-3. **The URL updates** automatically to show the active version
-4. **Version parameter** is added to the URL (e.g., `?v=2`)
+3. **The active version changes** for the page
+4. **Variant slugs** can be used when you need a separate URL for a specific variant
 
-### Version URL Structure
-- **V1 (Default)**: `https://yoursite.com/page`
-- **V2**: `https://yoursite.com/page?v=2`
-- **V3**: `https://yoursite.com/page?v=3`
+### Variant URLs
+- The primary variant uses the page's normal URL, for example `https://yoursite.com/page`.
+- Additional variants are separate page records and can have their own `variant_slug`.
+- If a variant slug is configured, it can be served as its own URL, for example `https://yoursite.com/page-v2`.
+- Funnel and Page Events variant nodes can also route traffic to a variant directly.
 
 ### Variant Status
 Each variant has a status:
@@ -56,7 +59,7 @@ Use variants for A/B testing different page versions:
 4. **Monitor performance** metrics for each variant
 
 ### Funnel-Level Integration
-Variants work seamlessly with funnel split testing:
+Variants work with funnel split testing:
 - **Split test node** can direct traffic to different variants
 - **Purchase tracking** attributes conversions to specific variants
 - **Analytics** show performance data for each variant
@@ -97,7 +100,7 @@ Use variants for personalized experiences:
 - **Purchase history** - Different offers based on past purchases
 - **Behavior-based** - Different content based on user actions
 
-## Technical Implementation
+## URLs and Routing
 
 ### URL Parameters
 Variants use the `v=` parameter:
@@ -150,5 +153,5 @@ Track key metrics for each variant:
 5. **Performance testing** - Check loading speed for each variant
 
 <Note>
-Page variants are powerful for optimization, but avoid creating too many variants simultaneously. Focus on testing meaningful differences that could impact your conversion rates.
+Use variants for meaningful tests only. Too many small variants make results harder to read.
 </Note> 

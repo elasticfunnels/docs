@@ -6,6 +6,7 @@ description: 'Create password-free members areas where customers access their pu
 A Members Area lets your customers log in with their purchase email and access their orders, digital downloads, bonuses, and account information — no password required.
 
 ## How It Works
+{/* SCREENSHOT: How It Works · members area screen · desktop */}
 
 ElasticFunnels uses an email-based login system tied to purchase records. There are two ways a customer gets access:
 
@@ -23,6 +24,7 @@ flowchart LR
 ```
 
 ## Key Components
+{/* SCREENSHOT: Key Components · members area screen · desktop */}
 
 A members area typically has three pages:
 
@@ -42,6 +44,7 @@ A members area typically has three pages:
 </CardGroup>
 
 ## Auto-Login After Purchase
+{/* SCREENSHOT: Auto-Login After Purchase · members area screen · desktop */}
 
 When a customer completes a purchase through ElasticFunnels checkout, the system automatically:
 
@@ -66,6 +69,7 @@ The session stores the following customer data automatically:
 | `customer.shipping_*` | Shipping address fields |
 
 ## Protecting Pages with Login
+{/* SCREENSHOT: Protecting Pages with Login · members area screen · desktop */}
 
 There are two ways to restrict a page to logged-in customers only.
 
@@ -104,6 +108,7 @@ You can pass the current path as a query parameter so the login page can redirec
 When a customer has a valid session (either from a purchase or from the login form), the script does nothing and the page renders normally.
 
 ## Auth Wrapper Pattern (recommended)
+{/* SCREENSHOT: Auth Wrapper Pattern (recommended) · members area screen · desktop */}
 
 When your members area has more than one page — dashboard, order history, bonuses, course access, account settings — the recommended approach is an **auth wrapper**: a shared layout or script block that handles the authentication check and loads common data in one place. Every members page extends or includes the wrapper, so you never repeat the login redirect logic.
 
@@ -262,6 +267,7 @@ Load only what each page needs. The dashboard might call `getOrders('newest', 5)
 </Tip>
 
 ## Template Variables
+{/* SCREENSHOT: Template Variables · members area screen · desktop */}
 
 Inside members-only pages, you can use the `customer` object to personalize content:
 

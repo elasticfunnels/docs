@@ -10,6 +10,7 @@ HTTP functions are only available when the HTTP proxy is configured. If the prox
 </Warning>
 
 ## `http.get(url, headers?)`
+{/* SCREENSHOT: `http.get(url, headers?)` · code editor or rendered example · desktop */}
 
 Make an HTTP GET request.
 
@@ -28,6 +29,7 @@ if (result.status === 200) {
 | `headers` | object | Optional request headers |
 
 ## `http.post(url, body, headers?)`
+{/* SCREENSHOT: `http.post(url, body, headers?)` · code editor or rendered example · desktop */}
 
 Make an HTTP POST request.
 
@@ -50,6 +52,7 @@ if (result.status !== 200) {
 | `headers` | object | Optional request headers |
 
 ## Response object
+{/* SCREENSHOT: Response object · code editor or rendered example · desktop */}
 
 Both `http.get` and `http.post` return an object:
 
@@ -69,6 +72,7 @@ var data = JSON.parse(result.body);
 ```
 
 ## Limits
+{/* SCREENSHOT: Limits · code editor or rendered example · desktop */}
 
 | Constraint | Value |
 |-----------|-------|
@@ -77,12 +81,14 @@ var data = JSON.parse(result.body);
 | Max response body size | 1 MB |
 
 ## Security
+{/* SCREENSHOT: Security · code editor or rendered example · desktop */}
 
 - All requests are routed through an authenticated proxy — they never originate from the application server directly
 - Private/internal IPs are blocked (localhost, 10.x.x.x, 172.16-31.x.x, 192.168.x.x, 169.254.x.x, AWS metadata endpoint)
 - Only `http://` and `https://` protocols are allowed
 
 ## Example: external auth check
+{/* SCREENSHOT: Example: external auth check · code editor or rendered example · desktop */}
 
 ```html
 <script scope="backend">

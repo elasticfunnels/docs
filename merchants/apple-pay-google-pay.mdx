@@ -3,12 +3,12 @@ title: 'Apple Pay and Google Pay'
 description: 'Enable and configure Apple Pay and Google Pay on your checkout (NMI or Stripe)'
 ---
 
-Apple Pay and Google Pay are payment options on your checkout. They work with both **NMI** and **Stripe** merchants — no separate merchant account is required. Card checkout remains available if a wallet is not shown or the customer cancels.
+Apple Pay and Google Pay are payment options on your checkout. They work with both **NMI** and **Stripe** merchants. No separate merchant account is required. Card checkout remains available if a wallet is not shown or the customer cancels.
 
 ## Overview
 
-- **Apple Pay** — Appears on **Safari** (macOS and iOS) when the customer has Apple Pay set up. Setup depends on your gateway (see below).
-- **Google Pay** — Appears on supported browsers when a Google Pay wallet is available. With NMI it appears on **Android devices** only. With Stripe it can also appear on **desktop Chrome**.
+- **Apple Pay** - Appears on **Safari** (macOS and iOS) when the customer has Apple Pay set up. Setup depends on your gateway (see below).
+- **Google Pay** - Appears on supported browsers when a Google Pay wallet is available. With NMI it appears on **Android devices** only. With Stripe it can also appear on **desktop Chrome**.
 - Both options appear on the **checkout page** only. By default they render above the card fields inside `<checkout-cc-panel>`, or you can place them separately with `<checkout-wallet />` or `<checkout-apple-pay />`.
 
 ## How to configure / enable
@@ -25,12 +25,12 @@ No configuration is required beyond domain registration (see Apple Pay step belo
 
 #### Apple Pay (Stripe)
 
-Stripe handles Apple's merchant validation behind the scenes — you do **not** need to create an Apple Merchant ID, CSR, or host a `.well-known` verification file. Follow these steps:
+Stripe handles Apple's merchant validation behind the scenes. You do **not** need to create an Apple Merchant ID, CSR, or host a `.well-known` verification file. Follow these steps:
 
 **Step 1: Make sure your Stripe account is in live mode**
 
 <Warning>
-Apple Pay **only works with live Stripe API keys**. If your Stripe merchant is using test-mode keys, Apple Pay will not appear — `canMakePayment()` returns `null` and the button is silently hidden. Switch to **live mode** in the Stripe Dashboard and use your live publishable key on the checkout domain.
+Apple Pay **only works with live Stripe API keys**. If your Stripe merchant is using test-mode keys, Apple Pay will not appear - `canMakePayment()` returns `null` and the button is silently hidden. Switch to **live mode** in the Stripe Dashboard and use your live publishable key on the checkout domain.
 </Warning>
 
 **Step 2: Register your checkout domain(s) with Stripe**
@@ -46,7 +46,7 @@ Apple Pay **only works with live Stripe API keys**. If your Stripe merchant is u
 Domains registered in **live mode** are automatically available in sandbox/test mode as well. For local testing, use a tool like [ngrok](https://ngrok.com/) to get an HTTPS domain and register that. However, Apple Pay itself still requires live keys to appear on supported devices.
 </Note>
 
-After registering with live keys, Apple Pay appears on checkout when the customer uses Safari on macOS or iOS and has Apple Pay configured. No verification file is needed — Stripe takes care of it.
+After registering with live keys, Apple Pay appears on checkout when the customer uses Safari on macOS or iOS and has Apple Pay configured. No verification file is needed - Stripe takes care of it.
 
 For more details, see [Stripe's domain registration guide](https://docs.stripe.com/payments/payment-methods/pmd-registration) and [Apple Pay on the web](https://docs.stripe.com/apple-pay?platform=web).
 
@@ -97,7 +97,7 @@ After all three steps, Apple Pay can appear on checkout when the customer uses S
 
 There are three ways to include Apple Pay / Google Pay on your checkout page:
 
-### Default — wallet buttons inside the card panel
+### Default - wallet buttons inside the card panel
 
 ```html
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
@@ -105,7 +105,7 @@ There are three ways to include Apple Pay / Google Pay on your checkout page:
 
 Apple Pay and Google Pay buttons appear above the card fields with an "or pay with card" divider. This is the simplest setup.
 
-### Standalone Apple Pay — separate from the card panel
+### Standalone Apple Pay - separate from the card panel
 
 Use `<checkout-apple-pay />` to place the Apple Pay button anywhere on the page, and disable it inside the card panel with `data-applepay="false"`:
 
@@ -119,7 +119,7 @@ Use `<checkout-apple-pay />` to place the Apple Pay button anywhere on the page,
 
 This lets you position Apple Pay prominently (e.g. above the personal details form) while keeping the card panel card-only.
 
-### Separated — Apple Pay above with divider
+### Separated - Apple Pay above with divider
 
 Use `data-applepay-layout="separated"` to render Apple Pay above the card panel with an "OR PAY ANOTHER WAY" divider between them. This gives Apple Pay top-level prominence without needing a separate `<checkout-apple-pay />` element:
 
@@ -157,7 +157,7 @@ Use this to conditionally show or hide parts of your checkout layout based on wa
   </checkout-personal-details>
 </template-if>
 
-<!-- Apple Pay section — always visible, button appears when supported -->
+<!-- Apple Pay section - always visible, button appears when supported -->
 <checkout-apple-pay />
 
 <!-- Divider when both options are available -->
@@ -170,7 +170,7 @@ Use this to conditionally show or hide parts of your checkout layout based on wa
 ```
 
 <Note>
-`checkout.wallet_available` is set after the payment library loads and detects wallet support (NMI Collect.js or Stripe.js). It may take 1–2 seconds after page load before the values update. Use `template-if` conditions so the UI adjusts automatically once the value is available.
+`checkout.wallet_available` is set after the payment library loads and detects wallet support (NMI Collect.js or Stripe.js). It may take 1-2 seconds after page load before the values update. Use `template-if` conditions so the UI adjusts automatically once the value is available.
 </Note>
 
 ### Example: wallet-first checkout
@@ -204,7 +204,7 @@ When a customer taps the Apple Pay or Google Pay button:
 1. The native wallet sheet appears (Face ID / Touch ID for Apple Pay, or Google Pay authentication).
 2. The wallet provides the payment token **and** contact data (name, address, email, phone).
 3. The system automatically fills the checkout form fields with the wallet data.
-4. The form auto-submits — no further action from the customer.
+4. The form auto-submits. No further action from the customer.
 
 This means the customer can skip filling out the checkout form entirely. The wallet provides everything needed for the payment. Personal and shipping fields are only filled if they are currently empty; billing fields are always overwritten with the wallet data for AVS accuracy.
 
@@ -219,7 +219,7 @@ The wallet (Apple Pay / Google Pay) automatically detects which contact fields t
 | Name fields (`first_name`, `last_name`, or `shipping_first_name`) | Name |
 | `email` field | Email |
 | `phone` field | Phone |
-| None of the above | No contact fields — payment token only |
+| None of the above | No contact fields - payment token only |
 
 **Digital product example:** A checkout page with only email and a payment panel (no name or address fields) causes Apple Pay to request only the customer's email. This is ideal for digital goods where shipping details are unnecessary.
 
@@ -242,7 +242,7 @@ No additional customer interaction is needed for renewals. The subscription bill
 
 ## One-click upsells
 
-When a customer pays with Apple Pay or Google Pay on the main checkout, the payment method is stored for reuse. Subsequent **one-click upsell** charges on the same funnel use this stored method server-to-server — no additional customer interaction is needed. The customer sees upsell pages and clicks "Yes, add this" as usual; the charge happens instantly.
+When a customer pays with Apple Pay or Google Pay on the main checkout, the payment method is stored for reuse. Subsequent **one-click upsell** charges on the same funnel use this stored method server-to-server. No additional customer interaction is needed. The customer sees upsell pages and clicks "Yes, add this" as usual; the charge happens instantly.
 
 This works the same as card-based one-click upsells for both NMI and Stripe.
 
@@ -250,7 +250,7 @@ This works the same as card-based one-click upsells for both NMI and Stripe.
 
 When a customer pays with Apple Pay or Google Pay, the wallet provides the **correct billing address** associated with the card. The system uses this wallet billing address automatically for payment verification (AVS), regardless of what the customer entered in the checkout form's billing fields. This prevents address verification mismatches and declined payments.
 
-No configuration is needed — this is handled automatically.
+No configuration is needed. This is handled automatically.
 
 <Note>
 For non-US addresses, Apple Pay may not return a state/region value (many countries don't use states in their address format). The checkout validation automatically skips state validation for wallet payments, so this does not cause errors.
@@ -264,7 +264,7 @@ For non-US addresses, Apple Pay may not return a state/region value (many countr
 - **Confirm you are using live API keys.** Apple Pay does not appear when the Stripe merchant is in test mode. This is the most common cause of Apple Pay not showing with Stripe. Switch to live mode in the Stripe Dashboard and ensure your checkout domain is using the **live publishable key**.
 - Confirm the domain is registered in the Stripe Dashboard under [Payment method domains](https://dashboard.stripe.com/settings/payment_method_domains) and shows as **Enabled**. Make sure you registered the domain in **live mode**.
 - Check that the customer is on **Safari** (macOS or iOS) and the page is served over **HTTPS**.
-- No `.well-known` verification file is needed for Stripe — Stripe handles merchant validation. If you previously used NMI and have a verification file on the domain, it does not interfere.
+- No `.well-known` verification file is needed for Stripe. Stripe handles merchant validation. If you previously used NMI and have a verification file on the domain, it does not interfere.
 - If using `<checkout-wallet />` or `<checkout-apple-pay />`, make sure the tag is on the page.
 
 **NMI:**
@@ -282,13 +282,13 @@ For non-US addresses, Apple Pay may not return a state/region value (many countr
 
 - Ensure the file is at the exact `.well-known` path and that the domain matches the one used at checkout.
 - If you use a subdomain for checkout, that subdomain must be the one registered with NMI and Apple and must serve the verification file.
-- **This does not apply to Stripe** — Stripe handles verification without a hosted file.
+- **This does not apply to Stripe** - Stripe handles verification without a hosted file.
 
 ### Other issues
 
-- **Wallet payment cancelled or failed** — The customer can pay with card instead; the card form remains available. No page reload is required.
-- **State/region error on wallet payment** — This should be handled automatically. If you see state validation errors after a wallet payment, ensure you are on the latest version of the checkout plugin.
-- **Subscription charges fail after initial wallet purchase** — Verify the payment created a stored payment method. For NMI, check the transaction record for a `customer_vault_id`. For Stripe, check for a stored `payment_method` on the customer.
-- **One-click upsell charges fail after wallet payment** — Same as above — ensure the payment method was stored during the initial charge.
+- **Wallet payment cancelled or failed** - The customer can pay with card instead; the card form remains available. No page reload is required.
+- **State/region error on wallet payment** - This should be handled automatically. If you see state validation errors after a wallet payment, ensure you are on the latest version of the checkout plugin.
+- **Subscription charges fail after initial wallet purchase** - Verify the payment created a stored payment method. For NMI, check the transaction record for a `customer_vault_id`. For Stripe, check for a stored `payment_method` on the customer.
+- **One-click upsell charges fail after wallet payment** - Same as above - ensure the payment method was stored during the initial charge.
 
 For more on NMI and Apple Pay, see [NMI's documentation](https://docs.nmi.com/docs/collectjs) and [Digital Wallet Setup](https://docs.nmi.com/docs/digital-wallet-setup). For Stripe, see [Stripe's Apple Pay guide](https://docs.stripe.com/apple-pay?platform=web) and [domain registration](https://docs.stripe.com/payments/payment-methods/pmd-registration).

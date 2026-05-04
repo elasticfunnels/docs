@@ -8,6 +8,7 @@ This guide covers setting up ClickBank as a merchant to sell your products throu
 <Note>This is for merchants selling through ClickBank. If you're an affiliate promoting ClickBank products, see the [ClickBank Affiliate Integration](/integrations/clickbank) instead.</Note>
 
 ## Prerequisites
+{/* SCREENSHOT: Prerequisites · merchant setup screen or postback state · desktop */}
 
 - Active ClickBank account with vendor access (ClickBank term)
 - Approved products in ClickBank marketplace
@@ -15,6 +16,7 @@ This guide covers setting up ClickBank as a merchant to sell your products throu
 - Understanding of ClickBank pitch flow system
 
 ## Step 1: Create ClickBank Merchant
+{/* SCREENSHOT: Step 1: Create ClickBank Merchant · merchant setup screen or postback state · desktop */}
 
 ### Add Merchant Configuration
 1. Go to **Settings** → **Merchants** → **Add Merchant**
@@ -38,6 +40,7 @@ For postback configuration, use the **Setup** modal available from the **Merchan
 </Note>
 
 ## Step 2: Configure Domain-Merchant Assignment
+{/* SCREENSHOT: Step 2: Configure Domain-Merchant Assignment · merchant setup screen or postback state · desktop */}
 
 ### Assign Merchant to Domain
 1. Go to **Settings** → **Domains** → **Edit Domain**
@@ -47,6 +50,7 @@ For postback configuration, use the **Setup** modal available from the **Merchan
 This ensures all funnels on this domain use ClickBank for payments.
 
 ## Step 3: Set Up ClickBank Pitch Flow
+{/* SCREENSHOT: Step 3: Set Up ClickBank Pitch Flow · merchant setup screen or postback state · desktop */}
 
 ### Create Pitch Flow in ClickBank
 1. Log into your ClickBank account
@@ -75,6 +79,7 @@ This decouples ClickBank from individual page URLs. You can later split test or 
 - **Document variants**: Keep track of which IDs correspond to which products
 
 ## Step 4: Configure Funnel Integration
+{/* SCREENSHOT: Step 4: Configure Funnel Integration · merchant setup screen or postback state · desktop */}
 
 ### Set Funnel Pitch Flow ID
 1. Go to **Funnels** → **Edit Funnel**
@@ -88,10 +93,12 @@ This decouples ClickBank from individual page URLs. You can later split test or 
 - **URL access**: Visitors can access via `domain.com` or `domain.com?f=funnel_id`
 
 ## Postbacks
+{/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
 Use the **Setup** modal in the **Merchants** list for step-by-step, up-to-date postback instructions and your unique URL. After you configure ClickBank and trigger a test (or run a test purchase), the modal will automatically mark the connection as validated once the webhook is received.
 
 ## Advanced Configuration
+{/* SCREENSHOT: Advanced Configuration · merchant setup screen or postback state · desktop */}
 
 ### Multiple Product Testing
 When split testing different products:
@@ -114,9 +121,10 @@ Purchase links automatically use the funnel's CBFID:
 
 ### Subscription Upsells (Upgrade/Cancel)
 
-If you sell recurring products, you can upgrade or cancel a customer's existing subscription mid-funnel using `[UPSELL_UPGRADE=old_sku, new_sku]` and `[UPSELL_CANCEL]` tags. This requires a **Developer API Key** (different from the encryption key) — see [Subscription Upsells](/products/subscription-upsells) for full setup instructions.
+If you sell recurring products, you can upgrade or cancel a customer's existing subscription mid-funnel using `[UPSELL_UPGRADE=old_sku, new_sku]` and `[UPSELL_CANCEL]` tags. This requires a **Developer API Key** (different from the encryption key) - see [Subscription Upsells](/products/subscription-upsells) for full setup instructions.
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
 
 ### Common Issues
 
@@ -142,6 +150,7 @@ If you sell recurring products, you can upgrade or cancel a customer's existing 
 4. **Check conversion tracking** in both systems
 
 ## Security Best Practices
+{/* SCREENSHOT: Security Best Practices · merchant setup screen or postback state · desktop */}
 
 - **Keep encryption keys secure** - don't share them
 - **Use strong, unique keys** - avoid simple passwords

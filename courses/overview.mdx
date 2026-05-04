@@ -6,6 +6,7 @@ description: 'Create structured courses with modules, lessons, and progress trac
 Courses let you deliver structured learning content (video, audio, or text lessons) to customers who have purchased access. Each course is organized into **modules** with **lessons** (contents). Enrollment is tied to a product purchase — when a customer buys the linked product, they are automatically enrolled.
 
 ## How courses work
+{/* SCREENSHOT: How courses work · relevant screen or example output · desktop */}
 
 ```mermaid
 flowchart LR
@@ -21,6 +22,7 @@ flowchart LR
 4. You gate content in the template: show the full course to enrolled customers, show an "Get access" CTA to others.
 
 ## Setting up a course
+{/* SCREENSHOT: Setting up a course · relevant screen or example output · desktop */}
 
 ### 1. Create the course
 
@@ -49,6 +51,7 @@ You need at minimum two pages:
 See [Courses — Template Reference](/courses/template) for complete backend script and template examples.
 
 ## Enrollment and `is_assigned`
+{/* SCREENSHOT: Enrollment and `is_assigned` · relevant screen or example output · desktop */}
 
 Enrollment is created automatically by `BrandCourseEnrollment` when a purchase conversion is recorded for a product that is linked to a course.
 
@@ -61,6 +64,7 @@ Customers are automatically logged in after checkout, so a customer who just pur
 </Note>
 
 ## Progress tracking
+{/* SCREENSHOT: Progress tracking · relevant screen or example output · desktop */}
 
 Progress is tracked server-side per customer, per lesson. All course functions that resolve enrollment (`getCourseForCustomer`, `getCourses`, `getCoursesForCustomer`) include the customer's progress:
 
@@ -80,6 +84,7 @@ For dashboards and aggregate views, two additional functions are available:
 See [Template Reference](/courses/template) for full API signatures and examples.
 
 ## Course object structure
+{/* SCREENSHOT: Course object structure · relevant screen or example output · desktop */}
 
 All course functions return objects with this shape:
 
@@ -132,6 +137,7 @@ All course functions return objects with this shape:
 ```
 
 ## Related
+{/* SCREENSHOT: Related · relevant screen or example output · desktop */}
 
 <CardGroup cols={2}>
   <Card title="Template Reference" icon="code" href="/courses/template">

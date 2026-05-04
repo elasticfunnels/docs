@@ -3,23 +3,25 @@ title: 'Overview'
 description: 'Introduction to the backend template engine: server-side directives and variable interpolation.'
 ---
 
-The **Backend Template Engine** renders templates on the server (or in preview) using directives like `@if`, `@foreach`, and `{{ variable }}`. The output is plain HTML sent to the visitor. Use it for content that is the same for everyone at request time—product lists, blog posts, conditional sections—or for layout structure that does not change after the page loads.
+The **Backend Template Engine** renders templates on the server (or in preview) using directives like `@if`, `@foreach`, and `{{ variable }}`. The output is plain HTML sent to the visitor. Use it for content that is fixed at request time, such as product lists, blog posts, conditional sections, or layout structure that does not change after the page loads.
 
 <Note>
 Use **`{{ }}`** for backend (server-side) variables. Use **`[[ ]]`** for frontend (client-side) values that update in the browser. Both can appear on the same page. For live-updating content (cart, totals, conditional UI), see [Frontend Template Engine](/frontend-template-engine/overview).
 </Note>
 
 ## When to use it
+{/* SCREENSHOT: When to use it · code editor or rendered example · desktop */}
 
 Use the backend template engine when:
 
-- **Content is fixed at request time** — Blog posts, product details, category lists, or any data that does not change while the visitor is on the page.
+- **Content is fixed at request time** - Blog posts, product details, category lists, or any data that does not change while the visitor is on the page.
 - **You need conditionals or loops in the HTML** — Show or hide blocks with `@if` / `@else`, or repeat a block per item with `@foreach`.
 - **You use layout inheritance** — A base layout with `@extends` and `@block` so child pages only define the changing regions.
 
 If the content depends on the visitor and must update without reloading (e.g. cart items, totals, coupon status), use the [Frontend Template Engine](/frontend-template-engine/overview) instead.
 
 ## Page builder vs coded templates
+{/* SCREENSHOT: Page builder vs coded templates · code editor or rendered example · desktop */}
 
 | Context | How you work | What gets saved / rendered |
 |--------|----------------|-----------------------------|
@@ -32,6 +34,7 @@ So:
 - **In coded templates:** Use **`@if`**, **`@else`**, **`@foreach`**, **`{{ }}`**, **`@set`**, **`@component`**, **`@extends`**, **`@block`** directly.
 
 ## What the engine provides
+{/* SCREENSHOT: What the engine provides · code editor or rendered example · desktop */}
 
 | Feature | Purpose |
 |--------|---------|
@@ -50,6 +53,7 @@ So:
 Details and examples are in [Directives](/backend-template-engine/directives), [Variables and filters](/backend-template-engine/variables-and-filters), and [Products, categories & shipping](/backend-template-engine/products-and-shipping) (catalog and shipping profile functions).
 
 ## Relation to other docs
+{/* SCREENSHOT: Relation to other docs · code editor or rendered example · desktop */}
 
 - **Frontend Template Engine** — [Overview](/frontend-template-engine/overview), [Syntax](/frontend-template-engine/syntax): client-side `[[ ]]`, `<template-if>`, `<template-foreach>`, etc.
 - **Backend Template Engine** (this section) — Server-side `{{ }}`, `@if`, `@foreach`, filters, inheritance.

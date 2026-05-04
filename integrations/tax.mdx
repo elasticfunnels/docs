@@ -1,0 +1,104 @@
+---
+title: 'Sales Tax Integrations'
+description: 'Calculate sales tax at checkout in real time using TaxJar, Avalara, or TaxCloud.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · tax integrations list · desktop */}
+
+ElasticFunnels can calculate sales tax at checkout using any of three external services. The active integration is queried for every cart that has a shipping or billing state subject to sales tax, and the calculated rate is applied to the order before payment.
+
+You can configure **multiple** tax integrations per brand. The offer app tries them in the order shown on the integrations list — useful for fallback (e.g. TaxJar primary, Avalara backup).
+
+## Supported providers
+{/* SCREENSHOT: Supported providers · settings · desktop */}
+
+| Provider | Best for | Auth |
+|----------|----------|------|
+| **TaxJar** | US sales tax across all 50 states; SaaS-friendly | API key |
+| **Avalara** | Enterprise; global jurisdictions, exemption handling, certificates | Account ID + License key |
+| **TaxCloud** | Free tier for SST member states (member sellers pay nothing) | API Login ID + API Key |
+
+## How it works
+{/* SCREENSHOT: How It Works · checkout · desktop */}
+
+1. Customer fills in their billing/shipping address on the checkout step.
+2. Before tax is shown, EF asks the configured tax provider for the rate using:
+   - The customer's destination state, ZIP, and city
+   - The order line items and total
+3. The provider returns the tax amount.
+4. EF adds the tax line to the order total and re-renders the order summary.
+5. When payment succeeds, the tax amount stored on the conversion is exactly what was returned by the provider.
+
+The same calculated tax flows into Shopify Order Sync (so your accountant sees matching numbers in Shopify), into the EF reports, and into the receipt email.
+
+## Setup
+{/* SCREENSHOT: Setup · integration form · desktop */}
+
+### TaxJar
+
+<Steps>
+  <Step title="Get an API token">
+    Sign up at [taxjar.com](https://www.taxjar.com). Open **Account** → **TaxJar API** → **API Tokens** and copy your token.
+  </Step>
+  <Step title="Activate in EF">
+    Go to **Integrations** → **Tax** → **TaxJar**. Paste the token, save.
+  </Step>
+  <Step title="(Optional) Set nexus states">
+    TaxJar uses your nexus configuration on its dashboard to decide which orders are taxable. Make sure your nexus list in TaxJar matches the states where you collect tax.
+  </Step>
+</Steps>
+
+### Avalara
+
+<Steps>
+  <Step title="Get account credentials">
+    From your Avalara account: **Settings** → **License and API Keys** → copy the **Account ID** and **License Key**.
+  </Step>
+  <Step title="Activate in EF">
+    Go to **Integrations** → **Tax** → **Avalara**. Paste both credentials and save. Toggle **Sandbox** during setup if you want to use the sandbox environment.
+  </Step>
+  <Step title="Configure company code">
+    Set the **Company Code** that matches the company entity in your Avalara dashboard. Avalara needs this to apply the right tax profile.
+  </Step>
+</Steps>
+
+### TaxCloud
+
+<Steps>
+  <Step title="Sign up">
+    Sign up at [taxcloud.com](https://taxcloud.com). The plan is free for sellers in SST member states.
+  </Step>
+  <Step title="Get API credentials">
+    Open **Websites** → pick your site → **Manage Tax States** to confirm coverage, then copy the **API Login ID** and **API Key**.
+  </Step>
+  <Step title="Activate in EF">
+    Go to **Integrations** → **Tax** → **TaxCloud**. Paste both values, save.
+  </Step>
+</Steps>
+
+## Multiple integrations & fallbacks
+{/* SCREENSHOT: Multiple integrations · settings · desktop */}
+
+If you create more than one tax integration, EF tries them in order until one returns a valid response:
+
+1. First active integration is queried.
+2. If it returns an error or is unavailable, the next is tried.
+3. If all integrations fail, the order falls back to **no tax** (and a warning is logged).
+
+This is useful for high-availability setups (TaxJar + Avalara as backup) or for switching providers without downtime.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · checkout logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Tax shows as $0 on checkout">
+    Either the destination address isn't taxable in your nexus configuration, the integration credentials are wrong, or the integration call timed out. Check the checkout's developer log on the conversion record.
+  </Accordion>
+  <Accordion title="Tax shown in EF doesn't match Shopify after sync">
+    Shopify Order Sync sends the tax amount **exactly as collected** in EF. If Shopify shows a different number, you have Shopify's automatic tax also turned on — turn it off for orders tagged `ElasticFunnel`, or set Shopify to "tax included" so it doesn't recompute.
+  </Accordion>
+  <Accordion title="Avalara returns 'TaxCalculationFailed'">
+    The most common cause is a missing `companyCode`. Check the integration form has the correct company code from your Avalara dashboard.
+  </Accordion>
+</AccordionGroup>

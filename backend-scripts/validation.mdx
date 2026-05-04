@@ -8,6 +8,7 @@ A `Schema` validation library is available globally in every backend script. It 
 The library is pure JavaScript and runs directly in the sandbox. No imports needed — `Schema` is a global.
 
 ## Quick start
+{/* SCREENSHOT: Quick start · code editor or rendered example · desktop */}
 
 ```javascript
 var schema = Schema.object({
@@ -28,6 +29,7 @@ setCrmField({ slug: 'my-entity-slug', fieldKey: 'current_weight', value: result.
 ```
 
 ## How it works
+{/* SCREENSHOT: How it works · code editor or rendered example · desktop */}
 
 1. Define a schema using `Schema.string()`, `Schema.number()`, etc.
 2. Chain validators: `.required()`, `.min(5)`, `.email()`, etc.
@@ -40,6 +42,7 @@ setCrmField({ slug: 'my-entity-slug', fieldKey: 'current_weight', value: result.
 </Note>
 
 ## Types
+{/* SCREENSHOT: Types · code editor or rendered example · desktop */}
 
 ### `Schema.string()`
 
@@ -127,6 +130,7 @@ Schema.any().valid('draft', 'published', 42, true)
 ```
 
 ## Modifiers
+{/* SCREENSHOT: Modifiers · code editor or rendered example · desktop */}
 
 | Method | Applies to | Description |
 |--------|-----------|-------------|
@@ -150,6 +154,7 @@ Schema.any().valid('draft', 'published', 42, true)
 | `.custom(fn)` | all | Custom validator function (return error string or nothing) |
 
 ## Type coercion
+{/* SCREENSHOT: Type coercion · code editor or rendered example · desktop */}
 
 The validator automatically coerces compatible types:
 
@@ -165,6 +170,7 @@ The validator automatically coerces compatible types:
 Non-coercible values fail validation (e.g. `"hello"` for `Schema.number()`).
 
 ## Custom validators
+{/* SCREENSHOT: Custom validators · code editor or rendered example · desktop */}
 
 Use `.custom()` for logic that built-in methods don't cover:
 
@@ -183,6 +189,7 @@ var schema = Schema.object({
 The function receives `(value, label)` and should return an error string if validation fails, or nothing/undefined if it passes.
 
 ## Full POST example
+{/* SCREENSHOT: Full POST example · code editor or rendered example · desktop */}
 
 A page at `/api/submit-checkin` that validates and stores data:
 
@@ -238,6 +245,7 @@ if (!json.ok) {
 ```
 
 ## Nested object example
+{/* SCREENSHOT: Nested object example · code editor or rendered example · desktop */}
 
 ```javascript
 var schema = Schema.object({

@@ -4,12 +4,14 @@ description: "Complete reference for all email template variables available in E
 ---
 
 ## How variables work
+{/* SCREENSHOT: How variables work · email editor or template settings · desktop */}
 
 Template variables use double curly braces: `{{ variable.path }}`. When an email is sent, each variable is replaced with the actual value from the transaction.
 
 Variables are grouped by **scope** — each email type has access to different scopes depending on the data available at send time.
 
 ## Brand variables (all emails)
+{/* SCREENSHOT: Brand variables (all emails) · email editor or template settings · desktop */}
 
 Every email template has access to these brand-level variables:
 
@@ -21,6 +23,7 @@ Every email template has access to these brand-level variables:
 | `brand.support_phone` | +1 800 555 0100 | Support phone from Brand Settings |
 
 ## Purchase variables
+{/* SCREENSHOT: Purchase variables · email editor or template settings · desktop */}
 
 Available in: purchase, refund, shipped, cancelled, renewal-success, renewal-failed, pre-renewal, subscription-paused, subscription-canceled, payment-method-expiring, dunning-final.
 
@@ -61,6 +64,7 @@ Available in: purchase, refund, shipped, cancelled, renewal-success, renewal-fai
 | `purchase.billing_country` | Billing country |
 
 ## Product variables (inside `@each`)
+{/* SCREENSHOT: Product variables (inside `@each`) · email editor or template settings · desktop */}
 
 Available inside `@each(product in products)` loops:
 
@@ -75,6 +79,7 @@ Available inside `@each(product in products)` loops:
 | `product.image_url` | https://... | Product image |
 
 ## Subscription variables
+{/* SCREENSHOT: Subscription variables · email editor or template settings · desktop */}
 
 Available in subscription-related emails (renewal-success, renewal-failed, pre-renewal, subscription-paused, subscription-canceled, payment-method-expiring, dunning-final):
 
@@ -91,6 +96,7 @@ Available in subscription-related emails (renewal-success, renewal-failed, pre-r
 | `subscription.retry_count` | 3 | Number of failed payment retries |
 
 ## Course variables
+{/* SCREENSHOT: Course variables · email editor or template settings · desktop */}
 
 Available in course enrollment, course magic link, and course comment notification emails:
 
@@ -105,6 +111,7 @@ Available in course enrollment, course magic link, and course comment notificati
 | `comment.text` | Great lesson! | Comment content |
 
 ## Login variables
+{/* SCREENSHOT: Login variables · email editor or template settings · desktop */}
 
 Available in member login verification code and magic link emails:
 
@@ -115,6 +122,7 @@ Available in member login verification code and magic link emails:
 | `expires_in_minutes` | 15 | Expiration time |
 
 ## Refund request variables
+{/* SCREENSHOT: Refund request variables · email editor or template settings · desktop */}
 
 Available in the refund request received email:
 

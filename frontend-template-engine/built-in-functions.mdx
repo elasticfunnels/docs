@@ -8,6 +8,7 @@ Expressions in **`[[ ... ]]`**, **`data-condition`**, **`data-ef-text`**, and si
 ---
 
 ## Price display: when to use `formatPrice` vs as-is
+{/* SCREENSHOT: Price display: when to use `formatPrice` vs as-is · code editor or rendered example · desktop */}
 
 Most **checkout** and **cart** values are **already formatted** (e.g. `"$29.00"`). Use them directly in **`[[ ... ]]`**. Use **`formatPrice()`** only when you need to display a **raw number** (e.g. **`*_raw`** keys or a computed number).
 
@@ -42,6 +43,7 @@ Do **not** pass an already-formatted string into **formatPrice** (e.g. `formatPr
 ---
 
 ## `formatPrice(value, currency?, locale?)` / `money` / `formatCurrency`
+{/* SCREENSHOT: `formatPrice(value, currency?, locale?)` / `money` / `formatCurrency` · code editor or rendered example · desktop */}
 
 Formats a **numeric** value as currency.
 
@@ -54,6 +56,7 @@ Formats a **numeric** value as currency.
 ---
 
 ## Cart helpers
+{/* SCREENSHOT: Cart helpers · code editor or rendered example · desktop */}
 
 | Function | Returns | Example |
 |----------|---------|--------|
@@ -64,6 +67,7 @@ Formats a **numeric** value as currency.
 ---
 
 ## String helpers
+{/* SCREENSHOT: String helpers · code editor or rendered example · desktop */}
 
 All coerce to string; `null`/`undefined` become empty string.
 
@@ -80,6 +84,7 @@ All coerce to string; `null`/`undefined` become empty string.
 ---
 
 ## Custom functions
+{/* SCREENSHOT: Custom functions · code editor or rendered example · desktop */}
 
 Register from application or plugin code:
 
@@ -101,6 +106,7 @@ Then in templates: **`[[ myFormat(item.name) ]]`**, **`[[ double(item.quantity) 
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 - **Price display:** Use the [table above](#price-display-when-to-use-formatprice-vs-as-is): pre-formatted keys as-is; **formatPrice** only for **raw** values or computed numbers.
 - **Cart:** **`cartCount`**, **`cartSubtotal`**, **`lineTotal`**; combine with **formatPrice** when you need a formatted string from a number.

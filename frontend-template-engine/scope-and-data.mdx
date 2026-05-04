@@ -6,6 +6,7 @@ description: 'window.efScope, checkout.*, cartItems, query.*, and how the templa
 All expressions in the frontend template engine are evaluated against a **merged context**: the global scope (`window.efScope`) plus any local context (e.g. loop variables). This page describes what data lives where and how to use it safely.
 
 ## Global scope: `window.efScope`
+{/* SCREENSHOT: Global scope: `window.efScope` · code editor or rendered example · desktop */}
 
 The single source of truth for reactive data is **`window.efScope`**. The application and plugins (cart, checkout, bumps) populate and update it.
 
@@ -31,6 +32,7 @@ The single source of truth for reactive data is **`window.efScope`**. The applic
 ---
 
 ## Cart: `cartItems` / `items`
+{/* SCREENSHOT: Cart: `cartItems` / `items` · code editor or rendered example · desktop */}
 
 - **`cartItems`** — Preferred name for the array of cart line items (used on checkout and cart UI).
 - **`items`** — Alias; same data in many contexts.
@@ -53,6 +55,7 @@ Cart plugin (e.g. cart.js) builds this structure and provides formatted `price` 
 ---
 
 ## Checkout: `checkout.*`
+{/* SCREENSHOT: Checkout: `checkout.*` · code editor or rendered example · desktop */}
 
 On **checkout pages**, `efScope.checkout` holds everything needed for the order summary, form, and payment. For full checkout-specific docs (totals, fields, coupon, bumps, payment panel), see [Checkout](/frontend-template-engine/checkout).
 
@@ -109,6 +112,7 @@ Use **`[[ bump.price ]]`** and **`[[ line.price ]]`** for display; do not pass t
 ---
 
 ## URL parameters: `query.*`
+{/* SCREENSHOT: URL parameters: `query.*` · code editor or rendered example · desktop */}
 
 **`query`** should be an object built from `window.location.search` (e.g. via `syncQueryToScope()` at init). Each query parameter is a key; e.g. **`query.coupon`**, **`query.p`**, **`query.bumps`**.
 
@@ -125,6 +129,7 @@ If the app does not set `efScope.query`, conditions like `query.coupon` will be 
 ---
 
 ## Effective context and `mode`
+{/* SCREENSHOT: Effective context and `mode` · code editor or rendered example · desktop */}
 
 The engine merges **caller context** (e.g. from a loop) with **`window.efScope`** to form the **effective context** for each expression. It also adds:
 
@@ -136,6 +141,7 @@ So you can write **`<template-if data-condition="is_single_product">`** and **`<
 ---
 
 ## Runtime API: watch and computed
+{/* SCREENSHOT: Runtime API: watch and computed · code editor or rendered example · desktop */}
 
 The frontend API also exposes Vue-like helpers at `window.ef.template`:
 
@@ -160,6 +166,7 @@ searchUrl.stop();
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 - **Data lives in `window.efScope`**; expressions see global scope + loop/block context.
 - **Reactivity is automatic** when `efScope` values change.

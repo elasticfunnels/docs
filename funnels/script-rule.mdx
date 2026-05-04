@@ -3,9 +3,10 @@ title: 'Script Rule'
 description: 'Advanced JavaScript-based conditional logic with access to visitor data, device info, geolocation, and more'
 ---
 
-Script Rule is a powerful Page Events node that allows you to write custom JavaScript logic to control your funnel flow based on visitor data, behavior, and characteristics. Unlike simple query parameter conditions, Script Rules give you full programming capabilities with access to comprehensive visitor information.
+Script Rule is a Page Events node for custom JavaScript logic. Use it when query parameter rules are not enough and you need to route visitors based on session, device, traffic, or purchase data.
 
 ## When to Use Script Rule
+{/* SCREENSHOT: When to Use Script Rule · funnel builder, page events, or published flow · desktop */}
 
 Script Rules are ideal when you need:
 
@@ -23,6 +24,7 @@ Script Rules execute on the server before the page loads, making them perfect fo
 </Note>
 
 ## How Script Rules Work
+{/* SCREENSHOT: How Script Rules Work · funnel builder, page events, or published flow · desktop */}
 
 1. **Server-Side Execution**: Script Rules run on the server before the page loads
 2. **Return Boolean**: Your script must return `true` or `false`
@@ -32,6 +34,7 @@ Script Rules execute on the server before the page loads, making them perfect fo
 4. **Available Data**: You have access to pre-loaded visitor data (see below)
 
 ## Available Data Variables
+{/* SCREENSHOT: Available Data Variables · funnel builder, page events, or published flow · desktop */}
 
 ### Core Variables
 
@@ -408,10 +411,11 @@ return visit_data.has_multiple_user_agents === false;
 ---
 
 ## Debugging Script Rules
+{/* SCREENSHOT: Debugging Script Rules · funnel builder, page events, or published flow · desktop */}
 
 ### Using the Debug Window
 
-The best way to debug Script Rules is with the **Debug Window** - a powerful tool that shows you exactly what's happening when your script executes.
+The best way to debug Script Rules is with the **Debug Window**. It shows what happens when your script runs.
 
 **How to Debug:**
 
@@ -422,7 +426,7 @@ The best way to debug Script Rules is with the **Debug Window** - a powerful too
 
 **What You'll See:**
 
-The Debug Window displays comprehensive Script Rule information:
+The Debug Window shows Script Rule details:
 
 - **Result**: `TRUE` or `FALSE` - which path was taken
 - **Execution Time**: How long the script took to run (in milliseconds)
@@ -481,6 +485,7 @@ For more details on using the Debug Window, see the [Debug Window documentation]
 ---
 
 ## Example Use Cases
+{/* SCREENSHOT: Example Use Cases · funnel builder, page events, or published flow · desktop */}
 
 ### Example 1: Geographic Targeting
 
@@ -560,6 +565,7 @@ return tags.includes('watched_vsl') &&
 ---
 
 ## Best Practices
+{/* SCREENSHOT: Best Practices · funnel builder, page events, or published flow · desktop */}
 
 ### Performance Optimization
 
@@ -653,6 +659,7 @@ return tags.includes('watched_vsl') &&
 ---
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · funnel builder, page events, or published flow · desktop */}
 
 ### Script Returns Unexpected Results
 
@@ -757,6 +764,7 @@ return ip_whois.country === 'US';
 ---
 
 ## JavaScript Limitations
+{/* SCREENSHOT: JavaScript Limitations · funnel builder, page events, or published flow · desktop */}
 
 Script Rules have some JavaScript limitations due to server-side execution:
 
@@ -793,6 +801,7 @@ Always test your script rules thoroughly. If unsure about a JavaScript feature, 
 ---
 
 ## Related Documentation
+{/* SCREENSHOT: Related Documentation · funnel builder, page events, or published flow · desktop */}
 
 - [Debug Window](/debugging/debug-window) - Learn how to debug Script Rules with the Debug Window
 - [Page Events](/funnels/page-events) - Overview of the Page Events system
@@ -802,6 +811,6 @@ Always test your script rules thoroughly. If unsure about a JavaScript feature, 
 - [Exit Popups](/funnels/exit-popups) - Behavior-based exit intent detection
 
 <Note>
-Script Rules are one of the most powerful features in Elastic Funnels. Start with simple logic and gradually add complexity as you become comfortable with the available data and patterns.
+Start with simple Script Rule logic. Add complexity only when you can test each branch and see the expected result in the Debug Window.
 </Note>
 

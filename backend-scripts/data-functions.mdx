@@ -8,6 +8,7 @@ Backend scripts expose the same data functions available in the template engine,
 All data functions that hit the database are **asynchronous** under the hood, but they look synchronous in your code — just call them and use the return value directly. Pure-computation helpers (like `formatPrice`, `productSavings`) are truly synchronous.
 
 ## Customer
+{/* SCREENSHOT: Customer · code editor or rendered example · desktop */}
 
 ### `getCustomer()`
 
@@ -31,7 +32,52 @@ if (user.email) {
 }
 ```
 
+## Translations
+{/* SCREENSHOT: Translations · backend script editor with t() and getLocale() · desktop */}
+
+Backend scripts can read the same per-brand translation entries that power `data-ef-hl` bindings and the template `t()` helper. The active locale is resolved per request from the URL (`hl`/`locale`/`lang`), session, brand defaults, and `Accept-Language` — backend scripts do not pick a locale themselves.
+
+See [Internationalization](/pages/internationalization) for the schema and admin UI.
+
+### `t(key, fallback?)`
+
+Returns the translation for `key` in the active locale, falling back to the brand's default language entry, then to `fallback`, then to an empty string.
+
+```javascript
+var label = t('hero.title', 'Welcome');
+setVariable('hero_title', label);
+```
+
+### `getLocale()`
+
+Returns the active locale code resolved for this request (e.g. `'en'`, `'pt-br'`). Empty string when the brand has no languages configured.
+
+```javascript
+if (getLocale() === 'pt-br') {
+  setVariable('currency_symbol', 'R$');
+}
+```
+
+### `getLocales()`
+
+Returns the list of locale codes configured for the brand, in admin sort order. Useful for rendering a language switcher.
+
+```javascript
+var available = getLocales(); // ['en', 'pt-br', 'de']
+```
+
+### `getDefaultLocale()`
+
+Returns the brand's default locale code, or empty string if no language is flagged as default.
+
+```javascript
+if (getLocale() !== getDefaultLocale()) {
+  setVariable('show_default_link', true);
+}
+```
+
 ## Orders
+{/* SCREENSHOT: Orders · code editor or rendered example · desktop */}
 
 ### `getOrders(sortBy?, limit?)`
 
@@ -146,6 +192,7 @@ These APIs return **filtered** data only. Full provider API responses and intern
 </Tip>
 
 ## Bonus Products
+{/* SCREENSHOT: Bonus Products · code editor or rendered example · desktop */}
 
 ### `getBonusProducts()`
 
@@ -294,6 +341,7 @@ setVariable('has_library', library.length > 0);
 Scoped to the **current session**: returns `[]` when the visitor is not identified.
 
 ## Subscriptions
+{/* SCREENSHOT: Subscriptions · code editor or rendered example · desktop */}
 
 Customer-scoped recurring billing functions. All operations are restricted to subscriptions belonging to the **current session customer** (matched by email) — a script can never read or modify another customer's subscription.
 
@@ -489,6 +537,7 @@ var result = changeSubscriptionFrequency('txn_xyz789', 'month', 2);
 ```
 
 ## Conversions
+{/* SCREENSHOT: Conversions · code editor or rendered example · desktop */}
 
 ### `getConversions(email)`
 
@@ -505,6 +554,7 @@ if (conversions.length > 0) {
 Returns an array of conversion records with fields like `public_order_id`, `created_at`, `customer_email`, `product_name`, `total`, `currency_code`, `status`.
 
 ## Products
+{/* SCREENSHOT: Products · code editor or rendered example · desktop */}
 
 ### `getProduct(code)`
 
@@ -730,6 +780,7 @@ setVariable('display_price', formatted);
 ```
 
 ## Courses
+{/* SCREENSHOT: Courses · code editor or rendered example · desktop */}
 
 ### `getCourse(courseId)`
 
@@ -857,6 +908,7 @@ var progress = getCourseProgress();
 ```
 
 ## Blog
+{/* SCREENSHOT: Blog · code editor or rendered example · desktop */}
 
 ### `getBlog(blogId?)`
 
@@ -930,6 +982,7 @@ setVariable('related_articles', related);
 ```
 
 ## Purchase Links
+{/* SCREENSHOT: Purchase Links · code editor or rendered example · desktop */}
 
 These functions generate URLs for the payment flow. They are synchronous.
 
@@ -988,6 +1041,7 @@ setVariable('cancel_url', link);
 ```
 
 ## Assets
+{/* SCREENSHOT: Assets · code editor or rendered example · desktop */}
 
 ### `asset(path)`
 
@@ -1003,6 +1057,7 @@ setVariable('css_url', cssUrl);
 Automatically appends a cache-busting parameter when `?nc`, `?no_cache`, or `?preview_key` is present in the request.
 
 ## Visitor Control
+{/* SCREENSHOT: Visitor Control · code editor or rendered example · desktop */}
 
 ### `whitelistVisitor()`
 
@@ -1027,6 +1082,7 @@ if (request.query.block === 'true') {
 ```
 
 ## Session Items
+{/* SCREENSHOT: Session Items · code editor or rendered example · desktop */}
 
 These functions read and write custom session items that are **compatible with the template engine's `setSessionItem` / `getSessionItem`** functions. Values are stored with a `custom_` prefix and base64-encoded.
 
@@ -1065,6 +1121,7 @@ For raw session access (without the `custom_` prefix and base64 encoding), use `
 </Note>
 
 ## CRM Data
+{/* SCREENSHOT: CRM Data · code editor or rendered example · desktop */}
 
 <Note>
 **Entries vs. Fields**: An **entry** is a single record or document stored in the CRM (like a row in a database, representing e.g. a specific check-in for a customer). A **field** (`fieldKey`) is a specific piece of data that lives inside an entry (like a column, e.g. "current_weight").

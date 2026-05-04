@@ -1,0 +1,107 @@
+---
+title: 'JVZoo Integration'
+description: 'Receive JVZoo affiliate postbacks and vendor IPNs to record sales, refunds, and chargebacks in ElasticFunnels.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · integration settings · desktop */}
+
+JVZoo has two postback flows. ElasticFunnels supports both, as separate integrations:
+
+- **JVZoo Affiliate S2S** — Set up when you promote JVZoo offers as an affiliate. ElasticFunnels receives a postback for each commission so the affiliate sale is attributed back to the original ElasticFunnels click.
+- **JVZoo Vendor IPN** — Set up when you sell **your own** offers through JVZoo checkout. ElasticFunnels receives the JVZoo Instant Payment Notification for every sale, rebill, refund, chargeback, and cancellation, and verifies it with your JVZoo `cverify` secret.
+
+You can run both integrations side by side if you both vend on JVZoo and run affiliate traffic.
+
+## JVZoo Affiliate S2S
+{/* SCREENSHOT: JVZoo affiliate S2S · integration settings · desktop */}
+
+### How it works
+
+1. You promote a JVZoo offer using an ElasticFunnels click code in the `tid` parameter on your JVZoo affiliate link.
+2. When a sale happens, JVZoo fires a server-to-server postback to your ElasticFunnels postback URL.
+3. ElasticFunnels reads the macros and creates a conversion.
+
+### Macros consumed
+
+| Macro | Used as |
+|-------|---------|
+| `{tid}` | ElasticFunnels click code (used to attribute the sale) |
+| `{transaction_id}` | External transaction ID stored on the conversion |
+| `{affiliate_amount}` | Affiliate commission amount |
+| `{customer_email}` | Customer email |
+| `{product_title}` | Product name shown in ElasticFunnels reports |
+| `{transaction_type}` | `purchase` or `refund` (mapped to EF conversion type) |
+
+### Setup
+
+<Steps>
+  <Step title="Activate the integration">
+    Go to **Integrations** → **Affiliate Networks** → **JVZoo Affiliate S2S** and click **Activate**.
+  </Step>
+  <Step title="Copy the postback URL">
+    Copy the unique postback URL from the form.
+  </Step>
+  <Step title="Configure JVZoo">
+    In your JVZoo affiliate dashboard, paste the postback URL into the affiliate notification settings for the offer(s) you promote. Make sure the link template includes `tid={{click_code}}` so the EF click code is sent back.
+  </Step>
+  <Step title="Test">
+    Make a test purchase on the JVZoo offer. The conversion should appear in **Conversions** within seconds.
+  </Step>
+</Steps>
+
+## JVZoo Vendor IPN
+{/* SCREENSHOT: JVZoo Vendor IPN · integration settings · desktop */}
+
+### How it works
+
+JVZoo posts a `JVZIPN` payload to your IPN URL on every transaction event for products you vend. ElasticFunnels:
+
+1. Verifies the payload using the `cverify` SHA-1 signature against your JVZoo secret key.
+2. Parses both v1 and v2 payload formats.
+3. Records the matching event:
+   - `SALE` → `purchase`
+   - `BILL` → `rebill`
+   - `RFND` → `refund`
+   - `CGBK` → `chargeback`
+   - `CANCEL-REBILL` → `cancellation`
+4. Attributes the conversion when the posted tracking ID matches an ElasticFunnels click code.
+
+### Setup
+
+<Steps>
+  <Step title="Get your JVZoo secret key">
+    In your JVZoo vendor account: **My Account** → **Seller Settings** → **Postbacks**. Copy the **Secret Key**.
+  </Step>
+  <Step title="Activate the integration">
+    Go to **Integrations** → **Affiliate Networks** → **JVZoo Vendor IPN**. Paste the secret key and save.
+  </Step>
+  <Step title="Configure the IPN URL in JVZoo">
+    Copy the **IPN URL** from the form and paste it into the JVZoo product's **Notify URL** field. Save the JVZoo product.
+  </Step>
+  <Step title="Use tracking IDs from EF">
+    Ensure your JVZoo links pass the EF click code through the JVZoo tracking-id parameter. EF reads it back from the IPN to attribute orders.
+  </Step>
+  <Step title="Test">
+    Make a test purchase. The IPN should arrive within seconds; failed signature checks are logged with the reason so you can debug a key mismatch.
+  </Step>
+</Steps>
+
+<Warning>
+**Don't share the secret key.** It's the only thing preventing third parties from forging IPN events. ElasticFunnels stores it encrypted and never exposes it in logs.
+</Warning>
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Affiliate postbacks not arriving">
+    Check that JVZoo's affiliate notification URL exactly matches the EF postback URL (no trailing whitespace) and that your link template includes the `tid` parameter populated with the EF click code.
+  </Accordion>
+  <Accordion title="Vendor IPNs failing signature check">
+    The JVZoo secret in EF must match the **current** secret in your JVZoo seller settings. If you regenerated the secret, paste the new value into the EF integration form. Failed `cverify` checks are recorded under **Logs** → **Inbound Postbacks** so you can see the exact reason.
+  </Accordion>
+  <Accordion title="Sales recorded with no click attribution">
+    The JVZoo payload didn't include a tracking ID matching an EF click code. Audit your JVZoo links to ensure they include the click code in the tracking-id parameter (most commonly `tid` for affiliates, the JVZoo-defined parameter for vendors).
+  </Accordion>
+</AccordionGroup>

@@ -6,6 +6,7 @@ description: 'Set up an email-based login page for your members area'
 The members login page lets returning customers access their purchases by entering the email they used at checkout. No password is needed — the system verifies their email against existing orders.
 
 ## How the Login Works
+{/* SCREENSHOT: How the Login Works · members area screen · desktop */}
 
 1. Customer enters their purchase email
 2. The form POSTs to `/api/check-order`
@@ -18,6 +19,7 @@ Customers who just completed a purchase are **already logged in** — their sess
 </Note>
 
 ## Setting Up a Login Page
+{/* SCREENSHOT: Setting Up a Login Page · members area screen · desktop */}
 
 ### Option 1: Use the Built-In Template
 
@@ -85,6 +87,7 @@ Create a form that POSTs to `/api/check-order` with the customer's email. The fo
 ```
 
 ## How the Form Submission Works
+{/* SCREENSHOT: How the Form Submission Works · members area screen · desktop */}
 
 ElasticFunnels automatically intercepts any form whose `action` starts with `/api` and submits it via JavaScript (AJAX). You do not need to write any JavaScript — the built-in form handler:
 
@@ -108,6 +111,7 @@ The `/api/check-order` endpoint returns these errors:
 | `"We didn't find an order with that email address."` | No purchase conversions exist for that email |
 
 ## What Happens After Login
+{/* SCREENSHOT: What Happens After Login · members area screen · desktop */}
 
 When login succeeds, the session is hydrated with data from the customer's most recent order:
 
@@ -119,6 +123,7 @@ This means any page that uses `{{ customer.name }}`, `{{ customer.email }}`, or 
 The customer is then redirected to the URL specified in `data-redirect-url` (typically your members dashboard page, e.g., `/members`).
 
 ## Configuring the Members Dashboard Page
+{/* SCREENSHOT: Configuring the Members Dashboard Page · members area screen · desktop */}
 
 Your members dashboard page (the page customers land on after login) should be configured with **Requires Login** enabled in page settings:
 
@@ -130,6 +135,7 @@ Your members dashboard page (the page customers land on after login) should be c
 This ensures that if someone tries to access the dashboard directly without a valid session, they are sent to the login page first.
 
 ## Logout
+{/* SCREENSHOT: Logout · members area screen · desktop */}
 
 To let customers sign out, clear the session and redirect back to the login page:
 

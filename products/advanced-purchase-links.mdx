@@ -1,19 +1,20 @@
 ---
 title: 'Advanced Purchase Links'
-description: 'Enhanced purchase link system with automatic generation and product dropdown integration'
+description: 'Insert product purchase links from the page builder without typing product codes by hand'
 ---
 
-The advanced purchase link system simplifies the process of adding buy buttons and links to your pages with automatic link generation and product dropdown integration.
+Use advanced purchase links to add buy buttons from the page builder without typing product codes by hand.
 
 ## Enhanced Link Insertion
+{/* SCREENSHOT: Enhanced Link Insertion · product form, builder panel, or checkout example · desktop */}
 
-### Automatic Product Dropdown
-Instead of manually typing product codes, you can now select products from a dropdown:
+### Product Dropdown
+Select products from a dropdown instead of typing product codes:
 
 1. **Select a link element** in your page builder
 2. **Click "Insert Product Purchase Link"** in the properties panel
 3. **Choose from dropdown** - All defined products appear in the list
-4. **Automatic link generation** - The system automatically creates the correct buy link
+4. **Generated link** - ElasticFunnels creates the correct buy link
 5. **Instant preview** - See the link format immediately
 
 ### Benefits of Dropdown Selection
@@ -24,6 +25,7 @@ Instead of manually typing product codes, you can now select products from a dro
 - **Quick updates** - Change products without remembering codes
 
 ## Link Types and Formats
+{/* SCREENSHOT: Link Types and Formats · product form, builder panel, or checkout example · desktop */}
 
 ### Standard Purchase Links
 **Generated format**: `[BUY=product_code]`
@@ -51,6 +53,7 @@ Instead of manually typing product codes, you can now select products from a dro
 - See [Subscription Upsells](/products/subscription-upsells) for full documentation
 
 ## Product Integration
+{/* SCREENSHOT: Product Integration · product form, builder panel, or checkout example · desktop */}
 
 ### Product Definition Requirements
 Before using the dropdown system, ensure you have:
@@ -67,6 +70,7 @@ Before using the dropdown system, ensure you have:
 - **Regular updates** - Keep product list current and clean
 
 ## Advanced Link Features
+{/* SCREENSHOT: Advanced Link Features · product form, builder panel, or checkout example · desktop */}
 
 ### Automatic Parameter Addition
 The system automatically adds relevant parameters:
@@ -82,7 +86,8 @@ Links adapt based on context:
 - **Visitor data** - Includes relevant visitor tracking information
 - **Split test variants** - Adjusts based on active split tests
 
-## Implementation Examples
+## Examples
+{/* SCREENSHOT: Implementation Examples · product form, builder panel, or checkout example · desktop */}
 
 ### Basic Product Page
 ```html
@@ -112,6 +117,7 @@ Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
 ```
 
 ## Integration with Existing Systems
+{/* SCREENSHOT: Integration with Existing Systems · product form, builder panel, or checkout example · desktop */}
 
 ### ClickBank Integration
 - **Automatic CBFID inclusion** - No need to manually add pitch flow IDs
@@ -121,9 +127,10 @@ Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
 ### Other Payment Gateways
 - **Merchant-specific formatting** - Adapts to your configured gateway
 - **Parameter optimization** - Includes gateway-specific requirements
-- **Fallback handling** - Graceful degradation if integration issues occur
+- **Fallback handling** - If a gateway-specific link cannot be generated, the page shows a clear error
 
 ## Best Practices
+{/* SCREENSHOT: Best Practices · product form, builder panel, or checkout example · desktop */}
 
 ### Link Organization
 - **Use descriptive anchor text** - Clear call-to-action text
@@ -144,6 +151,7 @@ Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
 - **Analytics tracking** - Monitor link performance and conversion rates
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · product form, builder panel, or checkout example · desktop */}
 
 ### Common Issues
 - **Product not appearing in dropdown** - Check that product is properly defined
@@ -166,6 +174,7 @@ Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
 5. **Review analytics** - Look for patterns in failed purchases
 
 ## Migration from Manual Links
+{/* SCREENSHOT: Migration from Manual Links · product form, builder panel, or checkout example · desktop */}
 
 ### Updating Existing Links
 1. **Identify manual links** - Find all manually typed purchase links
@@ -177,9 +186,10 @@ Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
 - **Reduced errors** - Eliminate typos in product codes
 - **Easier maintenance** - Update products in one place
 - **Better tracking** - Improved analytics and conversion tracking
-- **Future-proof** - Easier to adapt to new features and integrations
+- **Easier updates** - Easier to adapt when products or gateway settings change
 
 ## Advanced Customization
+{/* SCREENSHOT: Advanced Customization · product form, builder panel, or checkout example · desktop */}
 
 ### Custom Link Parameters
 You can still add custom parameters to generated links:
@@ -199,5 +209,5 @@ Use Page Events to modify links dynamically:
 - **Campaign tracking** - Add campaign-specific parameters
 
 <Note>
-The advanced purchase link system is designed to make your workflow more efficient while reducing errors. Take advantage of the dropdown selection feature to streamline your product page creation process.
+Use the dropdown to avoid typos in product codes.
 </Note> 

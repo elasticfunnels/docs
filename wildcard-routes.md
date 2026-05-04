@@ -138,3 +138,22 @@ You can use as many placeholders as you need, for example:
 | Full remainder as one string | Any wildcard page | `route_slug` |
 
 Use **`{name}`** in the slug for each dynamic part, then use **`route_params.name`** (or **`route_slug`**) in the template to drive your content and logic.
+
+---
+
+## Using a wildcard segment to drive locale (`{hl}`)
+
+If you want clean URLs like `/en/about` or `/pt-br/checkout` to switch
+the active locale, capture the locale segment with a placeholder named
+`hl` (or any name you prefer, then read it from `route_params` and pass
+it through `?hl=`).
+
+- **Page slug:** `{hl}/about`
+- **URL:** `/en/about`, `/pt-br/about`
+- **In template:** `route_params.hl` is `en` / `pt-br`
+
+The runtime's locale resolver reads `req.params.hl` first when picking
+the active locale. See [Internationalization (i18n)](pages/internationalization)
+for the full precedence chain (`hl` path segment → `?hl` → `?locale`
+→ `?lang` → session/domain/brand defaults → `Accept-Language`).
+

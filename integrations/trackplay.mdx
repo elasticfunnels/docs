@@ -1,0 +1,58 @@
+---
+title: 'TrackPlay Video Player'
+description: 'Sync videos from TrackPlay and embed their tracking-aware player on your funnel pages.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · integration form · desktop */}
+
+[TrackPlay](https://trackplay.io) is a video player built for direct-response funnels — heatmaps, watch-rate buckets, "video pixel" event tracking, and conversion-aware controls (pitch reveal, CTA show / hide, autoplay rules).
+
+The ElasticFunnels integration connects to your TrackPlay workspace so the EF page builder can list your videos and insert the right embed code without copy-pasting from TrackPlay.
+
+## What you get
+{/* SCREENSHOT: Capabilities · page builder · desktop */}
+
+- **Video picker in the page builder** — Inserting a TrackPlay video shows a searchable list of every video in your workspace, with thumbnails.
+- **Always-current embed** — When you change the player or settings on TrackPlay, the embed on your EF page picks the new settings up automatically (no need to re-export the embed code).
+- **Per-video event hooks** — TrackPlay's `onPlay`, `onProgress`, and `onComplete` events are exposed to EF page interactions, so you can fire show/hide rules, scroll-to-CTA, or analytics events from the player's lifecycle.
+
+## Setup
+{/* SCREENSHOT: Setup · integration form · desktop */}
+
+<Steps>
+  <Step title="Get your TrackPlay API key">
+    Log into [app.trackplay.io](https://app.trackplay.io). Go to **Workspace Settings** → **API Key**. Generate or copy the key (format `tp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`).
+  </Step>
+  <Step title="Activate the integration in EF">
+    Go to **Integrations** → **Utilities** → **TrackPlay**. Paste the API key and save.
+  </Step>
+  <Step title="Insert a video on a page">
+    In the page builder, add a **Video** block. The TrackPlay tab shows the list of videos in your workspace — pick one and save the page.
+  </Step>
+  <Step title="(Optional) Wire interactions">
+    Open the page's **Interactions** panel and bind on-event rules to the TrackPlay video (e.g. "show pitch button at 25%", "scroll to CTA at 90%").
+  </Step>
+</Steps>
+
+## Notes
+{/* SCREENSHOT: Notes · player options · desktop */}
+
+- **Player chrome and behavior is configured in TrackPlay.** EF doesn't override the player; whatever is set in the TrackPlay dashboard renders on the EF page.
+- **Domain whitelisting.** If TrackPlay's player is configured to only embed on whitelisted domains, add your EF domain to that list inside TrackPlay.
+- **Analytics.** TrackPlay's analytics live inside TrackPlay. For funnel-level conversion tracking, EF still records the conversion regardless of whether the user finished the video.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · page preview · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Video list is empty in EF">
+    The API key was rejected. Re-copy from TrackPlay's Workspace Settings and paste again — keys are 32 chars after the `tp_` prefix.
+  </Accordion>
+  <Accordion title="Video doesn't play on the live page">
+    The most common cause is a domain restriction in TrackPlay. Open the player settings on TrackPlay and add the EF page's domain (or `*.elasticfunnels.io` for testing) to the allowed embed domains.
+  </Accordion>
+  <Accordion title="Interactions don't fire">
+    Confirm you bound the interaction to the TrackPlay video block (not a generic video element) so EF subscribes to the TrackPlay JS events instead of the native HTML5 video events.
+  </Accordion>
+</AccordionGroup>

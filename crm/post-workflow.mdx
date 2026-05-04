@@ -6,6 +6,7 @@ description: 'Use pages as API endpoints — accept POST data, validate it, and 
 Pages accept both `GET` and `POST` requests. Combined with [backend scripts](/backend-scripts/overview), this lets you build data-collection endpoints, custom forms, and mini-apps using regular ElasticFunnels pages — no external server needed.
 
 ## The pattern
+{/* SCREENSHOT: The pattern · CRM workspace or workflow screen · desktop */}
 
 1. Create a page (e.g. `/weight/checkin`)
 2. Add a `<script scope="backend">` that checks for `POST`, validates `request.body` with the [Schema validator](/backend-scripts/validation), and stores the data
@@ -15,6 +16,7 @@ Pages accept both `GET` and `POST` requests. Combined with [backend scripts](/ba
 For reusable validation logic across multiple pages, use [shared backend script modules](/backend-scripts/imports) — create a module with exported functions and import them anywhere.
 
 ## Full example: Weight check-in
+{/* SCREENSHOT: Full example: Weight check-in · CRM workspace or workflow screen · desktop */}
 
 ### 1. Create a shared validation module
 
@@ -134,6 +136,7 @@ On any page (e.g. `/dashboard`), read the CRM data:
 ```
 
 ## How it fits together
+{/* SCREENSHOT: How it fits together · CRM workspace or workflow screen · desktop */}
 
 ```
 Frontend (browser)             Backend (sandbox)
@@ -147,6 +150,7 @@ fetch('/weight/checkin', {     → request.method = 'POST'
 ```
 
 ## CRM functions reference
+{/* SCREENSHOT: CRM functions reference · CRM workspace or workflow screen · desktop */}
 
 | Function | Description |
 |----------|-------------|
@@ -268,10 +272,12 @@ All inputs are strictly validated before data is stored:
 - Other invalid inputs still cause `false` / `null` / `[]` where applicable
 
 ## Quiz / anonymous visitor → customer CRM migration
+{/* SCREENSHOT: Quiz / anonymous visitor → customer CRM migration · CRM workspace or workflow screen · desktop */}
 
 A common pattern: save a quiz or funnel payload with `setCrmField({ referenceType: 'quiz_visitor', referenceId: sessionUuid, ... })` while the visitor is anonymous, then **after members login** call `reassignCrmReference` so the same CRM entries attach to `customer` + `customer_id`. `fromReferenceId` must match `session.get('quiz_visitor_id')` and the target must be the current session customer — see **ReassignCrmReference** on the [Data Functions](/backend-scripts/data-functions) page. Clear `quiz_visitor_id` from the session after a successful migration to keep the flow idempotent.
 
 ## Security checklist
+{/* SCREENSHOT: Security checklist · CRM workspace or workflow screen · desktop */}
 
 <Warning>
 **Always validate `request.body` in your backend script.** The body comes from the visitor's browser and can contain anything.
@@ -284,6 +290,7 @@ A common pattern: save a quiz or funnel payload with `setCrmField({ referenceTyp
 5. **Share validation logic** — create a [backend script module](/backend-scripts/imports) for reusable schemas and auth checks
 
 ## POST body limits
+{/* SCREENSHOT: POST body limits · CRM workspace or workflow screen · desktop */}
 
 | Constraint | Value |
 |-----------|-------|
@@ -292,6 +299,7 @@ A common pattern: save a quiz or funnel payload with `setCrmField({ referenceTyp
 | Body available as | `request.body` (parsed object or `null`) |
 
 ## Related
+{/* SCREENSHOT: Related · CRM workspace or workflow screen · desktop */}
 
 - [Backend Scripts Overview](/backend-scripts/overview) — how backend scripts work, sandboxing, execution order
 - [Schema Validator](/backend-scripts/validation) — full reference for the `Schema` validation API

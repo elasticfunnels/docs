@@ -1,6 +1,6 @@
 ---
 title: 'Overview'
-description: 'Introduction to the Elastic Funnels frontend template processor: Alpine-like scope, custom tags, and reactive UI.'
+description: 'Introduction to the ElasticFunnels frontend template processor: Alpine-like scope, custom tags, and reactive UI.'
 ---
 
 The **Frontend Template Engine** is a client-side processor that runs in the visitor’s browser. It lets you build HTML that reacts to data (cart items, checkout totals, URL parameters, etc.) and updates when that data changes—without a full page reload.
@@ -10,6 +10,7 @@ This documentation covers the **frontend** template system only. A separate **ba
 </Note>
 
 ## When to use it
+{/* SCREENSHOT: When to use it · code editor or rendered example · desktop */}
 
 Use the frontend template engine when:
 
@@ -20,6 +21,7 @@ Use the frontend template engine when:
 If the content is the same for everyone and does not change after load (e.g. a fixed headline), use normal content or [page variables](/pages/page-variables) instead.
 
 ## How it works
+{/* SCREENSHOT: How it works · code editor or rendered example · desktop */}
 
 1. **Data lives in `window.efScope`** — The app (and cart/checkout plugins) put data here: `cartItems`, `checkout`, `query`, etc.
 2. **You use custom tags and expressions** — `<template-if>`, `<template-foreach>`, `[[ path ]]`, `ef-text`, `@click`, and similar.
@@ -28,6 +30,7 @@ If the content is the same for everyone and does not change after load (e.g. a f
 There is no virtual DOM; reactivity is **scope- and event-driven** with automatic change detection.
 
 ## Quick start
+{/* SCREENSHOT: Quick start · code editor or rendered example · desktop */}
 
 ### 1. Put reactive data in `window.efScope`
 
@@ -75,6 +78,7 @@ window.efScope.currency = 'USD';
 On offer/checkout pages, the application and plugins (cart, checkout, bumps) usually manage `efScope` for you.
 
 ## What the engine provides
+{/* SCREENSHOT: What the engine provides · code editor or rendered example · desktop */}
 
 | Feature | Purpose |
 |--------|--------|
@@ -91,6 +95,7 @@ On offer/checkout pages, the application and plugins (cart, checkout, bumps) usu
 | **`ef.template.watch/computed`** | Runtime API for watchers and computed values via `window.ef.template`. |
 
 ## Builder-friendly bindings
+{/* SCREENSHOT: Builder-friendly bindings · code editor or rendered example · desktop */}
 
 For page-builder work, attribute bindings are often easier to preview and edit than mixed text tokens:
 
@@ -107,6 +112,7 @@ You can add these directly from the **Data Attributes** panel (right sidebar) wh
 Details and examples are in [Syntax](/frontend-template-engine/syntax), [Scope & Data](/frontend-template-engine/scope-and-data), [Bindings & Events](/frontend-template-engine/bindings-forms-events), [Functions](/frontend-template-engine/built-in-functions), [Cart](/frontend-template-engine/cart), and [Checkout](/frontend-template-engine/checkout).
 
 ## Relation to other docs
+{/* SCREENSHOT: Relation to other docs · code editor or rendered example · desktop */}
 
 - **Frontend Template Engine** (this section) — Full reference: syntax, scope, bindings, cart, checkout, limitations, debugging.
 - **Backend Template Engine** — Documented in [Backend Template Engine](/backend-template-engine/overview) (server-side `{{ }}`, `@if`, `@foreach`, etc.).

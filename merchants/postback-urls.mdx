@@ -1,32 +1,34 @@
 ---
 title: 'Postback URLs'
-description: 'Send a standardized JSON payload to your own URL whenever a merchant lifecycle event happens — independent of the underlying payment gateway.'
+description: 'Send a standardized JSON payload to your own URL whenever a merchant lifecycle event happens - independent of the underlying payment gateway.'
 ---
 
-ElasticFunnels can fire an outbound HTTP POST to a URL you control whenever a merchant event happens — a purchase, a refund, a subscription renewal, a chargeback, and so on. The payload is **the same regardless of which gateway** (Stripe, NMI, PayPal, ClickBank, BuyGoods, Digistore24, Klarna, Shop Pay, Shopify Checkout) actually processed the transaction, so you only have to integrate once.
+ElasticFunnels can fire an outbound HTTP POST to a URL you control whenever a merchant event happens - a purchase, a refund, a subscription renewal, a chargeback, and so on. The payload is **the same regardless of which gateway** (Stripe, NMI, PayPal, ClickBank, BuyGoods, Digistore24, Klarna, Shop Pay, Shopify Checkout) actually processed the transaction, so you only have to integrate once.
 
 This is intentionally simpler than building a full automation graph in the **Automations** module. Use postback URLs when you just need to forward a clean, predictable JSON event to your own backend, your data warehouse, an internal CRM, or a third-party partner.
 
 <Note>
-Postback URLs do not replace the [Automations](/integrations/automations) module — they are complementary. Automations are great for branching logic, retries with conditions, and connecting many third-party services. Postback URLs are great for "fire-and-forget" event forwarding.
+Postback URLs do not replace the [Automations](/integrations/automations) module - they are complementary. Automations are great for branching logic, retries with conditions, and connecting many third-party services. Postback URLs are great for "fire-and-forget" event forwarding.
 </Note>
 
 ## Where to configure
+{/* SCREENSHOT: Where to configure · merchant setup screen or postback state · desktop */}
 
 In your brand:
 
 1. Go to **Settings** → **Merchants** → pick a merchant → **Edit**.
 2. Open the **Postback URLs** tab.
 3. For each event you care about, set:
-   - **Postback URL** — `https://your-app.example.com/webhooks/elasticfunnels`
-   - **Bearer Token** *(optional)* — sent as `Authorization: Bearer <token>` so you can do basic auth from a reverse proxy.
-   - **Enabled** — must be checked for the URL to fire.
+   - **Postback URL** - `https://your-app.example.com/webhooks/elasticfunnels`
+   - **Bearer Token** *(optional)* - sent as `Authorization: Bearer <token>` so you can do basic auth from a reverse proxy.
+   - **Enabled** - must be checked for the URL to fire.
 4. Use the **Send test** button next to each URL to deliver a sample payload right away.
 5. The **Recent deliveries** section shows status, HTTP code, attempts, the exact payload that was sent, and lets you retry failed deliveries manually.
 
 The same tab also exposes the **Signing secret** that we use to sign every outbound request. Reveal it once when you wire up your verifier, and you can rotate it at any time.
 
 ## Supported events
+{/* SCREENSHOT: Supported events · merchant setup screen or postback state · desktop */}
 
 | Event key                      | Fires when                                                                 |
 | ------------------------------ | -------------------------------------------------------------------------- |
@@ -38,12 +40,13 @@ The same tab also exposes the **Signing secret** that we use to sign every outbo
 | `subscription_cancel`          | A subscription is cancelled (by the customer, the merchant, or dunning)    |
 | `subscription_change`          | A subscription is upgraded / downgraded / paused                           |
 | `abandon`                      | Cart abandonment is recorded                                               |
-| `failed_payment`               | An initial payment attempt fails (not a renewal — see above)               |
+| `failed_payment`               | An initial payment attempt fails (not a renewal - see above)               |
 | `shipped`                      | A tracking number is assigned to an order for the first time               |
 
-You can configure a different URL per event, or use the same URL for every event — your handler can branch on the `event` field and on the `X-EF-Event` header.
+You can configure a different URL per event, or use the same URL for every event - your handler can branch on the `event` field and on the `X-EF-Event` header.
 
 ## Request format
+{/* SCREENSHOT: Request format · merchant setup screen or postback state · desktop */}
 
 Every request looks like this:
 
@@ -144,12 +147,13 @@ def verify(secret: str, raw_body: bytes, headers: dict) -> bool:
 
 ### Response handling
 
-- Return any `2xx` status to acknowledge the delivery. The body is ignored (but stored in the deliveries log for debugging — keep it under a few KB).
+- Return any `2xx` status to acknowledge the delivery. The body is ignored (but stored in the deliveries log for debugging - keep it under a few KB).
 - Any non-2xx response, timeout, or connection error counts as a failure.
 - Failed deliveries are retried automatically with exponential backoff: `1m → 5m → 30m → 2h → 12h` (up to 5 attempts). After the final failure the delivery is marked **dead** and stops retrying. You can re-queue it manually from the Postback URLs tab.
 - Each delivery has a unique `X-EF-Delivery-Id`. Use it to dedupe on your end.
 
 ## Standardized payload
+{/* SCREENSHOT: Standardized payload · merchant setup screen or postback state · desktop */}
 
 All events share the same envelope. Fields that don't apply to a given event are present but `null`. The full schema:
 
@@ -300,14 +304,15 @@ All events share the same envelope. Fields that don't apply to a given event are
 
 ### Event-specific notes
 
-- **`refund` / `chargeback`** — `amounts.total` is **negative** for the refunded portion, and `order.original_conversion_code` references the original purchase row.
-- **`subscription_renewal_failed`** — `order.subscription.retry_count` and `order.subscription.next_charge_at` reflect the dunning schedule, and `meta.payment_status` will typically be `failed` with a populated `order.subscription.decline_reason`.
-- **`subscription_cancel`** — `order.subscription.status` is `cancelled` and `order.subscription.cancel_reason` is filled when available.
-- **`shipped`** — fires the **first time** a tracking number is set on an order. `shipping.tracking_number`, `shipping.tracking_url`, and `shipping.carrier` are populated. We dedupe per order so you only get one `shipped` event.
-- **`abandon`** — `order.status` is `abandoned` and `customer` may be partially populated depending on how far the visitor got in checkout.
-- **`test`** — Postbacks fired from the **Send test** button or originating from a sandbox merchant set `test: true`. Use it to gate side effects in your handler.
+- **`refund` / `chargeback`** - `amounts.total` is **negative** for the refunded portion, and `order.original_conversion_code` references the original purchase row.
+- **`subscription_renewal_failed`** - `order.subscription.retry_count` and `order.subscription.next_charge_at` reflect the dunning schedule, and `meta.payment_status` will typically be `failed` with a populated `order.subscription.decline_reason`.
+- **`subscription_cancel`** - `order.subscription.status` is `cancelled` and `order.subscription.cancel_reason` is filled when available.
+- **`shipped`** - fires the **first time** a tracking number is set on an order. `shipping.tracking_number`, `shipping.tracking_url`, and `shipping.carrier` are populated. We dedupe per order so you only get one `shipped` event.
+- **`abandon`** - `order.status` is `abandoned` and `customer` may be partially populated depending on how far the visitor got in checkout.
+- **`test`** - Postbacks fired from the **Send test** button or originating from a sandbox merchant set `test: true`. Use it to gate side effects in your handler.
 
 ## Example: minimal Express.js handler
+{/* SCREENSHOT: Example: minimal Express.js handler · merchant setup screen or postback state · desktop */}
 
 ```js
 import express from 'express';
@@ -345,8 +350,9 @@ app.listen(3000);
 ```
 
 ## Operational details
+{/* SCREENSHOT: Operational details · merchant setup screen or postback state · desktop */}
 
 - Deliveries are processed asynchronously so they do not block the gateway request that triggered them.
 - Failed deliveries are retried automatically after the configured backoff window has elapsed.
 - The Postback URLs tab shows recent deliveries, including the URL, payload, headers, response body, attempts, and final status.
-- The signing secret is stored encrypted at rest. Rotating it invalidates all previous signatures immediately — only do it if you can update your verifier in lockstep.
+- The signing secret is stored encrypted at rest. Rotating it invalidates all previous signatures immediately - only do it if you can update your verifier in lockstep.

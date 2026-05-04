@@ -1,0 +1,81 @@
+---
+title: 'External CRM Integrations'
+description: 'Push contacts, deals, and tags into HubSpot, Keap, Ontraport, Pipedrive, Close, and Agile CRM.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · CRM integrations list · desktop */}
+
+ElasticFunnels has its own customer-record store and CRM views. The integrations below let you push EF data into an external CRM as well — useful when sales, success, or marketing teams already work inside their CRM and shouldn't have to learn a new tool.
+
+<Info>
+For information on the **built-in** CRM (segments, customer profile, automations), see [CRM overview](/crm/overview).
+</Info>
+
+## Supported providers
+{/* SCREENSHOT: Supported providers · settings · desktop */}
+
+| Provider | Auth | What you can do |
+|----------|------|-----------------|
+| **HubSpot** | Private App access token | Create / update contacts, write custom contact properties, push deals |
+| **Keap** (Infusionsoft) | OAuth 2.0 | Create / update contacts, retrieve a contact, apply tags |
+| **Ontraport** | API key + App ID | Create / update contacts, check existence, manage tags |
+| **Pipedrive** | API key | Create / update **persons**, create deals on the right pipeline / stage |
+| **Close** (`closeio`) | API key | Create / update leads + contacts, push opportunities |
+| **Agile CRM** | API key + domain + admin email | Create / update contacts, manage tags |
+
+All six are exposed as actions inside the **Automation Builder** so you can wire them into any flow (form-submit, sale, refund, abandoned cart, dunning failure, etc.).
+
+## Setup pattern
+{/* SCREENSHOT: Setup pattern · integration form · desktop */}
+
+<Steps>
+  <Step title="Open the provider in EF">
+    Go to **Integrations** → **CRM** and click the provider. The form is provider-specific.
+  </Step>
+  <Step title="Authenticate">
+    Paste an API key (HubSpot Private App token, Pipedrive API key, etc.) or OAuth into the provider (Keap).
+  </Step>
+  <Step title="Map the right account / pipeline">
+    For Pipedrive and Keap, the form loads your pipelines / lists from the provider so you can pick them by name. For HubSpot, the integration writes to your default contact pipeline unless you configure a specific one in your automation.
+  </Step>
+  <Step title="Add the actions to an automation">
+    Open **Automations**, edit a flow, and add an action like `HubSpot: Create or Update Contact`. Map EF variables (`customer.email`, `customer.first_name`, custom fields) to the provider's fields.
+  </Step>
+  <Step title="Test with a dummy record">
+    Trigger the automation manually (Insert Test Run) and verify the record appears in the external CRM.
+  </Step>
+</Steps>
+
+## Field mapping notes
+{/* SCREENSHOT: Field mapping · automation step · desktop */}
+
+- **Custom properties / custom fields** — All six providers support custom fields. Add them in the provider first, then they show up in the action's mapping dropdown the next time you open the form.
+- **Tag management** — Each provider exposes its own list of tags / labels. EF lists them dynamically; you can also pass a tag name as a string to create it on the fly.
+- **Re-keying contacts** — All actions are upsert-style: EF tries to match by email first (or the provider's primary identifier) and updates if a match exists; otherwise it creates a new record.
+
+## When to push, when not to
+{/* SCREENSHOT: When to push · architecture · desktop */}
+
+Don't pipe **every** EF event into your CRM — most CRMs charge per contact and slow down with low-quality records. A common pattern:
+
+- **Push qualified leads** (form-submit, demo-booked) into the CRM immediately.
+- **Push customers** (first sale) into the CRM when they hit a paid plan or subscription.
+- **Skip abandons** unless your sales team works abandons by hand — keep them inside the EF callcenter or email engine.
+
+You can encode that gating with the EF automation's condition step (e.g. only run the HubSpot action when `total > 0`).
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · automation logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Action fails with 401 / token expired">
+    Re-authenticate the integration. HubSpot Private App tokens, Pipedrive API keys, and Ontraport API keys can be regenerated from the provider's dashboard; OAuth-based providers (Keap, AWeber) need to be re-authorized through EF's connect flow.
+  </Accordion>
+  <Accordion title="Custom field not showing up">
+    Create the custom field in the external CRM first, then re-open the EF action — the dropdown is fetched live and will include the new field.
+  </Accordion>
+  <Accordion title="Duplicate contacts in the CRM">
+    Most CRMs match on email. If you have multiple contacts with the same email but different IDs, the EF action picks the first match. Clean up duplicates in the CRM and re-run.
+  </Accordion>
+</AccordionGroup>

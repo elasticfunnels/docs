@@ -17,6 +17,7 @@ your *own* systems, use the [Merchant Postback URLs](/merchants/postback-urls)
 instead.
 
 ## How it differs from the legacy macro postback
+{/* SCREENSHOT: How it differs from the legacy macro postback · relevant screen or example output · desktop */}
 
 Affiliates have an existing single-URL **GET** mechanism with macros like
 `{subid}`, `{amount}`, `{txn_id}` — that one is unchanged and still works.
@@ -35,6 +36,7 @@ The system documented here is **additive**:
 You can use either, both, or neither.
 
 ## Configuration
+{/* SCREENSHOT: Configuration · relevant screen or example output · desktop */}
 
 In **Affiliates → Edit affiliate → Postback URLs** you'll find:
 
@@ -50,6 +52,7 @@ In **Affiliates → Edit affiliate → Postback URLs** you'll find:
    body, and a manual retry button.
 
 ## Supported events
+{/* SCREENSHOT: Supported events · relevant screen or example output · desktop */}
 
 | Event key | When it fires |
 |---|---|
@@ -64,6 +67,7 @@ Affiliate postbacks intentionally do **not** include `shipped`, `abandon`, or
 `failed_payment` — those aren't commission-bearing events.
 
 ## Request format
+{/* SCREENSHOT: Request format · relevant screen or example output · desktop */}
 
 ### HTTP
 
@@ -168,6 +172,7 @@ def webhook():
 </CodeGroup>
 
 ## Response handling
+{/* SCREENSHOT: Response handling · relevant screen or example output · desktop */}
 
 Return any **2xx** response to acknowledge delivery. Anything else (timeouts,
 non-2xx, network errors) is recorded as a failure and retried with exponential
@@ -175,6 +180,7 @@ backoff at **1m, 5m, 30m, 2h, 12h** (5 attempts total) before being marked
 `dead`. Dead deliveries can be manually retried from the Recent Deliveries log.
 
 ## Payload schema
+{/* SCREENSHOT: Payload schema · relevant screen or example output · desktop */}
 
 Every event uses the same envelope. Numeric amounts may be **negative** for
 clawback events (`refund`, `chargeback`, `subscription_renewal_failed`).
@@ -265,6 +271,7 @@ If you need that data for your own systems, use the
 merchant secret and contain the full conversion record.
 
 ## Operational details
+{/* SCREENSHOT: Operational details · relevant screen or example output · desktop */}
 
 - Deliveries are processed asynchronously.
 - Failed deliveries are retried automatically after their backoff window has elapsed.
@@ -273,6 +280,7 @@ merchant secret and contain the full conversion record.
   the change with your affiliate before rotating in production.
 
 ## Testing locally
+{/* SCREENSHOT: Testing locally · relevant screen or example output · desktop */}
 
 Point a URL at [webhook.site](https://webhook.site) or `ngrok`, hit **Send
 test** for the event you want, and you'll see the payload + headers arrive

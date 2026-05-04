@@ -1,0 +1,86 @@
+---
+title: 'RedTrack Integration'
+description: 'Send purchase, refund, and chargeback postbacks to RedTrack for accurate ad-traffic attribution.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · integration settings · desktop */}
+
+RedTrack is an ad tracker and conversion attribution platform for media buyers. The ElasticFunnels integration is **outbound only** — when a conversion is recorded in EF, a server-to-server postback is sent to RedTrack so the original click, traffic source, and campaign get the conversion credit.
+
+## How it works
+{/* SCREENSHOT: How It Works · integration settings · desktop */}
+
+1. The visitor clicks a RedTrack tracking link. RedTrack appends a click ID (commonly `rtkclickid` or `clickid`, optionally inside a `sub` parameter you choose).
+2. The visitor lands on an EF page. EF captures the click ID into the click record.
+3. When EF later records a `purchase`, `refund`, or `chargeback`, it builds the RedTrack postback URL with the captured click ID and sends an HTTP GET.
+4. RedTrack ingests the conversion event and attributes it to the original campaign.
+
+## What we send
+{/* SCREENSHOT: Postback macros · integration settings · desktop */}
+
+The postback URL template can use any of the following macros:
+
+| Macro | Replaced with |
+|-------|---------------|
+| `{clickid}` | RedTrack click ID (from `rtkclickid`, `clickid`, or your configured sub) |
+| `{sum}` / `{amount}` | Conversion amount in your account currency |
+| `{currency}` | ISO currency code (e.g. `USD`) |
+| `{type}` | Event type (`purchase`, `refund`, `chargeback`) |
+| `{order_id}` | EF conversion code |
+| `{email}` | Customer email (optional) |
+
+The default URL produced when you click **Insert sample URL** includes `{clickid}`, `{sum}`, `{currency}`, `{type}`, and `{order_id}`. Add custom parameters with the parameter builder if RedTrack expects more fields.
+
+## Setup
+{/* SCREENSHOT: Setup · integration settings · desktop */}
+
+<Steps>
+  <Step title="Get your RedTrack postback URL">
+    Log into RedTrack. Open the campaign settings → **Postback URL**. RedTrack will give you a URL template that already includes the macros it expects.
+  </Step>
+  <Step title="Activate the integration in EF">
+    Go to **Integrations** → **Affiliate Networks** → **RedTrack** and click **Activate**. (RedTrack supports multiple integrations — useful if you run separate networks or accounts.)
+  </Step>
+  <Step title="Paste the postback URL">
+    Paste the URL into the **Postback URL** field. Add or remove macros using the parameter builder; the URL field stays in sync.
+  </Step>
+  <Step title="Pick the click-ID parameter">
+    Choose which URL parameter on landing pages contains the RedTrack click ID. Common values: `rtkclickid`, `clickid`, `sub1`. EF falls back through these automatically if your selection isn't found.
+  </Step>
+  <Step title="Configure merchant filtering (optional)">
+    Limit the integration to specific merchants if not every funnel should report into RedTrack.
+  </Step>
+  <Step title="Save and test">
+    Click an actual RedTrack tracking link, complete a small purchase, and confirm the conversion appears in your RedTrack reports. Use **Logs → External Postbacks** to inspect the raw URL and response.
+  </Step>
+</Steps>
+
+## Multiple integrations
+{/* SCREENSHOT: Multiple integrations · list · desktop */}
+
+You can create more than one RedTrack integration when you need to:
+
+- Track different RedTrack accounts (e.g. agency vs. in-house).
+- Use different postback templates per merchant or per offer.
+- Run a `purchase` integration alongside a separate refund/chargeback integration.
+
+Each integration evaluates independently. A conversion can fan out to all of them.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="No postbacks being sent">
+    The conversion most likely has no captured click ID. Verify the customer landed via a RedTrack tracking link and that the **Click-ID Parameter** in the EF integration matches what RedTrack actually appends to the URL.
+  </Accordion>
+  <Accordion title="Postbacks sent but RedTrack shows nothing">
+    Open the postback in **Logs → External Postbacks** and confirm:
+    - The URL has the correct macros and your RedTrack tracker domain.
+    - The HTTP response code is 200/204 (success).
+    - The click ID value matches an active campaign in RedTrack.
+  </Accordion>
+  <Accordion title="Refund / chargeback events missing">
+    Make sure your postback URL includes `{type}` (or your network's equivalent) so RedTrack can distinguish refunds and chargebacks from purchases.
+  </Accordion>
+</AccordionGroup>

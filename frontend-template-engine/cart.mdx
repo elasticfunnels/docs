@@ -8,6 +8,7 @@ This page covers **cart** usage: **`cartItems`**, item properties, and **data at
 ---
 
 ## Scope: `cartItems` / `items`
+{/* SCREENSHOT: Scope: `cartItems` / `items` · code editor or rendered example · desktop */}
 
 **`cartItems`** (or **`items`**) is an array of line items. The cart plugin fills it; UI updates are reactive when cart scope changes.
 
@@ -36,6 +37,7 @@ This page covers **cart** usage: **`cartItems`**, item properties, and **data at
 ---
 
 ## Subscription details (`item.subscription`)
+{/* SCREENSHOT: Subscription details (`item.subscription`) · code editor or rendered example · desktop */}
 
 When `item.is_subscription` is `true`, `item.subscription` contains billing cadence and trial settings:
 
@@ -63,6 +65,7 @@ The same `is_subscription` and `subscription` fields are available on `checkout`
 ---
 
 ## Bonus products (`item.bonuses`)
+{/* SCREENSHOT: Bonus products (`item.bonuses`) · code editor or rendered example · desktop */}
 
 Each cart item may include a **`bonuses`** array — products that are included free with that item (configured in the product catalog under Bonuses). Populated automatically from the `/api/cart-products` response after the cart loads.
 
@@ -102,6 +105,7 @@ Example:
 ---
 
 ## Courses (`item.courses`)
+{/* SCREENSHOT: Courses (`item.courses`) · code editor or rendered example · desktop */}
 
 When a product has linked courses, they are available as `item.courses`. Populated automatically from the `/api/cart-products` response after the cart loads.
 
@@ -136,6 +140,7 @@ Example — listing included courses beneath a cart line:
 ---
 
 ## Quantity and remove (data attributes)
+{/* SCREENSHOT: Quantity and remove (data attributes) · code editor or rendered example · desktop */}
 
 Use these so the **cart plugin** handles +/- and remove without custom script:
 
@@ -170,6 +175,7 @@ For custom behavior, use **`@click`** with **`window.ef.addToCart(code, options?
 ---
 
 ## Order bumps (on checkout)
+{/* SCREENSHOT: Order bumps (on checkout) · code editor or rendered example · desktop */}
 
 On checkout pages, bump cards use these **data attributes** so the bump-products plugin can toggle and style:
 
@@ -185,6 +191,7 @@ For **scope** (**`checkout.bump_products`**, **`checkout.selectedBumpLines`**) a
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 - Use **`cartItems`** and **`[[ item.* ]]`**; **`item.price`** and **`item.total`** are already formatted.
 - **`item.is_subscription`** / **`item.subscription`** — billing cadence; also on `checkout` scope for single-product pages.

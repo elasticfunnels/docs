@@ -6,6 +6,7 @@ description: 'Backend template directives: @if, @else, @foreach, @set, session s
 This page describes the **directives** the backend template engine understands. Use them in the page builder via the corresponding **backend** blocks, or write them directly in coded templates.
 
 ## Conditionals: `@if`, `@else`, `@elseif`, `@endif`
+{/* SCREENSHOT: Conditionals: `@if`, `@else`, `@elseif`, `@endif` · code editor or rendered example · desktop */}
 
 Show one block when a condition is true, optionally with else branches.
 
@@ -47,6 +48,7 @@ Example with `@elseif` and array length:
 ---
 
 ## Loops: `@foreach` … `@endforeach`
+{/* SCREENSHOT: Loops: `@foreach` … `@endforeach` · code editor or rendered example · desktop */}
 
 Repeat a block once per element in an array.
 
@@ -67,6 +69,7 @@ Inside the block you can use `{{ item.property }}`, `@if`, nested `@foreach`, an
 ---
 
 ## Variables: `@set`
+{/* SCREENSHOT: Variables: `@set` · code editor or rendered example · desktop */}
 
 Define a variable for use later in the template.
 
@@ -80,6 +83,7 @@ Use when you need a reusable value or a clearer expression.
 ---
 
 ## Components: `@component`
+{/* SCREENSHOT: Components: `@component` · code editor or rendered example · desktop */}
 
 Include a reusable component by name, with optional arguments.
 
@@ -92,6 +96,7 @@ The engine looks up the component by name and renders it with the given argument
 ---
 
 ## Inheritance: `@extends`, `@block`, and `@yield`
+{/* SCREENSHOT: Inheritance: `@extends`, `@block`, and `@yield` · code editor or rendered example · desktop */}
 
 Use a **base template** and override only certain regions.
 
@@ -167,6 +172,7 @@ In the **page builder**, inheritance is supported with a read-only base layer: o
 ---
 
 ## Session storage
+{/* SCREENSHOT: Session storage · code editor or rendered example · desktop */}
 
 You can store and read simple values in the visitor’s session from templates. Use this for things like remembering a choice across requests (e.g. a selected option, a flag) without using the frontend.
 
@@ -215,6 +221,7 @@ You can store and read simple values in the visitor’s session from templates. 
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 | Directive | Purpose |
 |-----------|---------|

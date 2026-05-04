@@ -12,6 +12,7 @@ This page covers **checkout-only** usage of the frontend template engine: order 
 ---
 
 ## Order summary: single-product vs cart
+{/* SCREENSHOT: Order summary: single-product vs cart · code editor or rendered example · desktop */}
 
 Checkout can show either a **single-product** block (one product, hero image + title) or a **cart** block (list of items with thumbnails and qty). Use the scope flags to choose.
 
@@ -62,6 +63,7 @@ You can add `ef-*` attributes from the **Data Attributes** section (right sideba
 ---
 
 ## Subscription products
+{/* SCREENSHOT: Subscription products · code editor or rendered example · desktop */}
 
 On single-product checkout pages, `checkout.is_subscription` and `checkout.subscription` are set **server-side** and available immediately when the page loads — no async fetch required.
 
@@ -99,6 +101,7 @@ For **cart-mode checkout** (multiple items), subscription info is on each cart i
 ---
 
 ## Totals (display + raw)
+{/* SCREENSHOT: Totals (display + raw) · code editor or rendered example · desktop */}
 
 Checkout exposes the same totals keys in **both** modes (`is_single_product` and `is_cart`) so one layout can be reused for either flow.
 
@@ -126,6 +129,7 @@ Recommended template bindings:
 ---
 
 ## Form fields and validation
+{/* SCREENSHOT: Form fields and validation · code editor or rendered example · desktop */}
 
 ### Binding fields
 
@@ -183,6 +187,7 @@ The **entire billing info section** can be wrapped in **`<template-if data-condi
 ---
 
 ## Coupon
+{/* SCREENSHOT: Coupon · code editor or rendered example · desktop */}
 
 | Scope | Purpose |
 |-------|--------|
@@ -197,6 +202,7 @@ The **entire billing info section** can be wrapped in **`<template-if data-condi
 ---
 
 ## Order bumps
+{/* SCREENSHOT: Order bumps · code editor or rendered example · desktop */}
 
 | Scope | Purpose |
 |-------|--------|
@@ -210,6 +216,7 @@ The **entire billing info section** can be wrapped in **`<template-if data-condi
 ---
 
 ## Payment panel
+{/* SCREENSHOT: Payment panel · code editor or rendered example · desktop */}
 
 **Pattern A (generic):** Replace the payment block with **only**:
 
@@ -241,6 +248,7 @@ The function checks for visible, non-hidden inputs bound via `data-template-valu
 ---
 
 ## Wallet (Apple Pay / Google Pay)
+{/* SCREENSHOT: Wallet (Apple Pay / Google Pay) · code editor or rendered example · desktop */}
 
 ### Scope key
 
@@ -292,6 +300,7 @@ Full reference: [Checkout functionality reference — window.ef.checkout API](/c
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 - Use **`is_single_product`** / **`is_cart`** and **`checkout.product_*`** vs **cartItems** for order summary.
 - **Subscriptions:** `checkout.is_subscription` + `checkout.subscription` on single-product pages (server-side, available immediately); `item.is_subscription` + `item.subscription` on cart items.

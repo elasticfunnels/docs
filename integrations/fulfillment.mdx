@@ -1,60 +1,99 @@
 ---
 title: 'Fulfillment Integration'
-description: 'Automate your order fulfillment by connecting with 3PL providers like ShipOffers and Jetpack.'
+description: 'Send orders to a 3PL provider (ShipOffers or Jetpack) and reconcile cost of goods automatically.'
 ---
 
 ## Overview
+{/* SCREENSHOT: Overview · integration settings or log state · desktop */}
 
-The fulfillment integration allows you to automatically send conversion data to your fulfillment providers. Once an order is placed, ElasticFunnels syncs the details with your 3PL (Third-Party Logistics) provider to handle shipping and tracking.
+The fulfillment integrations push completed orders to a 3PL (Third-Party Logistics) provider and pull cost-of-goods (COGS) data back so your conversions show real profit, not just revenue.
 
-## Supported Providers
+## Supported providers
+{/* SCREENSHOT: Supported Providers · integration settings or log state · desktop */}
 
 <CardGroup cols={2}>
-  <Card title="ShipOffers" icon="ship">
-    Seamless integration with ShipOffers for automated order processing.
+  <Card title="ShipOffers Fulfillment" icon="ship">
+    Pick, pack, and ship through ShipOffers. Multi-hub network in Colorado, Tennessee, and the Netherlands; same-day shipping; real-time tracking.
   </Card>
-  <Card title="Jetpack Orders" icon="jet-fighter">
-    Fast and reliable order fulfillment via the Jetpack API.
+  <Card title="Jetpack Fulfillment" icon="rocket">
+    Multi-hub fulfillment across 65+ warehouses with intelligent inventory distribution (Multi-Hub IQ) and carrier selection (Carrier IQ).
+  </Card>
+  <Card title="ShipOffers COGS Reconciliation" icon="receipt">
+    Automatic email-based ingestion of weekly ShipOffers cost CSVs. Updates each conversion with line-item costs so profit is correct.
   </Card>
 </CardGroup>
 
-## How It Works
+## How fulfillment dispatch works
+{/* SCREENSHOT: How It Works · integration settings or log state · desktop */}
 
-1. **Order Received** → A customer completes a purchase on your funnel.
-2. **Merchant Mapping** → The system identifies the merchant associated with the sale.
-3. **Integration Trigger** → If a fulfillment integration is assigned to that merchant, a job is queued.
-4. **Data Sync** → Order details (customer info, shipping address, products) are sent to the provider.
-5. **Tracking Update** → Once shipped, the provider sends back a tracking number which is synced to your dashboard.
+1. **Order received** — A customer completes a purchase on your funnel.
+2. **Merchant resolution** — The merchant on the conversion is looked up.
+3. **Fulfillment provider lookup** — The product's `fulfillment_provider_id` (or merchant default) decides where the order goes. Each product can route to a different provider.
+4. **Job queued** — A fulfillment job is queued ~10 seconds after the conversion is finalized so refunds in the first window can short-circuit it.
+5. **Order pushed** — Customer info, shipping address, line items (with mapped SKUs), shipping method, and order total are sent to the provider.
+6. **Tracking sync** — When the provider returns shipment status and tracking, EF stores it on the conversion and surfaces it in the dashboard.
 
-## Setup Guide
+## Setup — ShipOffers
+{/* SCREENSHOT: ShipOffers setup · integration settings · desktop */}
 
-### Step 1: Connect your Provider
+<Steps>
+  <Step title="Get credentials">
+    Contact your ShipOffers account manager and request your **Store ID**, **Username**, and **Password**.
+  </Step>
+  <Step title="Create the integration">
+    Go to **Integrations** → **Operations** → **ShipOffers Fulfillment**. Enter the credentials and pick a default shipping service (Standard, Express, etc.).
+  </Step>
+  <Step title="Map SKUs">
+    In ShipOffers, set up your products and copy the SKU codes. In ElasticFunnels, edit each product and ensure its SKU matches the ShipOffers SKU exactly. SKU is what the picker uses to fulfill — mismatched SKUs cause picking errors.
+  </Step>
+  <Step title="Assign to merchants or products">
+    Either set ShipOffers as the **Fulfillment Provider** on a merchant (default for all products under that merchant) or override per product.
+  </Step>
+  <Step title="(Optional) Enable COGS reconciliation">
+    Activate **ShipOffers COGS Reconciliation** as a separate integration, copy the dedicated reconciliation email address, and ask ShipOffers to email weekly cost CSVs to that address. EF parses each CSV and updates the matched conversions with line-item costs.
+  </Step>
+</Steps>
 
-1. Go to **Settings → Integrations**.
-2. Select your fulfillment provider (e.g., **ShipOffers** or **Jetpack**).
-3. Enter your API credentials (API Key, Secret, etc.) provided by your 3PL.
-4. Save the integration.
+## Setup — Jetpack
+{/* SCREENSHOT: Jetpack setup · integration settings · desktop */}
 
-### Step 2: Assign to Merchants
+<Steps>
+  <Step title="Get credentials">
+    Contact Jetpack at jetpackshipping.com or 1-844-4-JETPACK. You'll receive an **API Key ID** and **Secret Key**.
+  </Step>
+  <Step title="Create the integration">
+    Go to **Integrations** → **Operations** → **Jetpack Fulfillment**. Enter your credentials and configure the primary warehouse and shipping preferences.
+  </Step>
+  <Step title="Map products and SKUs">
+    Set up your product catalog inside Jetpack with the same SKU codes you use on each `BrandProduct` in EF.
+  </Step>
+  <Step title="Assign to merchants or products">
+    Set Jetpack as the **Fulfillment Provider** at the merchant level, or override per product when only some products ship from Jetpack.
+  </Step>
+</Steps>
 
-Unlike pixel integrations which can run globally, fulfillment is tied directly to your **Merchants**.
+## SKU mapping
+{/* SCREENSHOT: SKU mapping · product detail · desktop */}
 
-1. Navigate to **Settings → Merchants**.
-2. Edit the merchant that should use this fulfillment provider.
-3. Select the integration in the **Fulfillment Integration** dropdown.
-4. Save the merchant settings.
-
-### Step 3: Map Product SKUs
-
-To ensure the correct items are shipped, you must ensure your product SKUs in ElasticFunnels match the SKUs in your fulfillment provider's system.
+The SKU on every `BrandProduct` in EF must match the SKU your 3PL uses to identify the physical item. Without a match, the order will be rejected by the provider or filled with the wrong product. To set or update the SKU:
 
 1. Go to **Products**.
-2. Ensure each product has a valid **SKU** that matches your 3PL's catalog.
+2. Edit the product.
+3. Set its **SKU** to the value from your 3PL catalog.
+4. Save.
 
-## Automation & Sync
+Re-saving a product does **not** retroactively re-fulfill old orders; only new orders use the updated SKU.
 
-Orders are typically processed in real-time or via a scheduled queue (usually every hour) depending on your system configuration. You can monitor the status of every fulfillment attempt in the **Conversions → Fulfillment** section.
+## Monitoring
+{/* SCREENSHOT: Monitoring · fulfillment list · desktop */}
+
+Go to **Conversions → Fulfillment** to see every fulfillment attempt with its status:
+
+- **Pending** — Queued, waiting for the dispatch window to elapse.
+- **Sent** — Provider accepted the order.
+- **Failed** — Provider rejected the payload (most often: missing SKU or invalid address). Use the failure detail to fix the data and retry.
+- **Tracking** — Provider has shipped the order; the tracking number and carrier are surfaced inline.
 
 <Info>
-  If a fulfillment attempt fails (e.g., due to an invalid address), you can manually retry or edit the order details from the Fulfillment list.
+If a fulfillment attempt fails because of a bad address, you can manually edit the conversion's shipping address and re-send. SKU mismatches require fixing the product first; orders already in flight are not re-keyed automatically.
 </Info>

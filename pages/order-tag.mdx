@@ -6,10 +6,12 @@ description: 'Display customer order history and details using the order tag sys
 The `<order>` tag allows you to display customer purchase history and order details on your pages. This is perfect for order confirmation pages, account pages, or any page where customers need to view their past purchases.
 
 ## Overview
+{/* SCREENSHOT: Overview · page builder, settings panel, or published page · desktop */}
 
 The order tag system dynamically displays purchase conversions grouped by session. It automatically shows all orders associated with the current customer's email or session, making it easy to create personalized order history pages.
 
 ## Basic Usage
+{/* SCREENSHOT: Basic Usage · page builder, settings panel, or published page · desktop */}
 
 ### Simple Order Display
 
@@ -40,6 +42,7 @@ You can add HTML attributes (like `class` or `id`) to the order tag:
 ```
 
 ## Order Selection
+{/* SCREENSHOT: Order Selection · page builder, settings panel, or published page · desktop */}
 
 The order tag automatically retrieves and displays orders based on the current customer session. Here's how orders are selected:
 
@@ -115,6 +118,7 @@ You can combine `sort-by` and `limit` with styling attributes:
 ```
 
 ## Security & Data Protection
+{/* SCREENSHOT: Security & Data Protection · page builder, settings panel, or published page · desktop */}
 
 The order tag system includes built-in security measures:
 
@@ -127,6 +131,7 @@ The order tag system includes built-in security measures:
 4. **Session-Based Access**: Orders are only shown to customers with valid sessions (email or customer flag)
 
 ## Order-Level Placeholders
+{/* SCREENSHOT: Order-Level Placeholders · page builder, settings panel, or published page · desktop */}
 
 These placeholders work within the `<order>` tag to display order information:
 
@@ -193,6 +198,7 @@ Customer name placeholder. This works both inside and outside the order tag.
 **Note**: If there's no customer session or no orders, `{customer_name}` will be removed from the page. Use `,{customer_name}` if you want the comma removed when the name is empty (e.g., "Hello, {customer_name}" becomes "Hello" if no customer).
 
 ## Nested Tags
+{/* SCREENSHOT: Nested Tags · page builder, settings panel, or published page · desktop */}
 
 ### Order Products
 
@@ -255,6 +261,7 @@ The `<order-product-tracking>` tag is reserved for future tracking functionality
 ```
 
 ## Complete Example
+{/* SCREENSHOT: Complete Example · page builder, settings panel, or published page · desktop */}
 
 Here's a complete example of an order history page:
 
@@ -338,6 +345,7 @@ Here's a complete example of an order history page:
 ```
 
 ## How It Works
+{/* SCREENSHOT: How It Works · page builder, settings panel, or published page · desktop */}
 
 1. **Customer Detection**: The system checks if the visitor has a customer session (email or customer flag).
 
@@ -371,6 +379,7 @@ Here's a complete example of an order history page:
    - The page displays without order information
 
 ## Important Notes
+{/* SCREENSHOT: Important Notes · page builder, settings panel, or published page · desktop */}
 
 ### Customer Session Required
 
@@ -410,6 +419,7 @@ You can style order tags using CSS classes or IDs:
 The attributes you add to the `<order>` tag (except `sort-by` and `limit`) are applied to the wrapper `<div>` that contains each order.
 
 ## Best Practices
+{/* SCREENSHOT: Best Practices · page builder, settings panel, or published page · desktop */}
 
 1. **Always include order number**: Use `{order_number}` so customers can reference their orders
 2. **Show order date**: Display `{order_date}` to help customers identify when they made purchases
@@ -419,6 +429,7 @@ The attributes you add to the `<order>` tag (except `sort-by` and `limit`) are a
 6. **Test with multiple orders**: Verify that multiple orders display correctly
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · page builder, settings panel, or published page · desktop */}
 
 ### Orders Not Showing
 

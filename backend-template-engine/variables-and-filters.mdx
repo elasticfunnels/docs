@@ -10,6 +10,7 @@ For `filter:arg`, the argument can be either:
 - or a **literal** (recommended as quoted text, for example `'USD'` or `'stripe'`)
 
 ## Variables: `{{ path }}`
+{/* SCREENSHOT: Variables: `{{ path }}` · code editor or rendered example · desktop */}
 
 Values are resolved from the current context (e.g. page data, article, posts, featured).
 
@@ -25,6 +26,7 @@ Paths can use dot notation and array indexing. If a value is missing, it usually
 ---
 
 ## Filters
+{/* SCREENSHOT: Filters · code editor or rendered example · desktop */}
 
 Filters are applied left to right. You can chain several: **`{{ value | filter1 | filter2:arg }}`**.
 
@@ -45,6 +47,7 @@ If you want text to always be treated as literal, quote it.
 ---
 
 ## Fallback filters
+{/* SCREENSHOT: Fallback filters · code editor or rendered example · desktop */}
 
 ### `default` — fallback when value is empty
 
@@ -72,6 +75,7 @@ Like `default`, but only triggers when the value is `null` or `undefined`. An **
 ---
 
 ## String filters
+{/* SCREENSHOT: String filters · code editor or rendered example · desktop */}
 
 ### `upper` / `lower` / `capitalize` / `title`
 
@@ -170,6 +174,7 @@ Return the number of characters in a string, or the number of elements in an arr
 ---
 
 ## Number filters
+{/* SCREENSHOT: Number filters · code editor or rendered example · desktop */}
 
 ### `round`
 
@@ -219,6 +224,7 @@ Format a number as currency. Optional arg is the ISO 4217 currency code (default
 ---
 
 ## Boolean / conditional filters
+{/* SCREENSHOT: Boolean / conditional filters · code editor or rendered example · desktop */}
 
 ### `yesno`
 
@@ -233,6 +239,7 @@ Return a string based on whether the value is truthy or falsy. Arg format: `'yes
 ---
 
 ## Array filters
+{/* SCREENSHOT: Array filters · code editor or rendered example · desktop */}
 
 ### `join`
 
@@ -271,6 +278,7 @@ Remove duplicate values from an array.
 ---
 
 ## Date filters
+{/* SCREENSHOT: Date filters · code editor or rendered example · desktop */}
 
 ### `date` — format a date
 
@@ -324,6 +332,7 @@ Render a date as a human-readable relative string.
 ---
 
 ## Output / serialization filters
+{/* SCREENSHOT: Output / serialization filters · code editor or rendered example · desktop */}
 
 ### `raw` — output HTML unescaped
 
@@ -347,6 +356,7 @@ Serialize any value to a JSON string. Safe: uses `JSON.stringify`, no code is ex
 ---
 
 ## Patterns from real templates
+{/* SCREENSHOT: Patterns from real templates · code editor or rendered example · desktop */}
 
 **Date with fallbacks:**
 
@@ -407,6 +417,7 @@ Your trial ends on {{ subscription.start_date | date_add:14 | date:'MMM d, yyyy'
 ---
 
 ## String concatenation: `+`
+{/* SCREENSHOT: String concatenation: `+` · code editor or rendered example · desktop */}
 
 Use the **`+`** operator to join strings, variables, and filtered expressions together.
 
@@ -448,6 +459,7 @@ Strings are **literal** — there is no variable interpolation inside quotes. Wr
 ---
 
 ## Filter reference
+{/* SCREENSHOT: Filter reference · code editor or rendered example · desktop */}
 
 | Filter | Category | Arg | Example |
 |--------|----------|-----|---------|
@@ -488,6 +500,7 @@ Strings are **literal** — there is no variable interpolation inside quotes. Wr
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 - Use **`{{ path }}`** to output a value; use **`| filter`** or **`| filter:arg`** to transform it.
 - **Chained `default`** — `a | default:b | default:c` gives the first non-empty value.
@@ -497,6 +510,7 @@ Strings are **literal** — there is no variable interpolation inside quotes. Wr
 - **Concatenation** — `"text" + variable + "more text"` joins values. No interpolation inside strings; use `+` instead.
 
 ## Purchase Link Functions
+{/* SCREENSHOT: Purchase Link Functions · code editor or rendered example · desktop */}
 
 These functions generate URLs for purchase and subscription actions. Use them in link `href` attributes.
 

@@ -8,6 +8,7 @@ Backend Scripts let you run custom JavaScript **on the server** before a page is
 Use them for logic that must happen **before** the visitor sees the page — access control, custom redirects, session manipulation, calling external APIs, or injecting dynamic template variables.
 
 ## How it works
+{/* SCREENSHOT: How it works · code editor or rendered example · desktop */}
 
 Add a `<script scope="backend">` tag anywhere in your page HTML. The server extracts and runs the code **before** funnel events and template rendering. The tag is always stripped from the final HTML — it never reaches the browser.
 
@@ -26,6 +27,7 @@ Add a `<script scope="backend">` tag anywhere in your page HTML. The server extr
 ```
 
 ## Execution order
+{/* SCREENSHOT: Execution order · code editor or rendered example · desktop */}
 
 Backend scripts run early in the page lifecycle, before funnel events:
 
@@ -39,6 +41,7 @@ Backend scripts run early in the page lifecycle, before funnel events:
 Because backend scripts run before funnel events, session values you set are visible to script rules and other funnel nodes downstream.
 
 ## Sandboxing & security
+{/* SCREENSHOT: Sandboxing & security · code editor or rendered example · desktop */}
 
 Backend scripts run inside a **locked-down sandbox**. This means:
 
@@ -55,14 +58,17 @@ Backend scripts run inside a **locked-down sandbox**. This means:
 The sandbox provides a controlled set of host functions (documented below) that bridge back to the server safely. User code cannot escape the sandbox or access anything beyond these APIs.
 
 ## When a script throws or times out
+{/* SCREENSHOT: When a script throws or times out · code editor or rendered example · desktop */}
 
 If your backend script throws an error or hits a timeout, the **visitor does not see the error message**. The page continues to render as normal. Any variables or actions your script applied before the error are still used; anything after the error is skipped. Failures are recorded for your team to review in logs. For development, use `console.log()` and check your backend or event logs.
 
 ## Multiple script blocks
+{/* SCREENSHOT: Multiple script blocks · code editor or rendered example · desktop */}
 
 You can have multiple `<script scope="backend">` tags on a page. They are concatenated in document order and executed as a single script.
 
 ## Importing shared modules
+{/* SCREENSHOT: Importing shared modules · code editor or rendered example · desktop */}
 
 You can share reusable functions and constants across pages using backend script modules. Create a module in your brand's **Backend Scripts** section (with a code like `app` or `utils`), then import from it:
 

@@ -12,6 +12,7 @@ For **template syntax** (`[[ ]]`, bindings, `checkout.*` in the page builder), s
 ---
 
 ## 1) Enable checkout on a page
+{/* SCREENSHOT: 1) Enable checkout on a page · relevant screen or example output · desktop */}
 
 Checkout behavior runs only when the page is marked as a checkout page:
 
@@ -24,6 +25,7 @@ If this is off, `checkout` scope data, submit handling, payment processing, and 
 ---
 
 ## 2) Checkout scope (frontend)
+{/* SCREENSHOT: 2) Checkout scope (frontend) · relevant screen or example output · desktop */}
 
 On checkout pages, the `checkout` scope is available to templates and bindings.
 
@@ -43,6 +45,7 @@ Template engine details: [Checkout](/frontend-template-engine/checkout).
 ---
 
 ## 3) Supported form field names
+{/* SCREENSHOT: 3) Supported form field names · relevant screen or example output · desktop */}
 
 These align with what the checkout runtime validates and submits (shipping-first; billing can mirror shipping).
 
@@ -70,6 +73,7 @@ These align with what the checkout runtime validates and submits (shipping-first
 ---
 
 ## 4) `checkout_settings` (backend script)
+{/* SCREENSHOT: 4) `checkout_settings` (backend script) · relevant screen or example output · desktop */}
 
 Configure checkout using variables set in a **backend** script on the **same checkout page** (`<script scope="backend">`). The platform reads `checkout_settings` when the page is rendered.
 
@@ -122,6 +126,7 @@ checkout_settings.usStates = ['CA', 'TX', 'NY', 'FL'];
 ---
 
 ## 5) Checkout abuse protection (card-testing / velocity)
+{/* SCREENSHOT: 5) Checkout abuse protection (card-testing / velocity) · relevant screen or example output · desktop */}
 
 Optional **progressive** friction on **main sale** card checkout submissions (`POST /process-checkout`). It is **off by default** unless you set `checkout_settings.abuse_protection.enabled` to `true`.
 
@@ -214,6 +219,7 @@ Captcha verification (handled inside checkout UI, not a merchant integration sur
 ---
 
 ## 6) Payment panel and submit wiring
+{/* SCREENSHOT: 6) Payment panel and submit wiring · relevant screen or example output · desktop */}
 
 Recommended card flow:
 
@@ -346,6 +352,7 @@ The "or pay another way" divider between Apple Pay and the card panel uses the `
 ---
 
 ## 7) After successful payment (redirects)
+{/* SCREENSHOT: 7) After successful payment (redirects) · relevant screen or example output · desktop */}
 
 - If the server returns `redirectUrl`, the visitor is sent there.
 - Otherwise, the default purchase confirmation route is used (query parameters typically include order and email).
@@ -355,6 +362,7 @@ Details: [Checkout redirect behavior](/funnels/checkout-redirect-behavior).
 ---
 
 ## 8) Troubleshooting
+{/* SCREENSHOT: 8) Troubleshooting · relevant screen or example output · desktop */}
 
 | Issue | What to check |
 |-------|----------------|
@@ -366,6 +374,7 @@ Details: [Checkout redirect behavior](/funnels/checkout-redirect-behavior).
 ---
 
 ## Related docs
+{/* SCREENSHOT: Related docs · relevant screen or example output · desktop */}
 
 - [How to design a checkout page](/guides/how-to-design-a-checkout-page) — build walkthrough and HTML patterns
 - [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` in templates

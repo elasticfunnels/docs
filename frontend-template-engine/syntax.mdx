@@ -10,6 +10,7 @@ Use **`[[ ]]`** for frontend expressions. **`{{ }}`** is reserved for the backen
 </Info>
 
 ## Conditionals: `template-if`, `template-else-if`, `template-else`
+{/* SCREENSHOT: Conditionals: `template-if`, `template-else-if`, `template-else` · code editor or rendered example · desktop */}
 
 Show one block among several based on a JavaScript expression evaluated in the current scope.
 
@@ -71,6 +72,7 @@ Expressions run in a context that includes `window.efScope` and any loop variabl
 ---
 
 ## Loops: `template-foreach`
+{/* SCREENSHOT: Loops: `template-foreach` · code editor or rendered example · desktop */}
 
 Repeat a block once per element in an array (or iterable). The element is replaced by the repeated content.
 
@@ -133,6 +135,7 @@ Inside the block, **`item`** (and `i` if you declared it) are in scope. You can 
 ---
 
 ## Variables: `template-set` and `template-vars`
+{/* SCREENSHOT: Variables: `template-set` and `template-vars` · code editor or rendered example · desktop */}
 
 ### `template-set`
 
@@ -166,6 +169,7 @@ Use when you have a shared fragment (e.g. a card or header) defined as a compone
 ---
 
 ## Expressions: `[[ ... ]]`
+{/* SCREENSHOT: Expressions: `[[ ... ]]` · code editor or rendered example · desktop */}
 
 **`[[ expression ]]`** is replaced by the result of the expression, evaluated in the current scope (global scope + loop/block context).
 
@@ -203,6 +207,7 @@ Functions available in expressions include [built-in helpers](/frontend-template
 ---
 
 ## Attribute binding shortcuts (`ef-*`)
+{/* SCREENSHOT: Attribute binding shortcuts (`ef-*`) · code editor or rendered example · desktop */}
 
 For many UI components, attribute bindings are easier to maintain than inline token strings:
 
@@ -220,6 +225,7 @@ These can be added from the page builder **Data Attributes** panel (right sideba
 ---
 
 ## Cloaking
+{/* SCREENSHOT: Cloaking · code editor or rendered example · desktop */}
 
 To avoid a flash of raw **`[[ ... ]]`** or the wrong branch before the template engine runs:
 
@@ -230,6 +236,7 @@ To avoid a flash of raw **`[[ ... ]]`** or the wrong branch before the template 
 ---
 
 ## Processing order
+{/* SCREENSHOT: Processing order · code editor or rendered example · desktop */}
 
 The engine runs directives in a fixed order:
 

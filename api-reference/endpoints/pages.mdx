@@ -264,7 +264,7 @@ Example request body:
   "title": "Split Test Page",
   "slug": "split-test-page",
   "status": "published",
-  "html": "<inline-split-test><variant name=\"control\" weight=\"70\"><h1>Original Headline</h1></variant><variant name=\"challenger\" weight=\"30\"><h1>New Headline</h1></variant></inline-split-test>"
+  "html": "<inline-split-test name=\"Headline Test\"><variant name=\"control\" weight=\"70\"><h1>Original Headline</h1></variant><variant name=\"challenger\" weight=\"30\"><h1>New Headline</h1></variant></inline-split-test>"
 }
 ```
 
@@ -278,7 +278,7 @@ Example create response shape:
     "slug": "split-test-page",
     "status": "published",
     "page_type": "editor",
-    "html": "<inline-split-test><variant name=\"control\" weight=\"70\"><h1>Original Headline</h1></variant><variant name=\"challenger\" weight=\"30\"><h1>New Headline</h1></variant></inline-split-test>"
+    "html": "<inline-split-test name=\"Headline Test\"><variant name=\"control\" weight=\"70\"><h1>Original Headline</h1></variant><variant name=\"challenger\" weight=\"30\"><h1>New Headline</h1></variant></inline-split-test>"
   }
 }
 ```

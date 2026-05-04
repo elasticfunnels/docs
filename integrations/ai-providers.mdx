@@ -1,0 +1,98 @@
+---
+title: 'AI Providers (BYO key)'
+description: 'Bring your own OpenAI, Anthropic, or Google Gemini key to power AI generation, page cloning, quizzes, and AI chat features inside ElasticFunnels.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · AI integrations list · desktop */}
+
+ElasticFunnels uses AI for several features — page generation, page cloning, copy rewriting, AI chat, quiz building, split-test analysis, and on-page interaction generation. You bring your own API keys for any of these providers, and EF routes each task to the right model.
+
+This is a **bring-your-own-key** integration: you control billing, rate limits, model selection, and which provider you trust for each task.
+
+## Supported providers
+{/* SCREENSHOT: Supported providers · settings · desktop */}
+
+<CardGroup cols={3}>
+  <Card title="OpenAI" icon="circle-nodes">
+    GPT-4-class and GPT-5-class models, plus reasoning models (o-series). Used for general copywriting, page generation, AI chat, and split-test analysis.
+  </Card>
+  <Card title="Anthropic Claude" icon="brain">
+    Claude 3.5 Sonnet, 3 Opus, 3 Haiku. Used for long-form copy, page cloning, and reasoning-heavy workflows.
+  </Card>
+  <Card title="Google Gemini" icon="atom">
+    Gemini 2.5 Pro, 2.5 Flash, 2.0 Flash. Optimized for page-event generation, script-rule generation, and multimodal page cloning with reference images.
+  </Card>
+</CardGroup>
+
+## What needs a key
+{/* SCREENSHOT: AI features · admin pages · desktop */}
+
+| Feature | Provider used (default) | Notes |
+|---------|-------------------------|-------|
+| AI page generation | OpenAI or Anthropic | Picks based on prompt length and your default |
+| Page cloning from URL | Anthropic or Gemini | Gemini is preferred when reference images are extracted |
+| Page cloning with screenshots | Gemini | Multimodal model required |
+| AI Assistant inside the page builder | OpenAI | Chat + targeted edits |
+| Page event / interaction generation | Gemini 2.5 Flash | Cheap, fast, well-suited to script generation |
+| Quiz builder AI | OpenAI | Question + outcome generation |
+| Copy rewriting (component panel) | OpenAI | One-shot with the user's style notes |
+| Split-test analysis | OpenAI or Anthropic | Reads conversion data and writes a recommendation |
+| Email copy assist | OpenAI | Subject + body suggestions |
+
+If a feature needs a provider you haven't connected, the UI shows a "Connect provider" prompt linking back to the integration form.
+
+## Setup
+{/* SCREENSHOT: Setup · integration form · desktop */}
+
+<Steps>
+  <Step title="Get an API key">
+    - **OpenAI**: [platform.openai.com](https://platform.openai.com) → **API Keys** → **Create new secret key**.
+    - **Anthropic**: [console.anthropic.com](https://console.anthropic.com) → **Settings** → **API Keys** → **Create Key**.
+    - **Google Gemini**: [aistudio.google.com](https://aistudio.google.com) → **Get API key** → **Create API key in new project**.
+  </Step>
+  <Step title="Activate the integration in EF">
+    Go to **Integrations** → **AI** and click the provider tab.
+  </Step>
+  <Step title="Paste the key">
+    Paste the API key into the form and click **Save**. Keys are encrypted at rest.
+  </Step>
+  <Step title="(Optional) Override default models">
+    Per-feature model overrides live on the integration form. Defaults are sensible — only override if you're cost-tuning or want a specific model family for a particular task.
+  </Step>
+  <Step title="Test">
+    Open any AI surface (the page builder's AI assistant, or **Pages** → **Generate with AI**) and verify the generation runs without authentication errors.
+  </Step>
+</Steps>
+
+<Tip>
+**Why BYO key?** AI calls can quickly become the largest line item in a SaaS bill. Bringing your own key keeps cost transparent (you see it on your provider invoice) and lets you negotiate enterprise pricing or use credits.
+</Tip>
+
+## Cost & rate limits
+{/* SCREENSHOT: Cost · billing · desktop */}
+
+EF tracks token usage and approximate cost per request inside the AI logs. You can view per-feature spend under **Logs** → **AI Generations**. Rate limits and monthly quotas are enforced by the provider, not EF — adjust them in the provider's dashboard.
+
+## Privacy
+{/* SCREENSHOT: Privacy · settings · desktop */}
+
+- API keys are encrypted at rest and never logged.
+- Prompts are only sent to the provider associated with the feature you're using.
+- ElasticFunnels does not train any models on your data.
+- Whether the provider trains on your prompts is governed by your account settings with that provider — Anthropic and OpenAI both let you opt out at the account level.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Authentication errors">
+    Regenerate the key in the provider's dashboard, paste the new value into EF, and save. Old keys may have been revoked.
+  </Accordion>
+  <Accordion title="Rate-limit errors">
+    The provider is throttling your account. Either request a quota increase, or switch to a cheaper / faster model in the integration form (e.g. Gemini 2.5 Flash for page-event generation).
+  </Accordion>
+  <Accordion title="Generation cuts off mid-output">
+    The model hit its max output token limit. Try a longer-context model from the same provider, or break the task into smaller prompts (the AI assistant supports follow-ups).
+  </Accordion>
+</AccordionGroup>

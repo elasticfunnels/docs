@@ -4,10 +4,12 @@ description: "Renewal, pre-renewal, paused, canceled, payment expiring, and dunn
 ---
 
 ## Overview
+{/* SCREENSHOT: Overview · email editor or template settings · desktop */}
 
 Subscription emails keep customers informed about their recurring billing status. They cover the full lifecycle: successful renewals, upcoming charges, payment issues, paused/canceled states, and dunning.
 
 ## Renewal Success
+{/* SCREENSHOT: Renewal Success · email editor or template settings · desktop */}
 
 **Trigger:** Sent after a successful subscription renewal charge.
 
@@ -20,6 +22,7 @@ Subscription emails keep customers informed about their recurring billing status
 - Card statement descriptor note
 
 ## Renewal Failed
+{/* SCREENSHOT: Renewal Failed · email editor or template settings · desktop */}
 
 **Trigger:** Sent when a subscription renewal payment fails.
 
@@ -42,6 +45,7 @@ The body text also escalates, becoming more urgent with each retry. The template
 Use the `subscription.retry_count` variable with `@if` directives to customize urgency levels further.
 
 ## Pre-Renewal Reminder
+{/* SCREENSHOT: Pre-Renewal Reminder · email editor or template settings · desktop */}
 
 **Trigger:** Sent 3 days before an upcoming subscription renewal.
 
@@ -54,6 +58,7 @@ Use the `subscription.retry_count` variable with `@if` directives to customize u
 - "Manage Subscription" CTA
 
 ## Subscription Paused
+{/* SCREENSHOT: Subscription Paused · email editor or template settings · desktop */}
 
 **Trigger:** Sent when a subscription is paused.
 
@@ -65,6 +70,7 @@ Use the `subscription.retry_count` variable with `@if` directives to customize u
 - "Resume Subscription" CTA
 
 ## Subscription Canceled
+{/* SCREENSHOT: Subscription Canceled · email editor or template settings · desktop */}
 
 **Trigger:** Sent when a subscription is canceled.
 
@@ -77,6 +83,7 @@ Use the `subscription.retry_count` variable with `@if` directives to customize u
 - Encourages the customer to return
 
 ## Payment Method Expiring
+{/* SCREENSHOT: Payment Method Expiring · email editor or template settings · desktop */}
 
 **Trigger:** Sent when a customer's card on file is about to expire.
 
@@ -90,6 +97,7 @@ Use the `subscription.retry_count` variable with `@if` directives to customize u
 - "Manage Subscription" CTA
 
 ## Dunning Final Notice
+{/* SCREENSHOT: Dunning Final Notice · email editor or template settings · desktop */}
 
 **Trigger:** Sent as the last dunning attempt before subscription cancellation.
 
@@ -105,6 +113,7 @@ For a deep dive on dunning configuration, see [Dunning](/emails/dunning).
 - "Update Payment Method" CTA
 
 ## Configuring subscription emails
+{/* SCREENSHOT: Configuring subscription emails · email editor or template settings · desktop */}
 
 Subscription email templates are configured in **Brand Settings > Subscriptions**. Each subscription event has a dropdown to select which email template to use.
 

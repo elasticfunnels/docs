@@ -1,0 +1,86 @@
+---
+title: 'Twilio Integration'
+description: 'Send SMS, run voice flows, and verify phone numbers from automations using your Twilio account.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · integration form · desktop */}
+
+The Twilio integration lets your ElasticFunnels automations send SMS / MMS messages, place outbound voice calls with TwiML instructions, start phone-verification flows, and check verification codes. The same Twilio account you connect here also powers the **call center** module's outbound dialing.
+
+## What you get
+{/* SCREENSHOT: Capabilities · automation builder · desktop */}
+
+| Action | What it does |
+|--------|--------------|
+| Send SMS / MMS | Sends a message from one of your purchased Twilio numbers |
+| Make voice call | Dials an outbound number and plays / interacts via a TwiML URL |
+| Start verification | Sends a one-time SMS / call code through Twilio Verify |
+| Check verification code | Validates the code the user submitted |
+| Get message status | Reads delivery status of a previously sent message |
+| Get call status | Reads the disposition of a previously placed call |
+
+The form dynamically lists the phone numbers and Verify services on your Twilio account so you can pick them by friendly name instead of pasting IDs.
+
+## Setup
+{/* SCREENSHOT: Setup · integration form · desktop */}
+
+<Steps>
+  <Step title="Create an API key in Twilio">
+    Log into the [Twilio Console](https://console.twilio.com). Open **Settings** → **API keys & tokens** → **Create API key** (Standard type). Copy the **Key SID** and **Secret** immediately — the secret is only shown once.
+  </Step>
+  <Step title="Copy your Account SID">
+    From the Twilio Console homepage, copy the **Account SID**.
+  </Step>
+  <Step title="Activate the integration in EF">
+    Go to **Integrations** → **Communications** → **Twilio**. Paste **Account SID**, **API Key**, and **API Secret**. Save.
+  </Step>
+  <Step title="(Voice) Buy a phone number">
+    In Twilio: **Phone Numbers** → **Manage** → **Buy a number**. Numbers purchased here automatically appear in EF's number picker.
+  </Step>
+  <Step title="(Verification) Create a Verify service">
+    In Twilio: **Verify** → **Services** → **Create Service**. Set the friendly name and channels (SMS, voice, email). The service shows up in EF's automation actions for `Start Verification` / `Check Verification`.
+  </Step>
+  <Step title="Use it in automations">
+    Open **Automations**, drop a `Twilio: Send SMS` (or any other Twilio action) into a flow, and pick the from-number, message body, and optional media URL. Map ElasticFunnels variables like `{{customer.phone}}` into the to-number field.
+  </Step>
+</Steps>
+
+## Common patterns
+{/* SCREENSHOT: Patterns · automation builder · desktop */}
+
+### Order receipt SMS
+
+Trigger: `Conversion: purchase` → Action: `Twilio: Send SMS` to the customer phone with order number and tracking link.
+
+### Two-factor login
+
+Trigger: `Form: submitted` (login form) → Action: `Twilio: Start Verification` → Wait for user input on the next page → Action: `Twilio: Check Verification Code`.
+
+### Abandoned cart SMS
+
+Trigger: `Cart abandoned (2h)` → Condition: `customer.phone is not empty` → Action: `Twilio: Send SMS` with a recovery link.
+
+### Outbound voice (call center)
+
+The Organization Callcenter integration uses your Twilio credentials to place outbound calls from agent dashboards. No additional setup beyond connecting Twilio is required.
+
+## Costs
+{/* SCREENSHOT: Costs · twilio billing · desktop */}
+
+You pay Twilio directly for messages, calls, and verifications based on their per-segment / per-minute pricing. ElasticFunnels does not mark up Twilio usage.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · automation logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Messages not delivering to US numbers">
+    US carriers require **A2P 10DLC registration** for application-to-person traffic. Register your brand and campaign inside the Twilio Console (**Messaging** → **Regulatory Compliance** → **A2P 10DLC**) before sending production traffic.
+  </Accordion>
+  <Accordion title="Verification codes never arrive">
+    Check the Verify service has the right channels enabled, the destination country isn't blocked in your Twilio geo permissions, and your account isn't in trial mode (trial accounts can only message verified numbers).
+  </Accordion>
+  <Accordion title="Voice call disconnects immediately">
+    The TwiML URL returned an error or invalid TwiML. Open **Twilio Console** → **Monitor** → **Logs** → **Errors** to see the call's failure detail.
+  </Accordion>
+</AccordionGroup>

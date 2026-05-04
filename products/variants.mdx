@@ -8,12 +8,14 @@ Product variants let you sell multiple versions of a product (e.g., different si
 ---
 
 ## How Variants Work
+{/* SCREENSHOT: How Variants Work · product form, builder panel, or checkout example · desktop */}
 
 Variants are built from **Variant Options** — brand-level axis definitions (e.g., "Color", "Size"). On the product, you select which options apply, then define each combination as an individual variant row.
 
 ---
 
 ## Setting Up Variant Options
+{/* SCREENSHOT: Setting Up Variant Options · product form, builder panel, or checkout example · desktop */}
 
 Before adding variants to a product, create the variant option definitions:
 
@@ -24,6 +26,7 @@ Before adding variants to a product, create the variant option definitions:
 ---
 
 ## Adding Variants to a Product
+{/* SCREENSHOT: Adding Variants to a Product · product form, builder panel, or checkout example · desktop */}
 
 1. Open the product and go to the **Variants** tab
 2. In **Variant Options**, check the options that apply to this product (e.g., Color and Size)
@@ -36,12 +39,14 @@ Before adding variants to a product, create the variant option definitions:
 ---
 
 ## Per-Variant Pricing
+{/* SCREENSHOT: Per-Variant Pricing · product form, builder panel, or checkout example · desktop */}
 
 Each variant has its own **Price** field. If left blank, the product's base price is used at checkout.
 
 ---
 
 ## Variant Option Values (`option_values`)
+{/* SCREENSHOT: Variant Option Values (`option_values`) · product form, builder panel, or checkout example · desktop */}
 
 Each variant stores its option selections as `option_values` — a map of option slug to selected value:
 
@@ -57,6 +62,7 @@ This map is available in the template engine as `variant.option_values`.
 ---
 
 ## Variant Attributes
+{/* SCREENSHOT: Variant Attributes · product form, builder panel, or checkout example · desktop */}
 
 Product Attributes with `applies_to = variant` or `applies_to = both` can store values per variant. These appear in each variant row in the Variants tab and are managed independently.
 
@@ -70,6 +76,7 @@ See [Product Attributes](/products/product-attributes) for full documentation on
 ---
 
 ## Template Access
+{/* SCREENSHOT: Template Access · product form, builder panel, or checkout example · desktop */}
 
 Variants are available on the product object:
 

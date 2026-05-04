@@ -1,0 +1,98 @@
+---
+title: 'Google Sheets Integration'
+description: 'Read and write rows in Google Sheets from ElasticFunnels automations using OAuth or a service account.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · integration form · desktop */}
+
+The Google Sheets integration gives ElasticFunnels automations full read/write access to a spreadsheet. Use it for ad-hoc lead tracking, data offload to ops teams who live in spreadsheets, or as a temporary store before more permanent reporting is built.
+
+## What you can do
+{/* SCREENSHOT: Capabilities · automation builder · desktop */}
+
+| Action | What it does |
+|--------|--------------|
+| Append row | Adds a row to the bottom of a sheet |
+| Batch update | Updates multiple cells in a single API call |
+| Read values | Reads a range of cells (single sheet or multiple) |
+| Find row | Looks up a row by a search value, returns the row data and index |
+| Update row by search | Updates a row matched by a search value (upsert-style) |
+| Create sheet | Adds a new tab to an existing spreadsheet |
+| Clear range | Empties a range without removing formatting |
+
+The integration uses **Google Sheets API v4** and respects the published 300-requests-per-minute quota with built-in throttling and retry.
+
+## Setup
+{/* SCREENSHOT: Setup · integration form · desktop */}
+
+You can authenticate two ways. Pick whichever matches how your team manages Google access.
+
+### Option A — OAuth (one user)
+
+<Steps>
+  <Step title="Connect your Google account">
+    Go to **Integrations** → **Storage** → **Google Sheets** → **Connect with Google**. EF redirects you to Google's OAuth screen.
+  </Step>
+  <Step title="Grant Sheets access">
+    Tick the **See, edit, create, and delete your spreadsheets** scope. EF stores an OAuth refresh token so it can keep accessing your sheets without re-prompting you.
+  </Step>
+  <Step title="Pick a default spreadsheet (optional)">
+    The form lets you pre-pick a spreadsheet so you don't have to paste the ID every time you build an automation.
+  </Step>
+</Steps>
+
+### Option B — Service account (recommended for teams)
+
+<Steps>
+  <Step title="Create a service account">
+    In the Google Cloud Console, create a project, enable the **Google Sheets API**, and create a **service account** with no roles. Generate a JSON key and download it.
+  </Step>
+  <Step title="Share your spreadsheet with the service account">
+    Open each spreadsheet you want EF to access and **Share** it with the service account's email (looks like `xxx@xxx.iam.gserviceaccount.com`) as **Editor**.
+  </Step>
+  <Step title="Paste the JSON in EF">
+    Paste the full JSON key contents into the **Service Account JSON** field of the EF integration form. Save.
+  </Step>
+</Steps>
+
+<Tip>
+**Use a service account in production.** OAuth tokens are tied to a specific Google user — if that person leaves your org, the integration breaks. A service account belongs to your project, not a person.
+</Tip>
+
+## Patterns
+{/* SCREENSHOT: Patterns · automation builder · desktop */}
+
+### Lead handoff to sales
+
+Trigger: `Form: submitted` → Action: `Google Sheets: Append row` to a "New Leads" tab with `email`, `name`, `phone`, `source`, `submitted_at`. The sales team works the sheet directly without logging into EF.
+
+### Order export for fulfillment ops
+
+Trigger: `Conversion: purchase` → Action: `Google Sheets: Append row` to an "Orders" tab with one row per line item.
+
+### Inventory check before purchase
+
+Trigger: `Form: submitted` (pre-checkout) → Action: `Google Sheets: Find row` matching the SKU on an "Inventory" tab → Condition: `available > 0` → continue or redirect to a backorder page.
+
+## Limits
+{/* SCREENSHOT: Limits · settings · desktop */}
+
+- **300 requests / minute** per integration (Google's quota; throttle is built-in).
+- **5 million cells** per spreadsheet (Google's hard limit). Move to a database before you get close.
+- Cell values are coerced to strings on write unless the sheet column is pre-formatted as date / number / currency.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · automation logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="403 forbidden when writing">
+    The service account hasn't been added to the spreadsheet, or the OAuth account no longer has access. Re-share the file or re-authenticate.
+  </Accordion>
+  <Accordion title="429 rate limited">
+    You're sending more than 300 requests / minute. Spread writes out (e.g. batch them with `Batch update` instead of one append per row), or split traffic across multiple spreadsheets.
+  </Accordion>
+  <Accordion title="Wrong cell type after append">
+    Pre-format the destination column in the spreadsheet (Format → Number) so Google Sheets knows to interpret the value correctly.
+  </Accordion>
+</AccordionGroup>

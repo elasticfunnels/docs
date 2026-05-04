@@ -116,7 +116,7 @@ This is the simplest way to split test on coded pages. For more advanced setups 
 ### Syntax
 
 ```html
-<inline-split-test>
+<inline-split-test name="My Test">
     <variant name="variant a" weight="50">
         <!-- HTML for variant A -->
     </variant>
@@ -130,8 +130,9 @@ This is the simplest way to split test on coded pages. For more advanced setups 
 
 | Element | Attribute | Required | Description |
 |---------|-----------|----------|-------------|
+| `<inline-split-test>` | `name` | Yes | Human-readable name for the split test. Used as the record name in the database and analytics dashboard. The tag is ignored on save if `name` is missing. |
 | `<inline-split-test>` | `id` | Auto-generated | Database record ID. Injected automatically on save — do not set or edit manually. |
-| `<variant>` | `name` | Yes | Unique name for the variant. Can contain any characters. |
+| `<variant>` | `name` | Yes | Unique name for the variant. Used to identify and track the variant across saves. |
 | `<variant>` | `weight` | No | Traffic percentage (0–100). If omitted on all variants, traffic splits evenly. |
 
 ### Basic example (equal split)
@@ -139,7 +140,7 @@ This is the simplest way to split test on coded pages. For more advanced setups 
 When no `weight` attributes are provided, traffic is distributed evenly across all variants:
 
 ```html
-<inline-split-test>
+<inline-split-test name="Headline Test">
     <variant name="short headline">
         <h1>Buy Now</h1>
     </variant>
@@ -156,7 +157,7 @@ This creates a 50/50 split. For three variants it would be 33/33/34, and so on.
 Send 70% of traffic to the control and 30% to the challenger:
 
 ```html
-<inline-split-test>
+<inline-split-test name="Headline Test">
     <variant name="control" weight="70">
         <h1>Original Headline</h1>
     </variant>
@@ -180,7 +181,7 @@ When you create or update a coded page through the public Pages API:
 Example source HTML sent to the API:
 
 ```html
-<inline-split-test>
+<inline-split-test name="Headline Test">
     <variant name="control" weight="70">
         <h1>Original Headline</h1>
     </variant>
@@ -208,7 +209,7 @@ If an API or editor save response returns normalized inline split test HTML with
 
 ### How it works
 
-1. **On editor save**, the system validates the tag structure (minimum 2 variants, each with a name). It creates a split test database record and injects an `id` attribute into the tag. The editor updates automatically to show the assigned ID.
+1. **On editor save**, the system validates the tag structure (the `<inline-split-test>` must have a `name`, and there must be at least 2 `<variant>` tags each with a `name`). It creates a split test database record and injects an `id` attribute into the tag. The `name` attribute on the tag is used as the split test record name. The editor updates automatically to show the assigned ID.
 
 2. **At runtime**, when a visitor loads the page the server:
    - Checks for an existing cookie (`st_res_{id}`) to maintain consistency for returning visitors
@@ -234,11 +235,12 @@ The `variant_code` is an internal identifier (e.g. `v0`, `v1`) that maps back to
 
 ### Rules
 
-- Minimum **2 variants** required.
-- Each variant must have a unique **name**.
+- The `<inline-split-test>` tag must have a **`name`** attribute. Tags without a name are ignored on save (no split test record is created or updated).
+- Minimum **2 variants** required, each with a unique **`name`**.
 - Weights must be positive numbers that sum to **100**. If no weights are set on any variant, traffic splits evenly.
 - Do not manually set or edit the **`id`** attribute — it is managed by the system.
-- Removing the tag from the page and saving will deactivate the split test record.
+- **Removing the tag** from the page does **not** delete or deactivate the split test record. The record stays active in the database. To deactivate a split test, use the split test management UI.
+- **Variant identity is tracked by name.** Existing variants keep their internal tracking code (`v0`, `v1`, etc.) across saves. Renaming a variant in the HTML creates a new variant with a new code — the original variant and its analytics data remain in the record. Removing a variant from the HTML does not delete it from the split test record.
 
 ---
 

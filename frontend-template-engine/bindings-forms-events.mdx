@@ -6,6 +6,7 @@ description: 'ef-text/ef-html, ef-* attribute bindings, ef-value/data-template-v
 The frontend template engine supports **one-way** and **two-way** bindings and **event handlers**. All expressions are evaluated in the current scope (global + loop/block context).
 
 ## Text and HTML bindings
+{/* SCREENSHOT: Text and HTML bindings · code editor or rendered example · desktop */}
 
 ### `ef-text="expression"` (or `data-ef-text`)
 
@@ -38,6 +39,7 @@ Prefer **`data-ef-text`** or **`[[ ... ]]`** when the value is not fully trusted
 ---
 
 ## One-way attribute bindings: `ef-href`, `ef-title`, `ef-alt`, `ef-placeholder`
+{/* SCREENSHOT: One-way attribute bindings: `ef-href`, `ef-title`, `ef-alt`, `ef-placeholder` · code editor or rendered example · desktop */}
 
 Use these when you want scope-driven attributes without writing full `[[ ... ]]` strings in markup.
 
@@ -59,6 +61,7 @@ These are great for page builder workflows: add them in **Data Attributes** (rig
 ---
 
 ## Two-way form binding: `ef-value` / `data-ef-value` / `data-template-value`
+{/* SCREENSHOT: Two-way form binding: `ef-value` / `data-ef-value` / `data-template-value` · code editor or rendered example · desktop */}
 
 **`ef-value="path"`** (or `data-ef-value` / `data-template-value`) on **`input`**, **`select`**, or **`textarea`** binds the control to a **dot path** in scope (e.g. **`checkout.customer.email`**, **`billing.name`**).
 
@@ -109,6 +112,7 @@ When present, **if the scope path is undefined on the first run**, the element�
 ---
 
 ## One-way bindings: `:checked`, `:disabled`, `:value`
+{/* SCREENSHOT: One-way bindings: `:checked`, `:disabled`, `:value` · code editor or rendered example · desktop */}
 
 Vue-style **one-way** bindings: the expression is evaluated and the **DOM property** is set on each update. The attribute is removed after first apply and the expression is stored in memory so the DOM stays clean.
 
@@ -126,6 +130,7 @@ Use when the value is **derived from scope** and the user does not edit it back 
 ---
 
 ## Event handlers: `@click` and others
+{/* SCREENSHOT: Event handlers: `@click` and others · code editor or rendered example · desktop */}
 
 **`@click="expression"`** runs the expression when the element (or a child) is clicked. The expression is evaluated in a context that includes **`$event`** / **`event`** (the DOM event) and **`$el`** / **`$target`** (element). Assignments in the expression (e.g. **`items = []`**, **`item.open = !item.open`**) mutate scope and the UI re-renders automatically.
 
@@ -165,6 +170,7 @@ When you need **custom @click** logic, you can use **`window.ef.addToCart(code, 
 ---
 
 ## Lifecycle & visibility directives
+{/* SCREENSHOT: Lifecycle & visibility directives · code editor or rendered example · desktop */}
 
 Element-level handlers that run when an element enters the DOM, leaves the DOM, or scrolls into the viewport. They share the same expression model and alias families as **`@click`** — the expression runs in the current scope and can read **`$el`** (the element itself).
 
@@ -247,6 +253,7 @@ For watchers tied to **scope paths** rather than DOM elements, use **`window.ef.
 ---
 
 ## Reactivity summary
+{/* SCREENSHOT: Reactivity summary · code editor or rendered example · desktop */}
 
 - **`[[ expression ]]`** — Re-evaluated automatically after relevant scope changes.
 - **Mounted `template-if` and `template-foreach`** — Re-render automatically when dependencies change.

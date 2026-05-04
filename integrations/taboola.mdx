@@ -4,10 +4,12 @@ description: 'Send conversion postbacks to Taboola for native advertising campai
 ---
 
 ## Overview
+{/* SCREENSHOT: Overview · integration settings or log state · desktop */}
 
 The Taboola integration enables S2S (server-to-server) conversion tracking to Taboola's native advertising platform. When conversions occur in ElasticFunnels, postbacks are automatically sent to Taboola with conversion data, enabling accurate campaign attribution and optimization.
 
 ## What This Integration Provides
+{/* SCREENSHOT: What This Integration Provides · integration settings or log state · desktop */}
 
 <CardGroup cols={2}>
   <Card title="Conversion Postbacks" icon="arrow-trend-up">
@@ -25,6 +27,7 @@ The Taboola integration enables S2S (server-to-server) conversion tracking to Ta
 </CardGroup>
 
 ## How It Works
+{/* SCREENSHOT: How It Works · integration settings or log state · desktop */}
 
 ### The Flow
 
@@ -43,6 +46,7 @@ This integration is perfect for native advertising campaigns where you want Tabo
 </Info>
 
 ## Setup Guide
+{/* SCREENSHOT: Setup Guide · integration settings or log state · desktop */}
 
 ### Step 1: Get Your Account ID
 
@@ -161,6 +165,7 @@ Affiliate IDs come from your payment gateway (BuyGoods, ClickBank, etc.). They i
 3. Verify conversion appears in Taboola dashboard
 
 ## Configuration Options
+{/* SCREENSHOT: Configuration Options · integration settings or log state · desktop */}
 
 ### Postback URL
 
@@ -200,6 +205,7 @@ Tells ElasticFunnels which URL parameter contains Taboola's click ID. Options:
 - `taboola_click_id` (alternative)
 
 ## Parameter Builder
+{/* SCREENSHOT: Parameter Builder · integration settings or log state · desktop */}
 
 ### How to Use
 
@@ -230,6 +236,7 @@ The URL and parameter builder stay in sync:
 - **Change Account ID or Event Name** → URL updates to match
 
 ## Available Variables
+{/* SCREENSHOT: Available Variables · integration settings or log state · desktop */}
 
 ### Required Variables
 
@@ -270,6 +277,7 @@ The URL and parameter builder stay in sync:
 </ParamField>
 
 ## Supported Currencies
+{/* SCREENSHOT: Supported Currencies · integration settings or log state · desktop */}
 
 Taboola supports the following currencies:
 
@@ -280,6 +288,7 @@ If currency is omitted, Taboola uses your account's default currency.
 </Info>
 
 ## Use Cases
+{/* SCREENSHOT: Use Cases · integration settings or log state · desktop */}
 
 ### For Advertisers
 
@@ -298,6 +307,7 @@ Manage multiple client accounts:
 - Campaign performance isolation
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · integration settings or log state · desktop */}
 
 <AccordionGroup>
   <Accordion title="No Conversions Showing in Taboola">
@@ -341,6 +351,7 @@ Manage multiple client accounts:
 </AccordionGroup>
 
 ## Best Practices
+{/* SCREENSHOT: Best Practices · integration settings or log state · desktop */}
 
 <Steps>
   <Step title="Configure Event in Taboola First">
@@ -365,6 +376,7 @@ Manage multiple client accounts:
 </Steps>
 
 ## Technical Details
+{/* SCREENSHOT: Technical Details · integration settings or log state · desktop */}
 
 ### Postback Method
 
@@ -378,7 +390,7 @@ Postbacks are sent via **HTTP GET requests**, which is the standard for Taboola 
 
 ### Error Handling
 
-The integration includes comprehensive error handling:
+The integration reports common errors clearly:
 - Failed postbacks are logged but don't break conversion creation
 - Network timeouts handled gracefully
 - Invalid URLs caught and logged
@@ -392,6 +404,7 @@ Postbacks are processed asynchronously via the `conversions` queue:
 - Can be monitored via queue logs
 
 ## Compatibility
+{/* SCREENSHOT: Compatibility · integration settings or log state · desktop */}
 
 ### Works With Any Payment Gateway
 
@@ -405,6 +418,7 @@ Compatible with running multiple Taboola campaigns:
 - Merchant-specific tracking per campaign
 
 ## Integration Architecture
+{/* SCREENSHOT: Integration Architecture · integration settings or log state · desktop */}
 
 <Note>
 **Important:** Taboola is an **outbound integration** - we send conversion data TO Taboola, we don't receive data FROM Taboola. This is the same pattern as Google Ads and Meta Ads conversion tracking.
@@ -418,6 +432,7 @@ Compatible with running multiple Taboola campaigns:
 - **Works with any merchant** - Compatible with any payment processor
 
 ## Frequently Asked Questions
+{/* SCREENSHOT: Frequently Asked Questions · integration settings or log state · desktop */}
 
 <AccordionGroup>
   <Accordion title="Which click ID parameter should I use?">
@@ -481,6 +496,7 @@ Compatible with running multiple Taboola campaigns:
 </AccordionGroup>
 
 ## URL Parameter Format
+{/* SCREENSHOT: URL Parameter Format · integration settings or log state · desktop */}
 
 ### Standard Taboola Format
 
@@ -503,6 +519,7 @@ Our integration automatically:
 - You don't need to worry about the hyphen/underscore difference
 
 ## Multiple Integrations
+{/* SCREENSHOT: Multiple Integrations · integration settings or log state · desktop */}
 
 You can create multiple Taboola integrations for different use cases:
 
@@ -526,6 +543,7 @@ Name each integration clearly (e.g., "Taboola - Purchase Events", "Taboola - Lea
 </Tip>
 
 ## Logging & Monitoring
+{/* SCREENSHOT: Logging & Monitoring · integration settings or log state · desktop */}
 
 ### View Postback Logs
 
@@ -544,6 +562,7 @@ Name each integration clearly (e.g., "Taboola - Purchase Events", "Taboola - Lea
 - Timing information
 
 ## Security & Privacy
+{/* SCREENSHOT: Security & Privacy · integration settings or log state · desktop */}
 
 ### Data Handling
 
@@ -560,6 +579,7 @@ You can exclude customer information:
 - Still track conversions with just revenue and order ID
 
 ## External Resources
+{/* SCREENSHOT: External Resources · integration settings or log state · desktop */}
 
 <CardGroup cols={2}>
   <Card
@@ -593,6 +613,7 @@ You can exclude customer information:
 </CardGroup>
 
 ## Next Steps
+{/* SCREENSHOT: Next Steps · integration settings or log state · desktop */}
 
 <CardGroup cols={2}>
   <Card

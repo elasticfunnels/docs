@@ -6,6 +6,7 @@ description: 'What the frontend template engine does not do, common mistakes, an
 This page covers **limitations** of the frontend template engine (compared to full frameworks like Vue or Alpine) and **common pitfalls** with fixes.
 
 ## Quick reference: common pitfalls
+{/* SCREENSHOT: Quick reference: common pitfalls · code editor or rendered example · desktop */}
 
 | Symptom | Cause | Fix |
 |--------|--------|-----|
@@ -22,6 +23,7 @@ This page covers **limitations** of the frontend template engine (compared to fu
 ---
 
 ## Limitations
+{/* SCREENSHOT: Limitations · code editor or rendered example · desktop */}
 
 ### Not a full framework
 
@@ -47,6 +49,7 @@ This page covers **limitations** of the frontend template engine (compared to fu
 ---
 
 ## Common pitfalls
+{/* SCREENSHOT: Common pitfalls · code editor or rendered example · desktop */}
 
 ### 1. Using `formatPrice` on already-formatted values
 
@@ -145,6 +148,7 @@ The server-side processor auto-converts `<template-foreach>` inside `<select>` i
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · code editor or rendered example · desktop */}
 
 - **Limitations:** No virtual DOM/component lifecycle; **template-else** needs a sibling **template-if**; **checkout** and **query** are context-specific.
 - **Pitfalls:** Don’t use **formatPrice** on formatted values; use **[[ ]]** not **{{ }}** for frontend; keep data paths aligned with bindings; use **checkout.*** for single-product summary; use **data-ef-cloak** where needed; keep **template-if/else** structure and checkout/bump attributes as specified; never use **template-foreach** inside **select** — use inline **data-each** on **option** instead (Safari/iOS).

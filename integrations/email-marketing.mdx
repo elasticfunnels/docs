@@ -1,0 +1,105 @@
+---
+title: 'Email Marketing & Validation Integrations'
+description: 'Sync contacts, send transactional email, and validate addresses through external email platforms.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · email integrations list · desktop */}
+
+ElasticFunnels ships its own email engine for broadcasts and automations, but you can also push contacts and send through external platforms when your team already lives there. Every email integration is wired into the **automation builder** as actions you can drop into any workflow (for example, after a form submission or a purchase).
+
+## Categories
+{/* SCREENSHOT: Categories · email integrations list · desktop */}
+
+<CardGroup cols={2}>
+  <Card title="ESP / contact-sync" icon="envelope">
+    Push subscribers, manage tags, and trigger sequences in your existing email service provider.
+  </Card>
+  <Card title="Transactional email" icon="paper-plane">
+    Send one-off API-driven emails through high-deliverability providers (or any SMTP relay).
+  </Card>
+  <Card title="Email validation" icon="shield-check">
+    Verify addresses at form-submit time to keep junk and spam-traps out of your list.
+  </Card>
+</CardGroup>
+
+## ESP / contact sync
+{/* SCREENSHOT: ESP integrations · settings · desktop */}
+
+| Provider | Auth | Available actions |
+|----------|------|-------------------|
+| **Klaviyo** | Private API key | Subscribe / update profile, retrieve profile, subscribe to a list (segmentation, predictive analytics) |
+| **ActiveCampaign** | API URL + token | Create / update contact, manage tags, add to automation |
+| **Mailchimp** | API key | Add / update contact, delete contact, manage tags, check subscription status |
+| **GetResponse** | API key | Create / update contact, add to campaign (list), manage tags |
+| **Kit (ConvertKit)** | API key (v4) | Create / update subscriber, manage tags, enroll in form / sequence |
+| **AWeber** | OAuth 2.0 | Create / update contact (dynamic list selection), manage tags |
+| **Brevo** (Sendinblue) | API key | Create / update contact, check existence, manage tags, SMS |
+| **Maropost** | API key + account | Send transactional via `emails/deliver.json`, sync contacts |
+
+<Tip>
+**Pick where the source of truth lives.** If Klaviyo or ActiveCampaign already runs your email program, sync EF data into them. If you want to retire your ESP and run broadcasts from EF, use the built-in **Emails** module instead.
+</Tip>
+
+## Transactional email
+{/* SCREENSHOT: Transactional integrations · settings · desktop */}
+
+These providers send one-off emails — order receipts, dunning notices, password resets, etc. — through their API or SMTP server.
+
+| Provider | Method | What you control |
+|----------|--------|------------------|
+| **SendGrid** | REST API v3 | Sender identity, stats, bounces, suppression management |
+| **Mailgun** | REST API v3 | Sender, mailing lists, bounce / complaint tracking, opens & clicks |
+| **Generic SMTP** (labelled "Mailrelay") | Any SMTP relay | Host, port, username, password — works with Gmail, Outlook, Postmark, Amazon SES, etc. |
+| **Maropost** | Marketing Cloud REST API | Transactional sends via campaign ID |
+
+<Info>
+The integration shown as **Mailrelay** in the UI is a general-purpose SMTP integration despite the name — point it at any SMTP server you already operate.
+</Info>
+
+## Email validation
+{/* SCREENSHOT: Validation integrations · settings · desktop */}
+
+| Provider | Auth | What it returns |
+|----------|------|-----------------|
+| **ZeroBounce** | API key | Status (`valid`, `invalid`, `catch-all`, `spamtrap`, `unknown`), sub-status, IP / geo enrichment, credit balance |
+| **Debounce** | API key | Deliverability + risk classification (`safe_to_send`, `risky`, etc.) |
+
+Both validators plug into:
+
+- **Forms** — call the validator inside the automation that runs after the form is submitted, and reject the row if the address is invalid.
+- **Automations** — gate any subsequent step (`add_to_list`, `tag`, `send_email`) on the validation result.
+
+## Setup pattern
+{/* SCREENSHOT: Setup pattern · integration form · desktop */}
+
+The setup is the same for every provider:
+
+<Steps>
+  <Step title="Find the provider">
+    Go to **Integrations** → **Email Marketing** (or **Validation**), find the provider, click **Activate**.
+  </Step>
+  <Step title="Authenticate">
+    Paste an API key, OAuth your account, or fill in SMTP credentials depending on the provider.
+  </Step>
+  <Step title="Pick lists / forms (where applicable)">
+    For ESP integrations, the form will load your lists, tags, forms, sequences, etc. directly from the provider so you can choose them by name instead of ID.
+  </Step>
+  <Step title="Use it in automations">
+    Open any **Automation** and drop the new actions (e.g. `Klaviyo: Subscribe Profile`) into the workflow. Map ElasticFunnels variables (email, first name, custom fields) to the provider's fields.
+  </Step>
+</Steps>
+
+## Built-in vs external
+{/* SCREENSHOT: Built-in vs external · architecture · desktop */}
+
+ElasticFunnels can replace these tools for many teams. Use the table below to decide:
+
+| Need | Use built-in EF | Use external integration |
+|------|-----------------|--------------------------|
+| Order, dunning, course, login emails | EF Emails (recommended) | SendGrid / Mailgun if you already pay for deliverability |
+| Marketing broadcasts to your list | EF Emails (campaigns + segments) | Klaviyo / ActiveCampaign / Mailchimp if your team lives there |
+| Behavior-based sequences | EF Automations | ActiveCampaign / Klaviyo automations |
+| Validation at form-capture | — | Debounce or ZeroBounce |
+
+You can also mix-and-match — for example, send transactional through SendGrid and broadcasts through Klaviyo, while EF still owns the funnel data, automations, and reporting.

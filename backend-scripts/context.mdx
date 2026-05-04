@@ -6,6 +6,7 @@ description: 'Read-only globals available inside backend scripts: request data, 
 These globals are injected automatically into every backend script execution. They are **read-only** — you cannot modify them directly.
 
 ## `request`
+{/* SCREENSHOT: `request` · code editor or rendered example · desktop */}
 
 Information about the current HTTP request.
 
@@ -53,6 +54,7 @@ Full request headers are not exposed to prevent leaking internal infrastructure 
 </Warning>
 
 ## `customer`
+{/* SCREENSHOT: `customer` · code editor or rendered example · desktop */}
 
 The current customer object from the session, or `null` if no customer is set. Populated after checkout or check-order login.
 
@@ -85,6 +87,7 @@ customer.shipping_country
 ```
 
 ## `is_customer`
+{/* SCREENSHOT: `is_customer` · code editor or rendered example · desktop */}
 
 Boolean. `true` if the visitor has an active customer session (completed a purchase or logged in via check-order).
 

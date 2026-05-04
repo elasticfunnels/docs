@@ -26,6 +26,7 @@ The **`window.ef`** object is available on every funnel page. Use it in **Client
 ---
 
 ## Where you can use it
+{/* SCREENSHOT: Where you can use it · funnel builder, page events, or published flow · desktop */}
 
 - **Client script** node — Your script runs in the page; you can call `ef.addTag()`, `ef.nextNode()`, `ef.waitForVisible()`, etc. The flow does **not** auto-advance after a client script; call `ef.nextNode()` when you want to continue.
 - **Any inline or page script** — `window.ef` is defined early, so you can use it in `onclick`, in a `<script>` block, or from other JS.
@@ -34,6 +35,7 @@ The **`window.ef`** object is available on every funnel page. Use it in **Client
 ---
 
 ## Tags
+{/* SCREENSHOT: Tags · funnel builder, page events, or published flow · desktop */}
 
 Tags are stored in cookies (same as the **Add tag** and **Has tag** nodes). Use the same tag name in the builder and in `ef` so conditions and scripts stay in sync.
 
@@ -79,6 +81,7 @@ ef.removeTag('saw_popup');
 ---
 
 ## Flow control
+{/* SCREENSHOT: Flow control · funnel builder, page events, or published flow · desktop */}
 
 ### ef.nextNode()
 
@@ -110,6 +113,7 @@ ef.wait(2000, function() {
 ---
 
 ## Visibility
+{/* SCREENSHOT: Visibility · funnel builder, page events, or published flow · desktop */}
 
 ### ef.isVisible(selectorOrElement)
 
@@ -147,6 +151,7 @@ var cancel = ef.waitForVisible('.popup', function() {
 ---
 
 ## Timing
+{/* SCREENSHOT: Timing · funnel builder, page events, or published flow · desktop */}
 
 ### ef.wait(ms, callback)
 
@@ -168,6 +173,7 @@ var cancel = ef.wait(5000, function() {
 ---
 
 ## Video
+{/* SCREENSHOT: Video · funnel builder, page events, or published flow · desktop */}
 
 These helpers use the same video state as the **Video progress check** and **On CTA** nodes (Vidalytics, TrackPlay, SmartPlayer, or main page video).
 
@@ -210,6 +216,7 @@ var progress = ef.getVideoProgress();
 ---
 
 ## Client script examples
+{/* SCREENSHOT: Client script examples · funnel builder, page events, or published flow · desktop */}
 
 **Wait for an element, then continue:**
 
@@ -250,6 +257,7 @@ if (ef.hasTag('saw_offer')) {
 ---
 
 ## Adding a tag from a click (no script)
+{/* SCREENSHOT: Adding a tag from a click (no script) · funnel builder, page events, or published flow · desktop */}
 
 Add `data-ef-add-tag="tagname"` to a link or button (or to a parent component with `data-cid`). When the user clicks, the tag is set automatically. Useful for "clicked CTA" or "opened modal" without a client script.
 
@@ -260,6 +268,7 @@ Add `data-ef-add-tag="tagname"` to a link or button (or to a parent component wi
 ---
 
 ## Summary
+{/* SCREENSHOT: Summary · funnel builder, page events, or published flow · desktop */}
 
 | Method | Description |
 |--------|-------------|

@@ -91,7 +91,8 @@
                 "pages": [
                   "pages/interactions-panel",
                   "pages/containers",
-                  "pages/page-variables"
+                  "pages/page-variables",
+                  "pages/internationalization"
                 ]
               },
               {
@@ -154,20 +155,49 @@
                 ]
               },
               {
-                "group": "Analytics & Tracking",
+                "group": "Affiliate Networks & Attribution",
                 "pages": [
-                  "integrations/google-analytics",
+                  "integrations/affiliate-tracking",
+                  "integrations/buygoods",
+                  "integrations/clickbank",
+                  "integrations/jvzoo",
                   "integrations/everflow",
-                  "integrations/affiliate-tracking"
+                  "integrations/redtrack"
                 ]
               },
               {
-                "group": "eCommerce",
+                "group": "Analytics & Tracking",
+                "pages": [
+                  "integrations/google-analytics"
+                ]
+              },
+              {
+                "group": "Email & CRM",
+                "pages": [
+                  "integrations/email-marketing",
+                  "integrations/crm"
+                ]
+              },
+              {
+                "group": "AI & Communications",
+                "pages": [
+                  "integrations/ai-providers",
+                  "integrations/twilio"
+                ]
+              },
+              {
+                "group": "eCommerce & Operations",
                 "pages": [
                   "integrations/shopify-order-sync",
                   "integrations/fulfillment",
-                  "integrations/buygoods",
-                  "integrations/clickbank"
+                  "integrations/tax",
+                  "integrations/google-sheets"
+                ]
+              },
+              {
+                "group": "Video Players",
+                "pages": [
+                  "integrations/trackplay"
                 ]
               },
               "integrations/callcenters",

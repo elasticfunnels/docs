@@ -8,6 +8,7 @@ This page covers all backend functions for courses and shows how to use them in 
 ---
 
 ## Backend functions
+{/* SCREENSHOT: Backend functions · relevant screen or example output · desktop */}
 
 All functions are available in `<script scope="backend">` blocks and in `.ef` files.
 
@@ -163,6 +164,7 @@ For dynamic slug pages (e.g. `guided-course/{course}.ef`), the slug is available
 ---
 
 ## Course list page
+{/* SCREENSHOT: Course list page · relevant screen or example output · desktop */}
 
 Show all courses, sorted so enrolled courses appear first. Use `is_assigned` and `started` to drive the CTA label.
 
@@ -257,6 +259,7 @@ Show all courses, sorted so enrolled courses appear first. Use `is_assigned` and
 ---
 
 ## Course detail page
+{/* SCREENSHOT: Course detail page · relevant screen or example output · desktop */}
 
 Resolve the slug from the URL, check enrollment with `getCourseForCustomer`, and gate content.
 
@@ -352,6 +355,7 @@ Resolve the slug from the URL, check enrollment with `getCourseForCustomer`, and
 ---
 
 ## Auth wrapper for course pages
+{/* SCREENSHOT: Auth wrapper for course pages · relevant screen or example output · desktop */}
 
 Use the [auth wrapper pattern](/members-area/overview#auth-wrapper-pattern-recommended) (`@extends`) so the login check and common data load happen once across all course pages:
 
@@ -387,6 +391,7 @@ Then each course page:
 ---
 
 ## Checking access to a specific product
+{/* SCREENSHOT: Checking access to a specific product · relevant screen or example output · desktop */}
 
 If you want to gate course access by checking whether the customer bought a specific product (rather than relying on enrollment), you can cross-reference with `getOrders()`:
 
@@ -421,6 +426,7 @@ Prefer the enrollment-based check (`getCourseForCustomer`) — it is more reliab
 ---
 
 ## Lesson types and content
+{/* SCREENSHOT: Lesson types and content · relevant screen or example output · desktop */}
 
 Each lesson in `mod.contents` has a `type` field:
 
@@ -443,6 +449,7 @@ Additional fields on each lesson:
 ---
 
 ## Progress API
+{/* SCREENSHOT: Progress API · relevant screen or example output · desktop */}
 
 All progress routes are prefixed with `/api/course/courses/:courseId/`. Authentication is via the active course session (cookie). `courseId`, `moduleId`, and `contentId` are numeric IDs.
 

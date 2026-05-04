@@ -6,6 +6,7 @@ description: 'Upgrade, downgrade, or cancel existing subscriptions mid-funnel an
 Subscription upsells let you modify an existing subscription **inside your funnel flow** — upgrade it, cancel it, or swap it for a different offer — all without sending the customer through another checkout page. This is different from a standard [one-click upsell](/products/upsells), which charges the customer for an additional product. A subscription upsell changes the product the customer is *already* paying for.
 
 ## How It Works
+{/* SCREENSHOT: How It Works · product form, builder panel, or checkout example · desktop */}
 
 A typical subscription upsell flow looks like this:
 
@@ -23,6 +24,7 @@ Subscription Upsell:   ef.sub.upgrade()  → API modifies subscription → then 
 ```
 
 ## Tags
+{/* SCREENSHOT: Tags · product form, builder panel, or checkout example · desktop */}
 
 Two new bracket tags handle subscription modifications. They work with any supported gateway (ClickBank, NMI).
 
@@ -71,6 +73,7 @@ These tags do **not** redirect to a checkout page like `[BUY=]` or `[UPSELL=]`. 
 </Note>
 
 ## Template Functions
+{/* SCREENSHOT: Template Functions · product form, builder panel, or checkout example · desktop */}
 
 If you use the Backend Template Engine, you can generate subscription action URLs with template functions instead of bracket tags:
 
@@ -93,6 +96,7 @@ These produce the same output as the bracket tags. You can also use them as filt
 ```
 
 ## JavaScript API (`ef.sub`)
+{/* SCREENSHOT: JavaScript API (`ef.sub`) · product form, builder panel, or checkout example · desktop */}
 
 For full control, use the `ef.sub` namespace on `window.ef`. This is available on any page where the merchant supports subscriptions (ClickBank or NMI). The script is loaded automatically.
 
@@ -141,6 +145,7 @@ The `*ThenNavigate` methods include a built-in loading overlay with a spinner an
 </Tip>
 
 ## Subscription Containers
+{/* SCREENSHOT: Subscription Containers · product form, builder panel, or checkout example · desktop */}
 
 Three page builder containers let you show different content based on the result of a subscription API call. Drag them from the **Offer** category in the block palette.
 
@@ -202,6 +207,7 @@ You can also build this flow entirely without containers — use the `ef.sub.*` 
 </Note>
 
 ## Session Variables
+{/* SCREENSHOT: Session Variables · product form, builder panel, or checkout example · desktop */}
 
 After a subscription modification succeeds, session variables are set so the **next page load** (e.g. thank-you page) can display relevant information:
 
@@ -227,6 +233,7 @@ Use these in Backend Template Engine directives on your thank-you page:
 The order display (`<order>` tags and `getOrders()` template data) also reflects the updated product after a subscription change — the session order data is updated when the API call succeeds.
 
 ## ClickBank Configuration
+{/* SCREENSHOT: ClickBank Configuration · product form, builder panel, or checkout example · desktop */}
 
 ClickBank subscription modifications use the ClickBank REST API (Orders API for upgrades, Tickets API for cancellations). This requires a **Developer API Key** in addition to the standard merchant setup.
 
@@ -268,13 +275,15 @@ After a subscription change, ClickBank sends Instant Notification Service (INS) 
 | `UNCANCEL-REBILL` | Conversion updated — subscription reactivated |
 
 ## NMI Configuration
+{/* SCREENSHOT: NMI Configuration · product form, builder panel, or checkout example · desktop */}
 
 For NMI merchants, subscription management is handled internally by ElasticFunnels — no additional API keys are needed beyond the standard NMI merchant setup.
 
-- **Upgrade**: Updates the internal subscription record (BrandTransaction) to reflect the new product. The next billing cycle uses the new product's price and terms.
-- **Cancel**: Marks the internal subscription record as cancelled. No further billing cycles are processed.
+- **Upgrade**: Updates the subscription in ElasticFunnels so the next billing cycle uses the new product's price and terms.
+- **Cancel**: Cancels the subscription in ElasticFunnels so no further billing cycles are processed.
 
 ## Complete Flow Example
+{/* SCREENSHOT: Complete Flow Example · product form, builder panel, or checkout example · desktop */}
 
 Here's a full subscription upsell funnel for a supplement business:
 
@@ -303,6 +312,7 @@ Thank You Page
 3. **Decline all**: Customer keeps original subscription unchanged
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · product form, builder panel, or checkout example · desktop */}
 
 ### Upgrade/Cancel Not Working
 
@@ -331,6 +341,7 @@ Thank You Page
 - **409 Conflict**: Product change not allowed — check that both SKUs are valid in the pitch flow
 
 ## Related Documentation
+{/* SCREENSHOT: Related Documentation · product form, builder panel, or checkout example · desktop */}
 
 - [Upsells](/products/upsells) — Standard one-click upsell setup
 - [Buy Links](/products/buy-links) — Purchase button configuration

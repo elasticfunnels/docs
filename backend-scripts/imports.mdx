@@ -6,6 +6,7 @@ description: 'Share and reuse code between backend scripts by importing from oth
 Backend scripts support `import` / `export` syntax to share functions, constants, and objects between pages. Create a "module" page with exported code, then import what you need in any other page's backend script.
 
 ## Quick example
+{/* SCREENSHOT: Quick example · code editor or rendered example · desktop */}
 
 Create a page (e.g. slug `app`) with shared functions:
 
@@ -37,6 +38,7 @@ Import and use them in another page:
 ```
 
 ## Import specifier formats
+{/* SCREENSHOT: Import specifier formats · code editor or rendered example · desktop */}
 
 All of these resolve to the same page slug `app`:
 
@@ -59,6 +61,7 @@ import { helper } from "utils/helpers";  // resolves to page slug "utils/helpers
 ```
 
 ## Named imports
+{/* SCREENSHOT: Named imports · code editor or rendered example · desktop */}
 
 Import specific exports by name:
 
@@ -83,6 +86,7 @@ setVariable('total', formatCurrency(price + tax));
 ```
 
 ## Default imports
+{/* SCREENSHOT: Default imports · code editor or rendered example · desktop */}
 
 Use `export default` for a module's primary export:
 
@@ -104,6 +108,7 @@ setVariable('support_email', config.supportEmail);
 ```
 
 ## Multiple modules
+{/* SCREENSHOT: Multiple modules · code editor or rendered example · desktop */}
 
 Import from several pages in the same script:
 
@@ -121,6 +126,7 @@ Import from several pages in the same script:
 ```
 
 ## Module pages work on their own
+{/* SCREENSHOT: Module pages work on their own · code editor or rendered example · desktop */}
 
 A page with `export` statements still works when visited directly — the `export` keywords are silently stripped before execution. This means you can add `setVariable` calls alongside exports for the module page's own rendering:
 
@@ -141,6 +147,7 @@ A page with `export` statements still works when visited directly — the `expor
 When another page imports `getPlans`, only the function is used — the `setVariable` call in the module runs inside the importing page's context too (both scripts share the same sandbox).
 
 ## Supported export syntax
+{/* SCREENSHOT: Supported export syntax · code editor or rendered example · desktop */}
 
 | Syntax | Supported |
 |--------|-----------|
@@ -154,6 +161,7 @@ When another page imports `getPlans`, only the function is used — the `setVari
 | `export { name1, name2 }` | Yes |
 
 ## Limits
+{/* SCREENSHOT: Limits · code editor or rendered example · desktop */}
 
 | Constraint | Value |
 |-----------|-------|
@@ -186,6 +194,7 @@ export function merge(input) {
 ```
 
 ## How imports work
+{/* SCREENSHOT: How imports work · code editor or rendered example · desktop */}
 
 When a backend script contains `import` statements:
 

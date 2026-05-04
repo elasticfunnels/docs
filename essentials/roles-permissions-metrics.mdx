@@ -4,6 +4,7 @@ description: How organization roles control menus, features, actions, and dashbo
 ---
 
 ## Overview
+{/* SCREENSHOT: Overview · relevant screen or example output · desktop */}
 
 ElasticFunnels uses **organization roles** to decide what each teammate can access. A role has:
 
@@ -13,6 +14,7 @@ ElasticFunnels uses **organization roles** to decide what each teammate can acce
 Owners always have full access. Users **not** in an organization (standalone brands) are not restricted by these lists.
 
 ## How access is decided
+{/* SCREENSHOT: How access is decided · relevant screen or example output · desktop */}
 
 Most areas of the app check more than one thing:
 
@@ -28,6 +30,7 @@ That means a user can sometimes:
 - have access to a feature, but still see no dashboard metrics
 
 ## What permissions affect
+{/* SCREENSHOT: What permissions affect · relevant screen or example output · desktop */}
 
 - **Sidebar and navigation**: Menu entries check both permissions and related modules.
 - **Screens and actions**: Buttons, create flows, update actions, and exports can be restricted separately.
@@ -35,6 +38,7 @@ That means a user can sometimes:
 - **Dashboard analytics**: Metrics, cards, and the metrics table are controlled by metric access, not only by feature permissions.
 
 ## Metrics vs permissions
+{/* SCREENSHOT: Metrics vs permissions · relevant screen or example output · desktop */}
 
 Permissions control **features** (pages, conversions, settings, etc.). **Metrics** control **dashboard numbers** (sales, revenue, cards, breakdown tables).
 
@@ -47,6 +51,7 @@ If your role has **no metrics** assigned, the dashboard will **not** show:
 You may still be able to use reports, conversions, customers, pages, or settings if your feature permissions allow them.
 
 ## Common examples
+{/* SCREENSHOT: Common examples · relevant screen or example output · desktop */}
 
 ### Reports behavior
 
@@ -62,6 +67,7 @@ If a user only has access to one report child, such as **Customers** or **Conver
 Billing visibility uses permissions such as `billing.invoices.view` and `billing.cards.view` (not the shorter `billing.invoices` labels).
 
 ## How to set up a restricted role
+{/* SCREENSHOT: How to set up a restricted role · relevant screen or example output · desktop */}
 
 For a practical setup flow:
 
@@ -71,6 +77,7 @@ For a practical setup flow:
 4. Test with a real restricted user account before assigning the role broadly.
 
 ## Tips for admins
+{/* SCREENSHOT: Tips for admins · relevant screen or example output · desktop */}
 
 1. Start from a template role close to what you need, then remove permissions.
 2. If someone sees a menu item but gets errors loading data, check both **permissions** and **module** toggles for the brand.
@@ -78,6 +85,7 @@ For a practical setup flow:
 4. Treat view, export, create, and update as separate capabilities. In some areas, being able to see a list does not mean the user can export or create.
 
 ## Next steps
+{/* SCREENSHOT: Next steps · relevant screen or example output · desktop */}
 
 - Use the [Permission Matrix](/essentials/permission-matrix) to map common capabilities to permission keys.
 - Use [Restricted Role Troubleshooting](/essentials/restricted-role-troubleshooting) for setup examples and debugging steps.

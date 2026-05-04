@@ -6,6 +6,7 @@ description: 'Build custom data applications on top of ElasticFunnels with the C
 The CRM module lets you define custom entity types, fields, pipelines, and stages — then store structured data entries linked to any record in the system. Think of it as both a **customer relations management** tool and a **general-purpose data platform** (like Webflow CMS Collections). You can create traditional pipeline-based entities (deals, contacts) or standalone data collections (properties, inventory, cities).
 
 ## How entries attach to records
+{/* SCREENSHOT: How entries attach to records · CRM workspace or workflow screen · desktop */}
 
 Each CRM entry is linked to a record in your funnel or store through two values:
 
@@ -17,6 +18,7 @@ Each CRM entry is linked to a record in your funnel or store through two values:
 This pattern lets you attach structured data to customers, orders, or custom reference types you define.
 
 ## Concepts
+{/* SCREENSHOT: Concepts · CRM workspace or workflow screen · desktop */}
 
 <Note>
 **Entries vs. Fields**: An **entry** is a single record or document stored in the CRM (like a row in a database, representing e.g. a specific check-in for a customer). A **field** is a specific piece of data that lives inside an entry (like a column, e.g. "current_weight" or "deal_value").
@@ -118,6 +120,7 @@ RemoveCrmRelation({
 Pipelines represent workflows (CRM mode only). Each pipeline contains ordered stages with optional colors and semantic statuses (e.g. `won`, `lost`, `active`). Entries move through stages as they progress.
 
 ## Customer CRM Data
+{/* SCREENSHOT: Customer CRM Data · CRM workspace or workflow screen · desktop */}
 
 The most common pattern is linking CRM entries to customers. When a customer visits a page, their session supplies the customer context so CRM defaults attach to the right person (creating the customer record when needed).
 
@@ -157,6 +160,7 @@ if (weight && goal && Number(weight) <= Number(goal)) {
 Customer CRM entries are visible in the **Customer Details** page under the **CRM** tab. This shows all CRM entries linked to that customer across all entity types.
 
 ## Functions
+{/* SCREENSHOT: Functions · CRM workspace or workflow screen · desktop */}
 
 The following functions are available in both the template engine and backend scripts. Write functions accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
 

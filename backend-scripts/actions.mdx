@@ -6,6 +6,7 @@ description: 'Side-effect functions: session, cookies, redirects, response contr
 Action functions let your backend script perform side-effects — set session data, cookies, redirect the visitor, inject template variables, or send custom responses.
 
 ## Session
+{/* SCREENSHOT: Session · code editor or rendered example · desktop */}
 
 Read and write values in the visitor's server-side session.
 
@@ -79,6 +80,7 @@ var ok = await session.setFromToken(headerToken);
 `session.setFromToken(token)` returns `true` on success, `false` on any failure (tamper, expiry, replay, wrong brand). It never throws.
 
 ## Cookies
+{/* SCREENSHOT: Cookies · code editor or rendered example · desktop */}
 
 Set or delete cookies on the visitor's browser.
 
@@ -103,6 +105,7 @@ Some cookie names are reserved and cannot be set or deleted. Use your own cookie
 </Note>
 
 ## Redirect
+{/* SCREENSHOT: Redirect · code editor or rendered example · desktop */}
 
 Redirect the visitor to a different URL. This **stops** page rendering — the visitor is immediately sent to the new URL.
 
@@ -121,6 +124,7 @@ Only relative paths (`/path`) and `http://` / `https://` URLs are allowed. Other
 </Warning>
 
 ## Template Variables
+{/* SCREENSHOT: Template Variables · code editor or rendered example · desktop */}
 
 Inject values into the template engine. These become available as `{{ var.key }}` in page HTML.
 
@@ -178,6 +182,7 @@ In short: `var.` is only for the **top-level** reference to variables set by `se
 Variables set with `setVariable` take precedence over brand variables with the same key.
 
 ## Response Headers
+{/* SCREENSHOT: Response Headers · code editor or rendered example · desktop */}
 
 Set custom HTTP response headers.
 
@@ -191,6 +196,7 @@ For security, certain response headers cannot be set (e.g. those that control co
 </Note>
 
 ## Custom Response
+{/* SCREENSHOT: Custom Response · code editor or rendered example · desktop */}
 
 Send a custom response instead of the rendered page. These **stop** page rendering.
 
@@ -220,6 +226,7 @@ response.send('<html><body><h1>Maintenance</h1></body></html>');
 ```
 
 ## Logging and errors
+{/* SCREENSHOT: Logging and errors · code editor or rendered example · desktop */}
 
 `console.log`, `console.info`, `console.warn`, and `console.error` are captured and stored in execution logs. Use them for debugging.
 

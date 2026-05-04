@@ -1,9 +1,9 @@
 ---
 title: 'Pages Overview'
-description: 'Complete guide to creating, customizing, and managing pages in ElasticFunnels'
+description: 'Create, edit, test, and publish pages in ElasticFunnels'
 ---
 
-Pages are the building blocks of your funnels. They're where visitors land, engage with your content, and take action. This section covers everything you need to know about creating and managing pages in ElasticFunnels.
+Pages are the building blocks of your funnels. They are where visitors land, read your offer, buy, opt in, or move to the next step.
 
 ## What Are Pages?
 
@@ -18,10 +18,17 @@ Pages are individual web pages that make up your funnels. Each page can be:
 
 ### Page Types
 
-ElasticFunnels supports two page creation methods:
+From **Create Page**, choose the starting point that fits the job:
 
-1. **Visual Builder** - Drag-and-drop interface for easy page creation
-2. **Code Editor** - Full HTML/CSS/JavaScript control for advanced customization
+1. **AI Page Builder** - Describe what you need; the app generates a draft you refine in the builder (beta).
+2. **AI Page Cloner** - Import a public URL into an editable page when your plan includes it.
+3. **Arbitrage Page Builder** - Guided flow tuned for arbitrage-style landers.
+4. **Drag and Drop Builder** - Page details, then the visual canvas.
+5. **Choose Template** - Pick from the template library, then finish the prompts.
+6. **Checkout Page** - Shown only when payments are set up; checkout-oriented templates (Stripe, NMI, PayPal, Klarna, and similar).
+7. **Code Editor** - Page details, then HTML, CSS, and JavaScript.
+
+For the full Create Page walkthrough, see [Create Landing Page](/pages/create-landing-page).
 
 ### Page Variants
 
@@ -38,17 +45,19 @@ Pages support dynamic content that changes based on:
 
 ## Getting Started
 
+{/* SCREENSHOT: Pages area · sidebar Pages + main list (optional) · desktop */}
+
 ### Create Your First Page
 
-1. **Navigate to Pages** in your dashboard
-2. **Click "Create Page"** and give it a name
-3. **Choose a domain** (optional - defaults to all domains)
-4. **Select page type** (Visual Builder or Code Editor)
-5. **Start building** your page content
+1. Open **Pages** in the sidebar.
+2. Click **Create Page**. Choose AI, a template, drag-and-drop, code, or checkout when your brand supports it.
+3. Pick the card that matches how you want to work.
+4. Complete **page details**, template questions, or the AI flow the app shows for that path.
+5. Build in the builder or editor, preview, then publish or leave the page on draft.
 
 <CardGroup cols={2}>
   <Card title="Create Landing Page" icon="file-plus" href="/pages/create-landing-page">
-    Learn how to build effective landing pages using the visual page builder
+    Choose AI, templates, drag-and-drop, code, or checkout when your brand supports it
   </Card>
   <Card title="Page Variants" icon="layers" href="/pages/page-variants">
     Create and manage multiple versions of your pages for split testing
@@ -59,6 +68,8 @@ Pages support dynamic content that changes based on:
 </CardGroup>
 
 ## Page Features
+
+{/* SCREENSHOT: Page builder or editor · canvas or code view with sidebar · desktop */}
 
 ### Containers
 
@@ -72,7 +83,7 @@ Containers are specialized page elements that add dynamic behavior:
 - **Whitelisted/Non-Whitelisted Containers** - Show different content based on visitor status
 
 <Card title="Containers" icon="box" href="/pages/containers">
-  Complete guide to using containers for dynamic content display
+  Use containers for dynamic content display
 </Card>
 
 ### Interactions
@@ -174,7 +185,7 @@ Pages can display content that changes based on:
 
 ### Integration with Funnels
 
-Pages work seamlessly with funnels:
+Pages connect inside funnels:
 - **Funnel nodes** - Connect pages in your funnel flow
 - **Split testing** - Test different page variants
 - **Page events** - Trigger actions based on page interactions

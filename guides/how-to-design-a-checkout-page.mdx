@@ -8,6 +8,7 @@ This guide walks through building checkout pages with the page builder or code e
 ---
 
 ## Prerequisites
+{/* SCREENSHOT: Prerequisites · relevant screen or example output · desktop */}
 
 1. The page must have **"Is checkout page"** enabled (Page List → Edit Page → toggle on).
 2. A product must be linked via a [buy link](/products/buy-links) or cart.
@@ -20,6 +21,7 @@ Quiz pages that process payments must **also** have "Is checkout page" enabled. 
 ---
 
 ## Example 1: Standard checkout
+{/* SCREENSHOT: Example 1: Standard checkout · relevant screen or example output · desktop */}
 
 The most common layout: shipping address at the top, billing (same as shipping by default), payment panel with card form and wallet buttons, then a pay button.
 
@@ -215,6 +217,7 @@ Apple Pay and Google Pay buttons appear automatically in the payment panel when 
 ---
 
 ## Example 2: Wallet-first checkout
+{/* SCREENSHOT: Example 2: Wallet-first checkout · relevant screen or example output · desktop */}
 
 For quiz funnels or lightweight pages where you want wallet buttons prominently at the top. This uses the **same blocks and backend processing** as the standard checkout — the only difference is layout order.
 
@@ -333,6 +336,7 @@ Both examples use the same `checkout-details`, `checkout-cc-panel`, and `checkou
 ---
 
 ## Example 3: Minimal digital product checkout
+{/* SCREENSHOT: Example 3: Minimal digital product checkout · relevant screen or example output · desktop */}
 
 For digital products where you only need email and payment — no name or address fields. The card panel automatically adds a cardholder name field and billing details since they're missing from the page.
 
@@ -366,6 +370,7 @@ What happens automatically:
 ---
 
 ## Configuration options
+{/* SCREENSHOT: Configuration options · relevant screen or example output · desktop */}
 
 These are set via `checkout_settings` in a `<script scope="backend">` block. See [Checkout functionality reference](/checkouts/checkout-functionality-reference#4-checkout_settings-backend-script) for full details.
 
@@ -380,6 +385,7 @@ These are set via `checkout_settings` in a `<script scope="backend">` block. See
 ---
 
 ## Page builder vs code editor
+{/* SCREENSHOT: Page builder vs code editor · relevant screen or example output · desktop */}
 
 Both examples above show raw HTML for the code editor. In the **page builder**, use the **Checkout** block category:
 
@@ -397,6 +403,7 @@ Drag these blocks in your preferred order. For a wallet-first layout, place **Cr
 ---
 
 ## Related docs
+{/* SCREENSHOT: Related docs · relevant screen or example output · desktop */}
 
 - [Checkout functionality reference](/checkouts/checkout-functionality-reference) — scope keys, `checkout_settings`, abuse protection, submit flow
 - [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` bindings and template patterns

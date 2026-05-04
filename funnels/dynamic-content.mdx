@@ -6,6 +6,7 @@ description: 'Create content that changes based on user behavior, location, or o
 Dynamic content automatically updates elements for scenarios like showing special pricing to certain affiliates or location-based offers.
 
 ## Core Concepts
+{/* SCREENSHOT: Core Concepts · funnel builder, page events, or published flow · desktop */}
 
 Before setting up, it helps to understand the relationship between containers and components:
 
@@ -17,6 +18,7 @@ Before setting up, it helps to understand the relationship between containers an
   - **3 Alternative Versions** built and saved as **Custom Components** (swapped in when conditions are met).
 
 ## Setup
+{/* SCREENSHOT: Setup · funnel builder, page events, or published flow · desktop */}
 
 ### Step 1: Create Custom Components
 Dynamic content works by swapping **Custom Components**. You cannot dynamically swap raw elements (like Divs or Sections) unless they are converted first.
@@ -48,6 +50,7 @@ You can use any logic within the **[Page Events](/funnels/page-events)** system 
 > - **Components not appearing in list**: Ensure you have **saved the page** after creating your components. Click the **reload icon** next to the component dropdown to refresh the list.
 
 ## Use Cases
+{/* SCREENSHOT: Use Cases · funnel builder, page events, or published flow · desktop */}
 
 - **Affiliate-specific content**: Show different pricing or bonuses based on referral source
 - **Location-based offers**: Display region-specific content or pricing
@@ -56,6 +59,7 @@ You can use any logic within the **[Page Events](/funnels/page-events)** system 
 - **Time-sensitive offers**: Display content based on time of day or date ranges
 
 ## HTML Reference
+{/* SCREENSHOT: HTML Reference · funnel builder, page events, or published flow · desktop */}
 
 The page builder inserts dynamic containers automatically when you use **Wrap in → Dynamic Container**, but you can write the HTML directly when editing page source.
 
@@ -162,7 +166,7 @@ If the component code is not found, the server renders an inline error:
 <component type="general-footer"></component>
 ```
 
-**Example: Dynamic container resolved to a component (under the hood)**
+**Example: dynamic container resolved to a component**
 
 When a `<dynamic-container>` matches a Page Events rule, the server internally converts it to a `<component>` embed before the final HTML is sent:
 
@@ -176,6 +180,7 @@ When a `<dynamic-container>` matches a Page Events rule, the server internally c
 ---
 
 ## Advanced Tips
+{/* SCREENSHOT: Advanced Tips · funnel builder, page events, or published flow · desktop */}
 
 - Use multiple conditions for more precise targeting
 - Test your dynamic content thoroughly across different scenarios

@@ -4,10 +4,12 @@ description: "Configure payment retry schedules, dunning emails, and callcenter 
 ---
 
 ## What is dunning?
+{/* SCREENSHOT: What is dunning? · email editor or template settings · desktop */}
 
 Dunning is the process of retrying failed subscription payments and communicating with customers about payment issues. ElasticFunnels automates this with configurable retry schedules and escalating email notifications.
 
 ## Retry schedule
+{/* SCREENSHOT: Retry schedule · email editor or template settings · desktop */}
 
 When a subscription payment fails, ElasticFunnels automatically retries based on your configured schedule. The default schedule is:
 
@@ -23,6 +25,7 @@ When a subscription payment fails, ElasticFunnels automatically retries based on
 After the final notice, if payment is still unsuccessful, the subscription is automatically canceled and the [Subscription Canceled](/emails/subscription-emails#subscription-canceled) email is sent.
 
 ## Configuring the retry schedule
+{/* SCREENSHOT: Configuring the retry schedule · email editor or template settings · desktop */}
 
 The retry schedule is configured in **Brand Settings > Subscriptions**. You can adjust:
 
@@ -31,6 +34,7 @@ The retry schedule is configured in **Brand Settings > Subscriptions**. You can 
 - **Final grace period** — Days after the last retry before cancellation
 
 ## Escalating email urgency
+{/* SCREENSHOT: Escalating email urgency · email editor or template settings · desktop */}
 
 The `renewal-failed` template uses the `subscription.retry_count` variable to escalate urgency:
 
@@ -50,6 +54,7 @@ The `renewal-failed` template uses the `subscription.retry_count` variable to es
 ```
 
 ## Dunning final notice
+{/* SCREENSHOT: Dunning final notice · email editor or template settings · desktop */}
 
 The `dunning-final` template is sent as a last resort before cancellation. It features:
 
@@ -59,16 +64,19 @@ The `dunning-final` template is sent as a last resort before cancellation. It fe
 - An "Update Payment Method" CTA
 
 ## Callcenter escalation
+{/* SCREENSHOT: Callcenter escalation · email editor or template settings · desktop */}
 
 If you have the Callcenter module enabled, failed payments can be escalated to your support team automatically. When a payment fails beyond a configurable threshold, a task is created in the callcenter queue for an agent to call the customer.
 
 Configure escalation in **Brand Settings > Subscriptions > Callcenter Escalation**.
 
 ## Support contact in emails
+{/* SCREENSHOT: Support contact in emails · email editor or template settings · desktop */}
 
 The `brand.support_phone` and `brand.support_email` variables (from Brand Settings > General) are shown in dunning emails to give customers a way to resolve payment issues. Make sure these are configured before enabling dunning.
 
 ## Related
+{/* SCREENSHOT: Related · email editor or template settings · desktop */}
 
 - [Subscription Emails](/emails/subscription-emails) — All subscription email templates
 - [Emails & Dunning settings](/subscriptions/emails-and-dunning) — Subscription settings reference

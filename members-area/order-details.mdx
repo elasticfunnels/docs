@@ -6,6 +6,7 @@ description: 'Display order history, products, tracking, and shipping informatio
 ElasticFunnels provides two ways to display order information on your pages: the `<order>` HTML tag (for the visual builder) and backend functions like `getOrders()` / `getOrder()` / `getSessionOrders()` / `getPurchasedProducts()` for code-based pages. Both retrieve data from the customer's purchase history.
 
 ## Two Approaches
+{/* SCREENSHOT: Two Approaches · members area screen · desktop */}
 
 | Approach | Best for | Used in |
 |----------|----------|---------|
@@ -19,6 +20,7 @@ For a member-area page that needs **each purchased product with its included bon
 </Tip>
 
 ## Using the `<order>` Tag
+{/* SCREENSHOT: Using the `<order>` Tag · members area screen · desktop */}
 
 The `<order>` tag is processed server-side and automatically loops through the customer's purchase history. See the full [Order Tag](/pages/order-tag) reference for all placeholders and options.
 
@@ -41,6 +43,7 @@ The `<order>` tag is processed server-side and automatically loops through the c
 ```
 
 ## Using `getOrders()` in Backend Scripts
+{/* SCREENSHOT: Using `getOrders()` in Backend Scripts · members area screen · desktop */}
 
 For code-based pages (`.ef` files or pages with backend scripts), `getOrders()` gives you full control over the layout. It returns an array of order objects you can loop through with `@foreach`.
 
@@ -92,6 +95,7 @@ You can also call `getOrders()` directly in a `@set` directive without a backend
 ```
 
 ## Using `getOrder()` for a Single Order Detail Page
+{/* SCREENSHOT: Using `getOrder()` for a Single Order Detail Page · members area screen · desktop */}
 
 When you already know which order to show, use `getOrder(code)` instead of loading the full order list and searching manually. This is ideal for pages like `/members-order?order=EF-12345`.
 
@@ -140,6 +144,7 @@ For an order detail page, prefer `getOrder(request.query.order)` over `getOrders
 </Tip>
 
 ## Fulfillment status and shipments
+{/* SCREENSHOT: Fulfillment status and shipments · members area screen · desktop */}
 
 Use **`getOrderFulfillment(code)`** on an **order detail** page to show 3PL fulfillment status and timestamps. Responses are **allowlisted** (no raw provider payloads).
 
@@ -234,6 +239,7 @@ Each order returned by `getOrders()` or `getOrder()` contains:
 ```
 
 ## Displaying Tracking Information
+{/* SCREENSHOT: Displaying Tracking Information · members area screen · desktop */}
 
 If your orders have physical shipments, tracking information is automatically extracted from fulfillment data. The system checks multiple sources for tracking numbers:
 
@@ -294,6 +300,7 @@ Tracking numbers are auto-linked to [17track.net](https://17track.net) when no c
 </Tip>
 
 ## `getSessionOrders()` — Current Session Orders
+{/* SCREENSHOT: `getSessionOrders()` — Current Session Orders · members area screen · desktop */}
 
 `getSessionOrders()` returns only the orders that were placed during the current browser session. Unlike `getOrders()`, which returns the full purchase history for a customer, `getSessionOrders()` is scoped to the active checkout session — making it the right choice for thank-you pages where you only want to show what was just bought.
 
@@ -326,6 +333,7 @@ Prefer `getSessionOrders()` over `getOrders('newest', 1)` on thank-you pages. A 
 </Tip>
 
 ## Thank You Pages
+{/* SCREENSHOT: Thank You Pages · members area screen · desktop */}
 
 Thank-you pages are a natural place to show order details. Since the customer is auto-authenticated from checkout, order data is available immediately.
 
@@ -367,6 +375,7 @@ If the order hasn't been indexed yet when the thank-you page loads, `getSessionO
 </Tip>
 
 ## Customer Data Outside of Orders
+{/* SCREENSHOT: Customer Data Outside of Orders · members area screen · desktop */}
 
 You can also display customer information directly using the `customer` template object (populated from the session):
 
@@ -378,6 +387,7 @@ You can also display customer information directly using the `customer` template
 The `customer` object includes: `name`, `email`, `first_name`, `last_name`, `phone`, `order_id`, `order_ids`, and full billing/shipping address fields. It is automatically available in every backend script and template — no function call needed.
 
 ## Order Grouping
+{/* SCREENSHOT: Order Grouping · members area screen · desktop */}
 
 Orders are grouped intelligently — multiple conversions from the same purchase session (e.g., a main product and an upsell bought in the same checkout flow) are combined into a single order. The grouping logic uses:
 
@@ -387,6 +397,7 @@ Orders are grouped intelligently — multiple conversions from the same purchase
 This means an upsell purchased immediately after the main product shows under the same order, not as a separate entry.
 
 ## Related Documentation
+{/* SCREENSHOT: Related Documentation · members area screen · desktop */}
 
 <CardGroup cols={2}>
   <Card title="Order Tag Reference" icon="receipt" href="/pages/order-tag">

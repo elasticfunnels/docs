@@ -3,18 +3,20 @@ title: 'Shopify Checkout'
 description: 'Set up Shopify Checkout (cart redirect) as a merchant, assign to a domain, and map products to Shopify variant IDs'
 ---
 
-This guide explains how to set up Shopify Checkout as a merchant. When a visitor clicks a buy link, they are redirected to your Shopify store’s cart and then to Shopify’s native checkout. The overall flow matches the generic merchant setup; use this page for Shopify Checkout–specific notes.
+This guide explains how to set up Shopify Checkout as a merchant. When a visitor clicks a buy link, they are redirected to your Shopify store's cart and then to Shopify's native checkout. The overall flow matches the generic merchant setup; use this page for Shopify Checkout-specific notes.
 
 <Note>
 **Shopify Checkout** sends customers to your Shopify cart (cart redirect). For draft-order checkout with Shop Pay one-click and bump support, see [Shop Pay](/merchants/shop-pay) instead.
 </Note>
 
 ## Prerequisites
+{/* SCREENSHOT: Prerequisites · merchant setup screen or postback state · desktop */}
 
 - A Shopify store with products (and variants, if you use multiple variants)
 - Admin access to your Shopify store and to ElasticFunnels
 
 ## Step 1: Connect Shopify and enable Shopify Checkouts
+{/* SCREENSHOT: Step 1: Connect Shopify and enable Shopify Checkouts · merchant setup screen or postback state · desktop */}
 
 1. Go to **Integrations** → **Operations**, find **Shopify**, and connect your store (see [Shopify Order Sync](/integrations/shopify-order-sync) for the full flow)
 2. Enable **Shopify Checkouts** so postbacks are received for orders created, updated, or deleted in your store
@@ -22,12 +24,14 @@ This guide explains how to set up Shopify Checkout as a merchant. When a visitor
 When you enable **Shopify Checkouts**, a **Shopify Checkouts** merchant is created automatically and linked to the integration. You do not need to create the merchant manually.
 
 ## Step 2: Assign merchant to domain
+{/* SCREENSHOT: Step 2: Assign merchant to domain · merchant setup screen or postback state · desktop */}
 
 1. Go to **Settings** → **Domains** → **Edit Domain**
 2. Select your **Shopify Checkouts** merchant (created in Step 1)
 3. Save
 
 ## Step 3: Map products
+{/* SCREENSHOT: Step 3: Map products · merchant setup screen or postback state · desktop */}
 
 Each product must be linked to a **Shopify variant ID** (a numeric ID from your Shopify store).
 
@@ -47,16 +51,18 @@ Every Shopify product has at least one variant. Use the variant ID, not the prod
 </Info>
 
 ## How it works
+{/* SCREENSHOT: How it works · merchant setup screen or postback state · desktop */}
 
 In your funnel, buy links use your **product code** (the same code you use for other gateways). When a visitor clicks add to cart or a buy link, we look up the **Shopify variant ID** you mapped for that product in **Merchant information** and redirect them to your Shopify store.
 
 - They are redirected to your Shopify store at `/cart/{variantId}:1` (one unit of that variant)
 - The click ID is passed as a cart attribute so conversions can be tracked
-- From the cart they proceed to Shopify’s native checkout
+- From the cart they proceed to Shopify's native checkout
 
-Shopify Checkout does **not** support upsells in the same flow — it is a simple cart redirect. For upsells and one-click Shop Pay, use [Shop Pay](/merchants/shop-pay) instead.
+Shopify Checkout does **not** support upsells in the same flow. It is a simple cart redirect. For upsells and one-click Shop Pay, use [Shop Pay](/merchants/shop-pay) instead.
 
 ## Links and Funnels
+{/* SCREENSHOT: Links and Funnels · merchant setup screen or postback state · desktop */}
 
 Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded Shopify cart URLs.
 
@@ -65,12 +71,14 @@ Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain an
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
 
 ## Postbacks
+{/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
 Orders from your Shopify store (including those that started from a funnel cart link) are reported via the Shopify integration. Ensure **Shopify Checkouts** is enabled in your **Shopify** integration (**Integrations** → **Operations**) so postbacks are received for orders created, updated, or deleted in the store.
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
 
-- **"Product missing Shopify variant ID"**: In the product’s **Merchant information** tab, enter the Shopify variant ID for the Shopify Checkout merchant. Use the steps above to find the variant ID in Shopify Admin.
+- **"Product missing Shopify variant ID"**: In the product's **Merchant information** tab, enter the Shopify variant ID for the Shopify Checkout merchant. Use the steps above to find the variant ID in Shopify Admin.
 - **"Shopify Checkout requires a linked Shopify integration"**: Connect Shopify under **Integrations** → **Operations** and ensure the merchant or domain is linked to that integration so the store domain is available.
 - **Wrong gateway on checkout**: Verify the domain is assigned to your Shopify Checkout merchant.
 - **Link not working**: Confirm the product has the correct Shopify variant ID in **Merchant information** for this merchant.

@@ -4,6 +4,7 @@ description: 'Prevent and manage chargebacks with automated alert monitoring, au
 ---
 
 ## Overview
+{/* SCREENSHOT: Overview · integration settings or log state · desktop */}
 
 The chargeback management integration connects ElasticFunnels to third-party chargeback prevention services. When a customer initiates a dispute with their bank, these services detect it **before** it becomes a formal chargeback and notify ElasticFunnels in real time. You can then auto-refund the transaction to prevent the chargeback, or fight it with evidence.
 
@@ -12,14 +13,25 @@ The chargeback management integration connects ElasticFunnels to third-party cha
 </Info>
 
 ## Supported Providers
+{/* SCREENSHOT: Supported Providers · integration settings or log state · desktop */}
 
 <CardGroup cols={2}>
   <Card title="Dispute.com" icon="shield-check">
     Alert monitoring (Ethoca & Verifi CDRN), Rapid Dispute Resolution (RDR), and chargeback representment.
   </Card>
+  <Card title="Chargebacks911" icon="shield-halved">
+    Real-time pre-chargeback alerts and case updates via webhook. Order data is pushed back to Chargebacks911 for better transaction matching and representment.
+  </Card>
 </CardGroup>
 
+<Info>
+  Both providers can run in parallel — for example, Dispute.com for alert auto-refunds and Chargebacks911 for representment on filed chargebacks. Each integration is assigned to merchants independently.
+</Info>
+
 ## How It Works
+{/* SCREENSHOT: How It Works · integration settings or log state · desktop */}
+
+### Dispute.com flow
 
 Dispute.com monitors card network activity for your merchant accounts. When a customer begins a dispute process, the flow is:
 
@@ -35,7 +47,17 @@ If a chargeback is filed despite prevention (or no alert was received), Dispute.
 
 For Visa transactions, Dispute.com can automatically resolve disputes through Visa's RDR program before they become chargebacks. These are logged in your dashboard as auto-resolved cases.
 
+### Chargebacks911 flow
+
+Chargebacks911 monitors card-network activity (Visa, Mastercard) on your merchant accounts and sends alerts and case updates over webhook. The flow is:
+
+1. **Order pushed** — When a conversion is created in ElasticFunnels for an eligible merchant, order data (transaction ID, customer, amount, products) is sent to Chargebacks911 to power transaction matching.
+2. **Alert received** — Chargebacks911 detects a pre-chargeback alert or case update and posts it to ElasticFunnels.
+3. **Auto-refund check** — If you've enabled auto-refund and the alert matches your rules, ElasticFunnels refunds the original transaction through the payment gateway.
+4. **Case updates** — Status changes (won, lost, in_progress) are posted as additional webhook events and surfaced in the Chargebacks page.
+
 ## Eligible Gateways
+{/* SCREENSHOT: Eligible Gateways · integration settings or log state · desktop */}
 
 Chargeback management requires a gateway where ElasticFunnels has direct API access to issue refunds:
 
@@ -50,7 +72,8 @@ Chargeback management requires a gateway where ElasticFunnels has direct API acc
 
 When you set up the integration, the merchant selector only shows merchants using eligible gateways. Merchants on unsupported gateways are automatically excluded.
 
-## Setup
+## Setup — Dispute.com
+{/* SCREENSHOT: Setup · integration settings or log state · desktop */}
 
 <Steps>
   <Step title="Get your Dispute.com API key">
@@ -77,11 +100,33 @@ When you set up the integration, the merchant selector only shows merchants usin
   </Step>
 </Steps>
 
+## Setup — Chargebacks911
+{/* SCREENSHOT: Chargebacks911 setup · integration settings · desktop */}
+
+<Steps>
+  <Step title="Get your Chargebacks911 credentials">
+    Contact your Chargebacks911 account manager and request API access. You'll receive credentials used for the order-push API and a webhook secret used to verify incoming alerts.
+  </Step>
+  <Step title="Create the integration">
+    In ElasticFunnels, go to **Settings → Integrations**, click **Add Integration**, and select **Chargebacks911** under the Chargeback category. Enter your credentials and save.
+  </Step>
+  <Step title="Send the webhook URL">
+    Copy the **Webhook URL** shown on the integration form and send it to your Chargebacks911 contact so they can configure outbound alerts to ElasticFunnels.
+  </Step>
+  <Step title="Configure merchant filtering">
+    Assign the integration to specific merchants (recommended) or all eligible merchants. Order data is only pushed for merchants in scope.
+  </Step>
+  <Step title="(Optional) Enable auto-refund">
+    The same auto-refund rules described above apply to Chargebacks911 alerts. Configure them on the integration form if you want EF to refund automatically before a chargeback is filed.
+  </Step>
+</Steps>
+
 <Tip>
   Start with a conservative auto-refund threshold (e.g., $30–$50) and monitor the results before increasing it. You can always manually handle higher-value alerts.
 </Tip>
 
 ## Auto-Refund Rules
+{/* SCREENSHOT: Auto-Refund Rules · integration settings or log state · desktop */}
 
 Auto-refund rules are processed entirely by ElasticFunnels when an alert arrives from Dispute.com. The rules are evaluated in order:
 
@@ -99,6 +144,7 @@ If all conditions pass, ElasticFunnels:
 If any condition fails, the alert is logged for manual review in the Chargebacks section of your dashboard.
 
 ## Monitoring
+{/* SCREENSHOT: Monitoring · integration settings or log state · desktop */}
 
 ### Chargebacks Page
 
@@ -113,6 +159,7 @@ Navigate to **Conversions → Chargebacks** to see all chargeback-related activi
 Each conversion that has chargeback activity shows a **Chargeback Services** card in the conversion drawer. This displays the alert/chargeback history, current status, and any actions taken.
 
 ## FAQ
+{/* SCREENSHOT: FAQ · integration settings or log state · desktop */}
 
 <AccordionGroup>
   <Accordion title="Do I need to set up anything on Dispute.com's side?">

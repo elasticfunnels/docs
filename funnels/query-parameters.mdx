@@ -6,6 +6,7 @@ description: 'Use URL parameters to control visitor behavior and content display
 Query Parameter Conditions allow you to create dynamic experiences based on URL parameters. This is essential for affiliate tracking, content visibility control, and personalized visitor experiences.
 
 ## Understanding Query Parameters
+{/* SCREENSHOT: Understanding Query Parameters · funnel builder, page events, or published flow · desktop */}
 
 Query parameters are the part of a URL that comes after the `?` symbol:
 - **Base URL**: `https://yoursite.com/page`
@@ -16,6 +17,7 @@ In this example:
 - `source` is a parameter with value `facebook`
 
 ## Query Parameter Condition Node
+{/* SCREENSHOT: Query Parameter Condition Node · funnel builder, page events, or published flow · desktop */}
 
 The Query Parameter Condition node checks if URL parameters exist or have specific values.
 
@@ -36,6 +38,7 @@ The Query Parameter Condition node checks if URL parameters exist or have specif
 - **Less Than** - Parameter value is less than specified number
 
 ## Common Use Cases
+{/* SCREENSHOT: Common Use Cases · funnel builder, page events, or published flow · desktop */}
 
 ### Content Whitelisting
 Use parameters to control access to full content:
@@ -84,6 +87,7 @@ Redirect based on location parameter:
 - Action: `Load Page` (US-specific page)
 
 ## Advanced Parameter Logic
+{/* SCREENSHOT: Advanced Parameter Logic · funnel builder, page events, or published flow · desktop */}
 
 ### Multiple Conditions
 You can check multiple parameters in sequence:
@@ -111,6 +115,7 @@ Ensure parameters meet specific criteria:
 - Action: `Whitelist Visitor`
 
 ## Integration with Other Features
+{/* SCREENSHOT: Integration with Other Features · funnel builder, page events, or published flow · desktop */}
 
 ### Whitelisting System
 Query parameters are the primary method for visitor whitelisting:
@@ -135,6 +140,7 @@ Parameters can trigger dynamic content changes:
 - Useful for limited-time offers or special promotions
 
 ## Best Practices
+{/* SCREENSHOT: Best Practices · funnel builder, page events, or published flow · desktop */}
 
 ### Parameter Naming
 - **Use clear names** - `vtID`, `affID`, `campaign` are descriptive
@@ -153,6 +159,7 @@ Parameters can trigger dynamic content changes:
 - **Test parameter combinations** - Ensure multiple parameters work together
 
 ## Common Parameter Patterns
+{/* SCREENSHOT: Common Parameter Patterns · funnel builder, page events, or published flow · desktop */}
 
 ### Affiliate Tracking
 Standard parameters for affiliate management:
@@ -176,6 +183,7 @@ Parameters for campaign management:
 - `utm_campaign` - UTM campaign tracking
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · funnel builder, page events, or published flow · desktop */}
 
 ### Common Issues
 - **Parameter not recognized** - Check spelling and case sensitivity
@@ -195,7 +203,8 @@ Parameters for campaign management:
 - **Test empty states** - Check what happens when parameters are missing
 - **Monitor page events** - Use debugging tools to track node execution
 
-## Advanced Implementation
+## Multi-Parameter Logic
+{/* SCREENSHOT: Multi-Parameter Logic · funnel builder, page events, or published flow · desktop */}
 
 ### Dynamic Parameter Generation
 Generate parameters dynamically:
@@ -216,5 +225,5 @@ Use parameters for API calls:
 - **Webhook integration** - Send parameter data to webhooks
 
 <Note>
-Query parameters are powerful but should be used thoughtfully. Too many parameters can make URLs unwieldy and harder to manage. Focus on the parameters that provide the most value for your specific use case.
+Keep query parameters focused. Too many parameters make URLs harder to read, test, and share.
 </Note> 

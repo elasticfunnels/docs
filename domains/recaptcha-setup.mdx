@@ -3,18 +3,19 @@ title: 'reCAPTCHA Setup'
 description: 'Configure Google reCAPTCHA v3 for domain security and spam protection'
 ---
 
-reCAPTCHA v3 provides advanced spam protection and fraud detection for your forms without interrupting user experience. This guide will walk you through setting up reCAPTCHA keys for your domains.
+reCAPTCHA v3 provides spam protection and fraud detection for your forms without interrupting user experience. This guide will walk you through setting up reCAPTCHA keys for your domains.
 
 <Info>
-**Important**: reCAPTCHA is **only used in Collection Forms** within Elastic Funnels. This includes lead capture forms, contact forms, newsletter signups, and other collection form types. It is not used for other form types or page elements.
+**Important**: reCAPTCHA is **only used in Collection Forms** within ElasticFunnels. This includes lead capture forms, contact forms, newsletter signups, and other collection form types. It is not used for other form types or page elements.
 </Info>
 
 ## Understanding reCAPTCHA v3
+{/* SCREENSHOT: Understanding reCAPTCHA v3 · domain settings or DNS setup screen · desktop */}
 
 ### What is reCAPTCHA v3?
 - **Score-based verification** - Works invisibly in the background
 - **No user interaction** - No "I'm not a robot" checkboxes
-- **Better user experience** - Seamless protection without friction
+- **Better user experience** - Runs in the background without adding a checkbox
 - **Advanced fraud detection** - Uses machine learning to detect suspicious activity
 
 ### Benefits
@@ -24,6 +25,7 @@ reCAPTCHA v3 provides advanced spam protection and fraud detection for your form
 - **Free tier** - Up to 10,000 assessments per month at no cost
 
 ## Creating reCAPTCHA Keys
+{/* SCREENSHOT: Creating reCAPTCHA Keys · domain settings or DNS setup screen · desktop */}
 
 ### Step 1: Access Google reCAPTCHA Admin
 1. Go to [Google reCAPTCHA Admin Console](https://www.google.com/recaptcha/admin/create)
@@ -32,12 +34,12 @@ reCAPTCHA v3 provides advanced spam protection and fraud detection for your form
 
 ### Step 2: Configure Your reCAPTCHA Site
 1. **Enter a Label**: 
-   - Use a descriptive name like "Elastic Funnels Domains"
+   - Use a descriptive name like "ElasticFunnels Domains"
    - This helps you identify the site later
 
 2. **Select reCAPTCHA Type**:
    - Choose **"Score based (v3)"**
-   - This is the recommended type for seamless user experience
+   - This is the recommended type for no-checkbox form experience
 
 3. **Add Domains**:
    - Click **"Add a domain"** button
@@ -46,7 +48,7 @@ reCAPTCHA v3 provides advanced spam protection and fraud detection for your form
      - `example.com`
      - `www.example.com`
    - Repeat for all domains you want to protect
-   - **Note**: You can use one reCAPTCHA key for all domains inside Elastic Funnels
+   - **Note**: You can use one reCAPTCHA key for all domains inside ElasticFunnels
 
 4. **Select Google Cloud Platform Project**:
    - Choose an existing project from the dropdown
@@ -69,7 +71,8 @@ After creating your site, you'll see two keys:
    - Keep this secure and never expose it publicly
    - Copy this value
 
-## Configuring reCAPTCHA in Elastic Funnels
+## Configuring reCAPTCHA in ElasticFunnels
+{/* SCREENSHOT: Configuring reCAPTCHA in ElasticFunnels · domain settings or DNS setup screen · desktop */}
 
 ### Step 1: Access Domain Settings
 1. Go to **Domains** in your ElasticFunnels.io dashboard
@@ -89,13 +92,14 @@ After creating your site, you'll see two keys:
 3. Click **"Save"** to apply the configuration
 
 ## Important: reCAPTCHA Usage & Cost Considerations
+{/* SCREENSHOT: Important: reCAPTCHA Usage & Cost Considerations · domain settings or DNS setup screen · desktop */}
 
 <Warning>
 **Cost Management**: Understanding how reCAPTCHA is used and optimizing placement can help you stay within the free tier and avoid unexpected costs.
 </Warning>
 
 ### Where reCAPTCHA is Used
-**reCAPTCHA is only used in Collection Forms** within Elastic Funnels. This includes:
+**reCAPTCHA is only used in Collection Forms** within ElasticFunnels. This includes:
 - Lead capture forms
 - Contact forms
 - Newsletter signups
@@ -127,6 +131,7 @@ reCAPTCHA is **not** used for other form types or page elements.
 **Use dedicated form pages** (e.g., `/contact`) instead of modal forms to avoid unnecessary reCAPTCHA API calls. This ensures reCAPTCHA assessments are only made when users actually navigate to the form page, not on every page load.
 
 ## Domain Whitelisting Best Practices
+{/* SCREENSHOT: Domain Whitelisting Best Practices · domain settings or DNS setup screen · desktop */}
 
 ### Adding Multiple Domains
 When adding domains to your reCAPTCHA site:
@@ -137,7 +142,7 @@ When adding domains to your reCAPTCHA site:
   - `www.example.com`
 - **Add all subdomains**: If you use subdomains, add them too:
   - `subdomain.example.com`
-- **One key for all domains**: You can use a single reCAPTCHA key for all your Elastic Funnels domains
+- **One key for all domains**: You can use a single reCAPTCHA key for all your ElasticFunnels domains
 
 ### Example Domain List
 For a complete setup, your domain list might look like:
@@ -150,6 +155,7 @@ subdomain.example.com
 ```
 
 ## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · domain settings or DNS setup screen · desktop */}
 
 ### Common Issues
 
@@ -176,6 +182,7 @@ subdomain.example.com
 4. **Test different domains**: Ensure all whitelisted domains work correctly
 
 ## Security Best Practices
+{/* SCREENSHOT: Security Best Practices · domain settings or DNS setup screen · desktop */}
 
 ### Key Management
 - **Keep Secret Key secure**: Never expose it in client-side code
@@ -190,6 +197,7 @@ subdomain.example.com
 - **Monitor for abuse**: Watch for suspicious activity in reCAPTCHA analytics
 
 ## Advanced Configuration
+{/* SCREENSHOT: Advanced Configuration · domain settings or DNS setup screen · desktop */}
 
 ### Using Multiple Keys
 You can use different reCAPTCHA keys for different domains:
@@ -203,9 +211,10 @@ You can use different reCAPTCHA keys for different domains:
 - **Fraud detection**: Review suspicious activity reports
 
 ## Integration with Collection Forms
+{/* SCREENSHOT: Integration with Collection Forms · domain settings or DNS setup screen · desktop */}
 
 ### Where reCAPTCHA is Used
-reCAPTCHA is **only used in Collection Forms** within Elastic Funnels. This includes:
+reCAPTCHA is **only used in Collection Forms** within ElasticFunnels. This includes:
 - **Lead capture forms**: Prevents spam submissions
 - **Contact forms**: Blocks automated form filling
 - **Newsletter signups**: Reduces fake email addresses
@@ -256,6 +265,7 @@ reCAPTCHA is **not** used for other form types or page elements. It specifically
 - **Fast processing**: Minimal impact on form submission speed
 
 ## Cost Management
+{/* SCREENSHOT: Cost Management · domain settings or DNS setup screen · desktop */}
 
 ### Understanding reCAPTCHA Pricing
 - **Free tier**: 10,000 assessments per month at no cost
@@ -275,6 +285,6 @@ reCAPTCHA is **not** used for other form types or page elements. It specifically
 - **Optimize placement**: Adjust form placement based on actual usage data
 
 <Note>
-reCAPTCHA v3 provides powerful spam protection without impacting user experience. Remember to add both www and non-www versions of your domains, and you can use one key for all your Elastic Funnels domains. For cost-effective usage, place collection forms on dedicated pages rather than in modals that load on every page view.
+reCAPTCHA v3 provides spam protection for Collection Forms without adding a checkbox. Remember to add both www and non-www versions of your domains, and you can use one key for all your ElasticFunnels domains. For cost-effective usage, place collection forms on dedicated pages rather than in modals that load on every page view.
 </Note>
 

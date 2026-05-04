@@ -1,0 +1,236 @@
+---
+title: 'Internationalization (i18n)'
+description: 'Translate page copy by binding elements to translation keys, switching the active language via URL, and rendering localized content from templates and backend scripts.'
+---
+
+ElasticFunnels gives you a single, brand-wide system for translating page
+copy without forking pages or maintaining duplicate variants. You write
+your page once, **bind elements to translation keys** in the builder,
+**store translations per language** in the admin, and the page swaps the
+right copy in/out based on the visitor's language.
+
+The system is intentionally narrow: it only translates copy. Layout,
+images, links, and behavior stay identical across languages. Use
+[Page Variants](./page-variants) when you need a fully different
+experience per audience.
+
+## How it works
+{/* SCREENSHOT: Translations admin · Pages → Advanced → Translations · desktop */}
+
+There are two things to manage:
+
+1. **Languages** — the list of locales your brand supports (e.g. `en`,
+   `pt-br`, `de`). One language is your **default**.
+2. **Entries** — for each language, a list of `key → translation` rows.
+   The same key (e.g. `hero.title`) lives in every language.
+
+Once a language has entries, any element on any page that you've bound
+to one of those keys will display the translated copy.
+
+### Translation keys
+
+Keys use **dot notation** so you can group related copy together —
+`hero.title`, `checkout.cta`, `faq.refund_policy`. They can contain
+letters, numbers, dots, dashes, and underscores, must start with a
+letter or number, and can be up to 191 characters long.
+
+Each `key` is unique within a language but is meant to repeat across
+languages — that's how the system knows the English `hero.title` and
+the German `hero.title` are the same slot.
+
+## Managing languages and translations
+{/* SCREENSHOT: Languages list · admin · desktop */}
+
+Open **Pages → Advanced → Translations** to manage everything in one
+place.
+
+### Add a language
+
+1. Click **Add language**.
+2. Enter a **locale code** — short BCP-47 tag like `en`, `de`, `pt-br`.
+3. Optionally add a **display label** (shown only in the admin).
+4. Toggle **Default language** for the language that should be served
+   when no other language is selected.
+5. Use **Sort order** to control the order in language pickers.
+
+### Add translation entries
+
+1. In the **Entries** section, pick a language from the dropdown.
+2. Click **Add entry**.
+3. Enter a **Key** (e.g. `hero.title`) and the translated **Value**.
+4. Save.
+
+Use the search box to filter by key or value when your dictionary grows.
+
+### Bulk edit
+{/* SCREENSHOT: Bulk editor · admin · desktop */}
+
+Click **Bulk edit** above the entries table to switch to a
+spreadsheet-style editor. Add or change many keys at once, then click
+**Save all changes**. The whole batch saves together — if any row
+fails validation, nothing is saved.
+
+### Permissions
+
+Access to translations is controlled by the **Translations** module
+permissions in your role: `view`, `create`, `update`, `delete`.
+
+## Binding elements in the page builder
+{/* SCREENSHOT: Translations sector · GrapeJS builder right panel · desktop */}
+
+Open any page in the builder, select an element, and look for the
+**Translations** sector in the right-hand panel.
+
+The sector has a single field: **`data-ef-hl=`**. Type a translation
+key (e.g. `hero.title`) and the builder binds the selected element to
+that key. The original copy stays in place and acts as the **fallback**
+when no entry exists for the active language.
+
+A bound element looks like this in the published page:
+
+```html
+<h1 data-ef-hl="hero.title">Welcome</h1>
+<img data-ef-hl="hero.alt" alt="Default alt" src="/hero.png" />
+<input data-ef-hl="form.email_placeholder" placeholder="you@example.com" />
+```
+
+When the page is rendered, ElasticFunnels will:
+
+- Replace the **inner content** of `<h1>` with the entry for
+  `hero.title` in the active language.
+- Swap the **`alt`** attribute on the `<img>` with the entry for
+  `hero.alt`.
+- Swap the **`placeholder`** on the `<input>` with the entry for
+  `form.email_placeholder`.
+
+The text-bearing attributes that get swapped automatically are:
+`alt`, `title`, `placeholder`, `value`, and `aria-label`. If a
+binding exists but the active language has no entry for that key, the
+original markup is left untouched (so editors always see something).
+
+## Choosing the active language
+
+ElasticFunnels picks the active language for each request from these
+sources, in priority order:
+
+1. **URL path segment**, when the page slug captures a language with a
+   `{hl}` placeholder (see [wildcard routes](../wildcard-routes)) —
+   e.g. `/en/about`.
+2. **`?hl=`** query parameter — preferred name (matches Google's
+   convention).
+3. **`?locale=`** query parameter.
+4. **`?lang=`** query parameter.
+5. **Domain default** — set on the domain.
+6. **Brand default** — set on the brand.
+7. **Browser `Accept-Language`** header.
+8. **English (`en`)** as a final fallback.
+
+Whatever language is chosen is then matched against your brand's
+configured languages:
+
+- **Exact match wins** — `?hl=pt-br` serves `pt-br` if you have it.
+- **Region falls back to base** — `?hl=pt-br` serves `pt` if only `pt`
+  is configured.
+- **Otherwise the brand's default language is used**.
+
+If the brand has no languages configured, pages render exactly as you
+authored them (no replacements happen).
+
+### Clean URLs per language
+
+If you want URLs like `/en/about` and `/pt-br/about` to switch the
+active language, capture the locale segment in your page slug:
+
+- **Page slug:** `{hl}/about`
+- **URLs that match:** `/en/about`, `/pt-br/about`
+
+The `{hl}` placeholder feeds straight into the language picker above —
+no extra wiring required.
+
+## Using translations in templates
+
+Inside a page or component template you can read translations directly:
+
+```twig
+<h1>{{ t('hero.title', 'Welcome') }}</h1>
+<p>{{ 'hero.subtitle' | t }}</p>
+
+<select>
+  @foreach(code in locales())
+    <option value="{{ code }}" @if(code == locale()) selected @endif>
+      {{ code }}
+    </option>
+  @endforeach
+</select>
+```
+
+| Helper | Returns |
+| --- | --- |
+| `t(key, fallback?)` | Translation for `key` in the active language. Falls back to the brand default language entry, then to `fallback`, then to `''`. |
+| `'key' \| t` / `'key' \| t('Default')` | Filter form of `t()`. |
+| `locale()` | Active language code (e.g. `en`, `pt-br`). |
+| `locales()` | All language codes configured for the brand. |
+| `default_locale()` | The brand's default language code. |
+
+The same data is also exposed on the page context, so you can use:
+
+- `{{ locale }}` — active language code
+- `{{ locales }}` — list of codes
+- `{{ default_locale }}` — brand default
+
+…anywhere in your templates without calling a function.
+
+## Using translations in backend scripts
+
+Backend scripts (`<script scope="backend">`) get the same helpers:
+
+```javascript
+var code = await getLocale();
+var langs = await getLocales();
+var defaultCode = await getDefaultLocale();
+
+var ctaText = await t('checkout.cta', 'Buy now');
+```
+
+These are useful when you need to make decisions (e.g. pick a shipping
+bucket) based on the visitor's language, or when you want to inject
+translated copy into a JSON payload returned from a backend script.
+
+For the full host surface, see
+[Backend Scripts → Data Functions](../backend-scripts/data-functions).
+
+## Caching
+
+Translations are served from a fast in-memory cache so live pages stay
+fast. Saving any language or entry from the admin **busts the cache
+immediately** — your changes are visible on the next page load, no
+manual purge needed.
+
+## Patterns and pitfalls
+
+- **Always set a default language.** `t()` falls back to the brand
+  default before falling back to the literal fallback string. A brand
+  with no default will return the literal fallback for missing entries
+  — confusing for editors who expect to see the original copy.
+- **Use stable keys.** Editing copy in the builder does not change the
+  bound key. Once `hero.title` exists, keep using it; rename only when
+  the meaning of the slot truly changes.
+- **Bound text wins.** The original builder copy is never shown to a
+  visitor when the active language has an entry for the key. Treat the
+  in-builder copy as your "default language" copy.
+- **Self-closing tags only get attribute swaps.** `<img>`, `<input>`,
+  etc. don't have inner text, so a binding only replaces `alt` /
+  `title` / `placeholder` / `value` / `aria-label` if those are set.
+- **Region snap-down.** A brand configured with `pt` will accept
+  `?hl=pt-br` and serve the `pt` entries. If you need true regional
+  variants, add `pt` and `pt-br` as separate languages.
+
+## Related
+
+- [Wildcard routes](../wildcard-routes) — capture an `hl` path segment
+  for clean URLs like `/en/about`.
+- [Page variables](./page-variables) — non-translation per-locale
+  switches (currency formatting, date masks, etc.).
+- [Backend scripts → data functions](../backend-scripts/data-functions)
+  — full reference for `t()`, `getLocale()`, `getLocales()`,
+  `getDefaultLocale()`.
