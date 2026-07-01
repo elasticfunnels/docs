@@ -227,6 +227,10 @@ Runs your **callback** whenever a product is added to the cart. It fires for the
 Post-purchase one-click upsells (`/ef-u`) are a separate purchase event and do **not** trigger this callback.
 </Note>
 
+<Tip>
+Safe to call from custom head code or a tracking script that runs before the page bundle finishes loading — early `ef.onAddToCart(...)` calls are queued and registered automatically once `window.ef` is ready.
+</Tip>
+
 The callback receives a single event object:
 
 - **source** — `'cart'` or `'buy-link'`.
