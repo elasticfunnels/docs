@@ -221,6 +221,7 @@ The cart plugin exposes a `window.ef` object you can call from custom scripts or
 | **`window.ef.removeFromCart(code, allowClear?)`** | Decrease quantity by 1. When `allowClear` is `false` (default), does nothing if quantity is already 1 (prevents going to 0). |
 | **`window.ef.getCart()`** | Returns the raw cart array `[{ code, quantity }, ...]` (for debugging or custom UI). |
 | **`window.ef.getCartForSubmit()`** | Same as `getCart()` but excludes zero-quantity lines. |
+| **`window.ef.onAddToCart(callback)`** | Run a callback when a product is added (client cart or `/b` buy links). Returns an unsubscribe function. See [EF API](/funnels/ef-api#cart). |
 
 Example — add to cart on button click:
 
@@ -246,6 +247,10 @@ window.addEventListener('cart-updated', (e) => {
 ```
 
 The event `detail` contains `{ brandId, cart }` where `cart` is the updated array.
+
+<Tip>
+`cart-updated` fires on **any** cart change (add, remove, quantity). If you only care about items being **added** — and want the `/b` buy links covered too — use [`window.ef.onAddToCart(callback)`](/funnels/ef-api#cart) instead.
+</Tip>
 
 ## Add-to-cart buttons
 {/* SCREENSHOT: Add-to-cart buttons · page builder, settings panel, or published page · desktop */}

@@ -21,6 +21,9 @@ The **`window.ef`** object is available on every funnel page. Use it in **Client
   <Card title="Video" icon="video" href="#video">
     Check video progress (seconds or %) and run a callback when the CTA is shown.
   </Card>
+  <Card title="Cart" icon="cart-shopping" href="#cart">
+    Run a callback when a product is added to the cart with <code>ef.onAddToCart()</code>.
+  </Card>
 </CardGroup>
 
 ---
@@ -214,6 +217,56 @@ console.log(progress.currentTime, progress.duration, progress.percent);
 
 ---
 
+## Cart
+
+### ef.onAddToCart(callback)
+
+Runs your **callback** whenever a product is added to the cart. It fires for the client-side cart (`ef.addToCart`, `.ef-add-to-cart` elements, and cart **+ / −** buttons) **and** for `/b` buy links. Returns an **unsubscribe** function.
+
+<Note>
+Post-purchase one-click upsells (`/ef-u`) are a separate purchase event and do **not** trigger this callback.
+</Note>
+
+The callback receives a single event object:
+
+- **source** — `'cart'` or `'buy-link'`.
+- **products** — array of `{ id, name, price, currency, brand, quantity }`.
+- **cart** — full cart snapshot (client cart only; `undefined` for buy links).
+
+```javascript
+var unsubscribe = ef.onAddToCart(function(event) {
+  event.products.forEach(function(product) {
+    console.log('Added:', product.id, product.price, 'from', event.source);
+
+    // Example: fire a Meta Pixel AddToCart event
+    // fbq('track', 'AddToCart', {
+    //   content_ids: [product.id],
+    //   value: product.price,
+    //   currency: product.currency,
+    // });
+  });
+});
+
+// Stop listening later:
+// unsubscribe();
+```
+
+The same payload is also dispatched as an `ef:add-to-cart` **CustomEvent** on `window`. This is handy for Google Tag Manager or pixels that listen for DOM events instead of calling `window.ef`:
+
+```javascript
+window.addEventListener('ef:add-to-cart', function(e) {
+  var products = (e.detail && e.detail.products) || [];
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'add_to_cart', ecommerce: { items: products } });
+});
+```
+
+<Note>
+`onAddToCart` fires only when an item is **added**. To react to any cart change (add, remove, quantity, clear), listen for the `cart-updated` window event instead — see the [Cart](/frontend-template-engine/cart) reference.
+</Note>
+
+---
+
 ## Client script examples
 
 **Wait for an element, then continue:**
@@ -278,3 +331,4 @@ Add `data-ef-add-tag="tagname"` to a link or button (or to a parent component wi
 | `ef.videoProgressCheck(opts)` | Returns true if video reached `opts.seconds` and/or `opts.percent`. |
 | `ef.onCta(callback)` | Run callback when video CTA is shown; returns unsubscribe. |
 | `ef.getVideoProgress()` | Returns `{ currentTime, duration, percent }` for the main video. |
+| `ef.onAddToCart(callback)` | Run callback when a product is added to the cart (client cart or `/b` buy links); returns unsubscribe. Also dispatches an `ef:add-to-cart` window event. |
