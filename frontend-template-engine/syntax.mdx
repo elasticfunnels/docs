@@ -153,18 +153,21 @@ Use when you need to reuse a computed value or keep markup readable.
 
 ### `template-vars` / `<template data-ef-vars>`
 
-Enables **`[[ var.name ]]`** and other expressions in the **content** of the element without requiring a wrapping `template-if` or `template-foreach`. The element is **replaced** by its inner content; that content is then processed (conditions, loops, and variable replacement run on it).
+Enables **`[[ expression ]]`** in the **content** of the element without requiring a wrapping `template-if` or `template-foreach`. The element is **replaced** by its inner content; that content is then processed (conditions, loops, and variable replacement run on it).
 
 Use **`<template-vars>`** or **`<template data-ef-vars>`** when you have a block where the only dynamic part is `[[ ... ]]` and you want to avoid an extra conditional.
 
-### `template-component`
+<Note>
+`[[ var.something ]]` does **not** work. `var` holds brand variables, which are a server-side concept and are never placed in `window.efScope`. Print brand variables with the backend engine (`{{ var.offer_name }}`), or assign what you need into `window.efScope` yourself.
+</Note>
 
-Include a reusable component by name. The element is replaced by the component’s output.
+### `template-component` — does not exist
 
-- **`data-component-name="name"`** — Component name (slug).
-- **`data-args`** — Optional JSON object of arguments passed to the component.
+<Warning>
+There is **no frontend component include.** `<template-component data-component-name="…">` appears in some older reference tables, but no engine resolves it — not the frontend processor, not the backend template engine, not the page pipeline. It reaches the browser as an inert unknown element and, being normally empty, renders **nothing at all with no error**.
 
-Use when you have a shared fragment (e.g. a card or header) defined as a component and want to embed it with different data.
+Include a component with the backend directive **`@component("code", { key: value })`** instead. See [Rendering pipeline](/pages/rendering-pipeline#template-component-does-not-exist).
+</Warning>
 
 ---
 

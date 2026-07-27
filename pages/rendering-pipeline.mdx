@@ -1,0 +1,259 @@
+---
+title: 'Rendering pipeline'
+description: 'The four layers that transform a page — page-event containers, the backend template engine, the browser reactive engine — and the order they run in.'
+---
+
+A published ElasticFunnels page is **one HTML string that is rewritten several times**, first on the server and then in the browser. Four different systems touch it, each with its own syntax and its own moment in the sequence. They look similar in the source, which is why they get mixed up.
+
+<Warning>
+These are **not** one system with alternative spellings. A construct from one layer placed inside a construct from another layer does not compose the way it looks like it does — the outer one has usually already finished running before the inner one starts. The [Wrong vs right](#wrong-vs-right) section shows the failures this produces.
+</Warning>
+
+## The four layers
+
+| Layer | Looks like | Runs | Owns |
+|-------|-----------|------|------|
+| **Containers** (page events) | `<split-test id="…">`, `<dynamic-container id="…">`, `<inline-split-test>` | Server, **first**, before any template engine | Choosing *which* markup goes in a slot |
+| **Page pipeline** (tags & components) | `<component type="…">`, `[BUY=…]`, `<product-item>`, `{customer.first_name}` | Server, second | Expanding platform tags into HTML |
+| **Backend template engine** | `{{ … }}`, `@if`, `@foreach`, `@set`, `@component`, `@extends`/`@block` | Server, **last** thing before the response is sent | Everything decided at request time |
+| **Frontend reactive engine** | `[[ … ]]`, `<template-if>`, `<template-foreach>`, `<template-set>`, `ef-*` / `data-ef-*` bindings, `window.efScope` | Browser, after `DOMContentLoaded` | Everything that changes without a reload |
+
+Two consequences follow from the order alone, and they are the source of most confusion:
+
+- **The backend engine never sees `[[ ]]`.** It only recognises `{{ }}` and `@` directives; `[[ ]]` is inert text to it and is passed through to the browser untouched.
+- **The frontend engine never sees `{{ }}` or `@if`.** By the time the browser has the HTML, those are already rendered away. Anything left over is literal text and the frontend engine ignores it.
+
+## Order of execution
+
+<Steps>
+  <Step title="Server — resolve the page">
+    Domain → funnel → page. The page HTML is loaded from the database exactly as you saved it.
+  </Step>
+  <Step title="Server — run the page-events graph (backend nodes)">
+    The per-page node graph executes. Nodes that rewrite HTML do it **here**, on the raw saved source:
+
+    - `component_split_test` fills a `<split-test>` container with the selected variant component
+    - `dynamic_container` fills a `<dynamic-container>` with a chosen component
+    - `page_variant` can swap the whole page out
+    - `script_rule`, `url_redirect`, `add_tag`, `set_merchant`, … run their side effects
+
+    Nodes marked as frontend are collected and shipped to the browser as JSON to run later.
+
+    <Note>
+    This step happens **before** the backend template engine and **long before** the browser. That is the single most important fact on this page.
+    </Note>
+  </Step>
+  <Step title="Server — expand platform tags and components">
+    `<component type="code">` and the builder's component placeholders are resolved (each component recursively runs this entire pipeline, including its own template render). Then inline split tests, purchase tags (`[BUY=]`, `[UPSELL=]`, `[QUICKBUY=]`, add-to-cart, subscription upsell), video tags, `<product-item>` / `<collection-item>`, order and date tags, `{customer.*}`, merchant tags, brand variables, quizzes, courses, and the checkout or cart processor (which is what seeds `window.efScope.checkout`).
+  </Step>
+  <Step title="Server — render the backend template engine">
+    Now, and only now, `{{ }}` and the `@` directives run: `@extends`/`@block`/`@yield` assemble the layout, `@if`/`@elseif`/`@else`, `@foreach`, `@set`, `@component`, variables and filters. Asset URLs are rewritten just before this.
+
+    Because `@extends` can pull in markup that was not in the page source, purchase tags are swept a second time after the render.
+  </Step>
+  <Step title="Server — prepare for the browser">
+    Elements containing unresolved `[[ … ]]` get `data-ef-cloak` so they are hidden until the frontend engine runs; `src`/`srcset`/`poster` attributes containing `[[ ]]` are deferred so the browser does not fetch a nonsense URL. The result is wrapped in the site layout, which injects the cloak stylesheet, the frontend page-events JSON, and the JS bundle. **The response is sent.**
+  </Step>
+  <Step title="Browser — before JS runs">
+    `template-if`, `template-foreach`, `template-else`, `template-if-else` and `template-set` are `display: none` from the cloak stylesheet, as is anything carrying `data-ef-cloak`. Containers are *not* hidden — they were already resolved on the server, so their content is final HTML.
+  </Step>
+  <Step title="Browser — mount the frontend engine">
+    On `DOMContentLoaded` (deferred one frame on checkout pages so the cart plugin can populate scope first), `initTemplateScope()` runs: it makes `window.efScope` reactive, copies the URL query string into `efScope.query`, then applies directives in a fixed order — `template-vars` → `template-set` → `template-partial` → `template-foreach` → `template-if` → `[[ ]]` interpolation — and finally wires the `ef-*` bindings and event handlers.
+  </Step>
+  <Step title="Browser — stay reactive">
+    Any mutation of `window.efScope` (or an explicit `notifyScopeUpdated()` / `ef-scope-updated` event) re-evaluates conditions, re-renders loops, and refreshes bindings. Frontend page-event nodes and `window.ef` scripts run in this phase too.
+  </Step>
+</Steps>
+
+## Which syntax do I use for…
+
+| I want to… | Use | Not |
+|---|---|---|
+| Print a value known at request time (brand variable, query param, product, order, customer, device) | `{{ var.offer_name }}` | `[[ var.offer_name ]]` — `var` is never put in browser scope |
+| Print a value that changes in the browser (cart, quantity, coupon, wizard step) | `[[ cartCount ]]` | `{{ }}` — it is long gone before the value exists |
+| Show/hide something decided at request time | `@if(…) … @endif` | `<template-if>` for something that can never change |
+| Show/hide something that flips without a reload | `<template-if data-condition="…">` | `@if` — the server already committed |
+| Loop over server data | `@foreach(item in items) … @endforeach` | — |
+| Loop over reactive data | `<template-foreach data-each="item in items">` | — |
+| Hold a temporary value server-side | `@set(name = value)` | — |
+| Hold a temporary value browser-side | `<template-set data-variable="n" data-value="expr">` | — |
+| Reuse a saved component | `@component("code", { key: value })` | `<template-component …>` — **not implemented**, see below |
+| Swap a section per visitor, with no test | `<dynamic-container id="…" name="…">` + a `dynamic_container` node | Writing the alternatives inline |
+| A/B test one section of a page | `<split-test id="…" name="…">` + a `component_split_test` chain | Writing the variants inline |
+| A/B test alternatives written inline in the page, with no graph | `<inline-split-test id="…">` with `<variant name="…" weight="…">` children | `<split-test>` |
+| A/B test a whole page | Page variants | A container |
+
+## `<template-component>` does not exist
+
+This one has to be stated plainly, because it appears in several older reference tables and the linter tag-balances it as though it were real:
+
+<Warning>
+**No engine implements `<template-component data-component-name="…">`.** The backend template engine only matches the literal `@component` directive. The page pipeline only matches `<component type="code">` and the builder's `data-component-type` placeholders. The frontend engine has no component directive at all — its complete tag list is `template-if`, `template-else-if`, `template-if-else`, `template-else`, `template-foreach`, `template-vars`, `template-set`, `template-partial` / `partial`.
+
+A `<template-component>` element therefore reaches the browser as an unknown HTML element. It is not even hidden by the cloak stylesheet. Because it is normally written self-closing or empty, it renders **nothing at all, with no error** — the most expensive kind of failure.
+</Warning>
+
+The ways to include a component that *do* work:
+
+| Form | Resolved by | When |
+|---|---|---|
+| `@component("code", { key: value })` | Backend template engine | Step 4 — during the template render |
+| `<component type="code">` | Page pipeline | Step 3 — before the template render. This is what a `dynamic_container` node emits |
+| Component split test / dynamic container node | Page-events graph | Step 2 — the component's HTML is spliced in as the container's content |
+
+In every case the component's own HTML is then run through the full pipeline itself, so the component can use `{{ }}`, `@if`, `[[ ]]` and the rest normally.
+
+## Containers are not a template engine
+
+`<split-test>` and `<dynamic-container>` are **slots**. They contain no logic. They do not evaluate anything. They mark a position in the page and say "the page-events graph may replace this".
+
+### The content model
+
+A container's inner content is the **default**. At request time exactly one of two things renders:
+
+1. **A test or a rule is bound to this container** — the graph picks a component and that component's HTML replaces the container, wrapper tag and all. For a split test the wrapper becomes a `div` carrying `data-sid` / `data-fnid` / `data-cid` for analytics; for a dynamic container it becomes a `div` keeping the original `id`.
+2. **Nothing is bound** — no split test running, no graph, no matching rule — and the **default content renders as-is, with the wrapper tag gone**.
+
+That is the whole model. The default is what you want a visitor to see when no test is running; the alternatives live in the graph, never in the markup.
+
+<Note>
+**Known bug, fix in flight.** In the current renderer an unbound container can survive into the response as a literal `<split-test id="…">…</split-test>` element instead of being unwrapped. A real published page has been observed doing this. The default content is still visible (unknown elements render their children) but the wrapper survives, which shows up in view-source and can break block layout because unknown elements are inline-level. Some unbound paths already unwrap correctly; the remaining ones are being fixed to match the model above. Write your pages against the model, not against the current output.
+</Note>
+
+### Why variants belong in the graph, not in the markup
+
+Because only one of the two outcomes above can ever render, **markup that lists several alternatives inside one container is always wrong**. Two sibling components inside one container is not "two variants" — it is one default that happens to contain both, and if a test is running neither of them renders. There is no syntax for "pick one of these inline children"; that job belongs to the graph, which is also where the weights, the assignment cookie, the winner selection and the reporting live.
+
+A single component inside a container is fine — it is just the default content.
+
+If you genuinely want the alternatives written inline in the page, that is a different tag: `<inline-split-test>` with `<variant name="…" weight="…">` children, which does select among its own children at request time and needs no graph.
+
+### A container inside a condition
+
+This is the interaction that surprises people, and it fails the same way for both engines:
+
+```html
+{{-- Backend condition --}}
+@if(query.step eq 1)
+  <split-test id="hero" name="Hero">…default…</split-test>
+@endif
+```
+
+```html
+<!-- Frontend condition -->
+<template-if data-condition="quizStep === 0">
+  <split-test id="hero" name="Hero">…default…</split-test>
+</template-if>
+```
+
+**Neither condition gates the container.** Containers are resolved in step 2. `@if` runs in step 4 and `<template-if>` runs in step 7 — both strictly later. So on every single request:
+
+- the graph runs, selects a variant, and writes the assignment cookie
+- the visitor is enrolled in the test and the test id is added to the session's split-test attribution list
+- *then* the condition removes the resolved markup from the page
+
+The visitor is counted as having seen a variant they never saw. Split-test results drift, and conversions get attributed to a test the visitor was never exposed to.
+
+**Do this instead:** keep the container unconditional, and put the condition *inside* it — either inside the default content or inside each variant component, which are ordinary pages and can use `@if` / `<template-if>` freely. If the whole conditional block is the thing you want to test, make the block itself the container.
+
+## Wrong vs right
+
+Here is the mistake this page exists for, and what each error costs.
+
+```html
+<!-- WRONG — three different layers glued together -->
+<template-if data-condition="quizStep === 0">
+  <div class="quiz-card">
+    <split-test id="intro-hook" name="Quiz Intro Hook">
+      <template-component data-component-name="quiz-intro-a"></template-component>
+      <template-component data-component-name="quiz-intro-b"></template-component>
+    </split-test>
+  </div>
+</template-if>
+```
+
+| # | Error | What actually happens |
+|---|---|---|
+| 1 | `<template-component>` is not implemented by any engine | Both elements render as empty unknown tags. The container's default content is **blank**. If the split test is ever paused or removed, the slot renders nothing at all. |
+| 2 | Two variants written inline in one container | They are not variants — they are one default. The graph is the only thing that can choose between alternatives, and it never sees these. |
+| 3 | The container is nested inside `<template-if>` | The variant is selected and the visitor enrolled on **every** request, including the ones where `quizStep !== 0` and the card is removed from the DOM before it paints. |
+
+### Right — split-test the intro
+
+```html
+<!-- In the page: the container is unconditional, and its content is a real default -->
+<div class="quiz-card">
+  <split-test id="intro-hook" name="Quiz Intro Hook">
+    <h2>Answer 6 questions and we'll match you to a plan</h2>
+    <p>Takes about 40 seconds.</p>
+  </split-test>
+</div>
+```
+
+Then in **Page Events**, wire the variants:
+
+```text
+component_split_test { container: "intro-hook", value: 2 }
+  ├─ split_test_weight { value: 50 } → component_split_test_component { component: "quiz-intro-a" }
+  └─ split_test_weight { value: 50 } → component_split_test_component { component: "quiz-intro-b" }
+```
+
+`quiz-intro-a` and `quiz-intro-b` are saved components — each one is the complete replacement markup for that slot. Weights must total exactly 100.
+
+### Right — gate the card on the quiz step
+
+Move the condition inside, so the container is resolved unconditionally and only its *presentation* is conditional:
+
+```html
+<div class="quiz-card">
+  <split-test id="intro-hook" name="Quiz Intro Hook">
+    <h2>Answer 6 questions and we'll match you to a plan</h2>
+  </split-test>
+</div>
+```
+
+…with the step logic living in the surrounding wizard rather than wrapped around the slot — or, if the card really must appear and disappear, put the `<template-if>` **inside** each variant component so every variant is enrolled and hidden on the same terms.
+
+### Right — inline alternatives with no graph
+
+When you want the alternatives in the page source and do not need component-level reporting:
+
+```html
+<inline-split-test id="4821">
+  <variant name="control" weight="50">
+    <h2>Answer 6 questions and we'll match you to a plan</h2>
+  </variant>
+  <variant name="urgency" weight="50">
+    <h2>40 seconds to your plan — start now</h2>
+  </variant>
+</inline-split-test>
+```
+
+### Right — a component include
+
+```html
+{{-- Backend include: resolved during the template render --}}
+@component("quiz-intro-a", { headline: "Start here" })
+```
+
+## Known gaps
+
+Verified against the renderer. Flagged rather than papered over.
+
+- **`<template-component>` is documented but unimplemented.** Several older reference tables list it as the frontend equivalent of `@component`. It is not — nothing resolves it. Use `@component("code")`.
+- **`[[ var.* ]]` does not resolve.** Brand variables are a backend concept; `var` is never seeded into `window.efScope`. Use `{{ var.x }}`, or explicitly assign what you need into `window.efScope` yourself.
+- **`<template-else-if>` is missing from the cloak stylesheet.** `template-if`, `template-else` and `template-if-else` are hidden before the engine mounts, but `template-else-if` is not, so an else-if branch can flash its content on first paint. Add `data-ef-cloak` to the elements inside it as a workaround.
+- **Unbound containers can leak their wrapper tag.** See the note above; a fix is in progress.
+- **`<split-test data-id="…">` is broken.** A second, `data-id`-based split-test form exists in the renderer but references an undefined variable and will throw if a page ever uses it. Use `<split-test id="…" name="…">`.
+- **The renderer matches container attributes in any order, but the builder's container scanner does not.** The Page Events container dropdown is populated by scanning for `id="…"` immediately followed by `name="…"`, both double-quoted. Written any other way the container still fills at runtime but cannot be selected in the UI. See [Dynamic content](/funnels/dynamic-content).
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Backend template engine" href="/backend-template-engine/overview" />
+  <Card title="Frontend template engine" href="/frontend-template-engine/overview" />
+  <Card title="Page events" href="/funnels/page-events" />
+  <Card title="Containers" href="/pages/containers" />
+  <Card title="Dynamic content" href="/funnels/dynamic-content" />
+  <Card title="Split testing" href="/funnels/split-testing" />
+</CardGroup>

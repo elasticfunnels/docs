@@ -184,8 +184,14 @@ The **Split Test Container** marks a section of the page whose content is chosen
 **Key Features:**
 - Marks one swappable slot, identified by its `id`
 - Filled by a **Component Split Test** node in Page Events
-- Its inner content is the fallback shown when no variant is resolved
+- Its inner content is the **default** — what renders when no split test is running
 - Each served variant is tagged for analytics (`data-sid` / `data-cid`)
+
+<Warning>
+Exactly one of two things renders: the component the graph selected (replacing the container, wrapper and all), or — when nothing is bound — the default content on its own. So **never write the variants inline** inside the container; they can never all render. A single component inside a container is fine, because that is just the default.
+
+Containers are also filled **before** both template engines run, so wrapping one in `@if` or `<template-if>` does not stop it being filled — it only hides the result after the visitor has already been enrolled in the test. See [Rendering pipeline](/pages/rendering-pipeline).
+</Warning>
 
 **How to Use:**
 

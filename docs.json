@@ -78,6 +78,7 @@
             "group": "Pages",
             "pages": [
               "pages/overview",
+              "pages/rendering-pipeline",
               "pages/create-landing-page",
               {
                 "group": "Variants & Testing",

@@ -9,6 +9,10 @@ The **Frontend Template Engine** is a client-side processor that runs in the vis
 This documentation covers the **frontend** template system only. A separate **backend** Template Engine (server-side) uses different syntax (e.g. `{{ }}`, `@if`, `@foreach`). You can use both on the same page: backend for initial render, frontend for live updates.
 </Note>
 
+<Warning>
+The frontend engine is the **last** of four layers that rewrite a page, and it is the only one that runs in the browser. Split-test and dynamic containers were already filled on the server, before this engine existed — so a `<template-if>` wrapped around a container does **not** stop the container from being filled. Read [Rendering pipeline](/pages/rendering-pipeline) before mixing layers.
+</Warning>
+
 ## When to use it
 {/* SCREENSHOT: When to use it · code editor or rendered example · desktop */}
 

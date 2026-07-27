@@ -9,6 +9,10 @@ The **Backend Template Engine** renders templates on the server (or in preview) 
 Use **`{{ }}`** for backend (server-side) variables. Use **`[[ ]]`** for frontend (client-side) values that update in the browser. Both can appear on the same page. For live-updating content (cart, totals, conditional UI), see [Frontend Template Engine](/frontend-template-engine/overview).
 </Note>
 
+<Warning>
+This engine runs **last** on the server — after the page-events graph has already filled every split-test and dynamic container. An `@if` wrapped around a container therefore hides the result but does **not** prevent the container from being filled (or the visitor from being enrolled in the test). See [Rendering pipeline](/pages/rendering-pipeline) for the full order.
+</Warning>
+
 ## When to use it
 {/* SCREENSHOT: When to use it · code editor or rendered example · desktop */}
 
