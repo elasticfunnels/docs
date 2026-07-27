@@ -179,22 +179,27 @@ If no merchant is set (neither at domain level nor via Page Events), merchant co
 
 ### Split Test Container
 
-The **Split Test Container** allows you to run A/B tests on specific sections of your page through Page Events.
+The **Split Test Container** marks a section of the page whose content is chosen by a traffic split. It renders as a `<split-test>` element and holds no logic of its own — the variants and their weights live in **Page Events**.
 
 **Key Features:**
-- Test different content variations
-- Controlled through Page Events
-- Tracks performance of each variant
-- Can split test any page element or section
+- Marks one swappable slot, identified by its `id`
+- Filled by a **Component Split Test** node in Page Events
+- Its inner content is the fallback shown when no variant is resolved
+- Each served variant is tagged for analytics (`data-sid` / `data-cid`)
 
 **How to Use:**
 
-1. **Add Split Test Container** to your page
-2. **Configure in Page Events**:
-   - Add Split Test Component node
-   - Set traffic distribution percentages
-   - Connect to Dynamic Container nodes to load different content
-3. **Track Results** in Analytics
+1. **Add a Split Test Container** to your page and fill in its **Split Test Container Name** trait — that name is what you pick from in Page Events.
+2. **Create one saved component per variant.**
+3. **Configure in Page Events**:
+   - Add a **Component Split Test** node and select the container
+   - Set **Total Variants** — a **Traffic Distribution** node is created for each one
+   - Attach one **Component** node under each Traffic Distribution node, and mark one as the baseline
+4. **Track Results** in Analytics
+
+<Warning>
+Variants attach to **Component** nodes, not Dynamic Content nodes. `Component Split Test → Traffic Distribution → Component` is the only valid chain; the builder rejects anything else.
+</Warning>
 
 **Common Use Cases:**
 - Test different headlines
@@ -267,7 +272,7 @@ Some specialized containers are documented in dedicated pages:
 [View Subscription Upsells Documentation →](/products/subscription-upsells)
 
 ### Dynamic Container
-The **Dynamic Container** allows you to change content from Page Events based on conditions, visitor data, or user actions.
+The **Dynamic Container** marks a slot whose content is replaced with a saved component when a Page Events condition matches. Unlike the Split Test Container, the choice is driven by a **condition you write**, not by a traffic split.
 
 [View Dynamic Content Documentation →](/funnels/dynamic-content)
 

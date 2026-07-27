@@ -55,6 +55,18 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/conversions?page=1&per
 ```
 </ResponseExample>
 
+### Funnel attribution on conversions
+
+List and detail responses can include a nested **`funnel`** object (`id`, `title`) only when the conversion was stored with a `funnel_id` — that comes from matching an **internal EF click** (click code / session), not from the merchant postback alone.
+
+| Field / signal | Meaning |
+|----------------|---------|
+| `aff_source: "buygoods"` | Sale was recorded via a **Buygoods postback** — it does **not** mean a funnel was matched |
+| Empty / missing `funnel` | No internal click ID was matched — common when the buyer reached checkout **directly** (e.g. Buygoods checkout URL) instead of through an **EF-tracked buy link** with a click/subid EF recognizes |
+| `funnel` populated | Postback (or checkout) resolved to an EF click that had `funnel_id` on the session |
+
+There is no API setting to backfill funnel on postbacks without click attribution. To get funnel on affiliate sales, traffic must pass through EF-tracked links so Buygoods (or other networks) send back a subid/click EF can resolve.
+
 ---
 
 ## Get Conversion Details

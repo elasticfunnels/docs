@@ -54,6 +54,7 @@
             "group": "Page Events",
             "pages": [
               "funnels/page-events",
+              "funnels/page-events-nodes",
               {
                 "group": "Event Types",
                 "pages": [
@@ -327,7 +328,10 @@
                   "backend-scripts/actions",
                   "backend-scripts/data-functions",
                   "backend-scripts/validation",
-                  "backend-scripts/http"
+                  "backend-scripts/http",
+                  "backend-scripts/cache",
+                  "backend-scripts/queue",
+                  "backend-scripts/storage"
                 ]
               },
               "backend-scripts/examples"

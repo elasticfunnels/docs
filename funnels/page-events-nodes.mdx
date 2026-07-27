@@ -1,0 +1,659 @@
+---
+title: 'Page Events Node Reference'
+description: 'Every Page Events node type: purpose, fields, inputs/outputs, and wiring constraints'
+---
+
+This is the complete reference for every node available in the **Page Events** builder. For the graph model, entry views, and execution order, start with [Page Events](/funnels/page-events).
+
+Each node is identified internally by a **type code** (`data.type`). The type code is what the AI flow generator, the API and the runtime use — the label in the UI is just the display name.
+
+---
+
+## How to read this reference
+
+Every node entry shows:
+
+| Field | Meaning |
+|-------|---------|
+| **Type** | The internal `data.type` value. |
+| **In / Out** | Number of input pins and output pins. `0` outputs means the branch ends there. |
+| **Runs on** | `Server` = evaluated before the HTML is sent. `Browser` = evaluated in the visitor's browser after load. Some nodes run in both places. |
+| **Module / permission** | The node only appears in **Add Node** if your role has this permission. |
+| **Fields** | Keys stored on the node. |
+
+**Condition nodes always have 2 outputs:**
+
+- **Output 1** = condition was **true** (the Yes path)
+- **Output 2** = condition was **false** (the No path)
+
+---
+
+## Wiring rules
+
+The builder enforces four connection rules. If a connection is rejected, one of these is why.
+
+<AccordionGroup>
+  <Accordion title="only_on — allowed parents">
+    Some nodes may only be attached below specific node types. For example **Component** (`component_split_test_component`) is `only_on: split_test_weight`, so it can only hang off a Traffic Distribution node.
+
+    When resolving the parent, the builder **skips pass-through nodes** (see `middleman` below) and compares against the first real parent. Generic condition nodes also match on their `base_type` of `script_rule`, which is why nodes restricted to `script_rule` accept **Is From Country**, **Query Parameter Condition**, and the other generated-script conditions too.
+  </Accordion>
+  <Accordion title="one_of_type — one of this kind per output">
+    When a node is marked `one_of_type`, you cannot attach two nodes of the same type to the same output of the parent. The builder removes the second connection and shows *"You can't connect more than one &lt;type&gt; node to this node"*.
+  </Accordion>
+  <Accordion title="max_per_output — fan-out limit">
+    Most nodes allow only **one** connection per output pin. To run several actions from one branch, use a **Sequence** node (which lets you add extra outputs) or chain the actions one after another.
+  </Accordion>
+  <Accordion title="middleman — pass-through nodes">
+    Nodes marked as pass-through (Tag User, Set Merchant, Set Variable, Has Tag, Wait Seconds, Show/Hide Element, the video checks, Sequence, and the generic conditions) are transparent for `only_on` resolution. Inserting one in the middle of a chain does not break a downstream node's parent requirement.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+**Server nodes cannot follow browser nodes on the same path.** A server-side node may be followed by a browser node (`script_rule` → `client_script` works), but not the other way round (`exit_intent` → `script_rule` does not work). Once a path reaches the browser it stays in the browser.
+</Warning>
+
+<Note>
+**Anything with a script becomes a Script Rule at runtime.** Before dispatching a node, the renderer checks for `data.script_rule` and, if present, treats the node as a `script_rule` regardless of its declared type. That is how **Query Parameter Condition**, **Is From Country** and every other generated condition actually execute — they are Script Rules with a pre-written script and a friendly form.
+</Note>
+
+---
+
+## Node catalogue
+
+| Node | Type | In / Out | Runs on |
+|------|------|----------|---------|
+| Loaded (entry) | `entry` | 0 / 1 | Server + Browser |
+| Router | `router` | 1 / 1 | Server |
+| Sequence | `sequence` | 1 / 2+ | Server + Browser |
+| Stop Next Events Execution | `stop_execution` | 1 / 0 | Server + Browser |
+| Script Rule | `script_rule` | 1 / 2 | Server |
+| Query Parameter Condition | `query_param_condition` | 1 / 2 | Server |
+| Is Customer | `is_customer` | 1 / 2 | Server |
+| Has Purchased Any Upsell | `accepted_upsells` | 1 / 2 | Server |
+| Referred By Affiliate | `referred_by_affiliate` | 1 / 2 | Server |
+| Is From Country | `is_from_country` | 1 / 2 | Server |
+| Is From State | `is_from_state` | 1 / 2 | Server |
+| Is From EU | `is_from_eu` | 1 / 2 | Server |
+| Is From Timezone | `is_from_timezone` | 1 / 2 | Server |
+| Is Using VPN/Proxy | `is_using_vpn` | 1 / 2 | Server |
+| Is Whitelisted? | `is_whitelisted` | 1 / 2 | Server + Browser |
+| Has Tag | `has_tag` | 1 / 2 | Server + Browser |
+| Cloaking.house | `cloaking_house` | 1 / 2 | Server + Browser |
+| Product Check | `product_check` | 1 / 2 | Not declared |
+| Product Check: Match Product | `product_check_product` | 1 / 1 | Not declared |
+| Product Check: Match All | `product_check_all` | 1 / 1 | Not declared |
+| Component Split Test | `component_split_test` | 1 / 2–5 | Server |
+| Split Test | `split_test` | 1 / 2–5 | Server + Browser |
+| Traffic Distribution | `split_test_weight` | 1 / 1 | Server + Browser |
+| Component | `component_split_test_component` | 1 / 0 | Server |
+| Dynamic Content | `dynamic_container` | 1 / 1 | Server |
+| Load Another Page | `page_variant` | 1 / 1 | Server |
+| Redirect to Page | `page` | 1 / 0 | Server + Browser |
+| Redirect to URL | `url_redirect` | 1 / 0 | Server + Browser |
+| Set Merchant | `set_merchant` | 1 / 1 | Server + Browser |
+| Clear Merchant | `clear_merchant` | 1 / 1 | Server + Browser |
+| Set Checkout Page | `set_checkout_page` | 1 / 1 | Server |
+| Set Checkout Bumps | `set_checkout_bumps` | 1 / 1 | Server |
+| Set Variable | `set_variable` | 1 / 1 | Server + Browser |
+| Tag User | `add_tag` | 1 / 1 | Server + Browser |
+| Whitelist visitor | `mark_whitelisted` | 1 / 1 | Server + Browser |
+| Mark visitor as NOT whitelisted | `mark_not_whitelisted` | 1 / 1 | Server + Browser |
+| Block Request | `block_request` | 1 / 0 | Server |
+| Ban Visitor by IP | `ban_ip` | 1 / 0 | Server |
+| Unban Visitor by IP | `unban_ip` | 1 / 0 | Server |
+| Execute Automation on Customer | `execute_automation` | 1 / 1 | Not declared |
+| On Exit Intent | `exit_intent` | 1 / 1 | Browser |
+| On Exited Page | `on_exited_page` | 1 / 1 | Server |
+| On Form Success | `on-form-success` | 1 / 1 | Browser |
+| On Add To Cart | `on-add-to-cart` | 1 / 1 | Browser |
+| CTA: On Shown | `on_cta` | 1 / 1 | Browser |
+| When scrolled to | `when_scrolled_to` | 1 / 1 | Browser |
+| Scroll Check | `scroll_check` | 1 / 2 | Browser |
+| Element In View | `element_in_view` | 1 / 2 | Browser |
+| If Showed CTA | `showed_cta` | 1 / 2 | Browser |
+| If Added To Cart | `added_to_cart` | 1 / 2 | Browser |
+| Video: Is muted | `video_is_muted` | 1 / 2 | Browser |
+| Video: On Pause | `video_pause` | 1 / 1 | Browser |
+| Video: On Goal Reached | `video_watched_seconds` | 1 / 1 | Browser |
+| Video: Progress Check | `video_progress_check` | 1 / 2 | Browser |
+| Show Video CTA | `show_video_cta` | 1 / 1 | Browser |
+| Hide Video CTA | `hide_video_cta` | 1 / 1 | Browser |
+| Show Element | `show_element` | 1 / 1 | Browser |
+| Hide Element | `hide_element` | 1 / 1 | Browser |
+| Wait Seconds | `wait_seconds` | 1 / 1 | Browser |
+| Show Popup | `exit_popup` | 1 / 0 | Browser |
+| Execute Javascript on Client | `client_script` | 1 / 1 | Browser |
+
+<Note>
+**"Not declared"** means the node definition in the builder does not state where it runs. In practice the renderer handles all three on the **server**: `product_check` inspects the purchased products, and `execute_automation` mints a token server-side and then hands the actual call to the browser. Treat them as server nodes when ordering a path, and confirm with the [Debug Window](/debugging/debug-window) if a mixed path behaves unexpectedly.
+</Note>
+
+---
+
+## Entry & flow control
+
+### Loaded (entry point)
+
+**Type** `entry` · **0 in / 1 out** · Server + Browser
+
+The start of a flow. `data.value` holds the ID of the page the flow belongs to.
+
+A page can have **more than one entry node**. Each one is a separate **View** in the left rail of the builder, and their order is stored in `entry_views_order`.
+
+<Note>
+Views are an **organisational device for the canvas only**. At render time every entry node's children are collected and run — the renderer does not pick one entry and ignore the rest, and it does not read `entry_views_order`. If you need only one branch to run, put the choice behind a condition, not behind separate views.
+</Note>
+
+**Fields**
+
+| Field | Description |
+|-------|-------------|
+| `value` | Page ID this entry belongs to. Set automatically. |
+| `view_name` | Name shown in the Views rail. Set with the pencil icon; unnamed views display as `View <id>`. |
+| `view_canvas_x` / `view_canvas_y` | Saved camera position for that view. Set automatically. |
+
+### Router
+
+**Type** `router` · **1 in / 1 out** · pass-through
+
+A junction node used to tidy up the canvas. It carries a short `code` that can be used to build a node-specific URL.
+
+**Fields:** `code` (generated).
+
+### Sequence
+
+**Type** `sequence` · **1 in / 2+ out** · Server + Browser · pass-through
+
+Runs the connected branches one after another. Because every other node is limited to one connection per output, Sequence is how you fan out several actions from a single branch — click **Add Sequence Output** on the node to add more output pins.
+
+**Fields:** none.
+
+See [Sequence Nodes](/funnels/sequence-nodes).
+
+### Stop Next Events Execution
+
+**Type** `stop_execution` · **1 in / 0 out** · Server + Browser
+
+Ends processing for this path. Nothing after it runs — and it also **discards the browser-side event queue for this request**, so triggers that would have shipped to the page are dropped too.
+
+**Fields:** none.
+
+---
+
+## Conditions (server)
+
+All condition nodes send the flow to **Output 1** when true and **Output 2** when false.
+
+### Script Rule
+
+**Type** `script_rule` · **1 in / 2 out** · Server · `only_on: entry, script_rule`
+
+Custom JavaScript that returns a boolean. This is the most flexible condition and the parent type that most generated conditions inherit from.
+
+**Fields**
+
+| Field | Description |
+|-------|-------------|
+| `script_rule` | The script body. Write only the body — no `function` wrapper — ending in a `return` of a boolean. |
+| `script_prompt` | The plain-language description used when the script was generated with AI. Optional. |
+| `intelligence_session_id` | AI chat session that produced the script. Set automatically. |
+
+<Note>
+`only_on` restricts Script Rule to sit under an entry node or another Script Rule — but because every generated condition below carries `base_type: script_rule`, you can also chain a Script Rule under **Is From Country**, **Query Parameter Condition**, and the rest.
+</Note>
+
+Full variable reference: [Script Rule](/funnels/script-rule).
+
+### Query Parameter Condition
+
+**Type** `query_param_condition` · **1 in / 2 out** · Server · pass-through
+
+A structured builder for URL parameter checks. The node **compiles your conditions into a `script_rule`** and stores both — and the renderer executes it as a Script Rule against the `query` object.
+
+**Fields**
+
+| Field | Description |
+|-------|-------------|
+| `conditions` | Array of `{ param, operator, value, logicalOperator }`. |
+| `script_rule` | The generated script. Regenerated whenever you edit `conditions` — do not hand-edit. |
+
+**Operators**
+
+| Operator | Generated comparison |
+|----------|----------------------|
+| `is` | `query.<param> == '<value>'` |
+| `is_not` | `query.<param> != '<value>'` |
+| `contains` | `query.<param>.includes('<value>')` |
+| `does_not_contain` | `!query.<param>.includes('<value>')` |
+| `starts_with` | `query.<param>.startsWith('<value>')` |
+| `ends_with` | `query.<param>.endsWith('<value>')` |
+| `is_empty` | `!query.<param> \|\| query.<param> == ''` — true when the parameter is missing **or** blank |
+| `is_not_empty` | `query.<param> && query.<param> != ''` |
+
+`logicalOperator` is `&&` (AND) or `||` (OR) and joins a condition to the **next** one in the list. The legacy values `and` / `or` are normalised to `&&` / `||` on load.
+
+<Warning>
+There are no numeric operators. `greater than` / `less than` do not exist on this node — use a **Script Rule** for numeric comparisons.
+</Warning>
+
+See [Query Parameter Conditions](/funnels/query-parameters).
+
+### Generated conditions
+
+These nodes are Script Rules with a fixed script and a friendly form. They all have **1 in / 2 out**, run on the **server**, and are pass-through.
+
+| Node | Type | Fields | Generated script |
+|------|------|--------|------------------|
+| Is Customer | `is_customer` | — | `return is_customer;` |
+| Has Purchased Any Upsell | `accepted_upsells` | — | `return customer && customer.accepted_upsells;` |
+| Referred By Affiliate | `referred_by_affiliate` | `affiliate_ids` (array of affiliate merchant account IDs) | `return [...].includes(session.aff_id);` |
+| Is From Country | `is_from_country` | `countries` (array of ISO country codes) | `return [...].includes(ip_whois.country_code);` |
+| Is From State | `is_from_state` | `states` (array of US state codes) | `return ip_whois.country_code == "US" && [...].includes(ip_whois.state);` |
+| Is From EU | `is_from_eu` | — | `return ip_whois.is_eu;` |
+| Is From Timezone | `is_from_timezone` | `timezones` (array of IANA IDs) | `return [...].includes(ip_whois.timezone.id);` |
+| Is Using VPN/Proxy | `is_using_vpn` | — | `return ip_whois.security.vpn \|\| ip_whois.security.proxy \|\| ip_whois.security.tor \|\| ip_whois.security.anonymous;` |
+
+Each of these also stores the compiled script under `script_rule`, and that is what the renderer runs.
+
+<Warning>
+The generated scripts read `ip_whois.country_code`, `ip_whois.state`, `ip_whois.is_eu`, `ip_whois.timezone.id` and `ip_whois.security.*`. If you write your own Script Rule, use those same paths — see [Script Rule → `ip_whois`](/funnels/script-rule#ip_whois).
+</Warning>
+
+<Tip>
+Prefer these over a hand-written Script Rule — they are cheaper to read and they document intent. Reach for Script Rule only when you need logic these cannot express.
+</Tip>
+
+**Timezone options in the picker:** `America/New_York`, `America/Chicago`, `America/Denver`, `America/Los_Angeles`, `Europe/London`, `Europe/Paris`, `Asia/Tokyo`, `Australia/Sydney`.
+
+### Is Whitelisted?
+
+**Type** `is_whitelisted` · **1 in / 2 out** · Server + Browser · pass-through
+
+Checks whether the visitor currently counts as whitelisted.
+
+**Fields:** none.
+
+### Has Tag
+
+**Type** `has_tag` · **1 in / 2 out** · Server + Browser · pass-through
+
+Checks for a tag set by **Tag User** (or `ef.addTag()`).
+
+**Fields:** `value` — tag name.
+
+### Cloaking.house
+
+**Type** `cloaking_house` · **1 in / 2 out** · Server + Browser · pass-through
+
+Routes based on a Cloaking.house verdict.
+
+**Fields:** `value`, `label`.
+
+### Product Check
+
+**Type** `product_check` · **1 in / 2 out**
+
+Branches on which product was purchased. It is a parent node: each output must carry one child.
+
+- **Product Check: Match Product** (`product_check_product`, `only_on: product_check`) — `value` = product code to match.
+- **Product Check: Match All** (`product_check_all`, `only_on: product_check`) — catch-all for everything not matched.
+
+---
+
+## Conditions (browser)
+
+### Scroll Check
+
+**Type** `scroll_check` · **1 in / 2 out** · Browser · pass-through
+
+Has the visitor already scrolled past a point? Desktop and mobile thresholds are configured separately.
+
+**Fields:** `value` (desktop pixels from top), `percent` (desktop % of page), `value_mobile`, `percent_mobile`.
+
+### Element In View
+
+**Type** `element_in_view` · **1 in / 2 out** · Browser · pass-through
+
+Is an element currently visible in the viewport?
+
+**Fields:** `value` (CSS selector), `min_percent_visible` (0–100).
+
+### If Showed CTA
+
+**Type** `showed_cta` · **1 in / 2 out** · Browser · pass-through
+
+Has the video CTA already been shown?
+
+**Fields:** none.
+
+### If Added To Cart
+
+**Type** `added_to_cart` · **1 in / 2 out** · Browser · pass-through · requires `products.view`
+
+**Fields:** `value` — product code.
+
+### Video: Is muted
+
+**Type** `video_is_muted` · **1 in / 2 out** · Browser · pass-through · `only_on: exit_intent`
+
+Checks whether the main video is muted. It can only be attached below an **On Exit Intent** node.
+
+**Fields:** none.
+
+### Video: Progress Check
+
+**Type** `video_progress_check` · **1 in / 2 out** · Browser · pass-through
+
+Has the video reached a position?
+
+**Fields:** `value` (seconds), `percent` (% of duration).
+
+---
+
+## Triggers (browser)
+
+Triggers wait for something to happen, then continue down their single output.
+
+| Node | Type | Fields | Notes |
+|------|------|--------|-------|
+| On Exit Intent | `exit_intent` | — | `only_on: entry, script_rule` |
+| On Form Success | `on-form-success` | `form` (form ID) | |
+| On Add To Cart | `on-add-to-cart` | — | requires `products.view` |
+| CTA: On Shown | `on_cta` | — | |
+| When scrolled to | `when_scrolled_to` | `value` (pixels from top), `percent` (% of page) | Either threshold can fire it |
+| Video: On Pause | `video_pause` | — | pass-through |
+| Video: On Goal Reached | `video_watched_seconds` | `value` (seconds watched), `percent` (% watched) | pass-through |
+
+### On Exited Page
+
+**Type** `on_exited_page` · **1 in / 1 out** · **Server**
+
+Despite the name, this node is declared as a server-side node in the builder rather than a browser trigger.
+
+**Fields:** none.
+
+<Warning>
+We could not find a handler for `on_exited_page` on either the server or the browser side of the renderer, and it is not in the list of trigger nodes that get promoted to their own root event. It may be a no-op in its current form. Verify with the [Debug Window](/debugging/debug-window) before building on it.
+</Warning>
+
+---
+
+## Content & routing actions
+
+### Dynamic Content
+
+**Type** `dynamic_container` · **1 in / 1 out** · Server · requires `pages.create` or `pages.update`
+
+Replaces the contents of a `<dynamic-container>` on the page with a saved component.
+
+**Fields**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `container` | Yes | The `id` of the `<dynamic-container>` to fill. The node warns *"Container is required"* until set. |
+| `component` | Yes | The **code** of the component to render. The node warns *"Component is required"* until set. |
+
+The container dropdown is populated from `GET /api/brands/{brand}/pages/{page}/component-type/dynamic-container`; the component dropdown from `GET /api/brands/{brand}/components/all?short=true`.
+
+Full guide: [Dynamic Content](/funnels/dynamic-content).
+
+### Load Another Page
+
+**Type** `page_variant` · **1 in / 1 out** · Server · requires `pages.create` or `pages.update`
+
+Renders a **different page's content at the current URL**. No redirect, no URL change.
+
+**Fields**
+
+| Field | Description |
+|-------|-------------|
+| `value` | ID of the page (or page variant) to load. |
+| `slug` | Slug of that page. Set automatically. |
+| `load_page_events` | **Load & Override Page Events.** Off by default: the variant inherits the primary page's events. Turn on to give the variant its own event graph — the renderer then reloads the events for the loaded page and re-runs the event pass (capped at 3 reloads, so avoid chains of variants that each override events). |
+
+The node is skipped in preview mode so you can inspect the original page.
+
+See [Page Variants](/pages/page-variants).
+
+### Redirect to Page
+
+**Type** `page` · **1 in / 0 out** · Server + Browser
+
+Sends the visitor to another page in the brand. The path ends here.
+
+**Fields:** `value` (page ID), `slug`, `code`.
+
+### Redirect to URL
+
+**Type** `url_redirect` · **1 in / 0 out** · Server + Browser
+
+Sends the visitor to any URL. The path ends here.
+
+**Fields:** `value` (target URL), `keep_query_params` (boolean — carry the current query string over; on by default, set it to `false` to drop it).
+
+The target URL supports two placeholder families, in both brace and percent form: `{click_id}` and `{query.<param>}`. A redirect back to the same host as the current request is suppressed so a rule cannot put the page into a loop.
+
+### Show Popup
+
+**Type** `exit_popup` · **1 in / 0 out** · Browser · requires `exitpopups.view`
+
+**Fields:** `value` — popup ID.
+
+See [Exit Popups](/funnels/exit-popups).
+
+### Show Element / Hide Element
+
+**Types** `show_element` / `hide_element` · **1 in / 1 out** · Browser · pass-through
+
+**Fields:** `value` — CSS selector.
+
+### Show Video CTA / Hide Video CTA
+
+**Types** `show_video_cta` / `hide_video_cta` · **1 in / 1 out** · Browser · pass-through
+
+`show_video_cta` takes `scroll_to` (boolean) — scroll the page to the CTA when it appears. `hide_video_cta` has no fields.
+
+### Wait Seconds
+
+**Type** `wait_seconds` · **1 in / 1 out** · Browser · pass-through
+
+**Fields:** `value` — seconds to pause before continuing.
+
+### Execute Javascript on Client
+
+**Type** `client_script` · **1 in / 1 out** · Browser
+
+Runs a snippet in the page.
+
+**Fields:** `client_script` — the JavaScript source.
+
+<Warning>
+The flow does **not** advance automatically after a client script. Call `ef.nextNode()` when you want the next node to run. See [Window API](/funnels/window-api).
+</Warning>
+
+---
+
+## Session, commerce & security actions
+
+### Tag User
+
+**Type** `add_tag` · **1 in / 1 out** · Server + Browser · pass-through
+
+**Fields:** `value` (tag name), `expiration_minutes` (omit or `0` for a session cookie; a positive number expires the tag after that many minutes — `10080` = 7 days).
+
+<Warning>
+**Server and browser write the tag cookie under different names.** When the node runs on the server the cookie is named exactly `value`; when it runs in the browser it is named `tag_<value>`. **Has Tag** on the server reads the bare name, while the `tags` array exposed to Script Rules is built from `tag_`-prefixed cookies only. Keep a tag's set/read pair on the same side of the fence, or set tags from the browser with `ef.addTag()` and read them with `tags.includes(...)`.
+</Warning>
+
+### Whitelist visitor
+
+**Type** `mark_whitelisted` · **1 in / 1 out** · Server + Browser · pass-through
+
+**Fields:** `value` — expiration in minutes. **`0` whitelists the visitor permanently.**
+
+Both nodes write an encrypted, `httpOnly` cookie named `whtst`. `Whitelist visitor` with `value: 0` sets it for ten years; `Mark visitor as NOT whitelisted` sets a 7-day negative cookie. Within the same request the change takes effect immediately, so **Is Whitelisted?** placed after either node sees the new value.
+
+### Mark visitor as NOT whitelisted
+
+**Type** `mark_not_whitelisted` · **1 in / 1 out** · Server + Browser · pass-through
+
+**Fields:** none.
+
+Both feed the Whitelisted / Non-Whitelisted containers — see [Content Visibility Control](/pages/visitor-based-content).
+
+### Set Merchant
+
+**Type** `set_merchant` · **1 in / 1 out** · Server + Browser · pass-through · requires `merchants.view`
+
+**Fields:** `value` (merchant ID), plus `merchant_gateway` and `merchant_account_id`, which are filled in automatically from the selected merchant.
+
+<Note>
+**Set Merchant, Clear Merchant and Set Checkout Page are ignored once the visitor has purchased in this session.** The renderer refuses to move a buyer onto a different processor or checkout mid-flow.
+</Note>
+
+### Clear Merchant
+
+**Type** `clear_merchant` · **1 in / 1 out** · Server + Browser · pass-through · requires `merchants.view`
+
+Resets the merchant back to the domain default. **Fields:** none.
+
+### Set Checkout Page
+
+**Type** `set_checkout_page` · **1 in / 1 out** · Server · pass-through
+
+Overrides which checkout page this session uses.
+
+**Fields:** `value` (page ID), `slug`.
+
+See [Checkout redirect behavior](/funnels/checkout-redirect-behavior).
+
+### Set Checkout Bumps
+
+**Type** `set_checkout_bumps` · **1 in / 1 out** · Server · pass-through
+
+**Fields:** `bumps` — array of bump objects (`title`, `description`, `price`, `added_message`, product code).
+
+<Note>
+This node is only offered in **Add Node** when the page is flagged as a checkout page.
+</Note>
+
+### Set Variable
+
+**Type** `set_variable` · **1 in / 1 out** · Server + Browser · pass-through
+
+Sets page variables for the rest of the render.
+
+**Fields:** `variables` — an object of key/value pairs.
+
+See [Page Variables](/pages/page-variables).
+
+### Execute Automation on Customer
+
+**Type** `execute_automation` · **1 in / 1 out** · requires `automations.view`
+
+**Fields:** `automation_id`, `delay` (seconds, optional).
+
+### Block Request
+
+**Type** `block_request` · **1 in / 0 out** · Server · pass-through
+
+**Fields:** `value` — the message shown to the blocked visitor.
+
+<Warning>
+Attach **Block Request** to the specific output of a condition. If you drop it directly under the entry node it blocks **every** request.
+</Warning>
+
+### Ban Visitor by IP / Unban Visitor by IP
+
+**Types** `ban_ip` / `unban_ip` · **1 in / 0 out** · Server · pass-through
+
+**Fields:** none.
+
+<Warning>
+These two nodes are offered in the builder but **the page renderer has no handler for them** — a path that reaches `ban_ip` or `unban_ip` simply stops. Do not rely on them for access control; use **Block Request** behind a condition instead.
+</Warning>
+
+---
+
+## Split testing
+
+These nodes are covered end to end in [Split Testing](/funnels/split-testing). Summary:
+
+### Component Split Test
+
+**Type** `component_split_test` · **1 in / 2–5 out** · Server · requires `split_tests.create` or `split_tests.update`
+
+Splits traffic between components rendered into a `<split-test>` container on this page.
+
+**Fields**
+
+| Field | Description |
+|-------|-------------|
+| `container` | `id` of the `<split-test>` container on the page. Required. |
+| `container_name` | Cached display name of that container. Set automatically. |
+| `value` | Number of variants: `2`, `3`, `4` or `5`. Changing it adds or removes output pins **and their Traffic Distribution nodes**. |
+| `name` | Test name, shown in split-test reporting. |
+| `enforce_exact_split` | `1` / `0`, set by the **Enforce Exact Split** checkbox. See the note below. |
+| `split_test_id` | ID of the split test record. Assigned when you save — do not set by hand. |
+| `winner_node_code` | `node_code` of the Traffic Distribution node marked as winner. When set, that variant is served to everyone and the weights are ignored. |
+
+<Note>
+**On `enforce_exact_split`:** the flag is stored on the node and carried into the published flow, but the current page renderer does not read it. Component split tests already allocate traffic **exactly** — a shared counter (Redis-backed, so it holds across workers) drives a smooth weighted rotation rather than a per-visitor dice roll. Leaving the box unchecked does not make allocation random.
+</Note>
+
+<Warning>
+A **Component Split Test** node **ends its branch**. It performs the container swap and stops — anything wired after it (rather than under a Traffic Distribution node) will not run.
+</Warning>
+
+Advanced statistics saved through the node's **Advanced Settings** modal (and to `PUT /api/brands/{brand}/split-tests/{id}` once `split_test_id` exists): `duration`, `sample_size_limit`, `min_sample_size_per_variant`, `significance_level`, `statistical_power`, `minimum_detectable_effect`, `multiple_testing_correction`, `early_stopping_enabled`, `statistical_method`, `sequential_testing_interval`, `primary_metric`, `winner_selection_criteria`, `practical_significance_threshold`, `require_practical_significance`, `check_guardrail_metrics`, `guardrail_metrics`, `goals`, `enable_automated_winner_selection`, `automated_decision_threshold`, `auto_select_winner`, `winner_selection_confidence`.
+
+### Split Test
+
+**Type** `split_test` · **1 in / 2–5 out** · Server + Browser · requires `split_tests.create` or `split_tests.update`
+
+The non-component split test: splits traffic between whole branches of the flow rather than between components in one container. Each output takes one **Traffic Distribution** node, and whatever hangs below that weight is the variant — commonly a **Load Another Page**.
+
+**Fields:** `value` (2–5), `name`, `enforce_exact_split` (see the note above), `split_test_id`, `winner_node_code`.
+
+<Note>
+Unlike Component Split Test, `split_test` can run on either side. On the server the branch is chosen from a shared exact-rotation counter; if the test is handed to the browser instead, selection is a weighted random draw stored in the `st_res_<split_test_id>` cookie.
+</Note>
+
+### Traffic Distribution
+
+**Type** `split_test_weight` · **1 in / 1 out** · Server + Browser · `only_on: component_split_test, split_test`
+
+One per variant. Created automatically when you change the parent's variant count.
+
+**Fields**
+
+| Field | Description |
+|-------|-------------|
+| `value` | Percentage of traffic, `0`–`100`. Editing one weight redistributes the remainder evenly across its siblings. |
+| `name` | Variant name, used in reporting. |
+| `is_winner` | `1` on the winning variant, `0` on the others, absent while the test runs. Marking a winner writes that variant's `node_code` to the parent's `winner_node_code`. |
+| `node_code` | Stable short code. This is the value used as `filter[node_code]` in analytics. |
+
+### Component
+
+**Type** `component_split_test_component` · **1 in / 0 out** · Server · `only_on: split_test_weight` · requires `pagecomponents.view`
+
+The component rendered for one variant.
+
+**Fields:** `component` (component code), `baseline` (boolean — mark the control).
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Page Events" href="/funnels/page-events" />
+  <Card title="Split Testing" href="/funnels/split-testing" />
+  <Card title="Dynamic Content" href="/funnels/dynamic-content" />
+  <Card title="Script Rule" href="/funnels/script-rule" />
+  <Card title="Query Parameters" href="/funnels/query-parameters" />
+  <Card title="Sequence Nodes" href="/funnels/sequence-nodes" />
+  <Card title="Window API" href="/funnels/window-api" />
+  <Card title="Debug Window" href="/debugging/debug-window" />
+</CardGroup>

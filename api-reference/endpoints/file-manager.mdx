@@ -7,6 +7,10 @@ description: 'Upload, list, rename, and delete brand media assets via API'
   All File Manager endpoints authenticate via the `EF-Access-Key` header. No session cookie or CSRF token is required.
 </Note>
 
+<Warning>
+  **`POST /api/brands/{brand}/media` does not exist** (returns 404). Use [Upload File](#upload-file) (`/file-manager/upload-file`) or [Legacy upload](#legacy-upload-brand-files) (`/files/upload`) below.
+</Warning>
+
 ---
 
 ## Upload File
@@ -277,6 +281,77 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/fi
 }
 ```
 </ResponseExample>
+
+---
+
+## Legacy: List brand files (database catalog)
+
+`POST /api/brands/{brand}/files` returns the brand's **existing image catalog** from the database. It does **not** accept file uploads despite using POST.
+
+```
+POST /api/brands/{brand}/files
+```
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/files \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "src": "https://cdn.elasticfunnels.io/42/assets/media/logo.png?t=1733846400",
+      "type": "image",
+      "width": 200,
+      "height": 80
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Legacy: Upload brand files
+
+Upload one or more images to the legacy brand files store (stored under `/assets/media/` on the CDN).
+
+```
+POST /api/brands/{brand}/files/upload
+```
+
+<ParamField body="files[]" type="file[]" required>
+  Image files (`multipart/form-data`). Each file must pass the `image` validation rule.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/files/upload \
+  -H "EF-Access-Key: your_api_key_here" \
+  -F "files[]=@/path/to/logo.png"
+```
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "src": "https://cdn.elasticfunnels.io/42/assets/media/logo.png",
+      "type": "image",
+      "width": 400,
+      "height": 120
+    }
+  ]
+}
+```
+</ResponseExample>
+
+<Note>
+  Prefer [Upload File](#upload-file) (`/file-manager/upload-file`) for new integrations — it supports paths, custom filenames, and more MIME types.
+</Note>
 
 ---
 

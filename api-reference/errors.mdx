@@ -5,7 +5,7 @@ description: 'Understanding API error responses'
 
 ## Error Response Format
 
-When an API request fails, ElasticFunnels returns an error response with a standard format:
+Most failed requests return a JSON body. The **most common** validation/auth shape is:
 
 ```json
 {
@@ -17,6 +17,23 @@ When an API request fails, ElasticFunnels returns an error response with a stand
   }
 }
 ```
+
+### Alternate shapes (also used in production)
+
+Endpoints are not fully normalized to one schema. Also handle these when present:
+
+| Pattern | Typical status | Example |
+|---------|----------------|---------|
+| `message` only | 401, 404 | `{ "message": "Invalid API key or brand access denied" }` |
+| `error` string | 403, 404, 409 | `{ "error": "component_in_use", "message": "...", "usage_count": 3 }` |
+| `success: false` | 409 | `{ "success": false, "message": "...", "code": "revision_conflict" }` |
+| `plan_error` | 403, 422 | `{ "error": "Upgrade required...", "plan_error": { ... } }` |
+| Laravel `errors` only | 422 | `{ "errors": { "domain": ["The domain has already been taken."] } }` |
+| Non-JSON / HTML | 302, 500 | Session redirect to login, or proxy error pages — check `Content-Type` |
+
+<Info>
+  Always branch on **HTTP status code** first, then parse JSON if `Content-Type` includes `application/json`. Log the raw response body when debugging unknown failures.
+</Info>
 
 ## HTTP Status Codes
 

@@ -1,292 +1,256 @@
 ---
 title: 'Page Events'
-description: 'Control visitor behavior and content flow with triggers, conditions, and actions'
+description: 'The flow graph attached to a page: how it is stored, when each node runs, and how to wire it'
 ---
 
-Page Events are a **visual flow builder** for your funnel: you connect triggers, conditions, and actions so the right thing happens at the right time—whitelisting, popups, video CTAs, merchant switching, and more.
+Page Events is a **flow graph attached to a page**. You connect triggers, conditions and actions, and the platform runs them — some before the HTML is sent, some in the visitor's browser after load. It is what powers whitelisting, dynamic content, component split tests, exit popups, merchant switching and video CTAs.
 
-## Quick navigation
-{/* SCREENSHOT: Quick navigation · funnel builder, page events, or published flow · desktop */}
+Open it from **Pages → (your page) → Manage Page Events**.
 
 <CardGroup cols={2}>
-  <Card title="How it works" icon="diagram-project" href="#how-page-events-work">
-    Execution order, entry points, and the difference between server and browser nodes
+  <Card title="Node reference" icon="list-tree" href="/funnels/page-events-nodes">
+    Every node type, its fields, and its wiring constraints
   </Card>
-  <Card title="Server-side nodes" icon="server" href="#server-side-nodes">
-    Query parameters, Script Rules, Load Page, Set Merchant, Dynamic Container, and more
+  <Card title="The graph model" icon="diagram-project" href="#the-graph-model">
+    Nodes, connections, entry views, and how it is stored
   </Card>
-  <Card title="Browser (frontend) nodes" icon="bolt" href="#browser-nodes">
-    Triggers, conditions, and actions that run in the visitor’s browser
+  <Card title="Server vs browser" icon="server" href="#server-vs-browser">
+    Which nodes run before the page is sent, and which run after
   </Card>
-  <Card title="Patterns & troubleshooting" icon="puzzle-piece" href="#common-patterns">
-    Example flows and how to fix common issues
+  <Card title="Patterns" icon="puzzle-piece" href="#common-patterns">
+    Worked examples and troubleshooting
   </Card>
 </CardGroup>
 
 ---
 
-## How Page Events Work
-{/* SCREENSHOT: How Page Events Work · funnel builder, page events, or published flow · desktop */}
+## The graph model
 
-### Execution order
-- **Left to right** — Nodes run in order along the connections.
-- **Top to bottom** — When several nodes connect from one source, they run from top to bottom.
-- **Sequential** — Each node finishes before the next one runs.
+A page's events are a **directed graph of nodes**. Every node has:
 
-### Entry points
-Flows start from:
-- **Page Load** — When the page loads
-- **Form Submit** — When a form is submitted
-- **Button Click** — When specific buttons are clicked
-- **Exit Intent** — When the visitor moves to leave (e.g. cursor to browser chrome)
+- a **type** (`data.type`) — the real identity of the node, e.g. `script_rule`, `dynamic_container`, `component_split_test`
+- a **node code** (`data.node_code`) — a short stable identifier used by analytics and split-test reporting
+- **input and output pins** — `input_1`, `output_1`, `output_2`… Connections are stored on both ends, so a link appears in the source node's `outputs.output_N.connections` and in the target's `inputs.input_M.connections`.
+- a **position** on the canvas (`pos_x`, `pos_y`)
 
-### Server vs browser
-- **Server-side nodes** (e.g. Query Parameter, Script Rule, Load Page, Set Merchant, Dynamic Container) run **before** the page is sent. Use them for routing, whitelisting, and content selection.
-- **Browser (frontend) nodes** (e.g. Video pause, When scrolled to, Exit popup, Show Video CTA) run **in the visitor’s browser** after the page loads. Use them for scroll, video, and popup behavior.
+### Reading a branch
+
+Outputs are ordered, and the order is the meaning:
+
+- **Output 1** — the first pin. For a condition node this is the **true / Yes** branch.
+- **Output 2** — the second pin. For a condition node this is the **false / No** branch.
+
+Every node except **Sequence** follows **one connection per output**. If you need two actions on the same branch, either chain them (most actions have an output that continues the flow) or use a **Sequence** node and add an output per action.
+
+### Entry views
+
+Every flow starts from an **entry node** (the node labelled *Loaded*). A page may have several.
+
+Each entry node appears as a **View** in the left rail of the builder. You can name it (pencil icon), reorder the list by dragging, and each view remembers its own camera position on the canvas. The order is saved as `entry_views_order`.
+
+<Warning>
+Views are a **canvas organisation feature, not a routing feature.** At render time the platform collects the children of **every** entry node and runs them all — it does not choose one view. `entry_views_order` affects the builder only. If two views must be mutually exclusive, put the choice behind a condition.
+</Warning>
+
+### Global page events
+
+Alongside per-page events, a brand has one **Global Page Events** graph — open it with **Manage Global Page Events** in the builder toolbar. Global events are merged into every page's flow and are **ordered ahead of the page's own events**. Use them for brand-wide concerns (cloaking, IP rules, universal tagging) instead of copying the same nodes onto every page.
+
+### Where it is stored
+
+Page events are loaded and saved through:
+
+```
+GET  /api/brands/{brand}/pages/{page}/events
+POST /api/brands/{brand}/pages/{page}/events
+```
+
+Use `global` in place of the page ID for the brand-wide graph. Save is **POST only — there is no PUT**, and these are session-authenticated app endpoints, not public API-key endpoints.
+
+The response body is the builder's export:
+
+```jsonc
+{
+  "drawflow": { "Home": { "data": {
+    "1": {
+      "id": 1,
+      "name": "entry",
+      "data": { "type": "entry", "value": "3202", "node_code": "…", "view_name": "Main" },
+      "inputs":  {},
+      "outputs": { "output_1": { "connections": [ { "node": "2", "output": "input_1" } ] } },
+      "pos_x": 960, "pos_y": 2154
+    }
+  } } },
+  "canvas_x": -1290,
+  "canvas_y": -1867,
+  "entry_views_order": [1, 5, 9]
+}
+```
+
+<Note>
+When a page has no events yet, `GET .../events` returns **`200` with an empty body** — not `{}` and not `404`. Handle that case if you are reading the endpoint programmatically.
+</Note>
+
+On save, the platform compiles the graph into a flattened execution tree, assigns `node_code`s where missing, and creates or updates the split-test records referenced by any `split_test` / `component_split_test` node.
 
 ---
 
-## Server-side nodes
-{/* SCREENSHOT: Server-side nodes · funnel builder, page events, or published flow · desktop */}
+## Server vs browser
 
-These run on the server before the page is rendered. They’re the main building blocks for **who sees what** and **which content loads**.
+Each node declares where it can run. The platform splits your graph into a **server pass** and a **browser payload**.
 
-### Conditions
+| | Server (before the HTML is sent) | Browser (after the page loads) |
+|---|---|---|
+| **Use for** | routing, whitelisting, cloaking, content selection, merchant/checkout setup | scroll, video, exit intent, popups, DOM changes, pixels |
+| **Examples** | Script Rule, Query Parameter Condition, Dynamic Content, Component Split Test, Load Another Page, Set Merchant, Block Request | On Exit Intent, When scrolled to, Video checks, Show Popup, Show/Hide Element, Execute Javascript on Client |
 
-| Node | What it does |
-|------|----------------|
-| **Query Parameter Condition** | Branches based on URL parameters (e.g. `vtID=k`, `source=facebook`). Supports equals, not equals, contains, is empty, is not empty. |
-| **Script Rule** | Custom JavaScript with access to visitor data, device, geo, referrer. Returns `true`/`false` to choose the path. Runs server-side. |
-| **Split Test Component** | Randomly assigns visitors to variants. Set traffic % per variant and connect each to different content or actions. |
+**How the split is decided:** a branch is sent to the browser if it — or anything below it — is a browser-only node. Certain nodes are pinned to the server even when they have browser children (`script_rule`, `page_variant`, `product_check`, `cloaking_house`, `is_whitelisted`, `url_redirect`, `set_variable`, `set_checkout_bumps`, `block_request`, `split_test`, `execute_automation`). When such a node picks a branch that belongs to the browser, the server hands that branch over to the browser payload and stops there.
 
-<CardGroup cols={2}>
-  <Card title="Query Parameter Conditions" icon="link" href="/funnels/query-parameters">
-    Full guide to URL parameters and operators
-  </Card>
-  <Card title="Script Rule" icon="code" href="/funnels/script-rule">
-    Variables, examples, and debugging
-  </Card>
-</CardGroup>
+<Warning>
+**Order matters and it is one-directional.** Server → browser works (`script_rule` → `client_script`). Browser → server does not (`exit_intent` → `script_rule`). Put every server-side decision before the first browser node on a path.
+</Warning>
 
-### Actions
-
-| Node | What it does |
-|------|----------------|
-| **Whitelist Visitor** | Marks the visitor as whitelisted for the session. Gives access to Whitelisted containers. |
-| **Mark Visitor as Not Whitelisted** | Removes whitelist so the visitor sees compliant content again. |
-| **Load Page** | Loads a different page **into the same URL**. No redirect; good for compliance. |
-| **Redirect to URL** | Sends the visitor to another URL (internal or external). |
-| **Dynamic Container** | Swaps content inside a container (e.g. different pricing by affiliate or location). |
-| **Set Merchant** | Overrides the payment processor for the page (e.g. Buygoods, Clickbank). Controls which Merchant Container shows. |
-| **Clear Merchant** | Resets merchant to the domain default. Use after tests or when leaving a special flow. |
-
-<Card title="Dynamic Content" icon="layer-group" href="/funnels/dynamic-content">
-  Set up containers and swap components by condition
-</Card>
-
-### Utility
-
-| Node | What it does |
-|------|----------------|
-| **Sequence** | Runs connected nodes one by one in order. Use when execution order matters. |
-| **Router** | Junction point for flows. Can generate unique URLs for testing. |
-
-<Card title="Sequence Nodes" icon="list-ol" href="/funnels/sequence-nodes">
-  When and how to use sequences
-</Card>
+Browser events are serialised into the page as `window.page_events` and executed by the funnel runtime script. **Save your flow and reload the page** to pick up changes.
 
 ---
 
-## Browser (frontend) nodes
-{/* SCREENSHOT: Browser (frontend) nodes · funnel builder, page events, or published flow · desktop */}
+## Node catalogue
 
-These run **in the visitor’s browser** after the page loads. They appear as triggers (e.g. in the funnel’s trigger list) or as steps inside a flow.
-
-### Triggers
-
-Triggers **wait for an event**, then run the next step.
+The full list — purpose, fields, inputs/outputs and constraints for every node — lives in the [Page Events Node Reference](/funnels/page-events-nodes). Quick orientation:
 
 <AccordionGroup>
-  <Accordion title="Exit intent">
-    Fires when the cursor moves toward the browser chrome (e.g. closing the tab). Use to show an exit popup. No settings.
+  <Accordion title="Flow control">
+    **Loaded** (entry) · **Router** · **Sequence** · **Stop Next Events Execution**
   </Accordion>
-  <Accordion title="Mobile exit intent">
-    Same idea on touch devices (e.g. fast upward scroll). No settings.
+  <Accordion title="Conditions — server">
+    **Script Rule** · **Query Parameter Condition** · **Is Customer** · **Has Purchased Any Upsell** · **Referred By Affiliate** · **Is From Country / State / EU / Timezone** · **Is Using VPN/Proxy** · **Is Whitelisted?** · **Has Tag** · **Cloaking.house** · **Product Check** (+ Match Product / Match All)
+
+    All of these compile to a script and take the **true** branch on Output 1.
   </Accordion>
-  <Accordion title="When scrolled to">
-    Fires when the visitor scrolls to a position. **Settings:** Pixels from top, or % of page (0–100). Either can trigger.
+  <Accordion title="Conditions & triggers — browser">
+    **On Exit Intent** · **On Form Success** · **On Add To Cart** · **CTA: On Shown** · **When scrolled to** · **Scroll Check** · **Element In View** · **If Showed CTA** · **If Added To Cart** · **Video: Is muted / On Pause / On Goal Reached / Progress Check**
   </Accordion>
-  <Accordion title="Video pause">
-    Fires when the visitor pauses the video (Vidalytics, TrackPlay, SmartPlayer, or HTML5). No settings.
+  <Accordion title="Content & routing">
+    **Dynamic Content** · **Load Another Page** · **Redirect to Page** · **Redirect to URL** · **Show Popup** · **Show / Hide Element** · **Show / Hide Video CTA** · **Wait Seconds** · **Execute Javascript on Client**
   </Accordion>
-  <Accordion title="Video watched (seconds / %)">
-    Fires when the video reaches a time or percentage. **Settings:** Seconds and/or Percent of video length.
+  <Accordion title="Session, commerce & security">
+    **Tag User** · **Whitelist visitor** · **Mark visitor as NOT whitelisted** · **Set Merchant** · **Clear Merchant** · **Set Checkout Page** · **Set Checkout Bumps** · **Set Variable** · **Execute Automation on Customer** · **Block Request**
   </Accordion>
-  <Accordion title="On CTA shown">
-    Fires when the video CTA is shown. No settings.
-  </Accordion>
-  <Accordion title="On form success">
-    Fires when a form is successfully submitted. **Setting:** Form ID (the form element’s `id`).
-  </Accordion>
-  <Accordion title="On add to cart">
-    Fires when the visitor adds a product to cart. No settings.
+  <Accordion title="Split testing">
+    **Component Split Test** · **Split Test** · **Traffic Distribution** · **Component**
+
+    See [Split Testing](/funnels/split-testing) for the full wiring.
   </Accordion>
 </AccordionGroup>
 
-### Conditions
-
-Conditions **check current state** and send the flow to **Output 1** or **Output 2**.
-
-<AccordionGroup>
-  <Accordion title="Element in view">
-    Is the element visible in the viewport? **Settings:** CSS selector; Min % of element visible (0–100). **Outputs:** 1 = in view, 2 = not yet.
-  </Accordion>
-  <Accordion title="Scroll check">
-    Has the visitor already scrolled to a position? Uses separate desktop/mobile thresholds (mobile = viewport &lt; 768px). **Settings:** Desktop and mobile — Pixels from top and/or % of page. **Outputs:** 1 = scrolled to position, 2 = not yet.
-  </Accordion>
-  <Accordion title="Video progress check">
-    Has the video reached a time or percentage? **Settings:** Seconds and/or Percent. **Outputs:** 1 = reached, 2 = not reached.
-  </Accordion>
-  <Accordion title="Video is muted">
-    Is the main video muted? **Outputs:** 1 = muted, 2 = not muted.
-  </Accordion>
-  <Accordion title="Showed CTA">
-    Has the video CTA already been shown this session? **Outputs:** 1 = shown, 2 = not shown.
-  </Accordion>
-  <Accordion title="Has tag">
-    Is a tag (cookie) set? **Setting:** Tag name. **Outputs:** 1 = set, 2 = not set.
-  </Accordion>
-  <Accordion title="Affiliate whitelisted">
-    Is the current affiliate (from `aff_id` in URL) whitelisted? **Outputs:** 1 = whitelisted, 2 = not.
-  </Accordion>
-  <Accordion title="Split test">
-    Splits traffic between paths. Variants and weights are set in the editor. **Outputs:** One per variant.
-  </Accordion>
-</AccordionGroup>
-
-### Actions
-
-Actions **do something** and then continue to the next step.
-
-<AccordionGroup>
-  <Accordion title="Exit popup">
-    Shows an exit popup by ID. **Setting:** Popup ID.
-  </Accordion>
-  <Accordion title="Show Video CTA">
-    Shows the video CTA block. **Setting:** Scroll to CTA — if checked, the page scrolls to the CTA when shown.
-  </Accordion>
-  <Accordion title="Hide Video CTA">
-    Hides the video CTA and restores elements that are hidden when the CTA is shown. No settings.
-  </Accordion>
-  <Accordion title="Wait (seconds)">
-    Pauses the flow for a number of seconds. **Setting:** Seconds.
-  </Accordion>
-  <Accordion title="Show element / Hide element">
-    Shows or hides an element by CSS selector (`display: block` or `display: none`). **Setting:** CSS selector.
-  </Accordion>
-  <Accordion title="URL redirect">
-    Sends the visitor to another URL. Flow stops after. **Setting:** URL.
-  </Accordion>
-  <Accordion title="Add tag">
-    Sets a tag (cookie) for use with **Has tag** later. **Settings:** Tag name; optional **Expiration (minutes)** — omit or 0 for session cookie (cleared when browser closes), or set a positive number (e.g. 60 for 1 hour, 10080 for 7 days).
-  </Accordion>
-  <Accordion title="Mark whitelisted / Mark not whitelisted">
-    Sets the whitelist cookie. **Settings:** Encrypted value (from backend), Expiration (minutes).
-  </Accordion>
-  <Accordion title="Client script">
-    Runs a JavaScript snippet in the page, then continues. **Setting:** Script. Use for pixels or small custom logic.
-  </Accordion>
-  <Accordion title="Execute automation">
-    Triggers an automation via the API. **Setting:** Token (from backend).
-  </Accordion>
-</AccordionGroup>
+<Note>
+Nodes are filtered by permission. If a node is missing from **Add Node**, your role probably lacks its permission — for example split-test nodes need `split_tests.create` / `split_tests.update`, and **Set Checkout Bumps** only appears on pages flagged as checkout pages.
+</Note>
 
 ---
 
 ## Common patterns
-{/* SCREENSHOT: Common patterns · funnel builder, page events, or published flow · desktop */}
 
-### Whitelisting from URL
+### Whitelisting from a URL parameter
 
 ```mermaid
 flowchart LR
-  A[Page Load] --> B{vtID present?}
-  B -->|Yes| C[Whitelist Visitor]
-  B -->|No| D[Compliant content]
+  A[Loaded] --> B{Query Parameter Condition<br/>vtID is not empty}
+  B -->|Output 1 · true| C[Whitelist visitor]
+  B -->|Output 2 · false| D[Compliant content]
 ```
 
-1. **Page Load** → **Query Parameter Condition** (`vtID` is not empty)
-2. **Yes** → **Whitelist Visitor**
-3. **No** → Continue with default content
+1. **Loaded** → **Query Parameter Condition** (`vtID`, operator `is not empty`)
+2. Output 1 → **Whitelist visitor** (`0` minutes = permanent)
+3. Output 2 → leave empty, or route to compliant content
+
+### Blocking traffic outside a country
+
+1. **Loaded** → **Is From Country** with `US` selected
+2. Output 1 (true) → leave empty
+3. Output 2 (false) → **Block Request** with your message
+
+<Warning>
+Attach **Block Request** to the specific output of the condition. Dropping it directly under the entry node blocks **every** visitor.
+</Warning>
 
 ### Merchant by traffic source
 
-1. **Page Load** → **Query Parameter Condition** (`source` equals `partner1`)
-2. **Yes** → **Set Merchant** (e.g. Buygoods)
-3. **No** → **Query Parameter Condition** (`source` equals `partner2`)
-4. **Yes** → **Set Merchant** (e.g. Clickbank)
-5. **No** → Use domain default merchant
+1. **Loaded** → **Query Parameter Condition** (`source` `is` `partner1`) → Output 1 → **Set Merchant**
+2. Output 2 → a second **Query Parameter Condition** (`source` `is` `partner2`) → Output 1 → **Set Merchant**
+3. Output 2 → nothing; the domain default applies
 
-<Note>
-Use **Clear Merchant** when you need to reset back to the default (e.g. after a test or on the next page load when the condition is no longer met).
-</Note>
+Use **Clear Merchant** to explicitly return to the domain default.
 
-### Video: pause at 30% then show CTA
+### Video: pause, then show the CTA
 
-1. **Video pause** (trigger) → **Video progress check** (30%)
-2. **Reached** → **Wait** (2 seconds) → **Show Video CTA** (optionally with “Scroll to CTA”)
-3. **Not reached** → (do nothing or another path)
+1. **Video: On Pause** → **Video: Progress Check** (`30`%)
+2. Output 1 → **Wait Seconds** (`2`) → **Show Video CTA** (with **Scroll to CTA** if you want the page to jump)
+3. Output 2 → nothing
 
-### Dynamic content by affiliate
+### Swapping content for one affiliate
 
-1. **Page Load** → **Script Rule** (e.g. check affiliate ID)
-2. **Affiliate 100** → **Dynamic Container** (show special pricing)
-3. **Other** → **Dynamic Container** (show default pricing)
+1. **Loaded** → **Referred By Affiliate** (pick the affiliate)
+2. Output 1 → **Dynamic Content** → container `pricing`, component `affiliate-pricing`
+3. Output 2 → nothing; the container's default content renders
+
+See [Dynamic Content](/funnels/dynamic-content).
 
 ---
 
 ## Best practices
-{/* SCREENSHOT: Best practices · funnel builder, page events, or published flow · desktop */}
 
-- **Keep flows readable** — Use sequences to group related steps and name nodes clearly.
-- **Test both branches** — For every condition, verify the Yes and No paths.
-- **Prefer simple conditions first** — Query parameters are faster than Script Rules when they’re enough.
-- **Avoid very long chains** — Long flows are harder to debug and can affect load.
+- **Prefer the purpose-built condition over a Script Rule.** *Is From Country*, *Is Using VPN/Proxy*, *Query Parameter Condition* and friends are readable at a glance and self-documenting. Save Script Rule for logic they cannot express.
+- **Combine instead of nesting.** One *Is From Country* with three countries beats three chained nodes. If a chain would be three levels deep, write one Script Rule.
+- **Put server decisions first.** Everything that routes, cloaks or selects content should run before the first browser node.
+- **Name your split tests and variants.** Those names are what you read in analytics later.
+- **Use views to keep the canvas readable**, not to separate behaviour — every view runs.
 
 <Tip>
-Use the **Rearrange** control in the events builder to auto-layout the canvas. Save and reload to keep the layout.
+Use **Rearrange** in the toolbar to auto-layout the canvas, then save. Camera position is stored per view, so each one reopens where you left it.
 </Tip>
 
 ---
 
 ## Troubleshooting
-{/* SCREENSHOT: Troubleshooting · funnel builder, page events, or published flow · desktop */}
 
 <AccordionGroup>
-  <Accordion title="Events not firing">
-    Check that triggers are connected from the correct entry point (e.g. trigger list for Video pause / When scrolled to) and that the next step is wired. For frontend nodes, save your flow and reload the page so the latest events are sent to the browser (you can’t so it’s included in `page_events`.
+  <Accordion title="Nothing happens on the page">
+    Save the flow and reload the page — browser nodes are shipped with the HTML, so an unsaved change is not live. Then check that the branch is actually reachable: a node wired to nothing, or attached below a condition whose other branch is being taken, will not run.
   </Accordion>
-  <Accordion title="Conditions always Yes or always No">
-    Verify parameter names and values (case-sensitive). For Script Rules, use the Debug Window to see the data the script receives.
+  <Accordion title="A branch runs when it should not">
+    Check which output you attached to. **Output 1 is true, Output 2 is false.** This trips people up most often with *Block Request* and *Load Another Page*.
   </Accordion>
-  <Accordion title="Content or popup not updating">
-    Confirm container names and popup IDs. For Dynamic Container, ensure the target component is saved and the container is correctly set in the node.
+  <Accordion title="Only one of my two actions runs">
+    Every node except **Sequence** allows one connection per output. Add a **Sequence** node and give it an output per action, or chain the actions.
   </Accordion>
-  <Accordion title="Page not loading or redirecting wrong">
-    Look for redirect or Load Page nodes in the path and for possible loops (e.g. condition always taking the same branch back into the flow).
+  <Accordion title="A node refuses to connect">
+    The builder enforces parent restrictions. **Component** only attaches to **Traffic Distribution**; **Traffic Distribution** only to a split-test node; **Video: Is muted** only below **On Exit Intent**; **Product Check: Match Product/All** only below **Product Check**. See [wiring rules](/funnels/page-events-nodes#wiring-rules).
+  </Accordion>
+  <Accordion title="Everything after my split test is ignored">
+    A **Component Split Test** ends its branch after swapping the container. Wire follow-up work before it, not after it.
+  </Accordion>
+  <Accordion title="A condition always takes the same path">
+    Open the [Debug Window](/debugging/debug-window) → **Page Events** tab. It shows each Script Rule's result, execution time, console output and the full data it received. Remember that parameter names and values are case-sensitive.
+  </Accordion>
+  <Accordion title="Split-test or container dropdown is empty">
+    The container list is read from the page itself. On builder pages the container must be a **Split Test Container** / **Dynamic Container** block with its name trait filled in; on coded pages the tag must be written as `<split-test id="…" name="…">` with `id` immediately before `name`. Click the reload icon next to the dropdown after saving the page.
   </Accordion>
 </AccordionGroup>
 
 ---
 
 ## Related docs
-{/* SCREENSHOT: Related docs · funnel builder, page events, or published flow · desktop */}
 
 <CardGroup cols={2}>
-  <Card title="Query Parameters" href="/funnels/query-parameters" />
+  <Card title="Node Reference" href="/funnels/page-events-nodes" />
   <Card title="Script Rule" href="/funnels/script-rule" />
+  <Card title="Query Parameters" href="/funnels/query-parameters" />
   <Card title="Dynamic Content" href="/funnels/dynamic-content" />
-  <Card title="Exit Popups" href="/funnels/exit-popups" />
+  <Card title="Split Testing" href="/funnels/split-testing" />
   <Card title="Sequence Nodes" href="/funnels/sequence-nodes" />
+  <Card title="Exit Popups" href="/funnels/exit-popups" />
+  <Card title="Window API" href="/funnels/window-api" />
+  <Card title="Page Variants" href="/pages/page-variants" />
   <Card title="Debug Window" href="/debugging/debug-window" />
 </CardGroup>

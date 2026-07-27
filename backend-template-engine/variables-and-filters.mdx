@@ -1,6 +1,6 @@
 ---
 title: 'Variables and filters'
-description: 'Backend template variables {{ path }} and filters: default, slice, raw, upper, lower, truncate, replace, currency, join, and more.'
+description: 'Backend template variables {{ path }} and filters: default, slice, raw, t (translations), upper, lower, truncate, replace, currency, join, and more.'
 ---
 
 Backend templates insert values with **`{{ path }}`** and can transform them with **filters** using the pipe character: **`{{ path | filter }}`** or **`{{ path | filter:arg }}`**.
@@ -43,6 +43,20 @@ In the first example, `product.currency_code` is resolved from context (for exam
 In the second example, `'USD'` is a fixed literal.
 
 If you want text to always be treated as literal, quote it.
+
+---
+
+## Translation filter: `t` {#translation-filter-t}
+
+For [brand translations](/pages/internationalization), **`| t`** treats the piped value as a **translation key** string. Resolution matches **`t()`**: brand dictionary for the resolved locale first, then built-in locale strings. Optional **`| t:params`** passes a context variable or safe expression that resolves to a **plain object** for built-in placeholder interpolation (same rules as **`t(key, params)`**).
+
+```html
+{{ 'hero.title' | t }}
+{{ t('hero.title') }}
+{{ 'product.savings_percent' | t:savingsOpts }}
+```
+
+Use **`t()`** and **`| t`** in templates for the same resolution order (brand first, then built-in). See [Internationalization (i18n)](/pages/internationalization) for **`locales()`**, **`{{ locale }}`**, and backend **`await t()`**.
 
 ---
 
@@ -496,6 +510,7 @@ Strings are **literal** — there is no variable interpolation inside quotes. Wr
 | `timeago` | Date | — | `{{ date \| timeago }}` |
 | `raw` | Output | — | `{{ html \| raw }}` |
 | `json` | Output | — | `{{ obj \| json \| raw }}` |
+| `t` | Translation | optional object | `{{ 'hero.title' \| t }}` |
 
 ---
 
@@ -508,6 +523,7 @@ Strings are **literal** — there is no variable interpolation inside quotes. Wr
 - **`raw`** — Use only for trusted HTML (e.g. article body, nl2br output, json).
 - **Parentheses** — `{{ (expression) | filter }}` so the filter applies to the whole expression.
 - **Concatenation** — `"text" + variable + "more text"` joins values. No interpolation inside strings; use `+` instead.
+- **`| t`** — Pipe a string key for translations; see [Internationalization](/pages/internationalization).
 
 ## Purchase Link Functions
 {/* SCREENSHOT: Purchase Link Functions · code editor or rendered example · desktop */}

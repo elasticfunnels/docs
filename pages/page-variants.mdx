@@ -48,17 +48,47 @@ Each variant has a status:
 - **Paused** - Temporarily disabled
 - **Archived** - Saved for reference but not active
 
+## Serving a variant from Page Events
+
+The **Load Another Page** node (`page_variant`) renders another page's content **at the current URL** — no redirect, no URL change. It is how a variant gets served without giving it its own address.
+
+| Field | Description |
+|-------|-------------|
+| **Page** | The variant to load. Stored as `value`; the slug is filled in automatically. |
+| **Load & Override Page Events** | Off by default — the variant inherits the primary page's event graph. Turn it on to give the variant its own events. |
+
+<Warning>
+**Load & Override Page Events re-runs the whole event pass** for the newly loaded page. That is capped at three reloads per request, so avoid chains where each variant loads another variant that also overrides its events.
+</Warning>
+
+The node is skipped in preview mode, so previewing a page always shows the page itself.
+
 ## Split Testing with Variants
 
-### Page-Level Split Testing
-Use variants for A/B testing different page versions:
+### Page-level split testing
 
-1. **Create multiple variants** with different content
-2. **Set up split test** in Page Events or Funnel level
-3. **Configure traffic distribution** (50/50, 70/30, etc.)
-4. **Monitor performance** metrics for each variant
+To split traffic between variants at one URL:
 
-### Funnel-Level Integration
+1. **Create the variants** with different content.
+2. In **Page Events**, add a **Split Test** node and set **Total Variants**.
+3. A **Traffic Distribution** node is created per output — set the percentages.
+4. Under each Traffic Distribution node, attach a **Load Another Page** pointing at that variant.
+5. Save. The split-test record is created and the node gains a **View Results** link.
+
+```mermaid
+flowchart LR
+  E[Loaded] --> ST[Split Test<br/>value: 2]
+  ST -->|Output 1| W1[Traffic Distribution 50%]
+  ST -->|Output 2| W2[Traffic Distribution 50%]
+  W1 --> P1[Load Another Page<br/>V1]
+  W2 --> P2[Load Another Page<br/>V2]
+```
+
+<Note>
+Testing **one section** of a page rather than the whole page? Use a component split test instead — it is cheaper to build and easier to read. See [Split Testing](/funnels/split-testing#which-kind-of-test-do-i-want).
+</Note>
+
+### Funnel-level integration
 Variants work with funnel split testing:
 - **Split test node** can direct traffic to different variants
 - **Purchase tracking** attributes conversions to specific variants
@@ -102,17 +132,20 @@ Use variants for personalized experiences:
 
 ## URLs and Routing
 
-### URL Parameters
-Variants use the `v=` parameter:
-- **Default behavior** - V1 loads without parameter
-- **Explicit versions** - V2+ require `v=2`, `v=3`, etc.
-- **SEO considerations** - Use canonical tags for duplicate content
-- **Analytics tracking** - Ensure proper tracking for each variant
+### Reaching a specific variant
+
+There are two ways, and **no `v=` query parameter**:
+
+- **By its own slug** — the active variant answers on the page's `slug`; every other variant answers on its `variant_slug` (for example `page-v2`). A variant without a `variant_slug` has no URL of its own.
+- **By a Load Another Page node** — the variant renders at the primary page's URL, with nothing in the address bar to reveal it. This is what you want for split tests.
+
+**SEO considerations** — use canonical tags when several slugs serve near-identical content.
 
 ### Page Events Integration
 Variants work with Page Events:
-- **Query parameter conditions** - Can check for version parameter
-- **Dynamic content** - Can load different content based on variant
+- **Load Another Page** - Serve a variant at the primary URL
+- **Query parameter conditions** - Route to a variant based on the incoming URL
+- **Dynamic content** - Swap sections rather than the whole page
 - **Conditional logic** - Different actions for different variants
 
 ### Funnel Integration
@@ -140,7 +173,8 @@ Track key metrics for each variant:
 ## Troubleshooting
 
 ### Common Issues
-- **Variants not loading** - Check URL parameters and routing
+- **Variants not loading** - Check the variant's `variant_slug`, or that a **Load Another Page** node is on the branch being taken. A condition on its own only picks a path — it does not load a page.
+- **Preview always shows the primary page** - Expected: **Load Another Page** is skipped in preview mode.
 - **Split tests not working** - Verify funnel or page event configuration
 - **Analytics not tracking** - Ensure proper tracking setup for variants
 - **Content not updating** - Clear cache and check variant status

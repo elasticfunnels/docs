@@ -33,46 +33,75 @@ if (user.email) {
 ```
 
 ## Translations
-{/* SCREENSHOT: Translations · backend script editor with t() and getLocale() · desktop */}
+{/* SCREENSHOT: Translations · backend script editor with t() · desktop */}
 
-Backend scripts can read the same per-brand translation entries that power `data-ef-hl` bindings and the template `t()` helper. The active locale is resolved per request from the URL (`hl`/`locale`/`lang`), session, brand defaults, and `Accept-Language` — backend scripts do not pick a locale themselves.
+Backend scripts use the same **resolved locale** as page templates (`req.locale` after host resolution). That value comes from route/query/session/domain/brand/`Accept-Language` and is then **snapped** to a row in Advanced → Translations when the brand has languages configured. See [Internationalization](/pages/internationalization) for precedence and template helpers (`t()`, `| t`, and related).
 
-See [Internationalization](/pages/internationalization) for the schema and admin UI.
-
-### `t(key, fallback?)`
-
-Returns the translation for `key` in the active locale, falling back to the brand's default language entry, then to `fallback`, then to an empty string.
-
-```javascript
-var label = t('hero.title', 'Welcome');
-setVariable('hero_title', label);
-```
+Most translation helpers are **async** in the sandbox — use `await`.
 
 ### `getLocale()`
 
-Returns the active locale code resolved for this request (e.g. `'en'`, `'pt-br'`). Empty string when the brand has no languages configured.
+Returns the active resolved locale code for this request (same as `req.locale`), e.g. `'en'` or `'ro'`.
 
 ```javascript
-if (getLocale() === 'pt-br') {
-  setVariable('currency_symbol', 'R$');
+if ((await getLocale()) === 'ro') {
+  setVariable('currency_symbol', 'lei');
 }
 ```
 
 ### `getLocales()`
 
-Returns the list of locale codes configured for the brand, in admin sort order. Useful for rendering a language switcher.
+Returns the list of locale **codes** configured for the brand (admin sort order). Empty array when the brand has no translation languages.
 
 ```javascript
-var available = getLocales(); // ['en', 'pt-br', 'de']
+var available = await getLocales(); // ['en', 'ro']
 ```
 
 ### `getDefaultLocale()`
 
-Returns the brand's default locale code, or empty string if no language is flagged as default.
+Returns the brand **default** language code, or the first language by sort order, or `''` when none exist.
 
 ```javascript
-if (getLocale() !== getDefaultLocale()) {
-  setVariable('show_default_link', true);
+if (await getDefaultLocale() === 'en') {
+  setVariable('show_usd', true);
+}
+```
+
+### `t(key, params?)`
+
+**Async.** Tries the **brand** dictionary first for `key`, then built-in locale JSON. Optional `params` is a plain object for `{{ name }}`-style interpolation in **built-in** strings — not a fallback text argument. This is the default choice in backend scripts for the same keys you use with **`t()`** or **`| t`** in templates.
+
+```javascript
+var label = await t('title.greeting');
+var hero = await t('hero.title');
+var cta = await t('checkout.cta');
+setVariable('hero_title', hero);
+setVariable('checkout_cta', cta);
+var pct = await t('product.savings_percent', { percent: 20 });
+setVariable('savings_label', pct);
+```
+
+### `getTranslation(key)`
+
+**Async.** Reads **only** the brand dictionary (no built-in fallback); returns `''` if the key is missing. Prefer **`t()`** unless you explicitly need that behavior.
+
+### `getTranslations()`
+
+Returns a **plain object** copy of every `key → value` for the active resolved language (empty object when the brand has no entries).
+
+```javascript
+var all = await getTranslations();
+console.log(Object.keys(all).length);
+```
+
+### `getResolvedLanguage()`
+
+Returns the **snapped** language code used for brand translations (e.g. `'ro'`), or the raw locale hint when the brand has no translation languages configured.
+
+```javascript
+var code = await getResolvedLanguage();
+if (code === 'de') {
+  setVariable('region', 'EU');
 }
 ```
 

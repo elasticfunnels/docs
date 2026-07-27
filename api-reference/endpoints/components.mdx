@@ -11,7 +11,7 @@ description: 'Create, read, update, and delete reusable page components via API'
 
 ## List Components
 
-Return all components for a brand with pagination. This endpoint does not include `html`, `css`, or `config` in the response — use [Get Component](#get-component) to retrieve full content for a specific component.
+Return all components for a brand with pagination. This endpoint does not include `html`, `css`, or `config` in the response — use [Get Component Content](#get-component-content) or [Get Component Builder Config](#get-component-builder-config) for full content.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -83,10 +83,10 @@ const { data, total, current_page, last_page } = await res.json();
 
 ## Get All Components (unpaginated)
 
-Return all components for a brand in a single array, without pagination. Only components that have a builder config are included.
+Return all components for a brand in a single array, without pagination (no `builder config` filter is applied).
 
 <Note>
-  This endpoint returns a lightweight shape: `id`, `name`, `code`, `type`, `screenshot`, and (unless `?short=true`) `config`. It does **not** return `html` or `css`. Use [Get Component](#get-component) for the full record of a specific component.
+  This endpoint returns a lightweight shape: `id`, `name`, `code`, `type`, `screenshot`, and (unless `?short=true`) `config`. It does **not** return `html` or `css`. For HTML use [Get Component Content](#get-component-content); for GrapesJS config use [Get Component Builder Config](#get-component-builder-config).
 </Note>
 
 <ParamField path="brand" type="string" required>
@@ -129,7 +129,11 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/components/all" \
 
 ## Get Component
 
-Retrieve a single component including its full `html`, `css`, and `config`. Accepts either a numeric ID or the component's `code` string.
+Retrieve a single component's **metadata** (not full content). Accepts either a numeric ID or the component's `code` string.
+
+<Warning>
+  This endpoint returns only `id`, `name`, `code`, and `screenshot`. It does **not** include `html`, `css`, `config`, `type`, or timestamps. Use the content endpoints below for body data.
+</Warning>
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -159,13 +163,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/components/custom-hero-
   "id": 12,
   "name": "Hero Section",
   "code": "custom-hero-section",
-  "type": "editor",
-  "html": "<!DOCTYPE html><html><body><section class=\"hero\">...</section></body></html>",
-  "css": ".hero { background: #fff; padding: 60px 0; }",
-  "config": null,
-  "brand_id": 42,
-  "created_at": "2024-11-01T09:00:00.000000Z",
-  "updated_at": "2024-12-10T14:30:00.000000Z"
+  "screenshot": null
 }
 ```
 
@@ -399,6 +397,10 @@ Update the HTML content of a component. Use this endpoint to publish new HTML or
   When saving a draft, pass an existing `revision_id` to update that specific draft instead of creating a new one.
 </ParamField>
 
+<ParamField body="expected_revision_id" type="number">
+  When publishing (not a draft), pass the `revision_id` you last read. If the server has a newer draft, the request returns **409** with `code: "revision_conflict"`.
+</ParamField>
+
 ```bash Request
 POST /api/brands/{brand}/components/{component}/editor
 ```
@@ -447,6 +449,15 @@ await fetch(
 {
   "success": true,
   "revision_id": 88
+}
+```
+
+```json 409 Revision conflict (publish)
+{
+  "success": false,
+  "message": "Revision conflict: component changed before publish.",
+  "code": "revision_conflict",
+  "latest_revision_id": 89
 }
 ```
 </ResponseExample>

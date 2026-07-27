@@ -19,23 +19,39 @@ In this example:
 ## Query Parameter Condition Node
 {/* SCREENSHOT: Query Parameter Condition Node · funnel builder, page events, or published flow · desktop */}
 
-The Query Parameter Condition node checks if URL parameters exist or have specific values.
+The Query Parameter Condition node checks if URL parameters exist or have specific values. It runs on the **server**, before the page is sent, and it has two outputs: **Output 1 when the condition is true**, Output 2 when it is false.
 
 ### Basic Setup
 1. Go to **Page Events** for your page
 2. Click **"Add Node"** 
 3. Select **"Query Parameter Condition"**
-4. Configure the parameter name and condition
-5. Connect to appropriate action nodes
+4. Add one or more conditions — each is a parameter name, an operator, a value, and how it joins the next one
+5. Connect Output 1 and Output 2 to the appropriate nodes
 
 ### Available Operators
-- **Equals** - Parameter exactly matches a value
-- **Not Equals** - Parameter doesn't match a value
-- **Contains** - Parameter contains a substring
-- **Is Empty** - Parameter exists but has no value
-- **Is Not Empty** - Parameter exists and has a value
-- **Greater Than** - Parameter value is greater than specified number
-- **Less Than** - Parameter value is less than specified number
+
+| Operator | Matches when |
+|----------|--------------|
+| **is** | The parameter equals the value exactly |
+| **is not** | The parameter does not equal the value |
+| **contains** | The value appears anywhere in the parameter |
+| **does not contain** | The value does not appear in the parameter |
+| **starts with** | The parameter begins with the value |
+| **ends with** | The parameter ends with the value |
+| **is empty** | The parameter is **missing or blank** (no value field needed) |
+| **is not empty** | The parameter is present and non-blank (no value field needed) |
+
+<Warning>
+There are **no numeric operators** on this node — "greater than" and "less than" do not exist. All comparisons are string comparisons. For numeric logic use a [Script Rule](/funnels/script-rule): `return parseInt(query.qty) > 3;`
+</Warning>
+
+### Combining conditions
+
+Add several conditions to one node and set each row's **logical operator** to **AND** or **OR**. The operator on a row joins it to the **next** row, and the conditions are evaluated left to right with JavaScript precedence — `A AND B OR C` is `(A AND B) OR C`. There is no grouping; for anything more nested, use a Script Rule.
+
+<Note>
+Under the hood the node compiles your conditions into a Script Rule against the `query` object and stores it on the node. That is what actually runs, which is why the semantics match JavaScript exactly. Do not hand-edit the generated script — it is rewritten every time you change a condition.
+</Note>
 
 ## Common Use Cases
 {/* SCREENSHOT: Common Use Cases · funnel builder, page events, or published flow · desktop */}

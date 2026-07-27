@@ -1,13 +1,13 @@
 ---
 title: 'Internationalization (i18n)'
-description: 'Translate page copy by binding elements to translation keys, switching the active language via URL, and rendering localized content from templates and backend scripts.'
+description: 'Translate page copy with a brand-wide dictionary, switch the active language via URL, and render localized strings from templates and backend scripts.'
 ---
 
 ElasticFunnels gives you a single, brand-wide system for translating page
 copy without forking pages or maintaining duplicate variants. You write
-your page once, **bind elements to translation keys** in the builder,
-**store translations per language** in the admin, and the page swaps the
-right copy in/out based on the visitor's language.
+your page once, **reference translation keys in templates** (or backend
+scripts), **store translations per language** in the admin, and the page
+shows the right copy based on the visitor's language.
 
 The system is intentionally narrow: it only translates copy. Layout,
 images, links, and behavior stay identical across languages. Use
@@ -24,15 +24,18 @@ There are two things to manage:
 2. **Entries** — for each language, a list of `key → translation` rows.
    The same key (e.g. `hero.title`) lives in every language.
 
-Once a language has entries, any element on any page that you've bound
-to one of those keys will display the translated copy.
+Once a language has entries, any template or script that uses that key
+under the **resolved** locale for the request will receive the matching
+value.
 
 ### Translation keys
 
 Keys use **dot notation** so you can group related copy together —
-`hero.title`, `checkout.cta`, `faq.refund_policy`. They can contain
-letters, numbers, dots, dashes, and underscores, must start with a
-letter or number, and can be up to 191 characters long.
+`hero.title`, `checkout.cta`, `faq.refund_policy`.
+
+Use **letters, numbers, underscores, and dots** in keys (e.g. `hero.title`,
+`form.email_placeholder`). The admin may allow a wider pattern for stored
+keys; sticking to this subset keeps lookups predictable.
 
 Each `key` is unique within a language but is meant to repeat across
 languages — that's how the system knows the English `hero.title` and
@@ -75,66 +78,39 @@ fails validation, nothing is saved.
 Access to translations is controlled by the **Translations** module
 permissions in your role: `view`, `create`, `update`, `delete`.
 
-## Binding elements in the page builder
-{/* SCREENSHOT: Translations sector · GrapeJS builder right panel · desktop */}
-
-Open any page in the builder, select an element, and look for the
-**Translations** sector in the right-hand panel.
-
-The sector has a single field: **`data-ef-hl=`**. Type a translation
-key (e.g. `hero.title`) and the builder binds the selected element to
-that key. The original copy stays in place and acts as the **fallback**
-when no entry exists for the active language.
-
-A bound element looks like this in the published page:
-
-```html
-<h1 data-ef-hl="hero.title">Welcome</h1>
-<img data-ef-hl="hero.alt" alt="Default alt" src="/hero.png" />
-<input data-ef-hl="form.email_placeholder" placeholder="you@example.com" />
-```
-
-When the page is rendered, ElasticFunnels will:
-
-- Replace the **inner content** of `<h1>` with the entry for
-  `hero.title` in the active language.
-- Swap the **`alt`** attribute on the `<img>` with the entry for
-  `hero.alt`.
-- Swap the **`placeholder`** on the `<input>` with the entry for
-  `form.email_placeholder`.
-
-The text-bearing attributes that get swapped automatically are:
-`alt`, `title`, `placeholder`, `value`, and `aria-label`. If a
-binding exists but the active language has no entry for that key, the
-original markup is left untouched (so editors always see something).
-
 ## Choosing the active language
 
-ElasticFunnels picks the active language for each request from these
-sources, in priority order:
+ElasticFunnels derives a **locale hint** from the request, then **snaps**
+it to a language row configured for the brand (when any exist).
 
-1. **URL path segment**, when the page slug captures a language with a
-   `{hl}` placeholder (see [wildcard routes](../wildcard-routes)) —
-   e.g. `/en/about`.
-2. **`?hl=`** query parameter — preferred name (matches Google's
-   convention).
-3. **`?locale=`** query parameter.
-4. **`?lang=`** query parameter.
-5. **Domain default** — set on the domain.
-6. **Brand default** — set on the brand.
-7. **Browser `Accept-Language`** header.
-8. **English (`en`)** as a final fallback.
+**Locale hint priority** (first match wins):
 
-Whatever language is chosen is then matched against your brand's
-configured languages:
+1. **Wildcard / route params** — `hl` or `locale` from the matched slug
+   (e.g. `{hl}` in [wildcard routes](../wildcard-routes)), also merged
+   Express `params` when present.
+2. **Query string** — `hl`, then `locale`, then `lang`.
+3. **Session** — `session.locale`.
+4. **Domain** — `locale` / `language` from domain config.
+5. **Brand** — `locale` / `language` from brand variables.
+6. **`Accept-Language`** — primary two-letter subtag of the first range
+   (e.g. `en-US` → `en`).
+7. **`en`** — final fallback for the hint.
 
-- **Exact match wins** — `?hl=pt-br` serves `pt-br` if you have it.
-- **Region falls back to base** — `?hl=pt-br` serves `pt` if only `pt`
-  is configured.
-- **Otherwise the brand's default language is used**.
+**Snapping to brand languages** (when the brand has at least one language
+in Advanced → Translations):
 
-If the brand has no languages configured, pages render exactly as you
-authored them (no replacements happen).
+- If the hint matches a configured **code** exactly (after normalization),
+  that language is used.
+- Otherwise the brand **default** language is used, or the first language
+  by sort order if no default is set.
+
+There is **no** automatic `pt-br` → `pt` alias today: add both codes in
+the admin if you need regional variants.
+
+If the brand has **no** languages configured, the hint is still set on
+the request for built-in helpers, but **`getTranslations()`** and
+dictionary-backed **`t()`** / **`| t`** paths will not load entries from
+the database.
 
 ### Clean URLs per language
 
@@ -144,86 +120,89 @@ active language, capture the locale segment in your page slug:
 - **Page slug:** `{hl}/about`
 - **URLs that match:** `/en/about`, `/pt-br/about`
 
-The `{hl}` placeholder feeds straight into the language picker above —
-no extra wiring required.
+The `{hl}` placeholder feeds into the route params used in step (1)
+above.
 
 ## Using translations in templates
 
-Inside a page or component template you can read translations directly:
+There are two sources of copy:
+
+1. **Brand dictionary** (Advanced → Translations) — **`t()`**, **`| t`**,
+   and **`getTranslations()`** use the **resolved** language for the request.
+2. **Built-in product strings** (`src/locales` on the server) — used when
+   **`t()`** or **`| t`** does not find a brand entry for the key; today the shipped
+   catalog is **English**; extra locale files extend this over time.
 
 ```twig
-<h1>{{ t('hero.title', 'Welcome') }}</h1>
-<p>{{ 'hero.subtitle' | t }}</p>
-
-<select>
-  @foreach(code in locales())
-    <option value="{{ code }}" @if(code == locale()) selected @endif>
-      {{ code }}
-    </option>
-  @endforeach
-</select>
+<h1>{{ t('title.greeting') }}</h1>
+<h2>{{ 'hero.subtitle' | t }}</h2>
+<img src="/hero.png" alt="{{ t('hero.alt') }}" />
+<p>{{ dump(locales()) }}</p>
+<p>Default: {{ defaultLocale() }}</p>
+<p>{{ t('product.savings_percent', { percent: 20 }) }}</p>
+<p>{{ 'product.savings_percent' | t:savingsOpts }}</p>
+<p>Language: {{ getResolvedLanguage() }}</p>
+<p>Active code (same as resolved): {{ locale }}</p>
 ```
 
-| Helper | Returns |
+| Function / filter | What it does |
 | --- | --- |
-| `t(key, fallback?)` | Translation for `key` in the active language. Falls back to the brand default language entry, then to `fallback`, then to `''`. |
-| `'key' \| t` / `'key' \| t('Default')` | Filter form of `t()`. |
-| `locale()` | Active language code (e.g. `en`, `pt-br`). |
-| `locales()` | All language codes configured for the brand. |
-| `default_locale()` | The brand's default language code. |
+| `getTranslations()` | Shallow copy of the full `key → value` map for the active resolved language. Async. |
+| `getResolvedLanguage()` | Snapped language **code** from the brand configuration (e.g. `pt-br`). Async. |
+| `t(key, params?)` | **Brand entry first** when the key exists for the resolved language; otherwise built-in JSON from `src/locales`. Optional `params` is an **object** for `{{ name }}`-style placeholders **only** for built-in strings. Async. |
+| `expr \| t` and `expr \| t:params` | Same resolution as `t()`; `expr` yields the **key string** (often a quoted literal). Optional **`t:params`** passes an object for built-in **`{{ name }}`** interpolation — `params` must be a variable or safe expression on the page context, same rules as `t(key, params)`. Async. |
+| `locales()` | Array of configured language codes for the brand (admin sort order). Async. |
+| `defaultLocale()` | Default language code, or first by sort order, or `''`. Async. |
 
-The same data is also exposed on the page context, so you can use:
+**`getTranslation(key)`** is still exposed for **brand-only** lookups (no built-in fallback, returns `''` if missing). For strings in pages and scripts, prefer **`t()`** or **`| t`** so product copy can fall through to the shipped catalog when useful.
 
-- `{{ locale }}` — active language code
-- `{{ locales }}` — list of codes
-- `{{ default_locale }}` — brand default
-
-…anywhere in your templates without calling a function.
+Use **`{{ locale }}`** for the active resolved code on the page context, or **`getResolvedLanguage()`** inside expressions when you need the snapped code explicitly.
 
 ## Using translations in backend scripts
 
-Backend scripts (`<script scope="backend">`) get the same helpers:
+Backend scripts (`<script scope="backend">`) expose the same **brand**
+helpers as templates (all async in the sandbox):
 
 ```javascript
-var code = await getLocale();
+var code = await getResolvedLanguage();
 var langs = await getLocales();
-var defaultCode = await getDefaultLocale();
-
-var ctaText = await t('checkout.cta', 'Buy now');
+var def = await getDefaultLocale();
+var hint = await getLocale();
+var dict = await getTranslations();
+var cta = await t('checkout.cta');
+var title = await t('title.greeting');
 ```
 
-These are useful when you need to make decisions (e.g. pick a shipping
-bucket) based on the visitor's language, or when you want to inject
-translated copy into a JSON payload returned from a backend script.
+**`t(key, params?)`** tries the **brand** dictionary first, then built-in
+locale JSON (same as templates). Use `await`. **`getLocale()`** returns
+the same resolved code as `{{ locale }}` (async in the sandbox).
+
+There is **no** pipe-filter syntax in backend scripts — use **`await t('key')`**.
 
 For the full host surface, see
 [Backend Scripts → Data Functions](../backend-scripts/data-functions).
 
 ## Caching
 
-Translations are served from a fast in-memory cache so live pages stay
-fast. Saving any language or entry from the admin **busts the cache
-immediately** — your changes are visible on the next page load, no
-manual purge needed.
+Translations are served from a fast **in-memory cache** (per app
+process). Saving languages or entries from the admin should **bust**
+that cache via the worker (`brand_translation` or full `brand` clear) so
+the next request reloads from the database.
 
 ## Patterns and pitfalls
 
-- **Always set a default language.** `t()` falls back to the brand
-  default before falling back to the literal fallback string. A brand
-  with no default will return the literal fallback for missing entries
-  — confusing for editors who expect to see the original copy.
-- **Use stable keys.** Editing copy in the builder does not change the
-  bound key. Once `hero.title` exists, keep using it; rename only when
+- **Always set a default language** in Advanced → Translations so
+  snapping has a predictable target when the URL hint does not match any
+  row.
+- **Use stable keys.** Renaming a key in the admin does not update your
+  templates. Once `hero.title` exists, keep using it; rename only when
   the meaning of the slot truly changes.
-- **Bound text wins.** The original builder copy is never shown to a
-  visitor when the active language has an entry for the key. Treat the
-  in-builder copy as your "default language" copy.
-- **Self-closing tags only get attribute swaps.** `<img>`, `<input>`,
-  etc. don't have inner text, so a binding only replaces `alt` /
-  `title` / `placeholder` / `value` / `aria-label` if those are set.
-- **Region snap-down.** A brand configured with `pt` will accept
-  `?hl=pt-br` and serve the `pt` entries. If you need true regional
-  variants, add `pt` and `pt-br` as separate languages.
+- **Missing entries.** When the brand has no value for a key in the active
+  language, **`t()` / `| t`** fall back to built-in strings when a catalog
+  entry exists; otherwise prefer a sensible default in markup or a **`default:`**
+  filter. **`getTranslation`** (brand-only) returns `''` when missing.
+- **Exact language codes.** Add `pt` and `pt-br` separately if you need
+  both; the runtime does not auto-collapse regions.
 
 ## Related
 
@@ -232,5 +211,4 @@ manual purge needed.
 - [Page variables](./page-variables) — non-translation per-locale
   switches (currency formatting, date masks, etc.).
 - [Backend scripts → data functions](../backend-scripts/data-functions)
-  — full reference for `t()`, `getLocale()`, `getLocales()`,
-  `getDefaultLocale()`.
+  — backend reference for translation helpers.

@@ -1,0 +1,228 @@
+---
+title: 'Storage'
+description: 'Durable, database-backed key-value store for backend scripts.'
+---
+
+Backend scripts have access to a durable key-value store via the `storage` global. Values are persisted to the database, so they **survive restarts and deploys** and are readable from **every runtime server immediately** — there's no per-server cache to warm and no worker to run.
+
+Every key is automatically scoped to the current brand — scripts can never read or write another brand's data. Values are JSON-serialised, so you can store strings, numbers, booleans, arrays, and plain objects.
+
+## Storage vs. Cache
+
+Both are brand-scoped key-value APIs, but they solve different problems:
+
+| | `storage` | `cache` |
+|--------------------|-------------------------------|------------------------------|
+| Backing store      | Database (durable)            | Redis (in-memory)            |
+| Survives restarts  | **Yes**                       | Until eviction / TTL         |
+| Default lifetime   | Permanent (no expiry)         | 1 hour                       |
+| Max value size     | 64 KB                         | 512 bytes                    |
+| Best for           | Tokens, settings, cursors, idempotency markers | Hot counters, short-lived dedupe, rate windows |
+
+<Tip>
+Reach for `cache` for high-frequency, disposable data. Reach for `storage` when losing the value would break something — OAuth refresh tokens, sync cursors, "have I already processed this?" markers.
+</Tip>
+
+## Options
+
+Every method takes an optional trailing `opts` object:
+
+| Field       | Type   | Default     | Description                                        |
+|-------------|--------|-------------|----------------------------------------------------|
+| `namespace` | string | `'default'` | Groups keys (e.g. per integration). Isolated per namespace. |
+| `ttl`       | number | —           | Seconds until the value expires. Omit for permanent. |
+
+## `storage.get(key, opts?)`
+
+Retrieve a value.
+
+```javascript
+var settings = storage.get('config', { namespace: 'aweber' });
+if (settings) {
+  setVariable('list_id', settings.list_id);
+}
+```
+
+**Returns:** The stored value, or `null` if the key is missing or expired.
+
+## `storage.set(key, value, opts?)`
+
+Store a value, overwriting any existing one.
+
+```javascript
+storage.set('sync_cursor', { page: 3, updated_at: Date.now() });
+storage.set('access_token', token, { namespace: 'aweber', ttl: 7200 });
+```
+
+| Parameter | Type   | Description                          |
+|-----------|--------|--------------------------------------|
+| `key`     | string | Storage key                          |
+| `value`   | any    | Value to store (JSON-serialised)     |
+| `opts`    | object | `{ namespace?, ttl? }`               |
+
+**Returns:** `true` on success, `false` if the brand key limit was reached.
+
+## `storage.del(key, opts?)`
+
+Delete a key.
+
+```javascript
+storage.del('sync_cursor');
+```
+
+**Returns:** `true`.
+
+## `storage.has(key, opts?)`
+
+Check whether a live (non-expired) key exists.
+
+```javascript
+if (!storage.has('seeded', { namespace: 'import' })) {
+  // first run — do one-time setup
+}
+```
+
+**Returns:** `true` if the key exists and has not expired, `false` otherwise.
+
+## `storage.setIfAbsent(key, value, opts?)`
+
+Write a value **only if the key is absent or expired**. This is atomic (row-locked), which makes it a reliable short-lived **mutex** across all runtime servers.
+
+```javascript
+// Ensure only one server sends the welcome email, ever.
+var isFirst = storage.setIfAbsent('welcome_sent:' + email, true, { namespace: 'email' });
+if (isFirst) {
+  // send it
+}
+```
+
+**Returns:** `true` if the value was written, `false` if a live value already existed.
+
+## `storage.compareAndSet(key, expected, next, opts?)`
+
+Atomically set `next` **only if** the current stored value equals `expected` (compared by value). A missing or expired key is treated as `null`. Use this for lock-free optimistic updates where a stale writer must not clobber newer data.
+
+```javascript
+var current = storage.get('rotating_config');
+var updated = Object.assign({}, current, { version: 5 });
+
+var ok = storage.compareAndSet('rotating_config', current, updated);
+if (!ok) {
+  // someone else updated it first — re-read and retry
+}
+```
+
+| Parameter  | Type   | Description                                    |
+|------------|--------|------------------------------------------------|
+| `key`      | string | Storage key                                    |
+| `expected` | any    | Value you expect to currently be stored        |
+| `next`     | any    | Value to write if `expected` still matches     |
+| `opts`     | object | `{ namespace?, ttl? }`                          |
+
+**Returns:** `true` if the swap happened, `false` if the current value didn't match `expected`.
+
+## `storage.increment(key, amount?, opts?)`
+
+Atomically add to a numeric value, creating it (starting at `0`) if absent.
+
+```javascript
+var total = storage.increment('lifetime_signups');
+```
+
+| Parameter | Type   | Default | Description                             |
+|-----------|--------|---------|-----------------------------------------|
+| `key`     | string | —       | Storage key                             |
+| `amount`  | number | 1       | Value to add (can be negative or float) |
+| `opts`    | object | —       | `{ namespace?, ttl? }`                  |
+
+**Returns:** The new numeric value after incrementing.
+
+## `storage.mutate(key, fn, opts?)`
+
+Atomically read a value, transform it, and write the result — the safe way to do read-modify-write without losing a concurrent update. `fn` receives the current value (`undefined` if the key is absent) and returns the value to store. Returning `undefined` aborts the write and leaves the stored value untouched.
+
+```javascript
+// Append to a durable list without clobbering a concurrent run.
+storage.mutate('recent_orders', function (list) {
+  list = list || [];
+  list.unshift(orderId);
+  return list.slice(0, 50);
+});
+```
+
+Under the hood this is an **optimistic loop**: read the current value, run `fn`, then commit with a row-locked `compareAndSet`. If another execution wrote first, it re-reads and runs `fn` again (a few times) until it commits cleanly.
+
+| Parameter | Type     | Description                                        |
+|-----------|----------|----------------------------------------------------|
+| `key`     | string   | Storage key                                        |
+| `fn`      | function | `(current) => next`. Return `undefined` to abort.  |
+| `opts`    | object   | `{ namespace?, ttl? }`                             |
+
+**Returns:** The newly stored value (or the unchanged value if `fn` returned `undefined`). Throws if it still can't commit after several retries (extreme contention).
+
+<Warning>
+Because `fn` can run **more than once** (on retry), it must be a **pure function of its input** — derive `next` only from `current`. Do **not** put one-time side effects inside `fn` (spending a single-use token, sending an email, charging a card). For exactly-once side effects, use the claim pattern shown below.
+</Warning>
+
+## Example: rotating OAuth refresh tokens (exactly-once)
+
+The motivating case. Providers like AWeber hand out a **short-lived access token** plus a **single-use refresh token that rotates on every refresh** — using the old refresh token invalidates it. Two guarantees are needed, and `storage` gives you both:
+
+1. **Durability** — the newly rotated refresh token must be persisted for the next run (backend scripts are stateless; there's nowhere else to keep it).
+2. **Exactly-once refresh** — if two requests refresh at the same instant, they'd both spend the *same* single-use refresh token and one call would fail. Only one request may perform the refresh.
+
+The fool-proof approach is **refresh-ahead + a claim**:
+
+- Refresh *before* the access token actually expires (while it's still valid), so a request that doesn't win the claim can safely keep using the current token — no waiting.
+- Use `setIfAbsent` as a **non-blocking claim**: exactly one request wins and refreshes; the others fall through. Because a claim can never outlive its TTL, a crashed run can't wedge the integration.
+
+```javascript
+var NS = 'integrations';
+var creds = storage.get('aweber_oauth', { namespace: NS }) || {};
+var now = Date.now();
+var REFRESH_AHEAD_MS = 5 * 60 * 1000; // refresh 5 min before expiry
+
+var needsRefresh = !creds.access_token || now >= ((creds.expires_at || 0) - REFRESH_AHEAD_MS);
+
+if (needsRefresh) {
+  // Non-blocking claim — only the winner refreshes. TTL releases it if a run dies.
+  var claimed = storage.setIfAbsent('aweber_refresh_claim', now, { namespace: NS, ttl: 30 });
+
+  if (claimed) {
+    var res = http.post('https://auth.aweber.com/oauth2/token', {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(creds.refresh_token),
+    });
+
+    if (res.status >= 200 && res.status < 300) {
+      creds = {
+        access_token:  res.body.access_token,
+        refresh_token: res.body.refresh_token,        // rotated — persisted for the next run
+        expires_at:    now + (res.body.expires_in * 1000),
+      };
+      storage.set('aweber_oauth', creds, { namespace: NS });
+    }
+    storage.del('aweber_refresh_claim', { namespace: NS });
+  }
+  // Didn't win the claim? Fall through — the current token is still valid
+  // (that's the point of refreshing ahead of expiry).
+}
+
+// creds.access_token is valid here — make the API call.
+```
+
+<Note>
+**Why not refresh *inside* a locked callback?** Two reasons: holding a database lock across an external network call is an anti-pattern, and the script sandbox can only wait on **one** async operation at a time — a network call nested inside a locked callback isn't supported and would fail. Keep the network call in your main script flow, guarded by a claim.
+</Note>
+
+<Note>
+**Limits per brand:**
+- **10,000 keys** maximum per brand
+- **64 KB** maximum value size
+- **No expiry by default** (max TTL when set: 1 year)
+- **50 storage operations** per script execution (a `mutate` retry spends a `get` + a `compareAndSet`)
+</Note>
+
+<Warning>
+Keys must match the pattern `[a-zA-Z0-9_.:-]` and be at most 191 characters. Namespaces follow the same pattern up to 64 characters. Values that don't fit, or keys/namespaces that don't match, are rejected.
+</Warning>

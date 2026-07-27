@@ -15,6 +15,10 @@ description: 'Manage custom domains, SSL certificates, DNS validation, and track
 GET /api/brands/{brand}/domains
 ```
 
+<Note>
+  Paginated list responses use Laravel's standard shape: the domain rows are in **`data`**, not `domains`. Example: `response.data[0].domain`.
+</Note>
+
 <ParamField query="per_page" type="number">
   Results per page (1–100, default: 25)
 </ParamField>
@@ -60,7 +64,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/domains \
 GET /api/brands/{brand}/domains/all
 ```
 
-Returns all domains as an array — used for dropdown selectors.
+Returns all domains as a **bare JSON array** at the root (no `data` or `domains` wrapper) — used for dropdown selectors. Each item includes `id`, `domain`, and `merchant_code`.
 
 ---
 
@@ -161,13 +165,27 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/domains/7/validation-in
 <ResponseExample>
 ```json Response
 {
-  "cname_record": {
-    "type": "CNAME",
-    "host": "checkout.mybrand.com",
-    "value": "proxy.elasticfunnels.io",
-    "ttl": 3600
-  },
-  "instructions": "Add the following CNAME record to your DNS provider, then click Validate."
+  "domain": "checkout.mybrand.com",
+  "is_apex": false,
+  "records": [
+    {
+      "type": "TXT",
+      "name": "_cf-custom-hostname.checkout.mybrand.com.",
+      "value": "abc123-verification-token",
+      "description": "Verifies domain ownership"
+    },
+    {
+      "type": "CNAME",
+      "name": "checkout",
+      "value": "proxy.elasticfunnels.io",
+      "description": "Points your subdomain to our platform"
+    }
+  ],
+  "platform_domain": "proxy.elasticfunnels.io",
+  "status": "pending-cname",
+  "cloudflare_status": null,
+  "ssl_status": null,
+  "cloudflare_verification_errors": null
 }
 ```
 </ResponseExample>
@@ -176,7 +194,9 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/domains/7/validation-in
 
 ## Validate Domain
 
-Trigger a DNS validation check for a domain. Marks `cname_validated = true` if the CNAME resolves correctly.
+Queue an asynchronous DNS / Cloudflare validation job for a domain. This endpoint does **not** return the final validation result synchronously.
+
+**Workflow:** `GET validation-instructions` → configure DNS → `POST validate` → poll `GET /domains/{id}` until `status` and `cname_validated` update.
 
 ```
 POST /api/brands/{brand}/domains/{domain}/validate
@@ -188,22 +208,16 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/domains/7/valid
 ```
 
 <ResponseExample>
-```json 200 Validated
+```json 200 Queued (normal response)
 {
-  "success": true,
-  "status": "validated",
-  "cname_validated": true
-}
-```
-
-```json 200 Not yet validated
-{
-  "success": false,
-  "status": "pending-cname",
-  "message": "CNAME record not found. Please check your DNS settings and try again."
+  "queued": true
 }
 ```
 </ResponseExample>
+
+<Note>
+  After calling validate, the domain `status` is set to `pending-cloudflare` while background jobs run. Poll [Get Domain](#get-domain) or [List Domains](#list-domains) for `cname_validated` and `status` changes — do not expect `success` / `cname_validated` in the validate response body.
+</Note>
 
 ---
 

@@ -285,8 +285,8 @@ Create a new product.
   Stock Keeping Unit
 </ParamField>
 
-<ParamField body="image" type="string">
-  Product image URL
+<ParamField body="image" type="file">
+  Product image file (`multipart/form-data` only). Must be an uploaded image file — **not** a JSON URL string. Omit from JSON-only creates; upload via [File Manager](/api-reference/endpoints/file-manager#upload-file) and reference the CDN URL in HTML, or send `image` on a multipart create request.
 </ParamField>
 
 <ParamField body="is_subscription" type="boolean">
@@ -341,11 +341,32 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/products \
   }'
 ```
 
+### Create with image (multipart)
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/products \
+  -H "EF-Access-Key: your_api_key_here" \
+  -F "code=product_123" \
+  -F "title=Premium Product" \
+  -F "price=49.99" \
+  -F "type=physical" \
+  -F "classification=main" \
+  -F "image=@/path/to/bottle.png"
+```
+
+<Note>
+  Sending `"image": "https://..."` in a JSON body fails validation (`422`) or is ignored — the API expects a file upload for the `image` field.
+</Note>
+
 ---
 
 ## Update Product
 
-Update an existing product.
+Update an existing product. Authenticate with `EF-Access-Key` on every request.
+
+<Note>
+  Both **PUT** and **POST** are supported for the same update handler. If PUT returns a redirect to login, use **POST** with the same URL and body.
+</Note>
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -355,19 +376,59 @@ Update an existing product.
   The product ID
 </ParamField>
 
+<ParamField body="title" type="string">
+  Product title (use `title`, not `name`)
+</ParamField>
+
+<ParamField body="price" type="number">
+  Product price
+</ParamField>
+
+<ParamField body="image" type="file">
+  Replace product image (`multipart/form-data` file upload, same rules as create)
+</ParamField>
+
 ```bash Request
 PUT /api/brands/{brand}/products/{product}
 ```
 
-```bash cURL
+Alternative (same handler):
+
+```
+POST /api/brands/{brand}/products/{product}
+```
+
+```bash cURL (PUT)
 curl -X PUT https://app.elasticfunnels.io/api/brands/{brand_id}/products/{product_id} \
   -H "EF-Access-Key: your_api_key_here" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Updated Product Name",
+    "title": "Updated Product Title",
     "price": 59.99
   }'
 ```
+
+```bash cURL (POST — preferred if PUT redirects)
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/products/{product_id} \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Product Title",
+    "price": 59.99
+  }'
+```
+
+<ResponseExample>
+```json 200 Updated
+{
+  "id": 2,
+  "title": "Updated Product Title",
+  "code": "glucotil",
+  "price": 59.99,
+  "brand_id": 42
+}
+```
+</ResponseExample>
 
 ---
 

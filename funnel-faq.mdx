@@ -57,18 +57,21 @@ Welcome! This document combines frequently asked questions (FAQ) with additional
 2. Then you go to the page events builder for that page
 3. Click "Add Node"
 4. Type a prompt like, "I want to split test video 1 and video 2 for people from the United States"
-5. Add a "Split Test Component" node if needed, ensuring you've selected a Split Test Container
+5. Add a "Component Split Test" node if needed, ensuring you've selected a Split Test Container
 
 **Manual Setup:**
 1. Create the headline (or element) as a component:
    - Right-click an element in the page builder and select "Create a new component," or build one from scratch
-2. Add a "Split Test Container" on the page and name it for reference
+2. Add a "Split Test Container" on the page and fill in its **Split Test Container Name** trait
 3. Go to the page events builder:
-   - Click "Add Node" and select "Split Test Component"
-   - Select the container for the split test
-   - Set the traffic percentage for each variant and choose the components to show
+   - Click "Add Node" and select **"Component Split Test"**
+   - Select the container and set **Total Variants** — a **Traffic Distribution** node is created for each variant
+   - Set the traffic percentage on each Traffic Distribution node, then attach a **Component** node under it and pick the component to show
+   - Mark one component as the **baseline** (the control)
 4. Ensure connections:
-   - Connect the split test component node to the "entry node" or "script rule" node if not already connected
+   - Connect the Component Split Test node to the "entry node" or a condition node if not already connected
+
+Full walkthrough: [Split Testing](/funnels/split-testing).
 
 ### How do I build an exit popup that triggers on exit intent?
 
@@ -84,8 +87,8 @@ Welcome! This document combines frequently asked questions (FAQ) with additional
 2. Click "Create Popup" and give it a name
 3. Select a base template if needed
 4. Return to the page events builder for the page
-5. Click "Add Node" and select the "Exit Intent" node
-6. Add a "Popup" node and connect it to the "Exit Intent" node
+5. Click "Add Node" and select the **"On Exit Intent"** node — it must be connected to the entry node or a Script Rule
+6. Add a **"Show Popup"** node, connect it to the On Exit Intent node, and select your popup
 
 ### How do I incorporate dynamic content blocks that change based on user behavior?
 
@@ -95,12 +98,15 @@ Welcome! This document combines frequently asked questions (FAQ) with additional
 1. Go to the page events builder
 2. Click "Add Node"
 3. Type a prompt like, "Change content 'packages' for affiliate ID 100 with 'packages cheaper'"
-4. Add a "Dynamic Container" node to ensure content replacement
+4. Add a "Dynamic Content" node to ensure content replacement
 
 **Manual Setup:**
-1. **Wrap Components:** In the page builder, wrap the desired element (e.g., packages) in a "Dynamic Container" block. Name the block for easy reference
-2. **Define Conditions:** In the page events builder, click "Add Node" and select "Script Rule." Specify conditions (e.g., affiliate ID, location)
-3. **Set Up the Dynamic Container:** Add a "Dynamic Container" node and specify the content to replace when conditions are met
+1. **Save your variations as components:** build each version and use **Transform to Component**. Raw divs and sections cannot be swapped.
+2. **Wrap the slot:** in the page builder, right-click the element (e.g. packages) and choose **Wrap in → Dynamic Container**. Fill in its **Dynamic Container Name** trait so you can find it later.
+3. **Define the condition:** in the page events builder, add a condition node — **Referred By Affiliate** or **Is From Country** where they fit, otherwise **Script Rule**.
+4. **Set up the swap:** off the condition's **Output 1** (the true branch), add a **Dynamic Content** node and pick the container and the component to render.
+
+Full walkthrough: [Dynamic Content](/funnels/dynamic-content).
 
 ## Integrations & Marketing
 

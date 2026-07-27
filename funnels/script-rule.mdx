@@ -29,9 +29,13 @@ Script Rules execute on the server before the page loads, making them perfect fo
 1. **Server-Side Execution**: Script Rules run on the server before the page loads
 2. **Return Boolean**: Your script must return `true` or `false`
 3. **Flow Control**: 
-   - `true` → Takes the **Yes** (left/top) path
-   - `false` → Takes the **No** (right/bottom) path
+   - `true` → **Output 1**, the Yes path
+   - `false` → **Output 2**, the No path
 4. **Available Data**: You have access to pre-loaded visitor data (see below)
+
+<Note>
+**The purpose-built conditions are Script Rules too.** *Is From Country*, *Is From State*, *Is From EU*, *Is From Timezone*, *Is Using VPN/Proxy*, *Is Customer*, *Has Purchased Any Upsell*, *Referred By Affiliate* and *Query Parameter Condition* all generate a script and store it on the node — the renderer treats any node carrying a script as a Script Rule. Prefer them when they fit: they are readable, validated, and use the same variables documented here. Reach for a raw Script Rule only for logic they cannot express.
+</Note>
 
 ## Available Data Variables
 {/* SCREENSHOT: Available Data Variables · funnel builder, page events, or published flow · desktop */}
@@ -49,8 +53,8 @@ return is_whitelisted === true;
 
 #### `whitelist_source`
 **Type:** String | Null  
-**Values:** `'cookie'`, `'cookie_blocked'`, `'expired_cookie'`, `'domain_all_whitelisted'`, `null`  
-**Description:** How the whitelist status was determined
+**Values:** `'same_request'`, `'same_request_blocked'`, `'cookie'`, `'cookie_blocked'`, `'expired_cookie'`, `'domain_all_whitelisted'`, `null`  
+**Description:** How the whitelist status was determined. `same_request` means a **Whitelist visitor** node ran earlier in this same request, before this Script Rule.
 
 ```javascript
 // Only allow domain-level whitelist
@@ -214,9 +218,12 @@ return customer.order_ids && customer.order_ids.length > 1;
 
 ### Session & Tracking
 
-#### `session.aff_id`
-**Type:** String  
-**Description:** Affiliate ID from session
+#### `session`
+**Type:** Object  
+**Description:** A deliberately narrow slice of the visitor's session. **Only two keys are exposed:**
+
+- `session.aff_id` — affiliate ID
+- `session.aff_source` — affiliate source
 
 ```javascript
 // Specific affiliate only
@@ -225,6 +232,10 @@ return session.aff_id === 'affiliate-001';
 // Any affiliate traffic
 return session.aff_id !== null && session.aff_id !== '';
 ```
+
+<Note>
+There is no `request`, `cookies` or `headers` object in a Script Rule. Header-derived facts are surfaced as `is_mobile`, `is_tablet`, `device` and `referer`; cookie-derived facts as `tags`, `is_whitelisted` and `is_customer`.
+</Note>
 
 #### `time` / `utc_timestamp`
 **Type:** Number (Unix timestamp in milliseconds)  
@@ -267,54 +278,69 @@ To use IP geolocation data, your script must reference `ip_whois` - the system a
 
 #### `ip_whois`
 **Type:** Object  
-**Description:** Comprehensive IP geolocation and ISP information
-
-**Available Properties:**
-- `ip_whois.country` - Country code (e.g., 'US', 'GB', 'DE')
-- `ip_whois.country_name` - Full country name
-- `ip_whois.region` - Region/state code
-- `ip_whois.region_name` - Full region name
-- `ip_whois.city` - City name
-- `ip_whois.zip` - Postal code
-- `ip_whois.lat` - Latitude
-- `ip_whois.lon` - Longitude
-- `ip_whois.timezone` - Timezone (e.g., 'America/New_York')
-- `ip_whois.isp` - Internet Service Provider
-- `ip_whois.org` - Organization
-- `ip_whois.as` - Autonomous System number
-- `ip_whois.asname` - AS name
-- `ip_whois.mobile` - Is mobile carrier
-- `ip_whois.proxy` - Is proxy detected
-- `ip_whois.hosting` - Is hosting provider
-- `ip_whois.is_government` - Is government IP
-- `ip_whois.is_bot` - Is known bot
+**Description:** IP geolocation, connection and security information.
 
 <Warning>
-Using `ip_whois` adds ~10-20ms to script execution time as it requires a geolocation lookup. Only use when geographic or ISP information is essential for your logic.
+**The country code lives on `ip_whois.country_code`, not `ip_whois.country`.** `country` holds the full country **name** (e.g. `"Spain"`). Timezone, ISP and proxy data are nested objects, not flat keys. These are the paths the built-in **Is From Country / State / EU / Timezone** and **Is Using VPN/Proxy** nodes generate, so matching them keeps hand-written rules consistent with the UI ones.
+</Warning>
+
+**Location**
+- `ip_whois.country_code` — ISO country code (`'US'`, `'GB'`, `'DE'`)
+- `ip_whois.country` — full country name (`'Spain'`)
+- `ip_whois.continent`, `ip_whois.continent_code`
+- `ip_whois.region` — region/state name · `ip_whois.region_code` — region/state code
+- `ip_whois.city`
+- `ip_whois.postal`
+- `ip_whois.latitude`, `ip_whois.longitude`
+- `ip_whois.is_eu` — boolean
+
+**Timezone** (`ip_whois.timezone` is an object)
+- `ip_whois.timezone.id` — IANA ID (`'Europe/Madrid'`)
+- `ip_whois.timezone.abbr`, `.is_dst`, `.offset`, `.utc`
+
+**Connection** (`ip_whois.connection` is an object)
+- `ip_whois.connection.isp` — ISP name
+- `ip_whois.connection.org` — organisation
+- `ip_whois.connection.asn` — AS number
+- `ip_whois.connection.domain`
+
+**Security** (`ip_whois.security` is an object)
+- `ip_whois.security.proxy`, `.vpn`, `.tor`, `.anonymous`, `.hosting`
+
+Also present: `ip_whois.ip`, `ip_whois.type` (`IPv4`/`IPv6`), `ip_whois.success`.
+
+<Warning>
+Using `ip_whois` adds ~10-20ms to script execution time as it requires a geolocation lookup. The lookup only runs if the literal string `ip_whois` appears in your script — so remove the reference entirely when you do not need it.
 </Warning>
 
 ```javascript
 // Target specific countries
-return ip_whois.country === 'US' || ip_whois.country === 'CA';
+return ip_whois && (ip_whois.country_code == 'US' || ip_whois.country_code == 'CA');
 
 // Block certain regions
-return ip_whois.country !== 'CN' && ip_whois.country !== 'RU';
+return ip_whois && ip_whois.country_code != 'CN' && ip_whois.country_code != 'RU';
 
-// Block VPNs and proxies
-return ip_whois.proxy !== true && ip_whois.hosting !== true;
+// Block VPNs, proxies and datacentre traffic
+const sec = ip_whois && ip_whois.security;
+return !!sec && sec.proxy != true && sec.vpn != true && sec.hosting != true;
 
-// Government/enterprise IPs
-return ip_whois.is_government === true;
+// EU visitors
+return ip_whois && ip_whois.is_eu == true;
 
-// Block bots
-return ip_whois.is_bot !== true;
+// Timezone-based routing
+return ip_whois && ip_whois.timezone.id == 'America/New_York';
 
 // ISP-based routing
-return ip_whois.isp.includes('Comcast') || ip_whois.isp.includes('Verizon');
+const isp = (ip_whois && ip_whois.connection && ip_whois.connection.isp) || '';
+return isp.includes('Comcast') || isp.includes('Verizon');
 
-// Mobile carrier traffic
-return ip_whois.mobile === true;
+// Block a known network by AS number
+return !(ip_whois && ip_whois.connection && ip_whois.connection.asn == 32934);
 ```
+
+<Tip>
+Security flags may come back as `true`/`false` **or** `1`/`0` depending on the lookup provider. Compare with `==` rather than `===`, or coerce with `!!`.
+</Tip>
 
 ---
 
@@ -448,11 +474,11 @@ The Debug Window is the most efficient way to debug Script Rules. It shows you e
 You can use `console.log()` to debug your Script Rules:
 
 ```javascript
-console.log('Current country:', ip_whois.country);
+console.log('Current country:', ip_whois.country_code);
 console.log('Visit count:', visit_data.visit_count);
 console.log('Is customer:', is_customer);
 
-return ip_whois.country === 'US';
+return ip_whois.country_code == 'US';
 ```
 
 Console logs appear in the **Debug Window "Page Events" tab** with real-time, expandable details.
@@ -469,10 +495,10 @@ console.log('Query params:', query);
 console.log('Is mobile:', is_mobile);
 console.log('Is customer:', is_customer);
 console.log('Visit count:', visit_data?.visit_count);
-console.log('Country:', ip_whois?.country);
+console.log('Country:', ip_whois?.country_code);
 
 // Log your condition results
-const isEligible = ip_whois.country === 'US' && visit_data.visit_count > 1;
+const isEligible = ip_whois.country_code == 'US' && visit_data.visit_count > 1;
 console.log('Is eligible:', isEligible);
 
 return isEligible;
@@ -491,9 +517,9 @@ For more details on using the Debug Window, see the [Debug Window documentation]
 
 ```javascript
 // US and Canada only, block VPNs
-return (ip_whois.country === 'US' || ip_whois.country === 'CA') &&
-       ip_whois.proxy !== true &&
-       ip_whois.hosting !== true;
+return (ip_whois.country_code == 'US' || ip_whois.country_code == 'CA') &&
+       ip_whois.security.proxy != true &&
+       ip_whois.security.hosting != true;
 ```
 
 ### Example 2: Customer Segmentation
@@ -512,8 +538,8 @@ return is_customer === true &&
 return click_data.ip_address_matches === true &&
        click_data.seconds_ago < 3600 &&
        visit_data.rapid_visits_detected !== true &&
-       ip_whois.is_bot !== true &&
-       ip_whois.proxy !== true;
+       ip_whois.security.tor != true &&
+       ip_whois.security.proxy != true;
 ```
 
 ### Example 4: Device & Platform Targeting
@@ -539,7 +565,7 @@ return visit_data.unique_pages_visited >= 3 &&
 ```javascript
 // Specific affiliate from US, mobile device, first-time visitor
 return session.aff_id === 'AFF123' &&
-       ip_whois.country === 'US' &&
+       ip_whois.country_code == 'US' &&
        is_mobile === true &&
        visit_data.visit_count === 1;
 ```
@@ -580,7 +606,7 @@ return tags.includes('watched_vsl') &&
    if (!is_customer) return false; // Fast check first
    
    // Then check heavy data
-   return ip_whois.country === 'US';
+   return ip_whois.country_code == 'US';
    ```
 
 3. **Use Tags for Behavior Tracking**
@@ -595,7 +621,7 @@ return tags.includes('watched_vsl') &&
 1. **Comment Your Code**
    ```javascript
    // Route high-value traffic: US/CA, mobile, new visitors
-   return (ip_whois.country === 'US' || ip_whois.country === 'CA') &&
+   return (ip_whois.country_code == 'US' || ip_whois.country_code == 'CA') &&
           is_mobile === true &&
           visit_data.visit_count === 1;
    ```
@@ -603,7 +629,7 @@ return tags.includes('watched_vsl') &&
 2. **Break Complex Logic into Steps**
    ```javascript
    // Check geographic eligibility
-   const isEligibleCountry = ip_whois.country === 'US';
+   const isEligibleCountry = ip_whois.country_code == 'US';
    
    // Check device requirements
    const isCorrectDevice = is_mobile && !is_tablet;
@@ -627,7 +653,7 @@ return tags.includes('watched_vsl') &&
 1. **Check for Null/Undefined**
    ```javascript
    // Good: Check if data exists before using it
-   return ip_whois && ip_whois.country === 'US';
+   return ip_whois && ip_whois.country_code == 'US';
    
    // Good: Array check
    return customer.order_ids && customer.order_ids.length > 0;
@@ -636,8 +662,8 @@ return tags.includes('watched_vsl') &&
 2. **Provide Fallback Values**
    ```javascript
    // Fallback to false if data unavailable
-   const country = ip_whois?.country || 'unknown';
-   return country === 'US';
+   const country = ip_whois?.country_code || 'unknown';
+   return country == 'US';
    ```
 
 ### Testing
@@ -674,11 +700,11 @@ return tags.includes('watched_vsl') &&
 
 ```javascript
 // Debug example - add these logs and check Debug Window
-console.log('Country:', ip_whois?.country);
+console.log('Country:', ip_whois?.country_code);
 console.log('Visit count:', visit_data?.visit_count);
 console.log('Is customer:', is_customer);
 
-return ip_whois.country === 'US';
+return ip_whois.country_code == 'US';
 ```
 
 Then check the Debug Window → Page Events tab to see:
@@ -735,7 +761,7 @@ The Debug Window will show you the exact line and error type, making it much eas
 
 ```javascript
 // Slow: Uses all heavy operations
-return ip_whois.country === 'US' &&
+return ip_whois.country_code == 'US' &&
        click_data.seconds_ago < 3600 &&
        visit_data.visit_count > 1;
 
@@ -754,11 +780,11 @@ return query.country === 'US' && is_customer === true;
 
 ```javascript
 // Safe check with fallback
-if (!ip_whois || !ip_whois.country) {
+if (!ip_whois || !ip_whois.country_code) {
     return false; // Default behavior if geolocation fails
 }
 
-return ip_whois.country === 'US';
+return ip_whois.country_code == 'US';
 ```
 
 ---
@@ -766,7 +792,22 @@ return ip_whois.country === 'US';
 ## JavaScript Limitations
 {/* SCREENSHOT: JavaScript Limitations · funnel builder, page events, or published flow · desktop */}
 
-Script Rules have some JavaScript limitations due to server-side execution:
+Script Rules run inside an isolated JavaScript sandbox — a fresh interpreter per execution, with no network, no filesystem and no access to the host process. That isolation sets the limits below.
+
+### Sandbox limits
+
+| Limit | Value |
+|-------|-------|
+| Execution time | 5 seconds — the script is interrupted past that |
+| Memory | 8 MB |
+| Stack | 512 KB |
+| `eval()` / `new Function()` | Disabled |
+
+A script that throws is treated as **false**, so the flow takes Output 2. The error and any `console` output are captured and shown in the [Debug Window](/debugging/debug-window).
+
+<Note>
+Your code is wrapped in a function before it runs, which is why it must **`return`** a value rather than just evaluate an expression. Write the body only — no `function` declaration of your own.
+</Note>
 
 ### Supported Features
 - Basic JavaScript syntax (ES5 + some ES6)
@@ -805,6 +846,7 @@ Always test your script rules thoroughly. If unsure about a JavaScript feature, 
 
 - [Debug Window](/debugging/debug-window) - Learn how to debug Script Rules with the Debug Window
 - [Page Events](/funnels/page-events) - Overview of the Page Events system
+- [Page Events Node Reference](/funnels/page-events-nodes) - Every node type and its fields
 - [Query Parameter Conditions](/funnels/query-parameters) - Simpler alternative for URL parameter checks
 - [Content Visibility Control](/pages/visitor-based-content) - Using whitelisting with containers
 - [Dynamic Content](/funnels/dynamic-content) - Personalizing content based on conditions
