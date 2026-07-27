@@ -55,7 +55,7 @@ Two consequences follow from the order alone, and they are the source of most co
     Elements containing unresolved `[[ … ]]` get `data-ef-cloak` so they are hidden until the frontend engine runs; `src`/`srcset`/`poster` attributes containing `[[ ]]` are deferred so the browser does not fetch a nonsense URL. The result is wrapped in the site layout, which injects the cloak stylesheet, the frontend page-events JSON, and the JS bundle. **The response is sent.**
   </Step>
   <Step title="Browser — before JS runs">
-    `template-if`, `template-foreach`, `template-else`, `template-if-else` and `template-set` are `display: none` from the cloak stylesheet, as is anything carrying `data-ef-cloak`. Containers are *not* hidden — they were already resolved on the server, so their content is final HTML.
+    Every tag the frontend engine consumes — `template-if`, `template-else-if`, `template-if-else`, `template-else`, `template-foreach`, `template-vars`, `template-set`, `template-partial` / `partial` — is `display: none` from the cloak stylesheet, as is anything carrying `data-ef-cloak`. Nothing an engine tag wraps is painted before the engine has decided what to keep. Containers are *not* hidden — they were already resolved on the server, so their content is final HTML.
   </Step>
   <Step title="Browser — mount the frontend engine">
     On `DOMContentLoaded` (deferred one frame on checkout pages so the cart plugin can populate scope first), `initTemplateScope()` runs: it makes `window.efScope` reactive, copies the URL query string into `efScope.query`, then applies directives in a fixed order — `template-vars` → `template-set` → `template-partial` → `template-foreach` → `template-if` → `[[ ]]` interpolation — and finally wires the `ef-*` bindings and event handlers.
@@ -69,7 +69,7 @@ Two consequences follow from the order alone, and they are the source of most co
 
 | I want to… | Use | Not |
 |---|---|---|
-| Print a value known at request time (brand variable, query param, product, order, customer, device) | `{{ var.offer_name }}` | `[[ var.offer_name ]]` — `var` is never put in browser scope |
+| Print a value known at request time (brand variable, query param, product, order, customer, device) | `{{ var.offer_name }}` | `[[ var.offer_name ]]` — `var` is backend-only, by design |
 | Print a value that changes in the browser (cart, quantity, coupon, wizard step) | `[[ cartCount ]]` | `{{ }}` — it is long gone before the value exists |
 | Show/hide something decided at request time | `@if(…) … @endif` | `<template-if>` for something that can never change |
 | Show/hide something that flips without a reload | `<template-if data-condition="…">` | `@if` — the server already committed |
@@ -82,6 +82,25 @@ Two consequences follow from the order alone, and they are the source of most co
 | A/B test one section of a page | `<split-test id="…" name="…">` + a `component_split_test` chain | Writing the variants inline |
 | A/B test alternatives written inline in the page, with no graph | `<inline-split-test id="…">` with `<variant name="…" weight="…">` children | `<split-test>` |
 | A/B test a whole page | Page variants | A container |
+
+## `var.*` is a backend facility
+
+Brand variables (`variables.json`, the Variables screen, funnel overrides) belong to the **backend template engine** — the third layer, on the server. They are resolved with `{{ var.x }}` while the server renders, and they are deliberately **not** copied into `window.efScope` — the browser never receives the variable set, only the values the page chose to print. That is by design, not a missing feature: it keeps a brand's full variable list (prices, internal codes, per-funnel overrides) off the wire, and it keeps `{{ }}` and `[[ ]]` on opposite sides of the response.
+
+So `[[ var.x ]]` resolves to nothing — there is no `var` in browser scope to resolve it against.
+
+When you *do* want a brand variable client-side, hand it over explicitly. The backend prints the value, the browser stores it under a name of your choosing:
+
+```html
+<script>
+  window.efScope = window.efScope || {};
+  window.efScope.offerName = {{ var.offer_name | json | raw }};
+</script>
+
+<p>[[ offerName ]]</p>
+```
+
+`| json` quotes and escapes the value so strings, numbers and objects all land as valid JavaScript. Assign it before the engine mounts (an inline `<script>` in the page body is fine) and `[[ offerName ]]` renders on first paint; assign it later and the scope's reactivity re-renders the bindings for you.
 
 ## `<template-component>` does not exist
 
@@ -241,10 +260,7 @@ When you want the alternatives in the page source and do not need component-leve
 Verified against the renderer. Flagged rather than papered over.
 
 - **`<template-component>` is documented but unimplemented.** Several older reference tables list it as the frontend equivalent of `@component`. It is not — nothing resolves it. Use `@component("code")`.
-- **`[[ var.* ]]` does not resolve.** Brand variables are a backend concept; `var` is never seeded into `window.efScope`. Use `{{ var.x }}`, or explicitly assign what you need into `window.efScope` yourself.
-- **`<template-else-if>` is missing from the cloak stylesheet.** `template-if`, `template-else` and `template-if-else` are hidden before the engine mounts, but `template-else-if` is not, so an else-if branch can flash its content on first paint. Add `data-ef-cloak` to the elements inside it as a workaround.
 - **Unbound containers can leak their wrapper tag.** See the note above; a fix is in progress.
-- **`<split-test data-id="…">` is broken.** A second, `data-id`-based split-test form exists in the renderer but references an undefined variable and will throw if a page ever uses it. Use `<split-test id="…" name="…">`.
 - **The renderer matches container attributes in any order, but the builder's container scanner does not.** The Page Events container dropdown is populated by scanning for `id="…"` immediately followed by `name="…"`, both double-quoted. Written any other way the container still fills at runtime but cannot be selected in the UI. See [Dynamic content](/funnels/dynamic-content).
 
 ## Related

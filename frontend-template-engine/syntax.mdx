@@ -158,7 +158,20 @@ Enables **`[[ expression ]]`** in the **content** of the element without requiri
 Use **`<template-vars>`** or **`<template data-ef-vars>`** when you have a block where the only dynamic part is `[[ ... ]]` and you want to avoid an extra conditional.
 
 <Note>
-`[[ var.something ]]` does **not** work. `var` holds brand variables, which are a server-side concept and are never placed in `window.efScope`. Print brand variables with the backend engine (`{{ var.offer_name }}`), or assign what you need into `window.efScope` yourself.
+**`var.*` is backend-only, by design.** Brand variables belong to the server-side template engine — print them with `{{ var.offer_name }}`. They are deliberately never copied into `window.efScope` (the browser gets the values a page chose to print, not the brand's variable set), so `[[ var.something ]]` has nothing to resolve against.
+
+To use one client-side, hand it over explicitly: the server prints the value, the page stores it under a name you choose.
+
+```html
+<script>
+  window.efScope = window.efScope || {};
+  window.efScope.offerName = {{ var.offer_name | json | raw }};
+</script>
+
+<p>[[ offerName ]]</p>
+```
+
+See [Rendering pipeline](/pages/rendering-pipeline#var-is-a-backend-facility).
 </Note>
 
 ### `template-component` — does not exist

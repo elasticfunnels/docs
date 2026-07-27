@@ -91,7 +91,7 @@ This page covers **limitations** of the frontend template engine (compared to fu
 
 **Mistake:** No **data-ef-cloak** on blocks that contain **`[[ ... ]]`** or **template-if** content, so users see raw brackets or the wrong branch until the processor runs.
 
-**Fix:** Add **`data-ef-cloak`** to elements that should be hidden until the template engine has run. The engine removes this attribute after processing. Pair with CSS that hides **`[data-ef-cloak]`** to avoid a flash. The page may also need CSS that hides **template-foreach**, **template-if**, **template-else**, **template-set** so raw custom tags are not visible before processing.
+**Fix:** Add **`data-ef-cloak`** to elements that should be hidden until the template engine has run. The engine removes this attribute after processing. On ElasticFunnels-hosted pages the cloak stylesheet is already in `<head>` and hides **`[data-ef-cloak]`** plus every engine tag — **template-if**, **template-else-if**, **template-if-else**, **template-else**, **template-foreach**, **template-vars**, **template-set**, **template-partial** / **partial**. If you embed the engine elsewhere, hide that full list; a tag left out of it paints its raw content on first paint and then disappears.
 </Warning>
 
 <Warning title="Wrong template-else structure">

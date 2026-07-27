@@ -77,7 +77,7 @@ window.efScope.items.push({ code: 'C3', name: 'New Item', price: 9.99, quantity:
 window.efScope.currency = 'USD';
 ```
 
-- **`data-ef-cloak`** — Hides the element until the template processor has run (removes the attribute when done). Use it to avoid a flash of raw `[[ ... ]]` or wrong branch. The app should include CSS that hides **`[data-ef-cloak]`** (e.g. `[data-ef-cloak] { display: none !important; }`) and optionally the template custom elements (**template-foreach**, **template-if**, **template-else**, **template-set**) until processed.
+- **`data-ef-cloak`** — Hides the element until the template processor has run (removes the attribute when done). Use it to avoid a flash of raw `[[ ... ]]` or the wrong branch. On ElasticFunnels-hosted pages the platform already ships this stylesheet in `<head>`: it hides `[data-ef-cloak]` plus **every** engine tag — **template-if**, **template-else-if**, **template-if-else**, **template-else**, **template-foreach**, **template-vars**, **template-set**, **template-partial** / **partial**. If you embed the engine elsewhere, hide the full list; a tag left out of it paints its raw content on first paint and then disappears.
 
 On offer/checkout pages, the application and plugins (cart, checkout, bumps) usually manage `efScope` for you.
 
