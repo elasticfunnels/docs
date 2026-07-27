@@ -20,7 +20,7 @@ In your brand:
 2. Open the **Postback URLs** tab.
 3. For each event you care about, set:
    - **Postback URL** - `https://your-app.example.com/webhooks/elasticfunnels`
-   - **Bearer Token** *(optional)* - sent as `Authorization: Bearer <token>` so you can do basic auth from a reverse proxy.
+   - **Authorization** - a token we send as `Authorization: Bearer <token>`, so you can gate the endpoint at a reverse proxy before it ever reaches your app. Use **Generate token** for a random one, or paste your own. Leave it blank and we generate one for you when you save - the field is never actually empty, so expect the header on every request.
    - **Enabled** - must be checked for the URL to fire.
 4. Use the **Send test** button next to each URL to deliver a sample payload right away.
 5. The **Recent deliveries** section shows status, HTTP code, attempts, the exact payload that was sent, and lets you retry failed deliveries manually.
@@ -61,7 +61,7 @@ X-EF-Timestamp: 1755555555
 X-EF-Signature: sha256=8c0e...
 X-EF-Brand-Id: 42
 X-EF-Merchant-Id: 17
-Authorization: Bearer <only if you set one>
+Authorization: Bearer <the token on that URL's row>
 ```
 
 | Header                | Purpose                                                                                       |
@@ -72,7 +72,7 @@ Authorization: Bearer <only if you set one>
 | `X-EF-Signature`      | `sha256=` + HMAC-SHA256 of `<timestamp>.<raw_body>` using your merchant's signing secret.     |
 | `X-EF-Brand-Id`       | The brand the merchant belongs to.                                                            |
 | `X-EF-Merchant-Id`    | The merchant the postback came from.                                                          |
-| `Authorization`       | Optional bearer token, only sent if you configured one for that URL.                          |
+| `Authorization`       | Bearer token for that URL's row. Snapshotted when the delivery is queued, so retries keep sending the token that was in effect at the time - rotating it will not change an already-queued delivery. |
 
 ### Verifying the signature
 
@@ -272,6 +272,7 @@ All events share the same envelope. Fields that don't apply to a given event are
     "subid2": null,
     "subid3": null,
     "subid4": null,
+    "subid5": null,
     "vtid": null
   },
 
@@ -301,6 +302,24 @@ All events share the same envelope. Fields that don't apply to a given event are
   }
 }
 ```
+
+### Passing your own tracking values
+
+Six fields in `tracking` are yours to populate - `vtid` and `subid` through `subid5`. Put any of them on the landing URL or on the buy link as a query parameter and we capture, store, and echo the value back on every postback for that order:
+
+```
+https://yourdomain.com/lander?vtid=YOUR_KEY
+https://yourdomain.com/b?p=product_1&vtid=YOUR_KEY
+```
+
+- **`vtid`** - "vendor tracking ID". A single general-purpose slot, independent of gateway and of any affiliate network. Best choice for a third-party tracker or session key that you need reflected back. Keep values under **512 characters**: the postback echoes the value in full, but the click record truncates at 512, so a longer value will not match between the two when you reconcile. This matters most for base64/encoded composite keys, which get long quickly.
+- **`subid` .. `subid5`** - five slots conventionally used for affiliate-network sub-tracking (RedTrack, Voluum, and similar).
+
+All six are also filterable and exportable from the **Conversions** report, so you can reconcile against the postbacks you received.
+
+<Note>
+Upsell and rebill conversions inherit these values from the original purchase, so a subscription's renewals carry the same `vtid` as the sale that created it.
+</Note>
 
 ### Event-specific notes
 
