@@ -38,7 +38,10 @@ Common keys:
 | Commerce | `checkout.coupon`, `checkout.coupon_message`, `checkout.bump_products`, `checkout.selectedBumpLines` |
 | Totals | `checkout.subtotal`, `checkout.tax`, `checkout.shipping`, `checkout.total`, plus `*_raw` variants (see template engine doc) |
 | Toggle | `checkout.shipping_same_as_billing` |
-| Wallets | `checkout.wallet_available` (`{ applePay, googlePay }` — set after Collect.js loads) |
+| Wallets | `checkout.wallet_available` (`{ applePay, googlePay }` — starts `false/false`, updated once Collect.js / Stripe.js detects support), `checkout.wallet_visible` (boolean — `true` once a wallet button actually renders; only promoted, never reset), `checkout.wallet_settings` (from `checkout_settings.wallet`) |
+| Merchant | `checkout.merchant_country` (merchant's country, falling back to the domain's, then `US`) |
+| Payment panel | `checkout.panel_billing_fields` (from `checkout_settings.billing_fields`; `null` = show all) |
+| Subscription | `checkout.is_subscription`, `checkout.subscription.*` (see template engine doc for the full shape, including `intro_offer`, `price_steps`, `prepaid`, `tiers`) |
 
 Template engine details: [Checkout](/frontend-template-engine/checkout).
 
@@ -49,18 +52,33 @@ Template engine details: [Checkout](/frontend-template-engine/checkout).
 
 These align with what the checkout runtime validates and submits (shipping-first; billing can mirror shipping).
 
-**Shipping / personal (primary)**
+**Names**
 
-- `first_name`, `last_name`, `email`
-- `phone` (optional)
+Two name pairs exist and both are recognised:
+
+- `shipping_first_name`, `shipping_last_name` — what the **Checkout Details** builder block emits, and what the server requires (with fallbacks). Use these on shipping-collecting pages.
+- `first_name`, `last_name` — what `<checkout-personal-details>` emits, and the pair the card panel checks when deciding whether to inject its own "Cardholder Name" field.
+
+<Note>
+The cardholder-name detector only looks for `first_name` / `last_name`. A page that collects `shipping_first_name` / `shipping_last_name` (the builder default) will therefore also get a **redundant** Cardholder Name field injected into the card panel. Add `first_name` / `last_name` inputs — hidden ones are fine — if you want to suppress it.
+</Note>
+
+Where a name is missing, the server backfills it: personal ← shipping ← billing ← the cardholder name (split into first / last).
+
+**Shipping / personal**
+
+- `email` (required), `phone` (optional)
 - `shipping_address`, `shipping_address2` (optional)
-- `shipping_country`, `shipping_city`, `shipping_state`, `shipping_zip`
-- Optional explicit shipping names: `shipping_first_name`, `shipping_last_name`
+- `shipping_country` (required, 2-letter, uppercased), `shipping_city`, `shipping_state`, `shipping_zip`
+
+<Note>
+Client-side validation requires any of these that are **present on the page**; server-side, only `email`, `shipping_country` and the shipping name pair are strictly required — address, city, state and ZIP are accepted empty. `shipping_country` defaults to `US` when left blank.
+</Note>
 
 **Billing** (when shown; if empty, shipping values are used)
 
-- `billing_first_name`, `billing_last_name`
-- `billing_address`, `billing_address2`, `billing_country`, `billing_city`, `billing_state`, `billing_zip`
+- `billing_first_name`, `billing_last_name` — never client-side required
+- `billing_address`, `billing_address2`, `billing_country`, `billing_city`, `billing_state`, `billing_zip` — validated client-side only when a billing field is visible; all optional server-side
 
 **Toggle**
 
@@ -120,6 +138,41 @@ checkout_settings.countries = ['US', 'CA', 'GB'];
 <script scope="backend">
 var checkout_settings = checkout_settings || {};
 checkout_settings.usStates = ['CA', 'TX', 'NY', 'FL'];
+</script>
+```
+
+### 4.4 Card panel billing fields
+
+`checkout_settings.billing_fields` controls which inputs the card panel's auto-injected billing block renders. It is surfaced to templates as `checkout.panel_billing_fields`.
+
+```html
+<script scope="backend">
+var checkout_settings = checkout_settings || {};
+checkout_settings.billing_fields = ['country'];   // country only, no ZIP
+</script>
+```
+
+| Value | Effect |
+|-------|--------|
+| omitted / `null` | Both Country and ZIP are shown (default) |
+| `['country']` | Country select only |
+| `['zip']` | ZIP / postal code only |
+| `['country', 'zip']` | Both — same as the default |
+| `['address']` | Legacy alias for `['zip']`, kept so existing pages keep working |
+
+If the resulting set is empty, the billing block is not rendered at all.
+
+### 4.5 Wallet labels
+
+`checkout_settings.wallet` is passed through to `checkout.wallet_settings` and used on the wallet payment sheet for subscriptions:
+
+```html
+<script scope="backend">
+var checkout_settings = checkout_settings || {};
+checkout_settings.wallet = {
+  recurring_description: 'Monthly wellness subscription',
+  management_url: 'https://members.yourdomain.com/subscriptions'
+};
 </script>
 ```
 
@@ -226,69 +279,150 @@ Recommended card flow:
 ```html
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
 <div data-checkout-message class="checkout-message"></div>
-<button type="submit" data-checkout-submit>Pay now</button>
+<button type="button" data-checkout-submit>Pay now</button>
 ```
+
+<Note>
+Submission is **formless**: the checkout runtime never submits a `<form>`. It listens for a click on `[data-checkout-submit]` (or `.checkout-button`), calls `preventDefault()`, and collects every named / `data-template-value` field from the page wrapper. `type="submit"`, `method="POST"` and `form="..."` are cosmetic.
+</Note>
 
 ### `<checkout-cc-panel>` attributes
 
+Written on the custom tag, these are read server-side and re-emitted onto the generated `<div class="checkout-cc-panel">`:
+
 | Attribute | Values | Default | Description |
 |-----------|--------|---------|-------------|
-| `data-accepted-cards` | Comma-separated card names | `visa,mastercard,amex,discover` | Card brands shown in the payment tab and validated during input |
-| `data-applepay` | `"false"` to disable | enabled | When `"false"`, Apple Pay and Google Pay buttons are not rendered inside this panel. Use with `<checkout-apple-pay />` for standalone placement. |
-| `data-applepay-layout` | `"tab"`, `"separated"`, `"inline"` | `"tab"` | Controls how Apple Pay is displayed. `"tab"` renders Apple Pay as a radio tab alongside Card/PayPal/Klarna. `"separated"` renders Apple Pay above the card panel with an "OR PAY ANOTHER WAY" divider. `"inline"` is the legacy layout (wallet buttons above card fields). |
+| `data-accepted-cards` | Comma-separated card names | `visa,mastercard,amex,discover` | Card brands shown in the payment tab and validated during input. Supported: `visa`, `mastercard`, `amex`, `discover`, `diners`, `jcb` |
+| `data-applepay` | `"false"` to disable | enabled | When `"false"`, Apple Pay is not rendered inside this panel. See the caveat below. |
+| `data-applepay-force` | `"true"` | — | Pre-renders a native `<apple-pay-button>` placeholder and sets `checkout.wallet_visible` immediately |
 | `data-paypal` | Merchant ID | — | Enables PayPal tab (resolved server-side) |
 | `data-klarna` | Merchant ID | — | Enables Klarna tab (resolved server-side) |
 
-The panel builds its UI client-side from these attributes and `efScope.checkout`. When PayPal or Klarna is configured, the panel renders as a tabbed accordion (PayPal / Klarna / Card). Otherwise it renders card fields only.
+The panel builds its UI client-side from these attributes and `efScope.checkout`. When PayPal, Klarna, or the Apple Pay tab is active, the panel renders as a tabbed accordion; otherwise it renders card fields only.
+
+<Warning>
+`data-applepay-layout` is **not** in this list. The client-side panel does read `data-applepay-layout` (`"separated"`, `"tab"`, `"inline"`, or unset for auto), but the server-side tag expander does not forward it — the generated `<div>` carries only the attributes above. Setting it on `<checkout-cc-panel>` has no effect. Use `<checkout-wallet />` for an above-the-panel wallet.
+</Warning>
+
+<Warning>
+`data-applepay="false"` does not always suppress Google Pay. On **NMI**, a `#googlePay` container is still injected when the visitor is on Android. On **Stripe**, both wallets share one mount point, so it disables both.
+</Warning>
+
+### Layout selection
+
+With no wallet tag elsewhere on the page, the panel picks its layout automatically:
+
+| Condition | Layout |
+|-----------|--------|
+| HTTPS, gateway is NMI or Stripe, `data-applepay` not `"false"`, and no `#applePay` already in the DOM | Apple Pay as a **radio tab** alongside Card (and PayPal / Klarna). The tab relabels to Google Pay if that is what gets detected. |
+| Any of the above not met | Legacy **inline** layout — wallet containers above the card fields with an `or pay with card` divider |
+
+Because the tab layout requires that no `#applePay` element already exists, adding `<checkout-wallet />` anywhere on the page automatically stops the panel from rendering its own wallet tab.
 
 ### Smart field detection
 
 The card panel automatically detects which checkout fields are present on the page and fills in any gaps:
 
-- **Cardholder name:** If `first_name` and `last_name` inputs are not on the page, a "Cardholder Name" field appears inside the card panel.
-- **Billing details:** If no `billing_address` or `shipping_address` inputs are on the page, the card panel shows a billing details section (name, country, address line).
+- **Cardholder name:** If `first_name` **or** `last_name` is missing from the page, a "Cardholder Name" field appears inside the card panel. Note this checks only that pair — `shipping_first_name` / `shipping_last_name` do not satisfy it.
+- **Billing block:** If neither `billing_zip` nor `shipping_zip` is on the page, the card panel renders a billing block containing a **Country** select and a **ZIP / postal code** input. It never adds a name or street-address field. Which of the two appear is controlled by `checkout_settings.billing_fields` (section 4.4).
 - **Auto-copy:** When billing fields are inside the card panel and no shipping fields exist on the page, billing values are automatically copied to shipping during submission (and vice versa).
 
-This means a minimal checkout page with only email and the payment panel still collects all required billing information.
+This means a minimal checkout page with only email and the payment panel still collects enough billing information for AVS.
 
 ### Wallet contact field auto-detection
 
-Apple Pay and Google Pay automatically detect which contact fields to request from the wallet based on which checkout fields are on the page:
+<Note>
+NMI / Collect.js only. On **Stripe**, the payment request is always created with `requestPayerName`, `requestPayerEmail` and `requestShipping` enabled and no phone request, regardless of which fields are on the page.
+</Note>
 
 | Page has | Wallet requests |
 |----------|----------------|
-| Shipping address fields | Shipping postal address |
-| Billing address fields | Billing postal address |
-| Name fields (`first_name`, `last_name`) | Name (in shipping or billing contact) |
-| Email field | Email |
-| Phone field | Phone |
+| `shipping_address` or `shipping_country` | Shipping postal address |
+| `billing_address` or `billing_country` | Billing postal address |
+| `first_name`, `shipping_first_name`, or `billing_first_name` | Name |
+| `email` | Email |
+| `phone` | Phone |
 | None of the above (card-only) | No contact fields — just the payment token |
 
-No configuration is needed. For digital products that only need email and payment, the wallet skips address collection entirely.
+Only first-name variants are checked; `last_name` alone does not trigger the name request. No configuration is needed — for digital products that only need email and payment, the wallet skips address collection entirely.
 
-### `<checkout-apple-pay />`
+### `<checkout-wallet />`
 
-Standalone Apple Pay button placement. Renders a container where the Apple Pay button appears (when the customer's device supports it). Use this to position Apple Pay separately from the card panel:
+Standalone wallet placement. Renders `<div class="ef-wallet-standalone">` containing both the `#applePay` and `#googlePay` containers, so the buttons can sit anywhere on the page:
 
 ```html
-<checkout-apple-pay />
+<checkout-wallet force="true" wallets="apple_pay,google_pay" />
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
 ```
 
+| Attribute | Values | Description |
+|-----------|--------|-------------|
+| `force` | `"true"` | Pre-renders a native `<apple-pay-button>` placeholder so iOS shows it immediately, and sets `checkout.wallet_visible` to `true` without waiting for detection |
+| `wallets` | `apple_pay`, `google_pay` (comma-separated) | Restricts which wallets are allowed. Emitted as `data-wallets` and used for Stripe's `disableWallets` |
+
+Both are plain attributes, **not** `data-` prefixed. The tag may be self-closing.
+
+`<checkout-apple-pay />` is the legacy single-wallet form of this tag. It accepts `force="true"` and renders only the Apple Pay container. Prefer `<checkout-wallet />` on new pages.
+
+<Note>
+`<checkout-wallet>` and `<checkout-apple-pay>` accept a self-closing form. The other checkout tags — `<checkout-cc-panel>`, `<checkout-personal-details>`, `<checkout-details>`, `<checkout-bump>` — **require an explicit closing tag**. Written self-closing they are neither expanded nor stripped, and pass through to the browser as unknown markup.
+</Note>
+
+### Tag content handling
+
+| Tag | Children you write inside it |
+|-----|------------------------------|
+| `<checkout-personal-details>` | Preserved, rendered through the template engine, and appended **after** the fields the tag generates |
+| `<checkout-details>` | Same — appended after the generated shipping / billing fields |
+| `<checkout-cc-panel>` | **Discarded.** The tag is replaced by an empty `<div>` that the client-side panel fills in |
+
+`<checkout-personal-details>` and `<checkout-details>` generate their own inputs (from `data-fields` and `data-shipping-fields` respectively) — you do not write the inputs yourself.
+
+**`<checkout-personal-details>` attributes**
+
+| Attribute | Values | Default |
+|-----------|--------|---------|
+| `data-fields` | Comma-separated: `email`, `phone`, `first_name`, `last_name` | `email,phone` |
+
+**`<checkout-details>` attributes**
+
+| Attribute | Description |
+|-----------|-------------|
+| `data-shipping-fields` | Which shipping fields to render |
+| `data-countries` | Country allowlist for the dropdown |
+| `data-theme-class` | Extra class applied to the generated container |
+| `data-input-style`, `data-label-style` | Inline style strings applied to generated inputs / labels |
+| `data-input-border-color`, `data-input-bg-color`, `data-input-text-color`, `data-input-focus-border-color`, `data-input-focus-shadow-color`, `data-input-border-radius`, `data-input-padding` | Generated input theming |
+| `data-label-color`, `data-label-bg-color`, `data-label-active-color`, `data-label-font-size`, `data-label-font-weight` | Generated floating-label theming |
+
 ### Wallet conditional display
 
-After the payment form loads, `checkout.wallet_available` is set with `{ applePay: true/false, googlePay: true/false }`. Use `template-if` to show or hide elements:
+| Key | Meaning |
+|-----|---------|
+| `checkout.wallet_available` | `{ applePay, googlePay }`. Starts `false / false` server-side; updated once the payment library detects support, typically 1-2 seconds after load |
+| `checkout.wallet_visible` | `true` once a wallet button has actually rendered. Only promoted `false` → `true`, never reset. Set immediately by `force="true"` |
+
+Prefer `wallet_visible` for layout decisions — it will not flicker on first paint the way `wallet_available` does:
 
 ```html
-<template-if data-condition="checkout.wallet_available.applePay">
-  <div style="text-align:center; padding: 20px;">
-    <checkout-apple-pay />
-    <p>Or fill out the form below</p>
-  </div>
+<checkout-wallet force="true" />
+
+<template-if data-condition="checkout.wallet_visible">
+  <div class="or-divider">or pay another way</div>
 </template-if>
 
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
 ```
+
+### `window.ef.checkout` API
+
+A small JavaScript API for programmatic wallet control:
+
+| Member | Description |
+|--------|-------------|
+| `ef.checkout.walletAvailable` | Getter returning the same `{ applePay, googlePay }` as `checkout.wallet_available` |
+| `ef.checkout.payWithWallet(method)` | Triggers `'applePay'` or `'googlePay'` by clicking the matching `[data-wallet]` button. Requires NMI Collect.js; logs a warning if the wallet or button is unavailable |
+| `ef.checkout.onWalletComplete(callback)` | Registers a callback fired after a wallet payment attempt |
 
 See [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) for full setup, configuration, and layout examples.
 
@@ -324,7 +458,7 @@ All standard input fields (`ef-floating-input`, `ef-form-input`) and quiz fields
 
 ### Styling the wallet divider
 
-The "or pay another way" divider between Apple Pay and the card panel uses the `ef-wallet-divider` classes. These are **not styled by the platform** — define them in your page's `<style>` block so each page can match its own design:
+The divider between the wallet buttons and the card panel uses the `ef-wallet-divider` classes. The platform emits the text in lowercase — `or pay another way` in the separated layout, `or pay with card` in the inline layout — and applies **no styling of its own**, so define these classes in your page's `<style>` block (the `text-transform` below is what makes it render uppercase):
 
 ```html
 <style>

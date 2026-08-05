@@ -18,6 +18,10 @@ This guide walks through building checkout pages with the page builder or code e
 Quiz pages that process payments must **also** have "Is checkout page" enabled. Quiz functionality and checkout are independent page flags — enabling both is valid and expected for quiz-to-purchase flows.
 </Info>
 
+<Note>
+**Checkout submission is formless.** The examples below wrap fields in a `<form>` for autofill and semantics, but the runtime never submits it: the checkout script sets its form reference to `null` and collects every named / `data-template-value` field from the page wrapper instead. Submission is a **click** on `[data-checkout-submit]` (or `.checkout-button`) that calls `preventDefault()` and posts via fetch. So `method="POST"` and `form="checkout-form"` have no effect, and fields do not have to live inside the `<form>` element to be submitted.
+</Note>
+
 ---
 
 ## Example 1: Standard checkout
@@ -118,10 +122,16 @@ checkout_settings.countries = ['US', 'CA', 'GB', 'AU'];
       <template-if data-condition="!checkout.shipping_same_as_billing">
         <div class="form-grid">
           <div class="floating-label-group">
-            <label class="form-label">Full Name *</label>
+            <label class="form-label">First Name *</label>
             <input type="text" name="billing_first_name"
                    data-template-value="checkout.customer.billing_first_name" class="form-input" />
             <div class="form-error" data-checkout-error="billing_first_name"></div>
+          </div>
+          <div class="floating-label-group">
+            <label class="form-label">Last Name *</label>
+            <input type="text" name="billing_last_name"
+                   data-template-value="checkout.customer.billing_last_name" class="form-input" />
+            <div class="form-error" data-checkout-error="billing_last_name"></div>
           </div>
           <div class="floating-label-group">
             <label class="form-label">Street Address *</label>
@@ -157,6 +167,7 @@ checkout_settings.countries = ['US', 'CA', 'GB', 'AU'];
       <template-else>
         <p class="billing-info-message">Billing address same as shipping.</p>
         <input type="hidden" name="billing_first_name" data-template-value="checkout.customer.billing_first_name" />
+        <input type="hidden" name="billing_last_name" data-template-value="checkout.customer.billing_last_name" />
         <input type="hidden" name="billing_address" data-template-value="checkout.customer.billing_address" />
         <input type="hidden" name="billing_city" data-template-value="checkout.customer.billing_city" />
         <input type="hidden" name="billing_state" data-template-value="checkout.customer.billing_state" />
@@ -204,8 +215,7 @@ checkout_settings.countries = ['US', 'CA', 'GB', 'AU'];
   <div data-checkout-message class="checkout-message"></div>
 
   <!-- Submit -->
-  <button type="submit" data-checkout-submit form="checkout-form"
-          class="pay-now-button">
+  <button type="button" data-checkout-submit class="pay-now-button">
     <span class="pay-now-text">PAY NOW</span>
   </button>
 
@@ -240,6 +250,13 @@ checkout_settings.wallet = {
 ```html
 <form id="checkout-form" method="POST">
 
+  <!-- Wallet buttons at the very top, above everything -->
+  <checkout-wallet force="true" wallets="apple_pay,google_pay" />
+
+  <template-if data-condition="checkout.wallet_visible">
+    <div class="or-divider">or pay another way</div>
+  </template-if>
+
   <!-- Contact (minimal: email + phone first) -->
   <section class="shipping-info-card">
     <div class="form-grid">
@@ -258,8 +275,8 @@ checkout_settings.wallet = {
     </div>
   </section>
 
-  <!-- Payment panel EARLY (wallet buttons appear here, above shipping) -->
-  <checkout-cc-panel></checkout-cc-panel>
+  <!-- Card panel below, with its own wallet tab disabled -->
+  <checkout-cc-panel data-applepay="false"></checkout-cc-panel>
   <div data-checkout-message class="checkout-message"></div>
 
   <!-- Shipping address (below payment) -->
@@ -319,18 +336,19 @@ checkout_settings.wallet = {
   </div>
 
   <!-- Submit -->
-  <button type="submit" data-checkout-submit form="checkout-form"
-          class="pay-now-button">
+  <button type="button" data-checkout-submit class="pay-now-button">
     <span class="pay-now-text">COMPLETE ORDER</span>
   </button>
 
 </form>
 ```
 
-The key difference is `<checkout-cc-panel>` is placed **above** the shipping address section. Customers with Apple Pay or Google Pay see wallet buttons immediately after entering email/phone. Customers without wallet support see the card form there instead and fill in shipping below.
+The key difference is the standalone `<checkout-wallet />` at the top, with the card panel's own wallet disabled below it. Customers with Apple Pay or Google Pay see the wallet buttons immediately; everyone else sees the card form and fills in shipping as usual.
+
+`checkout.wallet_visible` flips to `true` as soon as a wallet button actually renders, so the divider only appears when there is something above it. `force="true"` pre-renders the native Apple Pay button on iOS and sets `wallet_visible` immediately, avoiding a layout shift while detection runs.
 
 <Info>
-Both examples use the same `checkout-details`, `checkout-cc-panel`, and `checkout-button` patterns. The backend processes them identically. The only difference is where the blocks appear in the template.
+Both examples use the same `checkout-details` and `checkout-cc-panel` tags, and both submit through `[data-checkout-submit]`. The backend processes them identically — the only difference is where the blocks appear in the template. (`checkout-button` is a **page builder block name**, not an HTML tag; in the code editor use `<button data-checkout-submit>`.)
 </Info>
 
 ---
@@ -338,7 +356,7 @@ Both examples use the same `checkout-details`, `checkout-cc-panel`, and `checkou
 ## Example 3: Minimal digital product checkout
 {/* SCREENSHOT: Example 3: Minimal digital product checkout · relevant screen or example output · desktop */}
 
-For digital products where you only need email and payment — no name or address fields. The card panel automatically adds a cardholder name field and billing details since they're missing from the page.
+For digital products where you only need email and payment — no name or address fields. The card panel automatically adds a cardholder name field and a Country + ZIP billing block, since neither is on the page.
 
 ### Template
 
@@ -353,19 +371,23 @@ For digital products where you only need email and payment — no name or addres
     </div>
   </section>
 
-  <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"
-                     data-applepay-layout="separated"></checkout-cc-panel>
+  <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
 
   <div data-checkout-message class="checkout-message"></div>
-  <button type="submit" data-checkout-submit class="checkout-button">Purchase</button>
+  <button type="button" data-checkout-submit class="checkout-button">Purchase</button>
 </form>
 ```
 
 What happens automatically:
 
-- **Apple Pay** appears above the card panel with an "OR PAY ANOTHER WAY" divider. Since only email is on the page, the wallet only requests email — no address sheet.
-- **Card panel** shows cardholder name (since `first_name`/`last_name` aren't on the page) and billing details (name, country, address).
+- **Apple Pay** appears as a radio tab alongside Card. On NMI, since only email is on the page, the wallet requests only email — no address sheet. (Stripe always requests name, email and shipping.)
+- **Card panel** adds a cardholder name field, since `first_name` / `last_name` aren't on the page.
+- **Billing panel** adds a Country select and a ZIP / postal code input, since neither `billing_zip` nor `shipping_zip` is on the page.
 - **Billing values** are automatically copied to shipping during submission.
+
+<Note>
+To render the wallet buttons **above** the panel instead of as a tab, add `<checkout-wallet force="true" />` above it and set `data-applepay="false"` on the panel, as in Example 2. Setting `data-applepay-layout="separated"` on `<checkout-cc-panel>` does not work — the attribute is dropped during server-side tag expansion.
+</Note>
 
 ---
 
@@ -379,6 +401,7 @@ These are set via `checkout_settings` in a `<script scope="backend">` block. See
 | `checkout_settings.countries` | Restrict country dropdown (e.g. `['US', 'CA']`) |
 | `checkout_settings.usStates` | Restrict US state dropdown (e.g. `['CA', 'TX']`) |
 | `checkout_settings.abuse_protection` | Card-testing / velocity protection |
+| `checkout_settings.billing_fields` | Which fields the card panel's auto-billing block shows — `['country', 'zip']`. Omit for both; `'address'` is a legacy alias for `'zip'`. Exposed as `checkout.panel_billing_fields` |
 | `checkout_settings.wallet.recurring_description` | Label on Apple Pay sheet for subscriptions |
 | `checkout_settings.wallet.management_url` | Subscription management URL for Apple Pay |
 
@@ -395,10 +418,11 @@ Both examples above show raw HTML for the code editor. In the **page builder**, 
 - **Price Summary** — totals section
 - **Checkout Coupon** — coupon input with apply/clear
 - **Checkout Bumps** — order bump checkboxes
+- **Customer Flag** — consent / opt-in checkbox (`data-flag-key`, e.g. `allow_emails`)
 - **Single Product Summary** — product image/title for single-product checkout
 - **Cart Products** — product list for multi-item checkout
 
-Drag these blocks in your preferred order. For a wallet-first layout, place **Credit Card Form** above **Checkout Details**.
+Drag these blocks in your preferred order. For a wallet-first layout, add a `<checkout-wallet />` above **Checkout Details** via a custom code block and set `data-applepay="false"` on the **Credit Card Form**.
 
 ---
 

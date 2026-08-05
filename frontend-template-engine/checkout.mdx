@@ -75,6 +75,28 @@ On single-product checkout pages, `checkout.is_subscription` and `checkout.subsc
 | **`checkout.subscription.frequency_unit`** | string | `"day"`, `"week"`, `"month"`, or `"year"` |
 | **`checkout.subscription.trial_days`** | number | Free trial length in days (`0` = no trial) |
 | **`checkout.subscription.first_charge_free`** | boolean | `true` when the first cycle is free |
+| **`checkout.subscription.intro_offer`** | object \| null | `null` unless an intro offer is enabled on the product |
+| **`checkout.subscription.intro_offer.price`** | number \| null | Intro price |
+| **`checkout.subscription.intro_offer.period`** | number \| null | Intro period length (e.g. `2`) |
+| **`checkout.subscription.intro_offer.period_unit`** | string \| null | `"day"`, `"week"`, `"month"`, or `"year"` |
+| **`checkout.subscription.intro_offer.recurring_price`** | number \| null | Price charged after the intro period ends |
+| **`checkout.subscription.price_steps`** | array \| null | Stepped pricing schedule; `null` when not configured |
+| **`checkout.subscription.prepaid.discount_3_month`** | number \| null | Prepaid 3-month discount |
+| **`checkout.subscription.prepaid.discount_6_month`** | number \| null | Prepaid 6-month discount |
+| **`checkout.subscription.prepaid.discount_12_month`** | number \| null | Prepaid 12-month discount |
+| **`checkout.subscription.tiers`** | array \| null | Subscription tiers; `null` when not configured |
+
+Intro-offer copy, for example:
+
+```html
+<template-if data-condition="checkout.subscription.intro_offer">
+  <p>
+    [[ formatPrice(checkout.subscription.intro_offer.price) ]] for your first
+    [[ checkout.subscription.intro_offer.period ]] [[ checkout.subscription.intro_offer.period_unit ]],
+    then [[ formatPrice(checkout.subscription.intro_offer.recurring_price) ]].
+  </p>
+</template-if>
+```
 
 Use `template-if` to show subscription-specific UI only when the product is a subscription:
 
@@ -295,7 +317,7 @@ For programmatic wallet control, a small JavaScript API is available on `window.
 - **`ef.checkout.payWithWallet(method)`** — triggers `'applePay'` or `'googlePay'` programmatically
 - **`ef.checkout.onWalletComplete(callback)`** — fires after wallet payment attempt
 
-Full reference: [Checkout functionality reference — window.ef.checkout API](/checkouts/checkout-functionality-reference#7-windowefcheckout-api).
+Full reference: [Checkout functionality reference — `window.ef.checkout` API](/checkouts/checkout-functionality-reference#windowefcheckout-api).
 
 ---
 
@@ -311,4 +333,4 @@ Full reference: [Checkout functionality reference — window.ef.checkout API](/c
 - Coupon: **query.coupon**, **checkout.coupon**, **checkout.coupon_message**; **data-apply-coupon**, **data-clear-coupon**.
 - Bumps: **checkout.bump_products**, **checkout.selectedBumpLines**; **data-bump-*** attributes.
 - Payment: **Pattern A** — **`<checkout-cc-panel></checkout-cc-panel>`** only; **Pattern B** — explicit gateway div with **`data-gateway`**, optional cardholder, **secure-card-element**.
-- Wallet: **`checkout.wallet_available`** for conditional content; **`ef.checkout.payWithWallet()`** for programmatic triggers; place `<checkout-cc-panel>` above shipping for wallet-first layouts.
+- Wallet: **`checkout.wallet_visible`** (or **`checkout.wallet_available`**) for conditional content; **`ef.checkout.payWithWallet()`** for programmatic triggers; use **`<checkout-wallet force="true" />`** above the form for wallet-first layouts.

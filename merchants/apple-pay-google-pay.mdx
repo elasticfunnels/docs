@@ -9,7 +9,7 @@ Apple Pay and Google Pay are payment options on your checkout. They work with bo
 
 - **Apple Pay** - Appears on **Safari** (macOS and iOS) when the customer has Apple Pay set up. Setup depends on your gateway (see below).
 - **Google Pay** - Appears on supported browsers when a Google Pay wallet is available. With NMI it appears on **Android devices** only. With Stripe it can also appear on **desktop Chrome**.
-- Both options appear on the **checkout page** only. By default they render above the card fields inside `<checkout-cc-panel>`, or you can place them separately with `<checkout-wallet />` or `<checkout-apple-pay />`.
+- Both options appear on the **checkout page** only. By default they render inside `<checkout-cc-panel>`, or you can place them anywhere on the page with `<checkout-wallet />`.
 
 ## How to configure / enable
 
@@ -97,104 +97,117 @@ After all three steps, Apple Pay can appear on checkout when the customer uses S
 
 There are three ways to include Apple Pay / Google Pay on your checkout page:
 
-### Default - wallet buttons inside the card panel
+### Default - wallet tab inside the card panel
 
 ```html
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
 ```
 
-Apple Pay and Google Pay buttons appear above the card fields with an "or pay with card" divider. This is the simplest setup.
+On an HTTPS page with an NMI or Stripe merchant, the panel renders Apple Pay as a **radio tab** alongside Card (and PayPal / Klarna when configured). The tab relabels itself to Google Pay if Google Pay is detected instead.
 
-### Standalone Apple Pay - separate from the card panel
+The older inline layout - wallet buttons above the card fields with an `or pay with card` divider - is only used as a fallback when the tab layout is unavailable (non-HTTPS page, an unsupported gateway, or an `#applePay` container already on the page from `<checkout-wallet>`).
 
-Use `<checkout-apple-pay />` to place the Apple Pay button anywhere on the page, and disable it inside the card panel with `data-applepay="false"`:
+### Standalone - wallet buttons anywhere on the page
+
+Use `<checkout-wallet />` to place the wallet buttons wherever you want, and disable them inside the card panel with `data-applepay="false"`:
 
 ```html
-<!-- Apple Pay at the top of the checkout, before the form -->
-<checkout-apple-pay />
+<!-- Wallet buttons at the top of the checkout, before the form -->
+<checkout-wallet force="true" wallets="apple_pay,google_pay" />
 
 <!-- Card-only panel below -->
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
 ```
 
-This lets you position Apple Pay prominently (e.g. above the personal details form) while keeping the card panel card-only.
+This renders `<div class="ef-wallet-standalone">` containing both the `#applePay` and `#googlePay` containers. Because the panel skips its own wallet tab whenever an `#applePay` element already exists, adding `<checkout-wallet>` is enough on its own - but `data-applepay="false"` keeps the intent explicit.
 
-### Separated - Apple Pay above with divider
+| Attribute | Values | Effect |
+|-----------|--------|--------|
+| `force` | `"true"` | Pre-renders a native `<apple-pay-button>` placeholder so iOS shows it immediately, and sets `checkout.wallet_visible` to `true` right away instead of waiting for detection. |
+| `wallets` | `apple_pay`, `google_pay` (comma-separated) | Restricts which wallets are allowed. Passed to the client as `data-wallets` and used for Stripe's `disableWallets`. |
 
-Use `data-applepay-layout="separated"` to render Apple Pay above the card panel with an "OR PAY ANOTHER WAY" divider between them. This gives Apple Pay top-level prominence without needing a separate `<checkout-apple-pay />` element:
-
-```html
-<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"
-                   data-applepay-layout="separated"></checkout-cc-panel>
-```
-
-The Apple Pay button appears above the panel. When the customer's device doesn't support Apple Pay, the button and divider are hidden and the card panel shows normally.
-
-### Disable wallet buttons entirely
-
-```html
-<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
-```
-
-No Apple Pay or Google Pay buttons are shown. Customers can only pay with card (and PayPal/Klarna if configured).
-
-## Conditional display with `checkout.wallet_available`
-
-After the payment form loads, the scope variable `checkout.wallet_available` is updated with:
-
-```json
-{ "applePay": true, "googlePay": false }
-```
-
-Use this to conditionally show or hide parts of your checkout layout based on wallet availability:
-
-```html
-<!-- Show the personal details form only when Apple Pay is NOT available,
-     or after the customer chooses to pay with card instead -->
-<template-if data-condition="!checkout.wallet_available.applePay">
-  <checkout-personal-details>
-    <!-- name, email, address fields -->
-  </checkout-personal-details>
-</template-if>
-
-<!-- Apple Pay section - always visible, button appears when supported -->
-<checkout-apple-pay />
-
-<!-- Divider when both options are available -->
-<template-if data-condition="checkout.wallet_available.applePay">
-  <div class="or-divider">or fill out the form below</div>
-</template-if>
-
-<!-- Card panel (no inline wallet) -->
-<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
-```
+Both attributes are plain attributes, **not** `data-` prefixed. The tag may be written self-closing (`<checkout-wallet />`) or with an explicit closing tag.
 
 <Note>
-`checkout.wallet_available` is set after the payment library loads and detects wallet support (NMI Collect.js or Stripe.js). It may take 1-2 seconds after page load before the values update. Use `template-if` conditions so the UI adjusts automatically once the value is available.
+`<checkout-apple-pay />` is the legacy single-wallet version of this tag. It still works and accepts `force="true"`, but it only ever renders the Apple Pay container. Prefer `<checkout-wallet />` for new pages.
+</Note>
+
+### Disable wallet buttons in the card panel
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+Apple Pay is not rendered inside the panel.
+
+<Warning>
+`data-applepay="false"` does **not** always suppress Google Pay. On **NMI** merchants, a `#googlePay` container is still injected into the panel when the visitor is on an Android device, so a Google Pay button can still appear. On **Stripe** merchants both wallets share the same mount point, so `data-applepay="false"` disables both.
+</Warning>
+
+<Note>
+`data-applepay-layout` is read by the client-side panel, but the server-side tag expander does not forward it: `<checkout-cc-panel>` is rewritten into a `<div class="checkout-cc-panel">` carrying only `data-gateway`, `data-accepted-cards`, `data-applepay` and `data-applepay-force`. Writing `data-applepay-layout="separated"` on the tag therefore has **no effect** - use `<checkout-wallet />` for an above-the-panel wallet instead.
+</Note>
+
+## Conditional display
+
+Two scope variables drive wallet-aware layouts:
+
+| Key | Set by | Shape | Notes |
+|-----|--------|-------|-------|
+| `checkout.wallet_available` | Server-side as `{ applePay: false, googlePay: false }`, then updated client-side once the payment library detects support | `{ applePay, googlePay }` | Use for "which wallet does this visitor have" |
+| `checkout.wallet_visible` | Client-side by the payment panel when a wallet button is actually rendered | boolean | Only ever promoted from `false` to `true`, never reset. `<checkout-wallet force="true">` sets it immediately |
+
+Use them to show or hide parts of your checkout layout:
+
+```html
+<!-- Wallet buttons - always in the DOM, buttons fill in when supported -->
+<checkout-wallet force="true" />
+
+<!-- Divider only once a wallet button is actually showing -->
+<template-if data-condition="checkout.wallet_visible">
+  <div class="or-divider">or pay another way</div>
+</template-if>
+
+<!-- Personal details: the tag generates its own fields -->
+<checkout-personal-details data-fields="email,phone"></checkout-personal-details>
+
+<!-- Card panel (no wallet inside it) -->
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+```
+
+<Warning>
+`<checkout-personal-details>` **generates** its name / email / phone inputs from `data-fields` - you do not write them yourself. Any HTML you place inside the tag is preserved, but it is appended **after** the generated fields, not used in place of them. The same applies to `<checkout-details>` for shipping and billing. `<checkout-cc-panel>` discards its children entirely.
+</Warning>
+
+<Note>
+`checkout.wallet_available` starts as `{ applePay: false, googlePay: false }` and is only updated after the payment library loads and detects wallet support (NMI Collect.js or Stripe.js). This can take 1-2 seconds after page load, so a `template-if` on it will briefly evaluate false on first paint. Prefer `checkout.wallet_visible` (or `<checkout-wallet force="true">`) when you need the layout stable immediately.
 </Note>
 
 ### Example: wallet-first checkout
 
-This layout shows Apple Pay prominently at the top. When Apple Pay is available, the form fields are hidden until the customer scrolls past or chooses card. When Apple Pay is not available, the standard form shows immediately:
+This layout shows the wallet buttons prominently at the top, with the card form below:
 
 ```html
-<template-if data-condition="checkout.wallet_available.applePay">
-  <div style="text-align:center; padding: 24px 0;">
-    <h3>Quick checkout</h3>
-    <checkout-apple-pay />
-    <p style="margin-top: 12px; color: #6b7280; font-size: 14px;">
-      Or scroll down to pay with card
-    </p>
-  </div>
+<div style="text-align:center; padding: 24px 0;">
+  <h3>Quick checkout</h3>
+  <checkout-wallet force="true" wallets="apple_pay,google_pay" />
+</div>
+
+<template-if data-condition="checkout.wallet_visible">
+  <p style="margin-top: 12px; color: #6b7280; font-size: 14px;">
+    Or pay another way
+  </p>
 </template-if>
 
-<checkout-personal-details>
-  <!-- name, email, address fields -->
-</checkout-personal-details>
+<div class="floating-label-group">
+  <input type="email" name="email" data-template-value="checkout.customer.email" />
+  <div class="form-error" data-checkout-error="email"></div>
+</div>
 
 <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
 
-<button type="submit" data-checkout-submit>Pay now</button>
+<div data-checkout-message class="checkout-message"></div>
+<button type="button" data-checkout-submit>Pay now</button>
 ```
 
 ## How wallet payment works
@@ -206,20 +219,26 @@ When a customer taps the Apple Pay or Google Pay button:
 3. The system automatically fills the checkout form fields with the wallet data.
 4. The form auto-submits. No further action from the customer.
 
-This means the customer can skip filling out the checkout form entirely. The wallet provides everything needed for the payment. Personal and shipping fields are only filled if they are currently empty; billing fields are always overwritten with the wallet data for AVS accuracy.
+This means the customer can skip filling out the checkout form entirely. The wallet provides everything needed for the payment. Personal, shipping and billing form fields are only filled when they are currently **empty** - the one exception is `shipping_country` / `billing_country`, which are always overwritten with the wallet's value.
 
 ## Wallet contact field auto-detection
 
-The wallet (Apple Pay / Google Pay) automatically detects which contact fields to request based on which checkout fields are on the page. No explicit configuration is needed.
+<Note>
+This auto-detection applies to **NMI / Collect.js** checkouts only. On **Stripe**, the payment request is created with `requestPayerName`, `requestPayerEmail` and `requestShipping` always enabled and no phone request, regardless of which fields are on the page.
+</Note>
+
+On NMI, the wallet detects which contact fields to request based on which checkout fields are on the page. No explicit configuration is needed.
 
 | Page has | Wallet requests |
 |----------|----------------|
 | Shipping address fields (`shipping_address`, `shipping_country`) | Shipping postal address |
 | Billing address fields (`billing_address`, `billing_country`) | Billing postal address |
-| Name fields (`first_name`, `last_name`, or `shipping_first_name`) | Name |
+| A first-name field (`first_name`, `shipping_first_name`, or `billing_first_name`) | Name |
 | `email` field | Email |
 | `phone` field | Phone |
 | None of the above | No contact fields - payment token only |
+
+Only the **first-name** variants are checked. A page carrying `last_name` without any `*_first_name` field does not trigger the name request.
 
 **Digital product example:** A checkout page with only email and a payment panel (no name or address fields) causes Apple Pay to request only the customer's email. This is ideal for digital goods where shipping details are unnecessary.
 
@@ -227,8 +246,8 @@ The wallet (Apple Pay / Google Pay) automatically detects which contact fields t
 <div class="floating-label-group">
   <input type="email" name="email" data-template-value="checkout.customer.email" />
 </div>
-<checkout-cc-panel data-applepay-layout="separated"></checkout-cc-panel>
-<button type="submit" data-checkout-submit>Purchase</button>
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
+<button type="button" data-checkout-submit>Purchase</button>
 ```
 
 ## Subscriptions and recurring payments
@@ -248,9 +267,13 @@ This works the same as card-based one-click upsells for both NMI and Stripe.
 
 ## Billing address handling
 
-When a customer pays with Apple Pay or Google Pay, the wallet provides the **correct billing address** associated with the card. The system uses this wallet billing address automatically for payment verification (AVS), regardless of what the customer entered in the checkout form's billing fields. This prevents address verification mismatches and declined payments.
+When a customer pays with Apple Pay or Google Pay, the wallet provides the **correct billing address** associated with the card. The wallet's billing values always overwrite the internal `checkout.customer.billing_*` scope object, so the address used for verification (AVS) comes from the wallet rather than from anything typed earlier. This prevents address verification mismatches and declined payments.
 
 No configuration is needed. This is handled automatically.
+
+<Note>
+The scope object and the form inputs behave differently. `checkout.customer.billing_*` is always replaced with the wallet address, but the corresponding **form fields** are only overwritten when they were empty (`billing_country` and `shipping_country` excepted - those are always replaced). On a page that shows editable billing address inputs above the wallet button, a value the customer already typed is what gets submitted.
+</Note>
 
 <Note>
 For non-US addresses, Apple Pay may not return a state/region value (many countries don't use states in their address format). The checkout validation automatically skips state validation for wallet payments, so this does not cause errors.
@@ -271,7 +294,8 @@ For non-US addresses, Apple Pay may not return a state/region value (many countr
 - Confirm the domain uses an NMI merchant with **Collect.js** (tokenization) and a public/tokenization key.
 - Check that the customer is on **Safari** (macOS or iOS) and the page is served over **HTTPS**.
 - Confirm the domain is registered with NMI for Apple Pay and that the Apple verification file is reachable at `https://<your-checkout-domain>/.well-known/apple-developer-merchantid-domain-association`.
-- If using `<checkout-apple-pay />`, make sure the tag is on the page (it renders a container; the button appears inside it when supported).
+- If using `<checkout-wallet />` (or legacy `<checkout-apple-pay />`), make sure the tag is on the page (it renders a container; the button appears inside it when supported).
+- If you set `data-applepay-layout` on `<checkout-cc-panel>` and nothing changed, that is expected - the attribute is dropped during server-side expansion. Use `<checkout-wallet />` instead.
 
 ### Google Pay button does not show
 
