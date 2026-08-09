@@ -99,7 +99,7 @@ When creating a reference field, specify:
 
 #### Working with relations programmatically
 
-Use `SetCrmRelation` and `RemoveCrmRelation` to manage relations from backend scripts:
+Use `SetCrmRelation` and `RemoveCrmRelation` to manage relations. These two are **template-engine functions** — they are not available in backend scripts:
 
 ```javascript
 SetCrmRelation({
@@ -162,12 +162,25 @@ Customer CRM entries are visible in the **Customer Details** page under the **CR
 ## Functions
 {/* SCREENSHOT: Functions · CRM workspace or workflow screen · desktop */}
 
-The following functions are available in both the template engine and backend scripts. Write functions accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
+Write functions accept an optional `async` parameter (default `false`). When `true`, the write runs in the background for faster response times. Read functions are always synchronous.
+
+<Warning>
+**The function names differ between the two runtimes, and calling the wrong one takes the page down.**
+
+- **Template engine** (`{{ }}` / `@if` inside a page or component) — **PascalCase**: `SetCrmFields({...})`
+- **Backend scripts** (`<script scope="backend">` and standalone `scripts/*.js`) — **camelCase**: `setCrmFields({...})`
+
+An undefined function is not ignored — it aborts the render, and a live page starts returning **404**. Three functions exist in **templates only** (`CreateCrmEntry`, `SetCrmRelation`, `RemoveCrmRelation`) and `reassignCrmReference` exists in **backend scripts only**; there is no `createCrmEntry` in a backend script. To create an entry from a backend script use `addCrmFieldValue({...})`, or `setCrmFields({...})` to upsert.
+
+Test with a draft and open the preview URL before publishing.
+</Warning>
+
+The table below uses the **backend-script (camelCase)** spelling. For the template engine, capitalise the first letter.
 
 | Function | Description |
 |----------|-------------|
-| `EnsureCrmEntity({ slug, ... })` | Idempotently create an entity with fields (returns `{ id, slug, created, fields_added }`) |
-| `CreateCrmEntry({ slug, title?, values?, ... })` | Create a new entry and return its ID |
+| `ensureCrmEntity({ slug, ... })` | Idempotently create an entity with fields (returns `{ id, slug, created, fields_added }`) |
+| `CreateCrmEntry({ slug, title?, values?, ... })` | **Template engine only.** Create a new entry and return its ID. In a backend script use `addCrmFieldValue` / `setCrmFields` instead |
 | `getCrmEntries({ slug, ... })` | Fetch all entries for one entity **slug** + reference |
 | `getCrmField({ slug, fieldKey, ... })` | Get one field value (`slug` + `fieldKey` required) |
 | `getCrmFields({ slug, fieldKeys, ... })` | Get multiple field values (`slug` + `fieldKeys` required) |
@@ -176,8 +189,9 @@ The following functions are available in both the template engine and backend sc
 | `addCrmFieldValue({ slug, fieldKey, value, ... })` | Append a new entry with a field value — enables multiple values per key |
 | `getCrmFieldValues({ slug, fieldKey, ... })` | Get all values for a field key across entries (returns array) |
 | `clearCrmEntries({ slug, ... })` | Delete all entries for an entity slug + reference |
-| `SetCrmRelation({ slug, relationKey, targetEntryId, ... })` | Add a relation from entry to another entry |
-| `RemoveCrmRelation({ slug, relationKey, targetEntryId, ... })` | Remove a specific relation |
+| `SetCrmRelation({ slug, relationKey, targetEntryId, ... })` | **Template engine only.** Add a relation from entry to another entry |
+| `RemoveCrmRelation({ slug, relationKey, targetEntryId, ... })` | **Template engine only.** Remove a specific relation |
+| `reassignCrmReference({ slug, fromReferenceType, fromReferenceId, ... })` | **Backend scripts only.** Move entries from one visitor reference to another (e.g. anonymous → customer after login) |
 | `moveCrmLead({ slug, pipelineId/pipelineSlug, stageId/stageSlug, ... })` | Move entry to a specific pipeline + stage |
 | `moveCrmToStage({ slug, stageId/stageSlug, ... })` | Move entry to a stage (pipeline resolved from stage) |
 | `moveCrmToPipeline({ slug, pipelineId/pipelineSlug, ... })` | Move entry to a pipeline (lands on first stage) |
@@ -336,7 +350,7 @@ EnsureCrmEntity({
 
 ### Creating entries
 
-Use `CreateCrmEntry` to create a new entry and get back its ID (useful for setting relations):
+Use `CreateCrmEntry` to create a new entry and get back its ID (useful for setting relations). This is a **template-engine function** — from a backend script use `addCrmFieldValue({ slug, fieldKey, value })` or `setCrmFields({ slug, fields })` instead, as there is no `createCrmEntry` there:
 
 ```javascript
 var result = CreateCrmEntry({
