@@ -80,7 +80,7 @@ JVZoo posts a `JVZIPN` payload to your IPN URL on every transaction event for pr
     Copy the **IPN URL** from the form and paste it into the JVZoo product's **Notify URL** field. Save the JVZoo product.
   </Step>
   <Step title="Use tracking IDs from EF">
-    Ensure your JVZoo links pass the EF click code through the JVZoo tracking-id parameter. EF reads it back from the IPN to attribute orders.
+    Build your buy links with `[BUY=...]` tags rather than hardcoding them. ElasticFunnels then passes the click code automatically as `vtid`, the vendor tracking parameter, and reads it back from the IPN to attribute the order. Hardcoded links carry no click code, so their sales arrive unattributed. See [JVZoo merchant setup](/merchants/jvzoo) for buy links, the funnel ID, and the sales pixel.
   </Step>
   <Step title="Test">
     Make a test purchase. The IPN should arrive within seconds; failed signature checks are logged with the reason so you can debug a key mismatch.
@@ -102,6 +102,6 @@ JVZoo posts a `JVZIPN` payload to your IPN URL on every transaction event for pr
     The JVZoo secret in EF must match the **current** secret in your JVZoo seller settings. If you regenerated the secret, paste the new value into the EF integration form. Failed `cverify` checks are recorded under **Logs** → **Inbound Postbacks** so you can see the exact reason.
   </Accordion>
   <Accordion title="Sales recorded with no click attribution">
-    The JVZoo payload didn't include a tracking ID matching an EF click code. Audit your JVZoo links to ensure they include the click code in the tracking-id parameter (most commonly `tid` for affiliates, the JVZoo-defined parameter for vendors).
+    The JVZoo payload didn't include a tracking ID matching an EF click code. Audit your JVZoo links to ensure they carry the click code: `tid` when you are the affiliate, `vtid` when you are the vendor. Vendor buy links built from `[BUY=...]` tags set `vtid` for you; hardcoded links do not.
   </Accordion>
 </AccordionGroup>

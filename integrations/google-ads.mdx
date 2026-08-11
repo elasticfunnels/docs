@@ -35,7 +35,12 @@ The Google Ads integration syncs ad spend into ElasticFunnels and sends conversi
 2. Find **Google Ads** and click **"New integration"** or **"Manage integrations"**
 3. Click **"Connect your Google Ads Account"**
 4. You'll be redirected to Google to authorize access
-5. Grant the necessary permissions for ad data access
+5. Sign in with the Google account that has access to your Google Ads account
+6. On the permission screen, **leave every box ticked**, including the Google Ads box
+
+<Warning>
+**Do not untick the Google Ads permission.** Google's consent screen lets you approve the sign-in while refusing the Google Ads permission, and the connection still completes. It looks connected, but no ad accounts can be read and no spend imports. See [Connection and Permissions](#connection-and-permissions) for how to spot and fix this.
+</Warning>
 
 <Info>
 You'll need admin access to your Google Ads account to complete the authorization. A Google Ads Developer Token must be configured at the application level (contact support if needed).
@@ -52,6 +57,8 @@ After authorization, you'll see a list of all Google Ads accounts you have acces
 <Tip>
 If you manage multiple businesses, you can create separate integrations for each Google Ads account to keep reporting organized.
 </Tip>
+
+If the list comes back empty or shows a red error box, the connection has a problem that selecting an account will not fix. Read [When No Ad Accounts Appear](#when-no-ad-accounts-appear).
 
 ### Step 3: Configure Conversion Tracking (Required for Postbacks)
 
@@ -70,6 +77,68 @@ To enable conversion postbacks (highly recommended):
 
 <Warning>
 Conversion postbacks require a valid Conversion Action ID. If you enable postbacks without a Conversion Action ID, the system will warn you. The postback will only fire when conversions have a valid gclid (Google Click ID) parameter.
+</Warning>
+
+## Connection and Permissions
+{/* SCREENSHOT: Connected Google Account · integration settings showing the connected account card and the Reconnect button · desktop */}
+
+### Which Google Account Is Connected
+
+The integration stores credentials for one Google account, and that account is not always the person who set it up. An agency staffer, a former employee, or a personal Gmail can end up holding the connection.
+
+Open the integration and look at the **Connected Google Account** card at the top. It shows:
+
+- The email address of the Google account that authorized the connection
+- The account name, when Google returns one different from the email
+- The date the connection was made
+
+<Tip>
+Check this card first whenever spend stops importing. If the email is not the account you expect, the connection is reading a different set of Google Ads accounts than you think.
+</Tip>
+
+If the card says the account has not been recorded yet, the integration was connected before this was tracked. Click **Reconnect** and the email will be filled in.
+
+### The Google Ads Permission
+
+The connection asks Google for three things: your email, your basic profile, and access to Google Ads. Only the third one lets ElasticFunnels read campaigns and spend.
+
+Google's consent screen shows these as separate tick boxes. Approving the sign-in while unticking the Google Ads box produces a working set of credentials with no Google Ads access. The connection saves and reports success. Every later request to Google Ads is refused.
+
+When this happens the integration shows a red banner:
+
+> **Google Ads permission was not granted.** This account is signed in, but it did not approve access to Google Ads, so no ad accounts can be read and spend will not import. Reconnect and leave the Google Ads box ticked on the consent screen.
+
+The fix is to reconnect and approve the Google Ads permission.
+
+### Reconnecting an Integration
+
+Use the **Reconnect** button on the integration you want to fix, not the generic connect button on the Advertising tab.
+
+The Reconnect button names the integration it belongs to, so the new credentials replace that integration's credentials. Starting a fresh connect flow on a brand that already has several Google Ads integrations can write the new credentials onto a different one.
+
+<Info>
+Reconnecting always shows Google's permission screen again, even for an account you have already approved. This is deliberate. It is the only way to grant a permission you previously refused.
+</Info>
+
+Reconnecting keeps your selected ad account, Conversion Action ID, and postback settings. It replaces only the credentials.
+
+## When No Ad Accounts Appear
+{/* SCREENSHOT: Ad account lookup failure · integration settings showing the red lookup error and Reconnect button · desktop */}
+
+An empty ad account list is a symptom, not a cause. The integration reports what Google actually said, so read the message shown in the red box rather than guessing.
+
+| What the integration shows | What it means | What to do |
+|---|---|---|
+| **No Google account is connected** | The integration row exists but no connect flow ever finished. | Click **Connect your Google Ads Account**. |
+| **Google refused access to Google Ads for this account** | The credentials are valid, but they lack the Google Ads permission. | Reconnect and leave the Google Ads box ticked. |
+| **Access to this Google account was revoked** | Someone removed ElasticFunnels in their Google account security settings, or the password changed. | Reconnect. |
+| **Could not sign in to Google with the stored credentials** | Google rejected the stored credentials when refreshing them. | Reconnect. |
+| **Google rejected the stored credentials** | The credentials are no longer accepted. | Reconnect. |
+| **The Google Ads API version in use has been retired** | A platform-level problem, not an account problem. | Contact support. Reconnecting will not help. |
+| **No ad accounts found** with no error | Google answered normally and the account genuinely has no Google Ads accounts. | Confirm the connected email has access to a Google Ads account. |
+
+<Warning>
+The most common cause of a silently broken Google Ads integration is the refused Google Ads permission. It is easy to miss because the connection reports success, the integration looks configured, and the only symptom is that no data ever arrives.
 </Warning>
 
 ## Understanding Google Click ID (gclid)
@@ -186,11 +255,16 @@ Access the Tracking Link Builder from **Tools → Tracking → Tracking Link Bui
 ## Campaign Management
 {/* SCREENSHOT: Campaign Management · integration settings or log state · desktop */}
 
-You can view and manage your Google Ads campaigns:
+Go to **Reports → Ad Campaigns** in the sidebar and pick your Google Ads integration to browse the account:
 
-- View campaign information and performance
-- Monitor ad group performance
-- Track campaign metrics alongside funnel data
+- Campaigns, with spend, clicks, and impressions for a date range you choose
+- Ad groups inside each campaign
+- Ads inside each ad group, including headlines and descriptions
+- Funnel revenue and profit next to the ad metrics, when your tracking links carry the right parameters
+
+The status column accounts for parents. An ad group that is enabled inside a paused campaign reads as **Active but campaign paused**, so you can tell the difference between an ad group you paused and one that cannot deliver because of the campaign above it.
+
+See the [Campaigns Management](/integrations/campaigns-management) guide for the full interface, metric definitions, and the tracking link requirements that make funnel metrics appear.
 
 ## Managing Multiple Integrations
 {/* SCREENSHOT: Managing Multiple Integrations · integration settings or log state · desktop */}
@@ -222,17 +296,36 @@ Name each integration clearly (e.g., "Client A - Supplements", "Client B - Softw
 <AccordionGroup>
   <Accordion title="No Data Appearing After Setup">
     **Possible Causes:**
+    - The Google Ads permission was refused on the consent screen (most common)
     - First sync hasn't run yet
     - No ad spend in the selected date range
     - Ad account has no active campaigns
-    
-    **Solution:** Wait for first sync, or contact support to trigger manual sync
+
+    **Solution:** Open the integration and check the **Connected Google Account** card. If a red permission banner is showing, reconnect and leave the Google Ads box ticked. Otherwise wait for the first sync, or contact support to trigger a manual sync.
+  </Accordion>
+
+  <Accordion title="Ad Account List Is Empty">
+    **Cause:** Almost always a credentials or permission problem rather than a missing account.
+
+    **Solution:** Read the message in the red box on the integration and match it against the table in [When No Ad Accounts Appear](#when-no-ad-accounts-appear). Most cases are fixed by reconnecting.
+  </Accordion>
+
+  <Accordion title="Wrong Google Account Is Connected">
+    **Cause:** The connection was made by someone else, or with a different Google login than intended. Agencies hit this when a staff member connects with their own account.
+
+    **Solution:** Check the email on the **Connected Google Account** card. Click **Reconnect**, sign in as the correct Google account, and approve the Google Ads permission. Your ad account selection and postback settings are kept.
   </Accordion>
 
   <Accordion title="Session Expired / Connection Error">
-    **Cause:** Google OAuth tokens expire after a period of time
-    
-    **Solution:** Click the "Re-authenticate" button on your integration to refresh your connection
+    **Cause:** The stored Google credentials stopped working. This happens when the permission is removed in the Google account's security settings, when the password changes, or when Google revokes access.
+
+    **Solution:** Click **Reconnect** on your integration and approve the Google Ads permission again.
+  </Accordion>
+
+  <Accordion title="An Ad Group or Ad Shows Active but Gets No Traffic">
+    **Cause:** A parent is paused. An enabled ad group inside a paused campaign cannot deliver, and neither can an enabled ad inside a paused ad group.
+
+    **Solution:** The status column names the reason, for example **Active but campaign paused**. Activate the parent, or accept that the child will not run until you do.
   </Accordion>
 
   <Accordion title="Conversions Not Showing in Google Ads">
@@ -278,6 +371,7 @@ Name each integration clearly (e.g., "Client A - Supplements", "Client B - Softw
 {/* SCREENSHOT: Required Information · integration settings or log state · desktop */}
 
 - Google Ads account access with admin permissions
+- A Google login that approves the Google Ads permission during authorization
 - Conversion Action ID (created in Google Ads)
 - Google Ads Developer Token (configured at application level)
 

@@ -216,7 +216,11 @@ A structured builder for URL parameter checks. The node **compiles your conditio
 | Field | Description |
 |-------|-------------|
 | `conditions` | Array of `{ param, operator, value, logicalOperator }`. |
-| `script_rule` | The generated script. Regenerated whenever you edit `conditions` — do not hand-edit. |
+| `script_rule` | The compiled script — **this is what actually executes**. The builder regenerates it every time you edit `conditions`; nothing on the server does. |
+
+<Warning>
+Writing the graph through the API (`POST /api/brands/{brand}/pages/{page}/events`) you must send **both** fields, kept in sync. `conditions` alone is inert: the compile step lives in the builder UI, so a node saved with conditions but no `script_rule` has nothing to run and its condition never passes. Only edit `script_rule` by hand when you are writing the graph directly — in the builder, edit `conditions` and let it recompile.
+</Warning>
 
 **Operators**
 
@@ -232,6 +236,14 @@ A structured builder for URL parameter checks. The node **compiles your conditio
 | `is_not_empty` | `query.<param> && query.<param> != ''` |
 
 `logicalOperator` is `&&` (AND) or `||` (OR) and joins a condition to the **next** one in the list. The legacy values `and` / `or` are normalised to `&&` / `||` on load.
+
+**Outputs** — `output_1` runs when the compiled condition is **true**, `output_2` when it is **false**. Either may be left unconnected; an empty branch simply does nothing.
+
+Say the condition positively and hang the work off the branch you want, rather than inverting the operator. "Serve the white page unless the URL carries `?test=1`" is one condition — `is` / `test` / `1` — with the white-page node on **`output_2`**, the false branch.
+
+<Warning>
+`is_empty` is not the way to express "missing `test=1`". It only asks whether the parameter is **present**, ignoring its value, so `?test=2` counts as *not* empty and the branch never fires. When the user means "anything other than `test=1`", compare the value: `is` on `output_2`, or equivalently `is_not` on `output_1`.
+</Warning>
 
 <Warning>
 There are no numeric operators. `greater than` / `less than` do not exist on this node — use a **Script Rule** for numeric comparisons.
@@ -403,6 +415,18 @@ Full guide: [Dynamic Content](/funnels/dynamic-content).
 **Type** `page_variant` · **1 in / 1 out** · Server · requires `pages.create` or `pages.update`
 
 Renders a **different page's content at the current URL**. No redirect, no URL change.
+
+<Note>
+Three nodes read alike and are not interchangeable:
+
+| What you want | Node | Address bar |
+|---------------|------|-------------|
+| Show another page's content where the visitor already is | `page_variant` | unchanged |
+| Send the visitor to another page in this brand | `page` | changes |
+| Send the visitor to any other address | `url_redirect` | changes |
+
+"Load", "show", and "serve" mean `page_variant`. "Redirect", "send", and "go to" mean one of the redirect nodes. The distinction matters most when a condition guards a safe or white page: a redirect moves the visitor to a different URL, which is not the same thing as serving different content at the one they asked for — only `page_variant` does that. `page_variant` also keeps an output, so the graph can carry on after it; both redirect nodes are terminal.
+</Note>
 
 **Fields**
 

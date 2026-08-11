@@ -1,0 +1,214 @@
+---
+title: 'JVZoo'
+description: 'Set up JVZoo as a merchant, including funnel ID, buy links, the tracking pixel, and affiliate attribution'
+---
+
+This guide covers setting up JVZoo as a merchant to sell your products through JVZoo's hosted checkout, including the JVZoo funnel ID, buy links, the sales pixel, and affiliate attribution.
+
+<Note>
+**This page is for vending your own products on JVZoo.** It is a different setup from the [JVZoo Affiliate S2S integration](/integrations/jvzoo#jvzoo-affiliate-s2s), which is for promoting *other* sellers' JVZoo products and earning commissions.
+
+They are independent — you can run both, and the two use different tracking parameters (`vtid` for your own sales, `tid` for affiliate commissions). Don't configure one expecting it to cover the other.
+</Note>
+
+## How JVZoo differs from other merchants
+
+JVZoo is a **hosted checkout**. Your funnel owns the sales pages; JVZoo owns the cart, the payment, and the upsell sequence.
+
+- There is **no checkout API** — buyers leave your page for JVZoo's checkout.
+- **One-click upsells run inside JVZoo's funnel**, not ElasticFunnels'. The `jvzoo-checkout-state.js` script that JVZoo gives you belongs in the `<head>` of your upsell pages.
+- The post-purchase thank-you page is configured **per product in the JVZoo product editor**, not passed as a redirect parameter.
+
+## Prerequisites
+{/* SCREENSHOT: Prerequisites · merchant setup screen · desktop */}
+
+- Active JVZoo seller account with an approved product funnel
+- Your JVZoo **Account ID** (the vendor number, e.g. `117845`)
+- Your product IDs from JVZoo (e.g. `448013` for the front end)
+- Your JVZoo **funnel ID** — see Step 3
+
+## Step 1: Create the JVZoo merchant
+{/* SCREENSHOT: Step 1: Create JVZoo Merchant · merchant setup screen · desktop */}
+
+1. Go to **Settings** → **Merchants** → **Add Merchant**
+2. Select **Gateway**: JVZoo
+3. Enter your **Account ID** — your JVZoo vendor number. This becomes the first segment of every buy link.
+4. Tick **Create tracking pixels** to have the JVZoo sales pixel added automatically (see [Tracking pixel](#tracking-pixel))
+5. Save
+
+## Step 2: Assign the merchant to a domain
+{/* SCREENSHOT: Step 2: Domain assignment · merchant setup screen · desktop */}
+
+1. Go to **Settings** → **Domains** → **Edit Domain**
+2. Select your JVZoo merchant from the dropdown
+3. Save
+
+All funnels on this domain now build JVZoo buy links.
+
+## Step 3: Get your JVZoo funnel ID
+{/* SCREENSHOT: Step 3: JVZoo Buy Buttons screen · desktop */}
+
+JVZoo buy buttons are generated **per funnel**, and the funnel ID is baked into the link:
+
+```
+https://www.jvzoo.com/b/117845/448013/99
+                       ^vendor ^product ^funnel
+```
+
+To find it:
+
+1. Log in to your JVZoo **Seller Dashboard**
+2. Click the **⋯** menu next to your product → **Buy Buttons**
+3. Select your **Funnel** from the dropdown at the top (not "No Funnel")
+4. Read the last number off the generated button link — `99` in the example above
+
+The same funnel ID appears on every product in that funnel, and in the tracking pixel URLs.
+
+<Warning>
+If your product **is** in a JVZoo funnel, use the buy buttons from the funnel, not from the individual product. A link missing the funnel segment sends buyers through JVZoo's standalone-product flow, so your one-click upsells silently never run — the front-end sale still succeeds, which makes this fail quietly.
+</Warning>
+
+<Note>
+Selling a single product with no upsells? Choose **No Funnel** in JVZoo and leave **JVZoo Funnel ID** blank in ElasticFunnels. Buy links then have two segments instead of three, and everything else on this page works the same. See [Direct purchase links](#direct-purchase-links).
+</Note>
+
+## Step 4: Set the JVZoo Funnel ID in ElasticFunnels
+{/* SCREENSHOT: Step 4: Funnel domain row · desktop */}
+
+1. Go to **Funnels** → **Edit Funnel**
+2. In the **Domains** section, find the row for your JVZoo domain
+3. Enter the funnel ID into **JVZoo Funnel ID**
+4. Save
+
+It lives on the domain row rather than the funnel itself, so one funnel served on two domains can point at two different JVZoo funnels. This mirrors how **ClickBank Pitch Flow ID** works.
+
+## Product mapping
+
+ElasticFunnels product codes are yours; JVZoo product IDs are numeric. Map them per product:
+
+1. Go to **Products** → edit the product
+2. Under **Merchant Product IDs**, set the **jvzoo** value to the JVZoo product ID (e.g. `448013`)
+
+If no mapping exists, the product code is sent as-is — which only works if your ElasticFunnels code happens to be the JVZoo numeric ID.
+
+## Buy links
+
+Use the standard tag on your sales page:
+
+```html
+<a href="[BUY=SMART_INCOME_MAIN_P37]" class="opt-in-submit">Buy Now</a>
+```
+
+With the merchant, mapping, and funnel ID configured, that expands to:
+
+```
+https://www.jvzoo.com/b/117845/448013/99?vtid=<click_code>&aff=<affiliate_id>
+```
+
+| Part | Source |
+| --- | --- |
+| `117845` | Merchant **Account ID** |
+| `448013` | Product's **Merchant Product ID** for jvzoo |
+| `99` | **JVZoo Funnel ID** on the funnel's domain row |
+| `vtid` | ElasticFunnels click code — the vendor tracking ID, used to attribute the sale |
+| `aff` | Affiliate ID, when the visit was affiliate-referred |
+
+Upsell tags (`[UPSELL=...]`) build the same shape for your OTO products, carrying the same funnel ID and click code.
+
+<Note>
+`vtid` is the **vendor** tracking parameter — your own sales. `tid` is the **affiliate** SubID, used when you promote someone else's product. ElasticFunnels never writes to `tid`, so an affiliate's own sub-tracking passes through untouched on affiliate-driven sales.
+</Note>
+
+## Direct purchase links
+
+You don't have to use `[BUY=...]` tags — a hardcoded JVZoo link works too, and works with or without a funnel. **It must carry `vtid`**, or the sale arrives with no click attribution.
+
+Use the `{click_id}` token and ElasticFunnels substitutes the visitor's click code when the page renders:
+
+```html
+<!-- Product in a JVZoo funnel (99 is the funnel ID) -->
+<a href="https://www.jvzoo.com/b/117845/448017/99?vtid={click_id}">Buy Now</a>
+
+<!-- Standalone product, no funnel — two segments, trailing slash -->
+<a href="https://www.jvzoo.com/b/117845/448017/?vtid={click_id}">Buy Now</a>
+```
+
+In a backend script, use the template-engine syntax instead:
+
+```
+https://www.jvzoo.com/b/117845/448017/99?vtid={{ click_id }}
+```
+
+`{click_id}` and `[click_id]` (and their URL-encoded forms) are the legacy page-HTML substitutions and are still supported; `{{ click_id }}` is the current template-engine syntax.
+
+<Warning>
+The legacy `{click_id}` form is **case-sensitive** — `{CLICK_ID}` is not substituted and ships the literal text to JVZoo, which then posts back a tracking ID like `{CLICK_ID}` that matches no click. Those sales are flagged as a malformed click ID and cannot be attributed.
+</Warning>
+
+Prefer `[BUY=...]` tags where you can: they pick up the funnel ID, product mapping, and affiliate ID automatically, so a hardcoded link is one more place to update when any of those change.
+
+## Tracking pixel
+
+JVZoo requires a sales pixel on each sales page. Ticking **Create tracking pixels** when you add the merchant creates it for you:
+
+```html
+<img src='https://i.jvzoo.com/{jvz_acc_id}/{product_code_first}/{jvz_funnel_id}' border="0" width="1" height="1" />
+```
+
+Nothing to fill in — all three values resolve per page at render time:
+
+| Token | Resolves to |
+| --- | --- |
+| `{jvz_acc_id}` | The merchant's Account ID |
+| `{product_code_first}` | JVZoo ID of the first buy button on the page |
+| `{jvz_funnel_id}` | The funnel's JVZoo Funnel ID |
+| `{product_codes_comma}` | Every product code on the page, deduped and comma-separated |
+
+Because the product ID comes from the buy buttons, the same pixel works on your front end and every OTO page without editing.
+
+## Affiliate attribution
+{/* SCREENSHOT: JVZoo product editor · Pass Affiliate ID to Sales Page · desktop */}
+
+JVZoo only tells you which affiliate sent a visitor if you turn it on, **per product**:
+
+1. In the JVZoo product editor, find the **sales page URL** field
+2. Set **Pass Affiliate ID to Sales Page** to **Yes**
+3. Repeat for every product in the funnel
+
+JVZoo then appends `?aid=<affiliate_id>` when it hands the visitor to your page. ElasticFunnels stores it in the session and puts it back on the buy link as `aff`, so JVZoo credits the sale.
+
+<Warning>
+This setting is **off by default**. With it off, affiliate traffic arrives with no affiliate ID and those sales cannot be attributed — there is no way to recover the attribution afterwards.
+</Warning>
+
+## Postbacks
+
+Sales, refunds, and chargebacks for products you vend come back over JVZIPN. Set this up under **JVZoo Vendor IPN** — see [JVZoo Vendor IPN](/integrations/jvzoo#jvzoo-vendor-ipn) for the secret key, IPN URL, and event mapping.
+
+<Warning>
+Set up **JVZoo Vendor IPN**, not JVZoo Affiliate S2S. The affiliate one listens for commissions on other sellers' products and will never receive events for products you vend.
+</Warning>
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Upsells never run after the front-end sale">
+    The buy link is missing its funnel segment, so JVZoo used the standalone-product flow. Check **JVZoo Funnel ID** is set on the funnel's domain row, and that you copied it from the funnel's buy buttons rather than the individual product's.
+  </Accordion>
+  <Accordion title="Buy link points at the wrong product">
+    Check the product's **Merchant Product ID** for jvzoo. With no mapping, the ElasticFunnels product code is sent verbatim and JVZoo will not recognise it.
+  </Accordion>
+  <Accordion title="Affiliate sales recorded with no affiliate">
+    **Pass Affiliate ID to Sales Page** is off for that product in JVZoo, so no `aid` ever reached your page. It must be enabled per product.
+  </Accordion>
+  <Accordion title="Sales recorded with no click attribution">
+    The IPN arrived without a tracking ID matching an ElasticFunnels click code. Either the link was hardcoded without `?vtid={click_id}`, or the events are landing on the affiliate integration rather than JVZoo Vendor IPN. Inbound payloads are recorded under **Logs** → **Inbound Postbacks**.
+  </Accordion>
+  <Accordion title="Tracking ID arrives as the literal text {click_id}">
+    The token wasn't substituted, so JVZoo received it verbatim. Check the capitalisation — `{click_id}` is case-sensitive — and that it is in the page's HTML rather than a tracking script or JS block.
+  </Accordion>
+  <Accordion title="Pixel renders with an empty product ID">
+    `{product_code_first}` reads from the buy tags on the page. A page with no `[BUY=...]` or `[UPSELL=...]` tag has no product to report.
+  </Accordion>
+</AccordionGroup>

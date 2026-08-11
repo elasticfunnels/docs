@@ -1,12 +1,29 @@
 ---
 title: 'Campaigns Management'
-description: 'Manage your Meta Ads campaigns, ad sets, and ads directly from ElasticFunnels with unified performance metrics'
+description: 'Manage your ad campaigns, ad sets, and ads directly from ElasticFunnels with unified performance metrics'
 ---
 
 ## Overview
 {/* SCREENSHOT: Overview · integration settings or log state · desktop */}
 
-Campaigns Management gives you complete control over your Meta Ads campaigns without leaving ElasticFunnels. View your campaigns, ad sets, and ads in a unified interface that combines Meta's advertising metrics with your funnel's conversion data, giving you a complete picture of ROI and performance.
+Campaigns Management gives you control over your ad campaigns without leaving ElasticFunnels. View your campaigns, ad sets, and ads in one interface that combines the ad platform's metrics with your funnel's conversion data, giving you a complete picture of ROI and performance.
+
+Open it from **Reports → Ad Campaigns** in the sidebar, then choose which connected integration to view.
+
+### Supported Platforms
+
+| Platform | Hierarchy | Spend metrics | Pause and activate | Budget edits | Creative preview |
+|---|---|---|---|---|---|
+| Meta Ads | Campaign → ad set → ad | Yes | All three levels | Campaign and ad set | Images and videos |
+| Google Ads | Campaign → ad group → ad | Yes | All three levels | Campaign only | Headlines and descriptions |
+
+<Note>
+Most of this guide uses Meta Ads names. Google Ads works the same way, with **ad groups** in place of ad sets. Where the two differ, the difference is called out.
+</Note>
+
+<Info>
+Google Ads holds the budget on the campaign, so ad groups have no budget of their own. The ad group rows show the parent campaign's budget for reference. Editing it there is not possible, so change the campaign budget instead.
+</Info>
 
 ## What You Can Do
 {/* SCREENSHOT: What You Can Do · integration settings or log state · desktop */}
@@ -39,14 +56,14 @@ Campaigns Management gives you complete control over your Meta Ads campaigns wit
 
 Before using Campaigns Management, you need:
 
-1. **A Meta Ads Integration** - Connect your Meta Ads account first
+1. **An advertising integration** - Connect your ad platform first
    - Go to **Settings → Integrations → Advertising**
-   - Set up your Meta Ads integration (see [Meta Ads Integration](/integrations/meta-ads) guide)
-   - Ensure you've selected an ad account
+   - Set up [Meta Ads](/integrations/meta-ads) or [Google Ads](/integrations/google-ads)
+   - Ensure you've selected an ad account on the integration
 
 2. **Tracking Links Created with Tracking Link Builder** - **Required** for funnel analytics
    - You **must** use the [Tracking Link Builder](/integrations/affiliate-tracking#tracking-link-builder) to create tracking URLs
-   - Select **Meta Ads** as the platform in the builder
+   - Select the matching platform in the builder, **Meta Ads** or **Google Ads**, so it writes that platform's parameter format
    - The builder automatically generates the correct UTM parameters:
      - `utm_campaign={{campaign.name}}` (maps to campaign name)
      - `utm_content={{adset.name}}` (maps to ad set name)
@@ -68,13 +85,14 @@ See the [Setting Up UTM Tracking](#setting-up-utm-tracking) section below for de
 
 ### Accessing Campaigns Management
 
-1. Navigate to **Settings → Integrations**
-2. Click on your **Meta Ads integration**
-3. Look for the **"Campaigns"** tab or link
-4. You'll see your campaigns list
+1. Go to **Reports → Ad Campaigns** in the sidebar
+2. Pick the integration you want to view from the list of connected ad platforms
+3. You'll see your campaigns list
+
+If no advertising integration is connected yet, this screen explains what the feature does and links you to the Advertising tab to connect one.
 
 <Info>
-If you have multiple Meta Ads integrations, make sure you're viewing the one connected to the ad account you want to manage.
+If you have several integrations on the same platform, make sure you pick the one connected to the ad account you want to manage. The integration name is shown next to the platform.
 </Info>
 
 ## Understanding the Interface
@@ -467,8 +485,10 @@ The status column shows the effective status, which may be affected by parent it
 - Otherwise: Shows the ad's status
 
 <Info>
-This status display helps you understand why an ad might not be running even if it's set to "Active" in Meta Ads.
+This status display helps you understand why an ad might not be running even if it's set to "Active" in the ad platform.
 </Info>
+
+Google Ads behaves the same way, reading ad groups in place of ad sets. An enabled ad group inside a paused campaign shows **Active but campaign paused**, and an enabled ad inside a paused ad group shows the paused parent rather than claiming to be running.
 
 ## Best Practices
 {/* SCREENSHOT: Best Practices · integration settings or log state · desktop */}
