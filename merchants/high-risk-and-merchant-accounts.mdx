@@ -1,0 +1,122 @@
+---
+title: 'High-Risk Merchants and Merchant Accounts'
+description: 'What high risk actually means, why the gateway is not what approves you, and how to spread risk across multiple merchant accounts in ElasticFunnels'
+---
+
+Most confusion about "high-risk payments" comes from mixing up two different things: the
+**gateway** that moves the transaction and the **merchant account** that carries the risk.
+They are separate, they are provided by different companies, and only one of them decides
+whether you get approved.
+
+## Gateway vs merchant account vs ElasticFunnels
+
+| Layer | What it does | Who provides it | Does it decide if you are approved? |
+| --- | --- | --- | --- |
+| **Checkout / funnel** | Presents the offer, collects the payment, runs bumps and upsells, manages the subscription | ElasticFunnels | No |
+| **Gateway** | Passes the transaction from the checkout to the acquirer, tokenises the card | NMI, Stripe, and similar | No |
+| **Merchant account (MID)** | Holds the risk, receives the settlement, sets reserves and caps | An acquiring bank, usually via an ISO or payment facilitator | **Yes** |
+
+<Note>
+**ElasticFunnels does not underwrite anyone and does not issue merchant accounts.** EF is
+the layer above the gateway. You bring the merchant accounts you already hold, and EF
+decides which one each transaction is sent to.
+</Note>
+
+This is why the question "is this gateway high risk?" has no useful answer. A gateway is
+not high risk or low risk — it is a pipe. Two businesses on the same gateway can have
+completely different experiences because they sit behind different acquirers.
+
+## What "high risk" actually means
+
+An acquirer classifies a merchant as high risk when the expected cost of the relationship
+is higher than normal. The usual drivers:
+
+- **Chargeback exposure** — supplements, continuity offers, coaching, trials
+- **Delivery lag** — anything sold before it ships or before access is granted
+- **Regulatory attention** — health claims, financial advice, CBD, adult
+- **Recurring billing** — especially with free or discounted trials
+- **Ticket size and velocity** — sudden volume spikes look like fraud
+- **Cross-border settlement** — a merchant in one country, an acquirer in another
+
+Being classified high risk does not mean you cannot process. It means higher rates, a
+rolling reserve, volume caps, and closer monitoring — and it means a single merchant
+account is a fragile place to put all of your revenue.
+
+## Getting a merchant account
+
+ElasticFunnels cannot get you approved, but the pattern that works is consistent:
+
+1. **Apply through an ISO that knows your vertical.** A generic aggregator will approve you
+   quickly and shut you down at the first chargeback spike. A specialist acquirer prices
+   the risk in from the start.
+2. **Expect to show the funnel.** Underwriters read the sales page, the checkout, the terms,
+   the refund policy and the rebill disclosure. Vague continuity terms are the most common
+   reason for decline.
+3. **Have chargeback tooling in place before you apply.** Alert monitoring through
+   [chargeback management](/integrations/chargeback-management) demonstrably reduces ratio,
+   and underwriters ask about it.
+4. **Plan for more than one MID.** Approvals take weeks. The time to add the second account
+   is while the first one is healthy, not after it has been capped.
+
+## Spreading risk across multiple MIDs
+
+This is the part ElasticFunnels does, and it is the practical answer to being high risk.
+
+Connect each merchant account as its own merchant in EF, then route across them:
+
+- **Weighted routing** — send a defined share of volume to each MID so no single account
+  carries the whole business or breaches its monthly cap
+- **Cascade on soft declines** — when a charge fails for a recoverable reason
+  (insufficient funds, AVS mismatch, issuer timeout), retry it on a different MID instead
+  of losing the sale
+- **Per-product and per-region routing** — keep a risky offer off the MID that carries your
+  stable revenue
+- **Per-MID approval reporting** — watch approval rate by account so you see degradation
+  before the acquirer calls you
+
+<Warning>
+Cascading is for **soft** declines only. A hard decline — stolen card, closed account, an
+issuer block — must not be retried on another MID. Retrying hard declines inflates your
+decline ratio and is exactly the behaviour that gets an account reviewed and shut down.
+</Warning>
+
+See [how to set up a new merchant](/guides/how-to-set-up-a-new-merchant) to connect each
+account, and [subscriptions](/subscriptions/overview) for how rebills pick a MID.
+
+## Keeping the accounts you have
+
+Approval is the easy part. Staying approved is what decides whether the business survives.
+
+- **Watch the chargeback ratio per MID, not in aggregate.** The acquirer measures your
+  account, not your company. One bad offer on a shared MID takes down the good offers too.
+- **Make the rebill obvious.** Clear terms at checkout, a renewal reminder before the
+  charge, and an easy cancellation path prevent more chargebacks than any alert service.
+  See [subscription emails and dunning](/subscriptions/emails-and-dunning).
+- **Recover declines properly.** [Dunning](/subscriptions/emails-and-dunning) with sensible
+  retry windows and [retention offers](/subscriptions/retention-offers) converts failed
+  payments into revenue instead of cancellations.
+- **Do not let one MID drift.** Falling approval rate on a single account usually means the
+  acquirer has started filtering you, and it shows in EF's per-MID reporting well before
+  it shows in your bank statement.
+
+## Frequently asked
+
+**Is a particular gateway high risk?**
+No. Gateways do not underwrite. Your acquirer decides your classification. A gateway that
+connects to many acquirers is useful precisely because you can change acquirer without
+rebuilding your checkout.
+
+**Can I create my own merchant account?**
+You apply for one through an acquiring bank or an ISO — you cannot create one yourself, and
+no software vendor can issue you one. What you can do is own the account directly rather
+than processing under someone else's, which is what "bring your own MID" means in EF.
+
+**Do I need a separate merchant account for Apple Pay and Google Pay?**
+No. Wallets run through the merchant account you already have. See
+[Apple Pay and Google Pay](/merchants/apple-pay-google-pay) — note the Customer Token Vault
+requirement if you are billing wallet subscriptions.
+
+**How many MIDs should I run?**
+More than one, as soon as the revenue justifies the admin. Beyond that it depends on your
+volume caps and how many distinct offers you run. The point at which a second MID pays for
+itself is usually the first time the first one is capped or reviewed.

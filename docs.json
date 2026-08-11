@@ -119,6 +119,7 @@
             "group": "Merchants",
             "pages": [
               "guides/how-to-set-up-a-new-merchant",
+              "merchants/high-risk-and-merchant-accounts",
               "merchants/postback-urls",
               {
                 "group": "Payment Processors",
@@ -126,6 +127,7 @@
                   "merchants/clickbank",
                   "merchants/buygoods",
                   "merchants/digistore24",
+                  "merchants/jvzoo",
                   "merchants/shopify-checkout"
                 ]
               },

@@ -254,10 +254,41 @@ Only the **first-name** variants are checked. A page carrying `last_name` withou
 
 When a customer purchases a **subscription** using Apple Pay or Google Pay, the system stores the payment method for future use:
 
-- **NMI:** A **customer vault entry** is created during the initial charge. All subsequent subscription charges (renewals, rebills) use this vault entry server-to-server.
+- **NMI:** A **customer vault entry** is created during the initial charge. All subsequent subscription charges (renewals, rebills) use this vault entry server-to-server. **Requires Customer Token Vault — see below.**
 - **Stripe:** The **PaymentMethod** is saved to the Stripe customer with `setup_future_usage: 'off_session'`. All subsequent charges use this stored payment method server-to-server.
 
 No additional customer interaction is needed for renewals. The subscription billing schedule is managed entirely on the server. The wallet token is consumed on the first charge, and the stored method handles everything after that.
+
+<Warning>
+**NMI wallet subscriptions need Customer Token Vault switched on before they will renew.**
+
+Apple Pay hands the gateway a **single-use device token (DPAN)**. That token is bound to
+the cryptogram issued for that one transaction — it cannot be charged again on its own.
+The initial payment therefore succeeds while every renewal declines, which usually shows
+up weeks later as a cohort of failed rebills rather than an obvious error at checkout.
+
+For renewals to work, the merchant account needs **Customer Token Vault / network
+tokenisation** enabled at NMI so the gateway can store a reusable merchant token (MPAN)
+instead of the device token. This is an **opt-in** feature — ask your NMI representative
+or ISO to activate it. ElasticFunnels then declares the transaction as recurring on the
+initial authorization so Apple issues a reusable credential.
+
+**Verify with one real renewal before you scale spend on a wallet subscription offer.**
+Take a live Apple Pay subscription and force a rebill. A green toggle in the merchant
+settings is not sufficient proof on its own — the check degrades open, so it can report
+success on an account that has not had network tokenisation activated.
+</Warning>
+
+### Checking whether a wallet subscription will renew
+
+| Check | Where | What you want to see |
+| --- | --- | --- |
+| Customer Token Vault active | NMI merchant account (via your rep or ISO) | Enabled — it is opt-in and off by default |
+| Stored credential created | Transaction record after the first charge | A `customer_vault_id` is present (NMI) or a stored `payment_method` on the customer (Stripe) |
+| Renewal actually settles | One live forced rebill | Approved, with no customer interaction |
+
+If the first charge succeeds but no `customer_vault_id` is recorded, the subscription will
+not renew. Fix the vault configuration before sending traffic rather than after.
 
 ## One-click upsells
 
