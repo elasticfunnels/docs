@@ -1,428 +1,434 @@
 ---
 title: 'How to design a checkout page'
-description: 'Step-by-step guide with copy-paste HTML examples for standard and wallet-first checkout layouts.'
+description: 'Build a checkout page from scratch: enable the checkout flag, resolve a product from the URL, render single-product / cart / subscription blocks, wire wallets, the card panel, order bumps, and the formless submit.'
 ---
 
-This guide walks through building checkout pages with the page builder or code editor. For exact semantics of `checkout_settings`, scope keys, and security options, see [Checkout functionality reference](/checkouts/checkout-functionality-reference). For template syntax details, see [Frontend Template Engine: Checkout](/frontend-template-engine/checkout).
+This guide walks through building a working checkout page in the code editor (or page builder). It follows the real runtime: the same page can serve a **one-time** product, a **subscription**, or a multi-item **cart** depending on the URL, so most of the layout is built from conditionals that the browser evaluates against live checkout data.
+
+For exact scope keys and totals, see [Checkout functionality reference](/checkouts/checkout-functionality-reference) and [Frontend Template Engine: Checkout](/frontend-template-engine/checkout). For wallet setup, see [Apple Pay and Google Pay](/merchants/apple-pay-google-pay).
+
+<Info>
+The templates below mirror a real production checkout (`checkout.ef`). Every directive shown is copied from a page that renders correctly against a live merchant — not invented for the docs.
+</Info>
+
+---
+
+## How a checkout page renders
+{/* SCREENSHOT: How a checkout page renders · pipeline diagram or annotated page · desktop */}
+
+Two passes build the page:
+
+1. **Server pass (`CheckoutProcessor`).** Runs **only if the page has the "Is checkout page" flag on.** It resolves the product from the URL, builds the `checkout` scope (customer, totals, subscription, bumps, coupon, wallet settings), and **swaps the checkout tags** — `<checkout-cc-panel>` becomes a gateway-specific card `<div>`, `<checkout-wallet>` becomes the wallet containers. It injects the checkout payload onto `window.efScope.checkout`.
+2. **Client pass (frontend template engine).** In the browser, it evaluates every block marked `data-frontend-template="true"` against the live scope (including values only known client-side, such as whether a wallet button actually rendered), fills the card/wallet forms, and wires the submit button.
+
+<Warning>
+If **"Is checkout page" is off**, `CheckoutProcessor` never runs. The tags are **not** swapped — `<checkout-cc-panel>` and `<checkout-wallet>` reach the browser as raw, inert custom elements, and `checkout.*` scope is empty. The page looks broken even with a valid merchant. This flag is the single most common reason a checkout "doesn't work."
+</Warning>
 
 ---
 
 ## Prerequisites
-{/* SCREENSHOT: Prerequisites · relevant screen or example output · desktop */}
+{/* SCREENSHOT: Prerequisites · page settings toggle and merchant assignment · desktop */}
 
-1. The page must have **"Is checkout page"** enabled (Page List → Edit Page → toggle on).
-2. A product must be linked via a [buy link](/products/buy-links) or cart.
-3. The domain must have a **merchant** assigned (Settings → Domains → Edit → Merchant).
+1. **Enable "Is checkout page"** on the page. Open **Page List** → **Edit Page** → toggle **Is checkout page** on → Save.
+2. **Assign a merchant** to the domain (Settings → Domains → Edit → Merchant). The card panel is swapped for a gateway-specific form (Stripe / NMI / Authorize.Net) resolved from this merchant.
+3. **Link at least one product** so the page can be reached with `?p=<code>` (or a cart).
 
-<Info>
-Quiz pages that process payments must **also** have "Is checkout page" enabled. Quiz functionality and checkout are independent page flags — enabling both is valid and expected for quiz-to-purchase flows.
-</Info>
-
-<Note>
-**Checkout submission is formless.** The examples below wrap fields in a `<form>` for autofill and semantics, but the runtime never submits it: the checkout script sets its form reference to `null` and collects every named / `data-template-value` field from the page wrapper instead. Submission is a **click** on `[data-checkout-submit]` (or `.checkout-button`) that calls `preventDefault()` and posts via fetch. So `method="POST"` and `form="checkout-form"` have no effect, and fields do not have to live inside the `<form>` element to be submitted.
-</Note>
+<Warning>
+**"Is checkout page" is an app-only page setting.** It is stored on the page and toggled in the dashboard. It is **not** settable from the `ef` CLI, and `ef pages create` does **not** set it — a page pushed with the CLI still needs the toggle flipped in the app before checkout runs. Quiz pages that take payment must have this flag on **as well as** their quiz flag; the two are independent.
+</Warning>
 
 ---
 
-## Example 1: Standard checkout
-{/* SCREENSHOT: Example 1: Standard checkout · relevant screen or example output · desktop */}
+## Step 1 — resolve the product from the URL
+{/* SCREENSHOT: Step 1 resolve product · buy link with p= param · desktop */}
 
-The most common layout: shipping address at the top, billing (same as shipping by default), payment panel with card form and wallet buttons, then a pay button.
+A single-product checkout loads its product from the **`p` query parameter**: `/checkout?p=herpafend_6`. The runtime reads `req.query.p`, looks the product up for the brand, and populates the `checkout` scope (title, image, price, retail price, and — if the product is a subscription — the full billing cadence).
 
-### Backend script
+So the checkout page is generic; **the `?p=` code decides what it sells.** A plan or quantity selector is just a set of links (or a script) that point at the same page with a different `p`:
 
 ```html
-<script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.countries = ['US', 'CA', 'GB', 'AU'];
-</script>
+<!-- Plan / quantity selector: each option is the same checkout page, different ?p= -->
+<a href="/checkout?p=davincitone-1-week">1 week</a>
+<a href="/checkout?p=davincitone-4-weeks">4 weeks — most popular</a>
+<a href="/checkout?p=davincitone-12-weeks">12 weeks — best value</a>
 ```
 
-### Template
+<Info>
+If there is **no** `p` in the URL, the runtime falls back to **cart-only mode** (see Step 2). A page reached with neither `?p=` nor cart items cannot resolve anything to sell.
+</Info>
+
+Because product resolution happens on the server, `checkout.subscription` and the totals are already correct on first paint — no client fetch. See [Buy links](/products/buy-links) for how funnel buttons build the `?p=` link.
+
+---
+
+## Step 2 — single product vs cart
+{/* SCREENSHOT: Step 2 single vs cart · product row and cart list · desktop */}
+
+The order-summary area renders one of two shapes, chosen by scope flags:
+
+| Condition | When it's true | Data source |
+|-----------|----------------|-------------|
+| `is_single_product` | One product, loaded from `?p=` | `checkout.product_image`, `checkout.product_title`, `checkout.product_price`, `checkout.retail_price` |
+| `is_cart` | A multi-item **cart** is present | `<template-foreach data-each="item in cartItems">` with `[[ item.name ]]`, `[[ item.image ]]`, `[[ item.quantity ]]`, `[[ item.total ]]`, `[[ item.code ]]` |
+
+<Info>
+**"Carts" here are Shopify-style carts** — multi-item carts synced from Shopify, not an á-la-carte cart you build on the ElasticFunnels page. Most direct-response checkouts are single-product (one `?p=`); the `is_cart` branch exists so the same layout can also render a synced Shopify cart with per-line quantities and remove buttons. See [Shopify Checkout](/merchants/shopify-checkout).
+</Info>
+
+Both branches must be marked `data-frontend-template="true"` (see Step 6 below). This is the exact production markup:
 
 ```html
-<form id="checkout-form" method="POST">
-
-  <!-- Contact -->
-  <section class="shipping-info-card">
-    <div class="form-grid">
-      <div class="floating-label-group">
-        <label class="form-label">Phone Number *</label>
-        <input type="text" name="phone" data-template-value="checkout.customer.phone" class="form-input" />
-        <div class="form-error" data-checkout-error="phone"></div>
+<div class="dt-co-card">
+  <!-- Single product (from ?p=) -->
+  <template-if data-condition="is_single_product" data-frontend-template="true">
+    <div class="dt-co-prod-row">
+      <div class="dt-co-prod-img-wrap">
+        <template-if data-condition="checkout.product_image" data-frontend-template="true">
+          <img ef-src="checkout.product_image" alt="Product" />
+        </template-if>
+        <template-else data-frontend-template="true">
+          <span class="dt-co-prod-img-ph"><!-- placeholder icon --></span>
+        </template-else>
+        <span class="dt-co-prod-qty">1</span>
       </div>
-      <div class="floating-label-group">
-        <label class="form-label">Email Address *</label>
-        <input type="email" name="email" data-template-value="checkout.customer.email" class="form-input" />
-        <div class="form-error" data-checkout-error="email"></div>
+      <div class="dt-co-prod-info">
+        <p class="dt-co-prod-name"><span ef-text="checkout.product_title">Product</span></p>
+      </div>
+      <div class="dt-co-prod-price">
+        <span class="dt-co-prod-price-old" ef-text="checkout.retail_price"></span>
+        <span ef-text="checkout.product_price"></span>
       </div>
     </div>
-  </section>
+  </template-if>
 
-  <!-- Shipping address -->
-  <section class="shipping-info-card">
-    <h2 class="section-title">Shipping Information</h2>
-    <div class="form-grid">
-      <div class="floating-label-group">
-        <label class="form-label">Street Address *</label>
-        <input type="text" name="shipping_address"
-               data-template-value="checkout.customer.shipping_address"
-               autocomplete="shipping street-address" class="form-input" />
-        <div class="form-error" data-checkout-error="shipping_address"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">Apt/Suite (Optional)</label>
-        <input type="text" name="shipping_address2"
-               data-template-value="checkout.customer.shipping_address2"
-               autocomplete="shipping address-line2" class="form-input" />
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">City *</label>
-        <input type="text" name="shipping_city"
-               data-template-value="checkout.customer.shipping_city"
-               autocomplete="shipping address-level2" class="form-input" />
-        <div class="form-error" data-checkout-error="shipping_city"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">State/Province *</label>
-        <select name="shipping_state"
-                data-template-value="checkout.customer.shipping_state"
-                autocomplete="shipping address-level1" class="form-input">
-          <option value="">Select State</option>
-          <template-foreach data-each="opt in checkout.usStates">
-            <option value="[[ opt.value ]]">[[ opt.label ]]</option>
-          </template-foreach>
-        </select>
-        <div class="form-error" data-checkout-error="shipping_state"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">Postal Code *</label>
-        <input type="text" name="shipping_zip"
-               data-template-value="checkout.customer.shipping_zip"
-               autocomplete="shipping postal-code" class="form-input" />
-        <div class="form-error" data-checkout-error="shipping_zip"></div>
-      </div>
-      <input type="hidden" name="shipping_country"
-             data-template-value="checkout.customer.shipping_country" />
-    </div>
-
-    <!-- Same as billing toggle -->
-    <label class="checkbox-label">
-      <input type="checkbox" checked
-             data-template-value="checkout.shipping_same_as_billing"
-             data-set-onload class="checkbox-input" />
-      <span class="checkbox-text">Shipping details same as billing</span>
-    </label>
-  </section>
-
-  <!-- Conditional billing (shown when unchecked) -->
-  <template-if data-condition="checkout.shipping_same_as_billing == false">
-    <section class="billing-info-card">
-      <h2 class="section-subtitle">Billing Information</h2>
-      <template-if data-condition="!checkout.shipping_same_as_billing">
-        <div class="form-grid">
-          <div class="floating-label-group">
-            <label class="form-label">First Name *</label>
-            <input type="text" name="billing_first_name"
-                   data-template-value="checkout.customer.billing_first_name" class="form-input" />
-            <div class="form-error" data-checkout-error="billing_first_name"></div>
-          </div>
-          <div class="floating-label-group">
-            <label class="form-label">Last Name *</label>
-            <input type="text" name="billing_last_name"
-                   data-template-value="checkout.customer.billing_last_name" class="form-input" />
-            <div class="form-error" data-checkout-error="billing_last_name"></div>
-          </div>
-          <div class="floating-label-group">
-            <label class="form-label">Street Address *</label>
-            <input type="text" name="billing_address"
-                   data-template-value="checkout.customer.billing_address" class="form-input" />
-            <div class="form-error" data-checkout-error="billing_address"></div>
-          </div>
-          <div class="floating-label-group">
-            <label class="form-label">City *</label>
-            <input type="text" name="billing_city"
-                   data-template-value="checkout.customer.billing_city" class="form-input" />
-            <div class="form-error" data-checkout-error="billing_city"></div>
-          </div>
-          <div class="floating-label-group">
-            <label class="form-label">State/Province *</label>
-            <select name="billing_state"
-                    data-template-value="checkout.customer.billing_state" class="form-input">
-              <option value="">Select State</option>
-              <template-foreach data-each="opt in checkout.usStates">
-                <option value="[[ opt.value ]]">[[ opt.label ]]</option>
-              </template-foreach>
-            </select>
-            <div class="form-error" data-checkout-error="billing_state"></div>
-          </div>
-          <div class="floating-label-group">
-            <label class="form-label">Postal Code *</label>
-            <input type="text" name="billing_zip"
-                   data-template-value="checkout.customer.billing_zip" class="form-input" />
-            <div class="form-error" data-checkout-error="billing_zip"></div>
-          </div>
+  <!-- Shopify-style cart -->
+  <template-if data-condition="is_cart" data-frontend-template="true">
+    <template-foreach data-each="item in cartItems" data-frontend-template="true">
+      <div class="dt-co-prod-row">
+        <div class="dt-co-prod-img-wrap">
+          <template-if data-condition="item.image" data-frontend-template="true">
+            <img ef-src="item.image" alt="[[ item.name ]]" />
+          </template-if>
+          <template-else data-frontend-template="true">
+            <span class="dt-co-prod-img-ph"><!-- placeholder icon --></span>
+          </template-else>
+          <span class="dt-co-prod-qty" ef-text="item.quantity">1</span>
         </div>
-      </template-if>
-      <template-else>
-        <p class="billing-info-message">Billing address same as shipping.</p>
-        <input type="hidden" name="billing_first_name" data-template-value="checkout.customer.billing_first_name" />
-        <input type="hidden" name="billing_last_name" data-template-value="checkout.customer.billing_last_name" />
-        <input type="hidden" name="billing_address" data-template-value="checkout.customer.billing_address" />
-        <input type="hidden" name="billing_city" data-template-value="checkout.customer.billing_city" />
-        <input type="hidden" name="billing_state" data-template-value="checkout.customer.billing_state" />
-        <input type="hidden" name="billing_zip" data-template-value="checkout.customer.billing_zip" />
-      </template-else>
-      <input type="hidden" name="billing_country" data-template-value="checkout.customer.billing_country" />
-    </section>
-  </template-if>
-
-  <!-- Order summary -->
-  <template-if data-condition="is_single_product">
-    <div class="order-summary-single">
-      <img ef-src="checkout.product_image" ef-alt="checkout.product_title" />
-      <h2><span ef-text="checkout.product_title">Product Title</span></h2>
-      <span ef-text="checkout.product_price">$0.00</span>
-    </div>
-  </template-if>
-
-  <!-- Totals -->
-  <div class="price-summary-section">
-    <div class="price-breakdown-row">
-      <span>Subtotal</span>
-      <span ef-text="checkout.subtotal_after_discount">$0.00</span>
-    </div>
-    <template-if data-condition="checkout.shipping_raw > 0">
-      <div class="price-breakdown-row">
-        <span>Shipping</span>
-        <span ef-text="checkout.shipping">FREE</span>
+        <div class="dt-co-prod-info">
+          <p class="dt-co-prod-name"><span ef-text="item.name">Product</span></p>
+          <div class="dt-co-qty-ctrl">
+            <button type="button" data-cart-qty-minus data-code="[[ item.code ]]" data-disable-when-one aria-label="Decrease">&minus;</button>
+            <span ef-text="item.quantity">1</span>
+            <button type="button" data-cart-qty-plus data-code="[[ item.code ]]" aria-label="Increase">+</button>
+          </div>
+          <template-if data-condition="cartItems.length > 1" data-frontend-template="true">
+            <button type="button" data-cart-qty-remove data-code="[[ item.code ]]" class="dt-co-prod-remove">Remove</button>
+          </template-if>
+        </div>
+        <div class="dt-co-prod-price">
+          <span ef-text="item.total"></span>
+        </div>
       </div>
-    </template-if>
-    <template-if data-condition="checkout.tax_raw > 0">
-      <div class="price-breakdown-row">
-        <span>Tax</span>
-        <span ef-text="checkout.tax">$0.00</span>
-      </div>
-    </template-if>
-    <div class="total-price-row">
-      <span class="total-label">Total</span>
-      <span ef-text="checkout.total">$0.00</span>
-    </div>
-  </div>
-
-  <!-- Payment panel (card + wallet buttons injected automatically) -->
-  <checkout-cc-panel></checkout-cc-panel>
-  <div data-checkout-message class="checkout-message"></div>
-
-  <!-- Submit -->
-  <button type="button" data-checkout-submit class="pay-now-button">
-    <span class="pay-now-text">PAY NOW</span>
-  </button>
-
-</form>
+    </template-foreach>
+  </template-if>
+</div>
 ```
 
-Apple Pay and Google Pay buttons appear automatically in the payment panel when available. When a customer pays with a wallet, the correct billing address from the wallet is used for payment verification — no special handling needed in the template.
+<Warning>
+Do **not** read `cartItems[0]` inside the single-product block — use the `checkout.product_*` keys. In single-product mode `cartItems` is not the source of truth.
+</Warning>
 
 ---
 
-## Example 2: Wallet-first checkout
-{/* SCREENSHOT: Example 2: Wallet-first checkout · relevant screen or example output · desktop */}
+## Step 3 — subscription vs one-time (conditional)
+{/* SCREENSHOT: Step 3 subscription vs one-time · billing note variants · desktop */}
 
-For quiz funnels or lightweight pages where you want wallet buttons prominently at the top. This uses the **same blocks and backend processing** as the standard checkout — the only difference is layout order.
+**Key idea:** the same checkout page serves both one-time and subscription products, because the `?p=` code decides. So every subscription-specific element must be **gated** — never assume a subscription. Gate on the `checkout.subscription` object (it is `null` for one-time products, so it is falsy):
 
-### Backend script
-
-```html
-<script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.countries = ['US', 'CA'];
-// Optional: subscription wallet labels
-checkout_settings.wallet = {
-  recurring_description: 'Monthly wellness subscription',
-  management_url: 'https://members.yourdomain.com/subscriptions'
-};
-</script>
-```
-
-### Template
+- `<template-if data-condition="checkout.subscription">` — subscription framing (recurring heading, billing note, "save vs one-time", "Subscribe" CTA).
+- `<template-if data-condition="!checkout.subscription">` — one-time order framing.
 
 ```html
-<form id="checkout-form" method="POST">
-
-  <!-- Wallet buttons at the very top, above everything -->
-  <checkout-wallet force="true" wallets="apple_pay,google_pay" />
-
-  <template-if data-condition="checkout.wallet_visible">
-    <div class="or-divider">or pay another way</div>
-  </template-if>
-
-  <!-- Contact (minimal: email + phone first) -->
-  <section class="shipping-info-card">
-    <div class="form-grid">
-      <div class="floating-label-group">
-        <label class="form-label">Email Address *</label>
-        <input type="email" name="email" data-template-value="checkout.customer.email"
-               autocomplete="email" class="form-input" />
-        <div class="form-error" data-checkout-error="email"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">Phone Number *</label>
-        <input type="text" name="phone" data-template-value="checkout.customer.phone"
-               class="form-input" />
-        <div class="form-error" data-checkout-error="phone"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Card panel below, with its own wallet tab disabled -->
-  <checkout-cc-panel data-applepay="false"></checkout-cc-panel>
-  <div data-checkout-message class="checkout-message"></div>
-
-  <!-- Shipping address (below payment) -->
-  <section class="shipping-info-card">
-    <h2 class="section-title">Shipping Information</h2>
-    <div class="form-grid">
-      <div class="floating-label-group">
-        <label class="form-label">Street Address *</label>
-        <input type="text" name="shipping_address"
-               data-template-value="checkout.customer.shipping_address"
-               autocomplete="shipping street-address" class="form-input" />
-        <div class="form-error" data-checkout-error="shipping_address"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">City *</label>
-        <input type="text" name="shipping_city"
-               data-template-value="checkout.customer.shipping_city"
-               autocomplete="shipping address-level2" class="form-input" />
-        <div class="form-error" data-checkout-error="shipping_city"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">State/Province *</label>
-        <select name="shipping_state"
-                data-template-value="checkout.customer.shipping_state"
-                autocomplete="shipping address-level1" class="form-input">
-          <option value="">Select State</option>
-          <template-foreach data-each="opt in checkout.usStates">
-            <option value="[[ opt.value ]]">[[ opt.label ]]</option>
-          </template-foreach>
-        </select>
-        <div class="form-error" data-checkout-error="shipping_state"></div>
-      </div>
-      <div class="floating-label-group">
-        <label class="form-label">Postal Code *</label>
-        <input type="text" name="shipping_zip"
-               data-template-value="checkout.customer.shipping_zip"
-               autocomplete="shipping postal-code" class="form-input" />
-        <div class="form-error" data-checkout-error="shipping_zip"></div>
-      </div>
-      <input type="hidden" name="shipping_country"
-             data-template-value="checkout.customer.shipping_country" />
-    </div>
-    <label class="checkbox-label">
-      <input type="checkbox" checked
-             data-template-value="checkout.shipping_same_as_billing"
-             data-set-onload class="checkbox-input" />
-      <span class="checkbox-text">Billing same as shipping</span>
-    </label>
-  </section>
-
-  <!-- Totals -->
-  <div class="price-summary-section">
-    <div class="total-price-row">
-      <span class="total-label">Total</span>
-      <span ef-text="checkout.total">$0.00</span>
-    </div>
-  </div>
-
-  <!-- Submit -->
-  <button type="button" data-checkout-submit class="pay-now-button">
-    <span class="pay-now-text">COMPLETE ORDER</span>
-  </button>
-
-</form>
+<template-if data-condition="checkout.subscription" data-frontend-template="true">
+  <h2>Start your subscription</h2>
+</template-if>
+<template-if data-condition="!checkout.subscription" data-frontend-template="true">
+  <h2>Complete your one-time order</h2>
+</template-if>
 ```
 
-The key difference is the standalone `<checkout-wallet />` at the top, with the card panel's own wallet disabled below it. Customers with Apple Pay or Google Pay see the wallet buttons immediately; everyone else sees the card form and fills in shipping as usual.
+### The billing note (four cases)
 
-`checkout.wallet_visible` flips to `true` as soon as a wallet button actually renders, so the divider only appears when there is something above it. `force="true"` pre-renders the native Apple Pay button on iOS and sets `wallet_visible` immediately, avoiding a layout shift while detection runs.
-
-<Info>
-Both examples use the same `checkout-details` and `checkout-cc-panel` tags, and both submit through `[data-checkout-submit]`. The backend processes them identically — the only difference is where the blocks appear in the template. (`checkout-button` is a **page builder block name**, not an HTML tag; in the code editor use `<button data-checkout-submit>`.)
-</Info>
-
----
-
-## Example 3: Minimal digital product checkout
-{/* SCREENSHOT: Example 3: Minimal digital product checkout · relevant screen or example output · desktop */}
-
-For digital products where you only need email and payment — no name or address fields. The card panel automatically adds a cardholder name field and a Country + ZIP billing block, since neither is on the page.
-
-### Template
+Subscription products differ in how the first charge works, so the recurring note has to cover four mutually-exclusive cases. This is the production block verbatim — it reads `checkout.subscription.{intro_offer, first_charge_free, trial_days, frequency, frequency_unit}` and formats money with `formatPrice(...)` and values with `[[ … ]]`:
 
 ```html
-<form id="checkout-form" method="POST">
-  <section class="shipping-info-card">
-    <div class="floating-label-group">
-      <label class="form-label">Email Address *</label>
-      <input type="email" name="email" data-template-value="checkout.customer.email"
-             autocomplete="email" class="form-input" />
-      <div class="form-error" data-checkout-error="email"></div>
-    </div>
-  </section>
+<template-if data-condition="checkout.subscription" data-frontend-template="true">
+  <span class="subscription-billing-note">
+    <!-- 1. Intro offer: N-period intro, then recurring price every cycle -->
+    <template-if data-condition="checkout.subscription.intro_offer" data-frontend-template="true">[[ checkout.subscription.intro_offer.period ]]-[[ checkout.subscription.intro_offer.period_unit ]] intro &middot; Then [[ formatPrice(checkout.subscription.intro_offer.recurring_price) ]] every [[ checkout.subscription.frequency ]] [[ checkout.subscription.frequency_unit == 'month' ? (checkout.subscription.frequency > 1 ? 'months' : 'month') : checkout.subscription.frequency_unit ]]</template-if>
 
-  <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
+    <!-- 2. First charge free -->
+    <template-if data-condition="!checkout.subscription.intro_offer && checkout.subscription.first_charge_free" data-frontend-template="true">Try free &middot; Then billed every [[ checkout.subscription.frequency ]] [[ checkout.subscription.frequency_unit == 'month' ? (checkout.subscription.frequency > 1 ? 'months' : 'month') : checkout.subscription.frequency_unit ]]</template-if>
 
-  <div data-checkout-message class="checkout-message"></div>
-  <button type="button" data-checkout-submit class="checkout-button">Purchase</button>
-</form>
+    <!-- 3. Trial days -->
+    <template-if data-condition="!checkout.subscription.intro_offer && !checkout.subscription.first_charge_free && checkout.subscription.trial_days > 0" data-frontend-template="true">[[ checkout.subscription.trial_days ]]-day trial &middot; Then billed every [[ checkout.subscription.frequency ]] [[ checkout.subscription.frequency_unit == 'month' ? (checkout.subscription.frequency > 1 ? 'months' : 'month') : checkout.subscription.frequency_unit ]]</template-if>
+
+    <!-- 4. Plain recurring -->
+    <template-if data-condition="!checkout.subscription.intro_offer && !checkout.subscription.first_charge_free && checkout.subscription.trial_days == 0" data-frontend-template="true">Billed every [[ checkout.subscription.frequency ]] [[ checkout.subscription.frequency_unit == 'month' ? (checkout.subscription.frequency > 1 ? 'months' : 'month') : checkout.subscription.frequency_unit ]]</template-if>
+  </span>
+</template-if>
 ```
 
-What happens automatically:
+| Case | Condition | Note shown |
+|------|-----------|-----------|
+| Intro offer | `checkout.subscription.intro_offer` truthy | `2-week intro · Then $29.00 every month` |
+| First charge free | `first_charge_free` and no intro | `Try free · Then billed every month` |
+| Trial days | `trial_days > 0` and no intro/free | `14-day trial · Then billed every month` |
+| Plain recurring | none of the above | `Billed every 3 months` |
 
-- **Apple Pay** appears as a radio tab alongside Card. On NMI, since only email is on the page, the wallet requests only email — no address sheet. (Stripe always requests name, email and shipping.)
-- **Card panel** adds a cardholder name field, since `first_name` / `last_name` aren't on the page.
-- **Billing panel** adds a Country select and a ZIP / postal code input, since neither `billing_zip` nor `shipping_zip` is on the page.
-- **Billing values** are automatically copied to shipping during submission.
+`checkout.subscription.intro_offer.recurring_price` is the price charged **after** the intro ends. The `frequency_unit == 'month' ? …` ternary just pluralizes "month/months"; other units (`day`, `week`, `year`) are printed as-is. For the full subscription scope shape (`price_steps`, `prepaid`, `tiers`), see [Frontend Template Engine: Checkout](/frontend-template-engine/checkout#subscription-products).
 
 <Note>
-To render the wallet buttons **above** the panel instead of as a tab, add `<checkout-wallet force="true" />` above it and set `data-applepay="false"` on the panel, as in Example 2. Setting `data-applepay-layout="separated"` on `<checkout-cc-panel>` does not work — the attribute is dropped during server-side tag expansion.
+In **cart mode** subscription data lives on each line (`item.is_subscription`, `item.subscription`), not on `checkout.subscription`.
 </Note>
 
 ---
 
-## Configuration options
-{/* SCREENSHOT: Configuration options · relevant screen or example output · desktop */}
+## Step 4 — wallets (Apple Pay / Google Pay)
+{/* SCREENSHOT: Step 4 wallets · wallet buttons and or-divider · desktop */}
 
-These are set via `checkout_settings` in a `<script scope="backend">` block. See [Checkout functionality reference](/checkouts/checkout-functionality-reference#4-checkout_settings-backend-script) for full details.
+Place a `<checkout-wallet>` tag where you want the express buttons. The runtime swaps it for an `ef-wallet-standalone` container holding `#applePay` and `#googlePay`, and the client injects whichever wallet the device supports:
+
+```html
+<checkout-wallet wallets="applePay,googlePay"/>
+
+<template-if data-condition="checkout.wallet_visible" data-frontend-template="true">
+  <div class="ef-wallet-divider">
+    <div class="ef-wallet-divider-line"></div>
+    <span class="ef-wallet-divider-text">or pay another way</span>
+    <div class="ef-wallet-divider-line"></div>
+  </div>
+</template-if>
+```
+
+<Warning>
+The `wallets` value is **camelCase**: `wallets="applePay,googlePay"`. The value is passed through verbatim as `data-wallets` and matched against the payment library's wallet identifiers (e.g. Stripe's `disableWallets`), which are camelCase. Snake_case `apple_pay,google_pay` is **wrong** — it is emitted unchanged, matches nothing, and silently fails to filter wallets. `wallets` and `force` are plain attributes, **not** `data-` prefixed, and `<checkout-wallet>` may be self-closing.
+</Warning>
+
+Notes on behavior:
+
+- **Buttons appear automatically** when the device/browser supports a wallet — you do not render them yourself.
+- **`checkout.wallet_visible`** flips `false → true` only once a wallet button actually renders (it is promoted, never reset). Gate the "or pay another way" divider on it so the divider never shows above an empty space. Add `force="true"` to pre-render the native Apple Pay button on iOS and set `wallet_visible` immediately, avoiding a first-paint layout shift.
+- **Billing address comes from the wallet.** When a customer pays with Apple/Google Pay, the correct billing address is taken from the wallet sheet — no extra fields needed in your template.
+
+For a wallet-first layout, put `<checkout-wallet force="true" wallets="applePay,googlePay"/>` at the top and disable the card panel's own wallet tab with `data-applepay="false"` (next step).
+
+---
+
+## Step 5 — the card panel
+{/* SCREENSHOT: Step 5 card panel · rendered gateway card form · desktop */}
+
+Drop in a single `<checkout-cc-panel>` tag. **Do not hand-build card inputs** — the runtime swaps this tag for a gateway-specific secure card form resolved from the domain's merchant:
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+<div data-checkout-message></div>
+```
+
+What happens:
+
+- Server-side, the tag is replaced with `<div class="checkout-cc-panel" data-gateway="{stripe|nmi|authorize_net}" data-accepted-cards="…">`. The gateway is resolved from the merchant assigned to the domain.
+- Client-side, the secure card fields for that gateway are injected (Stripe Elements, NMI CollectJS, or Authorize.Net Accept.js). A resolved merchant/gateway is required for real tokenization.
+- `data-accepted-cards` sets the accepted card brands; `data-applepay="false"` suppresses the panel's built-in wallet tab (use it when you place `<checkout-wallet>` separately).
+
+| Attribute | Purpose |
+|-----------|---------|
+| `data-accepted-cards` | Comma list of brands, e.g. `visa,mastercard,amex,discover` |
+| `data-applepay` | `"false"` hides the panel's own wallet tab |
+
+<Warning>
+`<checkout-cc-panel>` **requires an explicit closing tag.** Written self-closing (`<checkout-cc-panel/>`) it is neither expanded nor stripped and passes through to the browser as inert markup. (Only `<checkout-wallet>` / `<checkout-apple-pay>` may self-close.) Any children you write inside the panel are discarded.
+</Warning>
+
+---
+
+## Step 6 — mark client-side blocks with `data-frontend-template="true"`
+{/* SCREENSHOT: Step 6 frontend-template · annotated conditional · desktop */}
+
+Add **`data-frontend-template="true"`** to **every** `template-if`, `template-else`, and `template-foreach` whose condition depends on data that is only known in the browser: the wallet divider, subscription blocks, order bumps, cart items, coupon state, and any `bump.added` / `checkout.wallet_visible` conditional.
+
+**Why:** the server template pass and the client template pass are separate. Values like `checkout.wallet_visible` (true only after a wallet renders), `bump.added` (toggled by the shopper), and coupon state (applied after an async validation) do not exist during the server pass. Marking a block `data-frontend-template="true"` tells the server pass to **leave it alone** and hands it to the client engine, which evaluates it against the live scope. Without the flag, the server tries to evaluate the condition against empty scope and the block is dropped or renders wrong.
+
+```html
+<!-- Evaluated in the browser, against live scope -->
+<template-if data-condition="checkout.wallet_visible" data-frontend-template="true"> … </template-if>
+<template-foreach data-each="item in cartItems" data-frontend-template="true"> … </template-foreach>
+```
+
+Server-side conditionals that depend on the request (e.g. Blade-style `@if(query.p == 'davincitone-4-weeks')`) are the opposite case — those are evaluated during the render and do **not** take the attribute.
+
+<Note>
+Pair client-side blocks with `data-ef-cloak` (and the CSS `[data-ef-cloak] { display: none !important; }`) on anything that would flash before the engine runs. Also hide the raw `template-if` / `template-foreach` tags with `display: none !important` so unprocessed markup never flashes.
+</Note>
+
+---
+
+## Step 7 — order bumps
+{/* SCREENSHOT: Step 7 order bumps · offer vs added states · desktop */}
+
+Bumps come from `checkout.bump_products` — an array with per-bump `code`, `name`, `description`, `price` (formatted), `price_raw`, `image`, `added`, and `added_message`. Loop it and render an **offer** state (`!bump.added`) and an **added** state (`bump.added`). Toggling with `@click="bump.added = true/false"` mutates the scope and re-renders:
+
+```html
+<template-if data-condition="checkout.bump_products.length > 0">
+  <template-foreach data-each="bump in checkout.bump_products" data-frontend-template="true">
+    <!-- Offer state -->
+    <template-if data-condition="!bump.added" data-frontend-template="true">
+      <div class="dt-co-bump">
+        <div class="flex justify-between gap-2 items-start mb-1">
+          <span ef-text="bump.name">Add-on</span>
+          <span ef-text="bump.price"></span>
+        </div>
+        <div data-ef-cloak>
+          <p ef-text="bump.description"></p>
+          <button type="button" @click="bump.added = true" class="dt-co-add-bump">Click to add to order</button>
+        </div>
+      </div>
+    </template-if>
+    <!-- Added state -->
+    <template-else data-frontend-template="true">
+      <div class="dt-co-bump-applied">
+        <span ef-text="bump.name">Add-on</span>
+        <span ef-text="bump.price"></span>
+        <span ef-text="bump.added_message != '' ? bump.added_message : 'Added to your order'">Added to your order</span>
+        <button type="button" @click="bump.added = false" class="dt-co-remove-bump">Remove</button>
+      </div>
+    </template-else>
+  </template-foreach>
+</template-if>
+```
+
+Added bumps also feed the totals — loop them again in the price summary, filtered to `bump.added`:
+
+```html
+<template-foreach data-each="bump in checkout.bump_products" data-frontend-template="true">
+  <template-if data-condition="bump.added" data-frontend-template="true">
+    <div class="dt-co-price-row">
+      <span ef-text="bump.name"></span>
+      <span ef-text="bump.price"></span>
+    </div>
+  </template-if>
+</template-foreach>
+```
+
+### Bumps are set by page events (and can be split-tested)
+
+The bumps in `checkout.bump_products` are **not hard-coded on the page**. They are supplied by the funnel graph's **Set Checkout Bumps** node (`set_checkout_bumps`), whose `bumps` field is an array of bump objects (`title`, `description`, `price`, `added_message`, product code). The node is only offered when the page is flagged as a checkout page.
+
+Because bumps come from a page-event node, you can **A/B test bump configurations**: place a **Split Test → Traffic Distribution** node in front, and give each branch its own **Set Checkout Bumps** node. Different visitors then get different bumps against the same checkout template, and the split test measures which set converts better. See [Page event nodes → Set Checkout Bumps](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing).
+
+---
+
+## Step 8 — the formless submit
+{/* SCREENSHOT: Step 8 formless submit · pay button and error slots · desktop */}
+
+**Checkout submission is not a form submit.** The `<form>` in the examples is only for autofill/semantics (`onsubmit="return false;"`); the runtime sets its form reference to `null` and collects every bound field from the page wrapper instead. Submission is a **click** on a `[data-checkout-submit]` button that `preventDefault()`s and posts via fetch — so fields do **not** have to live inside the `<form>`, and `method="POST"` has no effect.
+
+Wire it with three attributes:
+
+- **`data-template-value="checkout.customer.{field}"`** on each input/select — binds it into the checkout payload (`email`, `phone`, `shipping_address`, `shipping_city`, `shipping_state`, `shipping_zip`, `billing_*`, …).
+- **`data-checkout-error="{field}"`** on an empty element — the validation adapter fills it with that field's error message.
+- **`data-checkout-message`** on one element — the general status/error line for the whole submit.
+- **`data-checkout-submit`** on the pay button (`type="button"`).
+
+```html
+<form id="quiz-checkout-form" autocomplete="on" onsubmit="return false;">
+
+  <checkout-wallet wallets="applePay,googlePay"/>
+
+  <div class="ef-floating-label-group">
+    <input type="email" name="email" data-template-value="checkout.customer.email"
+           autocomplete="email" placeholder=" " required />
+    <label>Email address</label>
+    <div class="ef-form-error" data-checkout-error="email"></div>
+  </div>
+
+  <checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false"></checkout-cc-panel>
+  <div data-checkout-message></div>
+
+  <button type="button" data-checkout-submit class="dt-co-submit">Purchase</button>
+</form>
+```
+
+### Backend config: `checkout_settings`
+
+Checkout options are set in a `<script scope="backend">` block via **`setVariable("checkout_settings", { … })`**. This is the production block:
+
+```html
+<script scope="backend">
+setVariable("checkout_settings", {
+    collect_tax: false
+});
+</script>
+```
+
+`setVariable("checkout_settings", {…})` and assigning the `checkout_settings` object are the same thing — the object is read by both the render (to build the rendered dropdowns/labels) and `process-checkout` (to enforce the same rules on submit). Common keys:
 
 | Setting | Purpose |
 |---------|---------|
-| `checkout_settings.countries` | Restrict country dropdown (e.g. `['US', 'CA']`) |
-| `checkout_settings.usStates` | Restrict US state dropdown (e.g. `['CA', 'TX']`) |
+| `checkout_settings.collect_tax` | Toggle tax collection |
+| `checkout_settings.countries` | Restrict the country dropdown, e.g. `['US','CA','GB','AU']` |
+| `checkout_settings.usStates` | Restrict the US state dropdown, e.g. `['CA','TX','FL']` |
+| `checkout_settings.billing_fields` | Which fields the card panel's auto-billing block shows (`['country','zip']`); exposed as `checkout.panel_billing_fields` |
 | `checkout_settings.abuse_protection` | Card-testing / velocity protection |
-| `checkout_settings.billing_fields` | Which fields the card panel's auto-billing block shows — `['country', 'zip']`. Omit for both; `'address'` is a legacy alias for `'zip'`. Exposed as `checkout.panel_billing_fields` |
-| `checkout_settings.wallet.recurring_description` | Label on Apple Pay sheet for subscriptions |
+| `checkout_settings.wallet.recurring_description` | Label on the Apple Pay sheet for subscriptions |
 | `checkout_settings.wallet.management_url` | Subscription management URL for Apple Pay |
+
+Full semantics: [Checkout functionality reference → `checkout_settings`](/checkouts/checkout-functionality-reference#4-checkout_settings-backend-script).
+
+---
+
+## Output bindings reference
+{/* SCREENSHOT: Output bindings · ef-text and interpolation · desktop */}
+
+Two ways to print scope values, used throughout the examples above:
+
+| Binding | Use | Example |
+|---------|-----|---------|
+| `ef-text="expr"` | Set an element's text | `<span ef-text="checkout.product_title">Product</span>` |
+| `ef-src="expr"` | Set an `<img>` `src` | `<img ef-src="checkout.product_image" />` |
+| `ef-alt="expr"` | Set an `<img>` `alt` | `<img ef-alt="checkout.product_title" />` |
+| `[[ expr ]]` | Interpolate inside text/attributes | `alt="[[ item.name ]]"`, `data-code="[[ item.code ]]"` |
+
+Use `[[ … ]]` where you need a value **inside** an attribute or mixed with other text (`data-code="[[ item.code ]]"`); use `ef-text` / `ef-src` / `ef-alt` for a whole element's text or image. `formatPrice(raw)` formats a raw number as currency.
+
+`<template-foreach>` also drives select dropdowns for country/state, each option `{ value, label }`:
+
+```html
+<select name="shipping_state" data-template-value="checkout.customer.shipping_state">
+  <option value="">Select State</option>
+  <template-foreach data-each="opt in checkout.usStates">
+    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+  </template-foreach>
+</select>
+```
 
 ---
 
 ## Page builder vs code editor
-{/* SCREENSHOT: Page builder vs code editor · relevant screen or example output · desktop */}
+{/* SCREENSHOT: Page builder vs code editor · block palette · desktop */}
 
-Both examples above show raw HTML for the code editor. In the **page builder**, use the **Checkout** block category:
+Everything above is code-editor HTML. In the **page builder**, use the **Checkout** block category, which maps to the same tags/bindings:
 
-- **Checkout Details** — contact + shipping + billing (same as Example 1 contact/shipping sections)
-- **Credit Card Form** — equivalent to `<checkout-cc-panel>`
-- **Checkout Button** — equivalent to `<button data-checkout-submit>`
+- **Checkout Details** — contact + shipping + billing fields
+- **Credit Card Form** — `<checkout-cc-panel>`
+- **Checkout Button** — `<button data-checkout-submit>`
 - **Price Summary** — totals section
-- **Checkout Coupon** — coupon input with apply/clear
-- **Checkout Bumps** — order bump checkboxes
-- **Customer Flag** — consent / opt-in checkbox (`data-flag-key`, e.g. `allow_emails`)
-- **Single Product Summary** — product image/title for single-product checkout
-- **Cart Products** — product list for multi-item checkout
+- **Checkout Coupon** — coupon input with apply/clear (`data-apply-coupon`, `data-clear-coupon`)
+- **Checkout Bumps** — order bumps
+- **Single Product Summary** / **Cart Products** — the `is_single_product` / `is_cart` blocks
 
-Drag these blocks in your preferred order. For a wallet-first layout, add a `<checkout-wallet />` above **Checkout Details** via a custom code block and set `data-applepay="false"` on the **Credit Card Form**.
+For a wallet-first layout, add a `<checkout-wallet force="true" wallets="applePay,googlePay"/>` custom-code block above **Checkout Details** and set `data-applepay="false"` on the **Credit Card Form**.
 
 ---
 
@@ -430,7 +436,9 @@ Drag these blocks in your preferred order. For a wallet-first layout, add a `<ch
 {/* SCREENSHOT: Related docs · relevant screen or example output · desktop */}
 
 - [Checkout functionality reference](/checkouts/checkout-functionality-reference) — scope keys, `checkout_settings`, abuse protection, submit flow
-- [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` bindings and template patterns
-- [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) — wallet setup and configuration
-- [Buy links](/products/buy-links) — linking products to checkout
+- [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` bindings, totals, subscription shape
+- [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) — wallet setup
+- [Shopify Checkout](/merchants/shopify-checkout) — where `is_cart` carts come from
+- [Buy links](/products/buy-links) — building the `?p=` link
+- [Set Checkout Bumps node](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing) — configuring / A/B-testing bumps
 - [Checkout redirect behavior](/funnels/checkout-redirect-behavior) — post-checkout routing
