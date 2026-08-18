@@ -101,11 +101,32 @@ Configure checkout using variables set in a **backend** script on the **same che
 
 ```html
 <script scope="backend">
-var checkout_settings = checkout_settings || {};
-// Optional: restrict countries / US states (see below)
-// Optional: checkout abuse protection (see section 5)
+setVariable("checkout_settings", {
+  // Optional: restrict countries / US states (see 4.1)
+  // Optional: order bumps the page always offers (see 4.2)
+  // Optional: checkout abuse protection (see section 5)
+});
 </script>
 ```
+
+<Warning>
+**`setVariable` is what publishes the settings. A bare `var` does nothing.**
+
+Backend scripts run in a sandbox, and the only value that leaves it is what you hand to
+`setVariable`. Writing `var checkout_settings = {...}` and stopping there leaves the object
+inside the sandbox where nothing reads it. Nothing errors and the page renders normally, so the
+mistake is invisible: your country allowlist is silently not applied and your bumps never appear.
+
+If you would rather build the object up in steps, that is fine. Just publish it at the end:
+
+```html
+<script scope="backend">
+var checkout_settings = {};
+checkout_settings.countries = ['US'];
+setVariable("checkout_settings", checkout_settings);
+</script>
+```
+</Warning>
 
 ### 4.1 Countries and US states allowlist
 
@@ -127,32 +148,76 @@ Behavior:
 3. If nothing valid remains, the full default lists are used (not restricted).
 4. The effective allowlist is stored in the visitor **session** and **re-validated on submit**, so blocked values cannot be forced with browser devtools alone.
 
-### 4.2 Example: countries only
+Example, countries only:
 
 ```html
 <script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.countries = ['US', 'CA', 'GB'];
+setVariable("checkout_settings", {
+  countries: ['US', 'CA', 'GB']
+});
 </script>
 ```
 
-### 4.3 Example: US states only
+Example, US states only:
 
 ```html
 <script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.usStates = ['CA', 'TX', 'NY', 'FL'];
+setVariable("checkout_settings", {
+  usStates: ['CA', 'TX', 'NY', 'FL']
+});
 </script>
 ```
 
-### 4.4 Card panel billing fields
+### 4.2 Order bumps the page always offers
+
+`checkout_settings.bumps` names the order bumps this checkout page offers, so they do not depend
+on the URL or on a funnel run. Each entry is a **bump product code**, or an object carrying
+overrides:
+
+```html
+<script scope="backend">
+setVariable("checkout_settings", {
+  countries: ['US'],
+  bumps: ['bump-alzheimers-video']
+});
+</script>
+```
+
+```html
+<script scope="backend">
+setVariable("checkout_settings", {
+  bumps: [
+    { code: 'bump-shipping-protection', description: 'Covers loss in transit', added_message: 'Protected' }
+  ]
+});
+</script>
+```
+
+Behavior:
+
+1. Each code is resolved against the product catalog. A product whose classification is not
+   `bump` is skipped, so a typo shows nothing rather than selling the wrong item.
+2. `name`, `price` and `image` always come from the product record. `description`,
+   `image` and `added_message` given here override it when non-empty.
+3. These merge with any bumps from `?bumps=` and from the **Set Checkout Bumps** node. A code
+   declared in more than one place is offered once.
+
+<Tip>
+Prefer this over the URL when a page should always carry the same bump. Because it lives on the
+page, it survives a direct hit, a refresh and a shared link, none of which is true of `?bumps=`.
+Use the **Set Checkout Bumps** node instead when the bump set is decided per funnel branch or
+is being split-tested.
+</Tip>
+
+### 4.3 Card panel billing fields
 
 `checkout_settings.billing_fields` controls which inputs the card panel's auto-injected billing block renders. It is surfaced to templates as `checkout.panel_billing_fields`.
 
 ```html
 <script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.billing_fields = ['country'];   // country only, no ZIP
+setVariable("checkout_settings", {
+  billing_fields: ['country']   // country only, no ZIP
+});
 </script>
 ```
 
@@ -166,19 +231,40 @@ checkout_settings.billing_fields = ['country'];   // country only, no ZIP
 
 If the resulting set is empty, the billing block is not rendered at all.
 
-### 4.5 Wallet labels
+### 4.4 Wallet labels
 
-`checkout_settings.wallet` is passed through to `checkout.wallet_settings` and used on the wallet payment sheet for subscriptions:
+`checkout_settings.wallet` is surfaced as `checkout.wallet_settings` and its values are handed
+straight to Apple on the **Apple Pay recurring payment sheet**. They are not an ElasticFunnels
+concept: Apple defines these fields, and Apple requires them on a recurring transaction.
 
 ```html
 <script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.wallet = {
-  recurring_description: 'Monthly wellness subscription',
-  management_url: 'https://members.yourdomain.com/subscriptions'
-};
+setVariable("checkout_settings", {
+  wallet: {
+    recurring_description: 'Monthly wellness subscription',
+    recurring_label: 'Wellness Club',
+    management_url: 'https://members.yourdomain.com/subscriptions'
+  }
+});
 </script>
 ```
+
+| Key | Goes to | Falls back to |
+|-----|---------|---------------|
+| `recurring_description` | the sheet's description of what recurs | the product title, else `Subscription` |
+| `recurring_label` | the line item label on the sheet | the product title, else `Subscription` |
+| `management_url` | the "manage subscription" link Apple shows the customer | the page's own origin |
+
+<Warning>
+`management_url` should point at a page where the customer can genuinely view and cancel the
+subscription, such as your members area. It is shown to the buyer inside Apple's sheet and in
+their Apple Pay subscription settings afterwards. Leaving it unset silently falls back to the
+checkout page's origin, which is rarely a page that can actually cancel anything.
+</Warning>
+
+These apply only when **all** of the following hold: the gateway is NMI with Collect.js, the
+product is a subscription, and the page has an Apple Pay container. On a one-time purchase they
+are ignored.
 
 ---
 
@@ -195,17 +281,18 @@ This is separate from **site-wide** page rate limiting / HTML captcha on normal 
 
 ```html
 <script scope="backend">
-var checkout_settings = checkout_settings || {};
-checkout_settings.abuse_protection = {
-  enabled: true,
-  mode: 'progressive',
-  thresholds: {
-    captcha_requests: 8,
-    hard_block_requests: 20,
-    window_ms: 60000,
-    block_duration_ms: 3600000
+setVariable("checkout_settings", {
+  abuse_protection: {
+    enabled: true,
+    mode: 'progressive',
+    thresholds: {
+      captcha_requests: 8,
+      hard_block_requests: 20,
+      window_ms: 60000,
+      block_duration_ms: 3600000
+    }
   }
-};
+});
 </script>
 ```
 
@@ -328,7 +415,7 @@ Because the tab layout requires that no `#applePay` element already exists, addi
 The card panel automatically detects which checkout fields are present on the page and fills in any gaps:
 
 - **Cardholder name:** If `first_name` **or** `last_name` is missing from the page, a "Cardholder Name" field appears inside the card panel. Note this checks only that pair — `shipping_first_name` / `shipping_last_name` do not satisfy it.
-- **Billing block:** If neither `billing_zip` nor `shipping_zip` is on the page, the card panel renders a billing block containing a **Country** select and a **ZIP / postal code** input. It never adds a name or street-address field. Which of the two appear is controlled by `checkout_settings.billing_fields` (section 4.4).
+- **Billing block:** If neither `billing_zip` nor `shipping_zip` is on the page, the card panel renders a billing block containing a **Country** select and a **ZIP / postal code** input. It never adds a name or street-address field. Which of the two appear is controlled by `checkout_settings.billing_fields` (section 4.3).
 - **Auto-copy:** When billing fields are inside the card panel and no shipping fields exist on the page, billing values are automatically copied to shipping during submission (and vice versa).
 
 This means a minimal checkout page with only email and the payment panel still collects enough billing information for AVS.

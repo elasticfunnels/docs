@@ -1,9 +1,9 @@
 ---
 title: 'How to design a checkout page'
-description: 'Build a checkout page from scratch: enable the checkout flag, resolve a product from the URL, render single-product / cart / subscription blocks, wire wallets, the card panel, order bumps, and the formless submit.'
+description: 'Build a checkout page from scratch: enable the checkout flag, resolve a product from the URL or a backend script, render single-product / cart / subscription blocks, wire wallets, the card panel, order bumps, and the formless submit.'
 ---
 
-This guide walks through building a working checkout page in the code editor (or page builder). It follows the real runtime: the same page can serve a **one-time** product, a **subscription**, or a multi-item **cart** depending on the URL, so most of the layout is built from conditionals that the browser evaluates against live checkout data.
+This guide walks through building a working checkout page in the code editor (or page builder). It follows the real runtime: the same page can serve a **one-time** product, a **subscription**, or a multi-item **cart** depending on what the URL - or the page's own backend script - resolves, so most of the layout is built from conditionals that the browser evaluates against live checkout data.
 
 For exact scope keys and totals, see [Checkout functionality reference](/checkouts/checkout-functionality-reference) and [Frontend Template Engine: Checkout](/frontend-template-engine/checkout). For wallet setup, see [Apple Pay and Google Pay](/merchants/apple-pay-google-pay).
 
@@ -18,11 +18,11 @@ The templates below mirror a real production checkout (`checkout.ef`). Every dir
 
 Two passes build the page:
 
-1. **Server pass (`CheckoutProcessor`).** Runs **only if the page has the "Is checkout page" flag on.** It resolves the product from the URL, builds the `checkout` scope (customer, totals, subscription, bumps, coupon, wallet settings), and **swaps the checkout tags** — `<checkout-cc-panel>` becomes a gateway-specific card `<div>`, `<checkout-wallet>` becomes the wallet containers. It injects the checkout payload onto `window.efScope.checkout`.
+1. **Server pass (`CheckoutProcessor`).** Runs if the page has the "Is checkout page" flag on, **or** if the page's backend script named a product (see Step 1b). It resolves the product, builds the `checkout` scope (customer, totals, subscription, bumps, coupon, wallet settings), and **swaps the checkout tags** - `<checkout-cc-panel>` becomes a gateway-specific card `<div>`, `<checkout-wallet>` becomes the wallet containers. It injects the checkout payload onto `window.efScope.checkout`.
 2. **Client pass (frontend template engine).** In the browser, it evaluates every block marked `data-frontend-template="true"` against the live scope (including values only known client-side, such as whether a wallet button actually rendered), fills the card/wallet forms, and wires the submit button.
 
 <Warning>
-If **"Is checkout page" is off**, `CheckoutProcessor` never runs. The tags are **not** swapped — `<checkout-cc-panel>` and `<checkout-wallet>` reach the browser as raw, inert custom elements, and `checkout.*` scope is empty. The page looks broken even with a valid merchant. This flag is the single most common reason a checkout "doesn't work."
+If **"Is checkout page" is off** and the page's backend script sets no product, `CheckoutProcessor` never runs. The tags are **not** swapped - `<checkout-cc-panel>` and `<checkout-wallet>` reach the browser as raw, inert custom elements, and `checkout.*` scope is empty. The page looks broken even with a valid merchant. This is the single most common reason a checkout "doesn't work."
 </Warning>
 
 ---
@@ -30,12 +30,12 @@ If **"Is checkout page" is off**, `CheckoutProcessor` never runs. The tags are *
 ## Prerequisites
 {/* SCREENSHOT: Prerequisites · page settings toggle and merchant assignment · desktop */}
 
-1. **Enable "Is checkout page"** on the page. Open **Page List** → **Edit Page** → toggle **Is checkout page** on → Save.
+1. **Enable "Is checkout page"** on the page. Open **Page List** → **Edit Page** → toggle **Is checkout page** on → Save. (A page that names its product in a backend script can skip this - see Step 1b.)
 2. **Assign a merchant** to the domain (Settings → Domains → Edit → Merchant). The card panel is swapped for a gateway-specific form (Stripe / NMI / Authorize.Net) resolved from this merchant.
-3. **Link at least one product** so the page can be reached with `?p=<code>` (or a cart).
+3. **Link at least one product** so the page can resolve something to sell - from `?p=<code>`, a cart, or a backend script.
 
 <Warning>
-**"Is checkout page" is an app-only page setting.** It is stored on the page and toggled in the dashboard. It is **not** settable from the `ef` CLI, and `ef pages create` does **not** set it — a page pushed with the CLI still needs the toggle flipped in the app before checkout runs. Quiz pages that take payment must have this flag on **as well as** their quiz flag; the two are independent.
+**"Is checkout page" is an app-only page setting.** It is stored on the page and toggled in the dashboard. It is **not** settable from the `ef` CLI, and `ef pages create` does **not** set it - a page pushed with the CLI still needs the toggle flipped in the app, *or* a `setVariable("checkout_product", …)` in its backend script, before checkout runs. Quiz pages that take payment must have this flag on **as well as** their quiz flag; the two are independent.
 </Warning>
 
 ---
@@ -45,7 +45,7 @@ If **"Is checkout page" is off**, `CheckoutProcessor` never runs. The tags are *
 
 A single-product checkout loads its product from the **`p` query parameter**: `/checkout?p=your-product-6-bottles`. The runtime reads `req.query.p`, looks the product up for the brand, and populates the `checkout` scope (title, image, price, retail price, and - if the product is a subscription - the full billing cadence).
 
-So the checkout page is generic; **the `?p=` code decides what it sells.** A plan or quantity selector is just a set of links (or a script) that point at the same page with a different `p`:
+So a checkout page reached this way is generic; **the `?p=` code decides what it sells.** A plan or quantity selector is just a set of links (or a script) that point at the same page with a different `p`:
 
 ```html
 <!-- Plan / quantity selector: each option is the same checkout page, different ?p= -->
@@ -55,10 +55,100 @@ So the checkout page is generic; **the `?p=` code decides what it sells.** A pla
 ```
 
 <Info>
-If there is **no** `p` in the URL, the runtime falls back to **cart-only mode** (see Step 2). A page reached with neither `?p=` nor cart items cannot resolve anything to sell.
+If there is **no** `p` in the URL, the page falls back to what its backend script named (Step 1b), and then to **cart-only mode** (see Step 2). A page with none of the three cannot resolve anything to sell.
 </Info>
 
 Because product resolution happens on the server, `checkout.subscription` and the totals are already correct on first paint — no client fetch. See [Buy links](/products/buy-links) for how funnel buttons build the `?p=` link.
+
+---
+
+## Step 1b - set the product from a backend script
+{/* SCREENSHOT: Step 1b backend product · VSL page with checkout below the fold · desktop */}
+
+A `?p=` in the URL assumes the buyer arrives from somewhere else - a landing page, a funnel button, a buy link. **A one-page VSL + checkout has no such link.** The visitor lands on the video, watches, and scrolls down to a checkout on the same page, so nothing ever put a product code in the URL.
+
+For that shape, the page names its own product in a `<script scope="backend">` block:
+
+```html
+<script scope="backend">
+setVariable("checkout_product", "your-course-code");
+</script>
+```
+
+That single line does three things:
+
+1. **Resolves the product server-side**, exactly as `?p=` would - same title, image, price, retail price and subscription cadence in the `checkout` scope, correct on first paint.
+2. **Turns the page into a checkout page.** You do *not* need the "Is checkout page" toggle. Naming a product *is* the flag, so the checkout tags get swapped and `checkout.*` is populated on a page the dashboard still lists as an ordinary one.
+3. **Pins the selection to the session**, so the submit charges what the page rendered rather than whatever the browser posts back.
+
+<Info>
+The rest of the guide applies unchanged. The order summary, card panel, wallets, bumps and the formless submit are all built exactly as in Steps 2-8 - only where the product came from is different.
+</Info>
+
+### Precedence: the script wins over `?p=`
+
+When a page sets `checkout_product`, it **outranks** any `?p=` in the URL. That is deliberate rather than restrictive, because the backend sandbox already receives the query string - a page that wants the URL to decide simply says so:
+
+```html
+<script scope="backend">
+// URL wins when present, page default otherwise.
+setVariable("checkout_product", request.query.p || "your-course-code");
+</script>
+```
+
+Because the script is ordinary JavaScript, the same hook covers anything you can compute at render: a geo-priced variant, a returning customer's upgrade code, a split-test arm, an expired-deadline fallback.
+
+```html
+<script scope="backend">
+// Cheaper variant once the launch window closes.
+var launchOver = Date.now() > Date.parse("2026-09-01T00:00:00Z");
+setVariable("checkout_product", launchOver ? "your-course-standard" : "your-course-launch");
+</script>
+```
+
+<Warning>
+Set `checkout_product` **or** `checkout_cart`, never both. A product code always wins and the cart is ignored, so setting both silently sells only the single product.
+</Warning>
+
+<Info>
+A page made a checkout page *only* by its backend script cannot be picked as a funnel's or merchant's **checkout page target** - the **Set Checkout Page** node validates the stored flag, which is still off. That is usually what you want, since such a page sells its own product rather than whatever a buy link asks for. If you need it in both roles, turn the "Is checkout page" toggle on as well; the script keeps working either way.
+</Info>
+
+### Selling several products from one page
+
+Two ways, depending on whether the buyer chooses.
+
+**A fixed bundle** - the page decides, the buyer does not. Use `checkout_cart` with `{ code, quantity }` lines. The order summary renders through the `is_cart` branch (Step 2) and the totals are the sum of the lines:
+
+```html
+<script scope="backend">
+setVariable("checkout_cart", [
+    { code: "your-course-code",   quantity: 1 },
+    { code: "your-workbook-code", quantity: 2 }
+]);
+</script>
+```
+
+Repeat a code and its quantities add up rather than producing a duplicate line; a line whose code is missing or malformed is dropped without taking the rest of the bundle with it.
+
+**A cart the buyer fills** - the VSL offers several products and the visitor picks. Put `[ADD-TO-CART=<code>]` buttons in the page copy and leave `checkout_product` / `checkout_cart` unset; the checkout section below reads the cart the buttons built:
+
+```html
+<a href="[ADD-TO-CART=your-course-code]">Add the course - $297</a>
+<a href="[ADD-TO-CART=your-workbook-code]">Add the workbook - $47</a>
+```
+
+<Info>
+The buyer-filled cart lives in browser storage, so it survives a scroll but not a cleared browser. A fixed `checkout_cart` is resolved on the server every render and cannot be edited by the visitor at all - prefer it whenever the bundle is not the buyer's choice.
+</Info>
+
+### What the buyer cannot change
+
+Whichever of the two the page sets, the resolved codes are pinned to the session against that page's id while it renders. On submit the runtime charges the pin, not the posted fields - so an edited form, a stale tab, or a hand-crafted POST cannot swap the product out from under a page that already showed a price. Pages that use `?p=` or a buyer-filled cart pin nothing and behave exactly as they always have.
+
+<Info>
+Bumps are unaffected and stack on top of any of these. Configure them as in Step 7 - from page config or the **Set Checkout Bumps** node - and the buyer's selections are added to the pinned product or bundle at submit.
+</Info>
 
 ---
 
@@ -69,11 +159,11 @@ The order-summary area renders one of two shapes, chosen by scope flags:
 
 | Condition | When it's true | Data source |
 |-----------|----------------|-------------|
-| `is_single_product` | One product, loaded from `?p=` | `checkout.product_image`, `checkout.product_title`, `checkout.product_price`, `checkout.retail_price` |
+| `is_single_product` | One product, from `?p=` or `checkout_product` | `checkout.product_image`, `checkout.product_title`, `checkout.product_price`, `checkout.retail_price` |
 | `is_cart` | A multi-item **cart** is present | `<template-foreach data-each="item in cartItems">` with `[[ item.name ]]`, `[[ item.image ]]`, `[[ item.quantity ]]`, `[[ item.total ]]`, `[[ item.code ]]` |
 
 <Info>
-**"Carts" here are Shopify-style carts** — multi-item carts synced from Shopify, not an á-la-carte cart you build on the ElasticFunnels page. Most direct-response checkouts are single-product (one `?p=`); the `is_cart` branch exists so the same layout can also render a synced Shopify cart with per-line quantities and remove buttons. See [Shopify Checkout](/merchants/shopify-checkout).
+**Most carts here are Shopify-style carts** - multi-item carts synced from Shopify. Most direct-response checkouts are single-product (one `?p=`); the `is_cart` branch exists so the same layout can also render a synced Shopify cart with per-line quantities and remove buttons. See [Shopify Checkout](/merchants/shopify-checkout). The same branch renders the two on-page multi-product shapes from Step 1b: a fixed `checkout_cart` bundle, and a cart the buyer fills with `[ADD-TO-CART=<code>]` buttons.
 </Info>
 
 Both branches must be marked `data-frontend-template="true"` (see Step 6 below). This is the exact production markup:
@@ -460,11 +550,28 @@ Ticking the checkbox in Example A mutates `bump.added`, which re-renders the blo
 Keep the codes in the template and the node in sync, and when you split-test bump sets, make sure every branch either supplies the codes your template targets or the template also has an unfiltered fallback loop.
 </Warning>
 
-### Bumps are set by page events (and can be split-tested)
+### Where bumps come from
 
-The bumps in `checkout.bump_products` are **not hard-coded on the page**. They are supplied by the funnel graph's **Set Checkout Bumps** node (`set_checkout_bumps`), whose `bumps` field is an array of bump objects (`title`, `description`, `price`, `added_message`, product code). The node is only offered when the page is flagged as a checkout page.
+`checkout.bump_products` is filled from three sources, which merge. A code named by more than one is offered once:
 
-Because bumps come from a page-event node, you can **A/B test bump configurations**: place a **Split Test → Traffic Distribution** node in front, and give each branch its own **Set Checkout Bumps** node. Different visitors then get different bumps against the same checkout template, and the split test measures which set converts better. See [Page event nodes → Set Checkout Bumps](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing).
+1. **The page's own backend script**, via `checkout_settings.bumps`. Use this when the page should always offer the same bump. See [checkout_settings order bumps](/checkouts/checkout-functionality-reference).
+2. **The Set Checkout Bumps node** (`set_checkout_bumps`) in the funnel graph, whose `bumps` field is an array of bump objects (`title`, `description`, `price`, `added_message`, product code). The node is only offered when the page is flagged as a checkout page.
+3. **The `?bumps=` query parameter**, a comma-separated list of bump product codes. This is how a `/b` buy link carries a bump into the checkout.
+
+<Warning>
+`?bumps=` lives only in that one URL. A visitor who opens the page directly, shares the link, or reloads after the parameter is gone sees no bump. If a page should always offer one, declare it in the backend script or the node instead of relying on the link.
+</Warning>
+
+Because a bump set can come from a page-event node, you can **A/B test bump configurations**: place a **Split Test → Traffic Distribution** node in front, and give each branch its own **Set Checkout Bumps** node. Different visitors then get different bumps against the same checkout template, and the split test measures which set converts better. See [Page event nodes → Set Checkout Bumps](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing).
+
+### `bumps` offers, `selected_bumps` chooses
+
+The two query parameters do different jobs, and confusing them loses the offer:
+
+- **`bumps`** is the **offer** list: which bumps the checkout renders at all.
+- **`selected_bumps`** is the shopper's **choice** among them, and is what the page writes back to the URL as they tick and untick. When it is present it also decides which boxes start ticked, so an empty `selected_bumps=` means "everything was unticked" and survives a refresh.
+
+Never rewrite `bumps` from the current selection. That deletes the offer the moment nothing is ticked, and the next reload renders no bump at all.
 
 ---
 
@@ -511,17 +618,25 @@ setVariable("checkout_settings", {
 </script>
 ```
 
-`setVariable("checkout_settings", {…})` and assigning the `checkout_settings` object are the same thing — the object is read by both the render (to build the rendered dropdowns/labels) and `process-checkout` (to enforce the same rules on submit). Common keys:
+The published object is read by both the render (to build the rendered dropdowns and labels) and `process-checkout` (to enforce the same rules on submit). It sits alongside `checkout_product` / `checkout_cart` (Step 1b) in the same backend block: one names *what* the page sells, the other configures *how* it takes payment.
+
+<Warning>
+**`setVariable` is not optional, and assigning the object is not the same thing.** Backend scripts run in a sandbox, and only what you pass to `setVariable` leaves it. A block that just writes `var checkout_settings = {...}` publishes nothing. It throws no error and the page still renders, so the failure is silent: the country allowlist is not applied and declared bumps never appear. If you build the object in steps, finish with `setVariable("checkout_settings", checkout_settings)`.
+</Warning>
+
+Common keys:
 
 | Setting | Purpose |
 |---------|---------|
 | `checkout_settings.collect_tax` | Toggle tax collection |
 | `checkout_settings.countries` | Restrict the country dropdown, e.g. `['US','CA','GB','AU']` |
 | `checkout_settings.usStates` | Restrict the US state dropdown, e.g. `['CA','TX','FL']` |
+| `checkout_settings.bumps` | Order bumps this page always offers, e.g. `['bump-shipping-protection']` |
 | `checkout_settings.billing_fields` | Which fields the card panel's auto-billing block shows (`['country','zip']`); exposed as `checkout.panel_billing_fields` |
 | `checkout_settings.abuse_protection` | Card-testing / velocity protection |
-| `checkout_settings.wallet.recurring_description` | Label on the Apple Pay sheet for subscriptions |
-| `checkout_settings.wallet.management_url` | Subscription management URL for Apple Pay |
+| `checkout_settings.wallet.recurring_description` | What recurs, shown on the Apple Pay sheet |
+| `checkout_settings.wallet.recurring_label` | Line item label on the Apple Pay sheet |
+| `checkout_settings.wallet.management_url` | Where the buyer manages or cancels the subscription, shown by Apple |
 
 Full semantics: [Checkout functionality reference → `checkout_settings`](/checkouts/checkout-functionality-reference#4-checkout_settings-backend-script).
 
@@ -579,5 +694,6 @@ For a wallet-first layout, add a `<checkout-wallet force="true" wallets="applePa
 - [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) — wallet setup
 - [Shopify Checkout](/merchants/shopify-checkout) — where `is_cart` carts come from
 - [Buy links](/products/buy-links) — building the `?p=` link
+- [Backend scripts: actions](/backend-scripts/actions) - `setVariable` and the rest of the `<script scope="backend">` surface used in Step 1b
 - [Set Checkout Bumps node](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing) — configuring / A/B-testing bumps
 - [Checkout redirect behavior](/funnels/checkout-redirect-behavior) — post-checkout routing
