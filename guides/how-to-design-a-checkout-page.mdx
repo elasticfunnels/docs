@@ -43,15 +43,15 @@ If **"Is checkout page" is off**, `CheckoutProcessor` never runs. The tags are *
 ## Step 1 — resolve the product from the URL
 {/* SCREENSHOT: Step 1 resolve product · buy link with p= param · desktop */}
 
-A single-product checkout loads its product from the **`p` query parameter**: `/checkout?p=your-product-6-bottles`. The runtime reads `req.query.p`, looks the product up for the brand, and populates the `checkout` scope (title, image, price, retail price, and — if the product is a subscription — the full billing cadence).
+A single-product checkout loads its product from the **`p` query parameter**: `/checkout?p=your-product-6-bottles`. The runtime reads `req.query.p`, looks the product up for the brand, and populates the `checkout` scope (title, image, price, retail price, and - if the product is a subscription - the full billing cadence).
 
 So the checkout page is generic; **the `?p=` code decides what it sells.** A plan or quantity selector is just a set of links (or a script) that point at the same page with a different `p`:
 
 ```html
 <!-- Plan / quantity selector: each option is the same checkout page, different ?p= -->
 <a href="/checkout?p=your-product-1-week">1 week</a>
-<a href="/checkout?p=your-product-4-weeks">4 weeks — most popular</a>
-<a href="/checkout?p=your-product-12-weeks">12 weeks — best value</a>
+<a href="/checkout?p=your-product-4-weeks">4 weeks - most popular</a>
+<a href="/checkout?p=your-product-12-weeks">12 weeks - best value</a>
 ```
 
 <Info>
@@ -266,7 +266,7 @@ Add **`data-frontend-template="true"`** to **every** `template-if`, `template-el
 <template-foreach data-each="item in cartItems" data-frontend-template="true"> … </template-foreach>
 ```
 
-Server-side conditionals that depend on the request (e.g. Blade-style `@if(query.p == 'your-product-4-weeks')`) are the opposite case — those are evaluated during the render and do **not** take the attribute.
+Server-side conditionals that depend on the request (e.g. Blade-style `@if(query.p == 'your-product-4-weeks')`) are the opposite case - those are evaluated during the render and do **not** take the attribute.
 
 <Note>
 Pair client-side blocks with `data-ef-cloak` (and the CSS `[data-ef-cloak] { display: none !important; }`) on anything that would flash before the engine runs. Also hide the raw `template-if` / `template-foreach` tags with `display: none !important` so unprocessed markup never flashes.
@@ -323,7 +323,7 @@ Added bumps also feed the totals — loop them again in the price summary, filte
 
 ### Placing a specific bump in a specific location
 
-The loop above renders **every** bump in one place, in payload order. Most real checkouts want the opposite: a small shipping-protection checkbox tucked under the shipping fields, and a large product-bundle card in the sidebar — each styled differently.
+The loop above renders **every** bump in one place, in payload order. Most real checkouts want the opposite: a small shipping-protection checkbox tucked under the shipping fields, and a large product-bundle card in the sidebar - each styled differently.
 
 There is **no "get bump by code" lookup**. The idiom is to loop `checkout.bump_products` as usual and filter *inside* the loop on `bump.code`. Because the loop renders nothing when the condition never matches, you can repeat this block as many times as you like, anywhere on the page, and each bump lands in its own slot:
 
@@ -335,9 +335,9 @@ There is **no "get bump by code" lookup**. The idiom is to loop `checkout.bump_p
 </template-foreach>
 ```
 
-That gives three nested levels — `foreach` → code filter → added/not-added — and **every one of them needs `data-frontend-template="true"`**. A missing flag on any level drops the block during the server pass.
+That gives three nested levels - `foreach` → code filter → added/not-added - and **every one of them needs `data-frontend-template="true"`**. A missing flag on any level drops the block during the server pass.
 
-#### Example A — compact checkbox bump, next to the shipping fields
+#### Example A - compact checkbox bump, next to the shipping fields
 
 ```html
 <template-foreach data-each="bump in checkout.bump_products" data-frontend-template="true">
@@ -387,9 +387,9 @@ That gives three nested levels — `foreach` → code filter → added/not-added
 This example is safe without `:checked` because the checkbox only exists in the `!bump.added` branch, so it always renders unchecked. If you collapse the two states into **one** block instead, bind the state explicitly: `<input type="checkbox" :checked="bump.added" @change="bump.added = $event.target.checked">`.
 </Note>
 
-#### Example B — rich product card, in its own container
+#### Example B - rich product card, in its own container
 
-Same filter, different bump code, different markup and placement — this one sits in a dedicated wrapper so CSS can float it beside the summary:
+Same filter, different bump code, different markup and placement - this one sits in a dedicated wrapper so CSS can float it beside the summary:
 
 ```html
 <div class="bump-card-wrap bump-card-wrap--desktop-left">
@@ -434,7 +434,7 @@ Same filter, different bump code, different markup and placement — this one si
 ```
 
 <Note>
-**The payload only carries `code`, `name`, `description`, `price`, `price_raw`, `image`, `added` and `added_message`.** Anything richer — the claims list, a bespoke heading, a hero image at a specific size — is hard-coded in the template, as above. Use `ef-text` / `ef-src` for the fields that come from the bump so price, name and image stay in sync with the **Set Checkout Bumps** node, and hard-code only the copy the node cannot supply.
+**The payload only carries `code`, `name`, `description`, `price`, `price_raw`, `image`, `added` and `added_message`.** Anything richer - the claims list, a bespoke heading, a hero image at a specific size - is hard-coded in the template, as above. Use `ef-text` / `ef-src` for the fields that come from the bump so price, name and image stay in sync with the **Set Checkout Bumps** node, and hard-code only the copy the node cannot supply.
 </Note>
 
 #### The totals loop stays unfiltered
@@ -452,10 +452,10 @@ Wherever the bump was rendered, the price summary uses the same single loop over
 </template-foreach>
 ```
 
-Ticking the checkbox in Example A mutates `bump.added`, which re-renders the block into its added state, adds the row above, and rolls the bump price into `checkout.subtotal` and `checkout.total` — one state change, three places updated, no extra wiring.
+Ticking the checkbox in Example A mutates `bump.added`, which re-renders the block into its added state, adds the row above, and rolls the bump price into `checkout.subtotal` and `checkout.total` - one state change, three places updated, no extra wiring.
 
 <Warning>
-**A hard-coded `bump.code` is a contract with the funnel's Set Checkout Bumps node.** If that node stops supplying the code — renamed product, edited node, or a split-test branch that serves a different bump set — the filter simply never matches and **the block renders nothing, silently**. There is no error and no empty slot to notice in review.
+**A hard-coded `bump.code` is a contract with the funnel's Set Checkout Bumps node.** If that node stops supplying the code - renamed product, edited node, or a split-test branch that serves a different bump set - the filter simply never matches and **the block renders nothing, silently**. There is no error and no empty slot to notice in review.
 
 Keep the codes in the template and the node in sync, and when you split-test bump sets, make sure every branch either supplies the codes your template targets or the template also has an unfiltered fallback loop.
 </Warning>

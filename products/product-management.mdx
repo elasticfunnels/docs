@@ -89,7 +89,7 @@ Warehousing, inventory, cost breakdown, SKU categorisation, product specificatio
 
 #### How a shipping rate is chosen
 
-A shipping profile (**Products → Shipping Profiles**) holds two separate rates — **Mainland US Cost** and **International Cost (outside Mainland US)** — plus an optional list of per-country overrides. At checkout the buyer's country selects exactly one of them:
+A shipping profile (**Products → Shipping Profiles**) holds two separate rates - **Mainland US Cost** and **International Cost (outside Mainland US)** - plus an optional list of per-country overrides. At checkout the buyer's country selects exactly one of them:
 
 | Buyer's country | Rate applied |
 |-----------------|--------------|
@@ -98,7 +98,7 @@ A shipping profile (**Products → Shipping Profiles**) holds two separate rates
 | Anything else | **International Cost** |
 
 <Warning>
-**The two rates are independent — neither one falls back to the other.** Leaving a field empty does not mean "charge the other rate". It means **free shipping for that region**, applied silently with no warning.
+**The two rates are independent - neither one falls back to the other.** Leaving a field empty does not mean "charge the other rate". It means **free shipping for that region**, applied silently with no warning.
 
 A profile set to Mainland US `$10` with International left blank charges $10 in the US and **$0.00 in every other country**. The checkout's Shipping line renders `$0.00` and the order is placed with no shipping charge at all.
 
@@ -108,10 +108,10 @@ Fill in **both** fields on every profile. If you truly do not ship outside the U
 </Warning>
 
 <Note>
-**"Mainland US" means country = `US`.** Alaska, Hawaii and US territories are not separated out — they receive the Mainland US rate. To charge them differently, add a per-country override or a state-specific rate.
+**"Mainland US" means country = `US`.** Alaska, Hawaii and US territories are not separated out - they receive the Mainland US rate. To charge them differently, add a per-country override or a state-specific rate.
 </Note>
 
-A product with **no** shipping profile assigned also ships free. Assign a profile to every physical product — **including upsell and downsell products**, which are charged as separate orders — or use the Products list's bulk **Set shipping profile** action to apply one to many products at once.
+A product with **no** shipping profile assigned also ships free. Assign a profile to every physical product - **including upsell and downsell products**, which are charged as separate orders - or use the Products list's bulk **Set shipping profile** action to apply one to many products at once.
 
 ---
 
