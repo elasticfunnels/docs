@@ -45,6 +45,10 @@ Common keys:
 
 Template engine details: [Checkout](/frontend-template-engine/checkout).
 
+<Warning>
+**`checkout.shipping` renders `$0.00` when the buyer's region has no rate defined.** Shipping comes from the product's shipping profile, and its **Mainland US** and **International** rates are independent — an empty rate is treated as free shipping for that region, not as a fallback to the other rate. A blank International Cost therefore ships free to every non-US buyer, and a product with no shipping profile ships free everywhere. See [How a shipping rate is chosen](/products/product-management).
+</Warning>
+
 ---
 
 ## 3) Supported form field names
