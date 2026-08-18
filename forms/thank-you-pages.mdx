@@ -5,6 +5,17 @@ description: 'Create custom thank you pages to confirm form submissions and guid
 
 A custom "thank you" page can confirm submission success and guide users to next steps.
 
+<Note>
+This page covers thank-you pages for **form submissions** - lead magnets, contact forms, newsletter signups.
+
+For an **order confirmation** page that lists what the customer just bought, use
+[`getSessionOrders()`](/members-area/order-details) instead. It is scoped to the current
+checkout, so it shows the main product, any order bumps and every one-click upsell, complete on
+the first load. Do not use `getOrders()` there: it returns the customer's full purchase history
+and reads the search index, so a returning buyer can see previous orders and a just-accepted
+upsell can be missing until it is indexed.
+</Note>
+
 ## Create and Stylize a "Thank You" Page
 {/* SCREENSHOT: Create and Stylize a "Thank You" Page · form builder or submission list · desktop */}
 
