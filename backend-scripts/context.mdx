@@ -14,7 +14,7 @@ Information about the current HTTP request.
 request.query          // { foo: 'bar', utm_source: 'google' }
 request.headers        // see below
 request.method         // 'GET' or 'POST'
-request.body           // parsed JSON body (POST only, null for GET, max 64 KB)
+request.body           // parsed body, JSON or form-urlencoded (POST only, null for GET, max 64 KB)
 request.ip             // IPv4 address, e.g. '1.2.3.4'
 request.ip6            // IPv6 address (if available)
 request.path           // '/my-page'
@@ -25,7 +25,7 @@ request.is_tablet      // true/false
 
 ### `request.body`
 
-When a page receives a `POST` request with a JSON body, it is parsed and available as `request.body`. Pages accept both GET and POST requests — the same backend script runs for both. Use `request.method` to distinguish.
+When a page receives a `POST` request, the body is parsed and available as `request.body`. Pages accept both GET and POST requests, and the same backend script runs for both, so use `request.method` to distinguish.
 
 ```javascript
 if (request.method === 'POST' && request.body) {
@@ -34,9 +34,35 @@ if (request.method === 'POST' && request.body) {
 }
 ```
 
+Both JSON (`application/json`) and ordinary form posts
+(`application/x-www-form-urlencoded`) are parsed, so a plain HTML `<form>` can
+post straight to the page that renders it:
+
+```html
+<form method="post">
+  <input type="email" name="email" required>
+  <button type="submit">Notify me</button>
+</form>
+
+<script scope="backend">
+if (request.method === 'POST' && request.body) {
+  setVariable('submitted_email', request.body.email);
+}
+</script>
+```
+
 <Note>
-The body is capped at **64 KB**. Larger payloads are silently dropped (`request.body` will be `null`). Only JSON content types are parsed — form-urlencoded and multipart are not supported.
+`multipart/form-data` is **not** parsed on page routes, so a form with that
+`enctype` (including file uploads) arrives with `request.body` as `null`.
 </Note>
+
+<Warning>
+The body handed to the script is capped at **64 KB**, well below the request
+size the server itself accepts. A larger payload is dropped silently:
+`request.body` is `null` rather than truncated, and nothing is logged. Guard
+with `if (request.method === 'POST' && request.body)` so a page never assumes
+a body it did not get.
+</Warning>
 
 ### `request.headers`
 
