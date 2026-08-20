@@ -27,6 +27,7 @@ Core product identity, titles, images, descriptions, category assignment, and SE
 | **Code** | Unique identifier used in buy links (read-only after creation) |
 | **Classification** | Main, Upsell, Downsell, Bump, or Bonus |
 | **Status** | Active, Draft, or Archived |
+| **Show in frontend** | On by default. Lists the product in shop and catalog pages. Turning it off hides it from `getProducts()` only, it still sells everywhere it is used. See [Storefront visibility](/backend-template-engine/products-and-shipping#storefront-visibility) |
 | **Title** | Primary display name |
 | **Checkout Title** | Overrides Title at checkout (optional) |
 | **Product Image** | Primary product image — upload directly from this tab |
@@ -196,6 +197,7 @@ Every product returned by a data function has the following fields:
 | `type` | `"physical" \| "digital" \| "service"` | Product type |
 | `classification` | `"main" \| "upsell" \| "downsell" \| "bump" \| "bonus"` | Role in the funnel |
 | `status` | `"active" \| "draft" \| "archived"` | Visibility status |
+| `show_in_frontend` | `boolean` | `true` when the product is listed in shop and catalog pages. Does not affect whether it can be sold |
 | `price` | `number` | Selling price |
 | `retail_price` | `number \| null` | Compare-at (strikethrough) price |
 | `currency` | `string \| null` | 3-letter currency code (e.g. `"USD"`); `null` = brand default |
@@ -253,12 +255,12 @@ Each item in `product_files`, `digital_files`, and `bonus_files`:
 
 ### Data Functions
 
-#### `GetProduct(code)` {#fn-getproduct}
+#### `getProduct(code)` {#fn-getproduct}
 
 Loads a single product by its **code** for the current brand. Also pre-loads structured attribute values so the `attr` and `attrLabel` filters work immediately on the returned object.
 
 ```
-{% set product = GetProduct('PROD-001') %}
+{% set product = getProduct('PROD-001') %}
 {{ product.title }} — {{ product.price | formatPrice:product.currency }}
 ```
 
@@ -266,9 +268,9 @@ Loads a single product by its **code** for the current brand. Also pre-loads str
 
 ---
 
-#### `GetProducts(filters?)` {#fn-getproducts}
+#### `getProducts(filters?)` {#fn-getproducts}
 
-Returns all active products for the brand, with optional filters.
+Returns the brand's products, with optional filters. Products with **Show in frontend** off are left out unless you ask for them, see [Storefront visibility](/backend-template-engine/products-and-shipping#storefront-visibility).
 
 | Filter key | Type | Description |
 |------------|------|-------------|
@@ -277,9 +279,10 @@ Returns all active products for the brand, with optional filters.
 | `codes` | `string` | Comma-separated list of product codes |
 | `category_id` | `number \| string` | Filter by product category ID |
 | `subcategory_id` | `number \| string` | Filter by subcategory ID |
+| `show_in_frontend` | `boolean \| string` | Defaults to `true`. Pass `'any'` for everything, `false` for hidden products only |
 
 ```
-{% set upsells = GetProducts({ classification: 'upsell' }) %}
+{% set upsells = getProducts({ classification: 'upsell' }) %}
 {% for p in upsells %}
   <div>{{ p.title }} — {{ p.price | formatPrice:p.currency }}</div>
 {% endfor %}
@@ -289,12 +292,12 @@ Returns all active products for the brand, with optional filters.
 
 ---
 
-#### `GetAllProducts()` {#fn-getallproducts}
+#### `getAllProducts()` {#fn-getallproducts}
 
 Returns every product for the brand without filters. Fastest when you need to iterate all products and filter in the template.
 
 ```
-{% set all = GetAllProducts() %}
+{% set all = getAllProducts() %}
 {% for p in all %}{% if p.status == 'active' %}
   {{ p.title }}
 {% endif %}{% endfor %}
@@ -304,7 +307,7 @@ Returns every product for the brand without filters. Fastest when you need to it
 
 ---
 
-#### `GetProductCategories(filters?)` {#fn-getproductcategories}
+#### `getProductCategories(filters?)` {#fn-getproductcategories}
 
 Returns product categories. By default returns a full tree ordered by position, then name, with a `depth` field.
 
@@ -318,10 +321,10 @@ Returns product categories. By default returns a full tree ordered by position, 
 Each item: `{ id, name, position, parent_id, depth? }`
 
 ```
-{% set cats = GetProductCategories({ top_level: true }) %}
+{% set cats = getProductCategories({ top_level: true }) %}
 {% for cat in cats %}
   <h3>{{ cat.name }}</h3>
-  {% set subs = GetProductCategories({ parent_id: cat.id }) %}
+  {% set subs = getProductCategories({ parent_id: cat.id }) %}
   {% for sub in subs %}<span>{{ sub.name }}</span>{% endfor %}
 {% endfor %}
 ```
@@ -330,12 +333,12 @@ Each item: `{ id, name, position, parent_id, depth? }`
 
 ---
 
-#### `ProductDownloads(product)` {#fn-productdownloads}
+#### `productDownloads(product)` {#fn-productdownloads}
 
 Flattens all downloadable files attached to a product into a single deduplicated array. Useful for rendering download lists on digital product pages.
 
 ```
-{% set files = ProductDownloads(product) %}
+{% set files = productDownloads(product) %}
 {% for f in files %}
   <a href="{{ f.url }}">{{ f.title or f.extension | upper }} — {{ f.kind }}</a>
 {% endfor %}
@@ -347,12 +350,12 @@ Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary,
 
 ---
 
-#### `ProductSavings(product)` {#fn-productsavings}
+#### `productSavings(product)` {#fn-productsavings}
 
 Returns a structured savings breakdown comparing `retail_price` to `price`. Returns `null` if there is no saving.
 
 ```
-{% set savings = ProductSavings(product) %}
+{% set savings = productSavings(product) %}
 {% if savings and savings.amount > 0 %}
   You save {{ savings.amountFormatted }} ({{ savings.percent }}% off)
 {% endif %}
@@ -362,13 +365,13 @@ Returns a structured savings breakdown comparing `retail_price` to `price`. Retu
 
 ---
 
-#### `SubscriptionSummary(product)` {#fn-subscriptionsummary}
+#### `subscriptionSummary(product)` {#fn-subscriptionsummary}
 
 Generates a human-readable billing summary string for a subscription product (e.g. `"7-day free trial · Every 1 month"`).
 
 ```
 {% if product.is_subscription %}
-  <p>{{ SubscriptionSummary(product) }}</p>
+  <p>{{ subscriptionSummary(product) }}</p>
 {% endif %}
 ```
 
@@ -376,7 +379,7 @@ Generates a human-readable billing summary string for a subscription product (e.
 
 ---
 
-#### `GetProductAttributes(filters?)` {#fn-getproductattributes}
+#### `getProductAttributes(filters?)` {#fn-getproductattributes}
 
 Returns the brand's structured attribute definitions. See [Product Attributes](/products/product-attributes) for details on attribute types and scoping.
 
@@ -392,13 +395,13 @@ Each item: `{ id, name, slug, type, applies_to, options, filterable, visible_on_
 
 ---
 
-#### `GetProductAttributeValues(product)` {#fn-getproductattributevalues}
+#### `getProductAttributeValues(product)` {#fn-getproductattributevalues}
 
 Returns all attribute values for a product as a `{ slug: value }` map.
 
 ```
-{% set defs = GetProductAttributes({ visible: true }) %}
-{% set vals = GetProductAttributeValues(product) %}
+{% set defs = getProductAttributes({ visible: true }) %}
+{% set vals = getProductAttributeValues(product) %}
 {% for attr in defs %}
   <dt>{{ attr.name }}</dt>
   <dd>{{ vals[attr.slug] }}</dd>
@@ -499,10 +502,10 @@ Looks up the merchant-specific product identifier from `merchant_product_ids` (c
 
 #### `attr` {#filter-attr}
 
-Returns the value of a structured attribute by its slug. Only works on products loaded via `GetProduct` (which pre-loads attribute values).
+Returns the value of a structured attribute by its slug. Only works on products loaded via `getProduct` (which pre-loads attribute values).
 
 ```
-{% set product = GetProduct('MY-PRODUCT') %}
+{% set product = getProduct('MY-PRODUCT') %}
 {{ product | attr:'material' }}
 {# → "Organic Cotton" #}
 ```

@@ -107,7 +107,7 @@ Each variant object:
 ### Accessing Variant Attributes
 
 ```
-{% set variantAttrDefs = GetProductAttributes({ applies_to: 'variant' }) %}
+{% set variantAttrDefs = getProductAttributes({ applies_to: 'variant' }) %}
 {% for variant in product.variants %}
   {% for def in variantAttrDefs %}
     {{ def.name }}: {{ variant | attr:def.slug }}

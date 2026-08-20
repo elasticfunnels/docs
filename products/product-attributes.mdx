@@ -80,7 +80,7 @@ Attributes with `applies_to = variant` are managed in the Variants tab, not the 
 ### List Definitions
 
 ```
-{% set attrs = GetProductAttributes() %}
+{% set attrs = getProductAttributes() %}
 {% for attr in attrs %}
   {{ attr.slug }}: {{ attr.name }} ({{ attr.type }})
 {% endfor %}
@@ -89,20 +89,20 @@ Attributes with `applies_to = variant` are managed in the Variants tab, not the 
 Filter by scope or visibility:
 
 ```
-{% set visibleAttrs = GetProductAttributes({ visible: true, applies_to: 'product' }) %}
+{% set visibleAttrs = getProductAttributes({ visible: true, applies_to: 'product' }) %}
 ```
 
 ### Get Product Values
 
 ```
-{% set vals = GetProductAttributeValues(product) %}
+{% set vals = getProductAttributeValues(product) %}
 {{ vals.material }}
 {{ vals.scent }}
 ```
 
 ### Shorthand Filters
 
-When a product is loaded via `GetProduct()`, attribute values and definitions are pre-loaded:
+When a product is loaded via `getProduct()`, attribute values and definitions are pre-loaded:
 
 ```
 {{ product | attr:'material' }}        — value by slug
@@ -112,8 +112,8 @@ When a product is loaded via `GetProduct()`, attribute values and definitions ar
 ### Full Display Example
 
 ```
-{% set attrDefs = GetProductAttributes({ visible: true }) %}
-{% set attrVals = GetProductAttributeValues(product) %}
+{% set attrDefs = getProductAttributes({ visible: true }) %}
+{% set attrVals = getProductAttributeValues(product) %}
 <dl>
 {% for def in attrDefs %}
   {% set val = attrVals[def.slug] %}

@@ -14,11 +14,45 @@ If the brand context is missing or invalid, these functions return **empty resul
 
 | Function | What it returns |
 |----------|-----------------|
-| **`GetProduct(code)`** | One product by **code** or numeric **id** (for the current brand). |
-| **`GetProduct(brandId, code)`** | Same, but the first argument is an explicit brand id (advanced; still validated). |
-| **`GetAllProducts()`** | All active products for the brand (cached on the server for performance). |
-| **`GetProducts(filters)`** | Filtered list. Optional object `filters`: `type`, `classification`, `codes`, **`category_id`**, **`subcategory_id`** (see below). |
-| **`GetProductByCode(brandId, merchantCode, productCode)`** | Resolve a product by merchant integration code (advanced). |
+| **`getProduct(code)`** | One product by **code** or numeric **id** (for the current brand). |
+| **`getProduct(brandId, code)`** | Same, but the first argument is an explicit brand id (advanced; still validated). |
+| **`getAllProducts()`** | Every product for the brand, storefront visibility ignored (cached on the server for performance). |
+| **`getProducts(filters)`** | Filtered list, **listable products only** by default. Optional object `filters`: `type`, `classification`, `codes`, **`category_id`**, **`subcategory_id`**, **`show_in_frontend`** (see below). |
+| **`getProductByCode(brandId, merchantCode, productCode)`** | Resolve a product by merchant integration code (advanced). |
+
+<Note>
+These names are also available in **PascalCase** (`GetProducts`, `GetProduct` and so on). Both spellings call the same function, so pages written against the old names keep working. Use camelCase in new pages, which is what backend scripts and most other template functions already use.
+</Note>
+
+### Storefront visibility
+
+Each product has a **Show in frontend** toggle (Products, open the product, **General**). It is **on by default**.
+
+**`getProducts()` returns only products with it on.** Your product table is not the same thing as your catalog: it also holds upsell-only SKUs, order bumps, bonuses and funnel-specific variants that were never meant to be browsed. Turning the toggle off keeps a product out of shop and category listings without touching anything else.
+
+| You want | Pass |
+|----------|------|
+| Only listable products (**default**) | nothing, or `{ show_in_frontend: true }` |
+| Everything, hidden included | `{ show_in_frontend: 'any' }` |
+| Only the hidden ones | `{ show_in_frontend: false }` |
+
+```html
+@foreach(p in getProducts())
+  <p>{{ p.title }}</p>
+@endforeach
+
+@foreach(p in getProducts({ show_in_frontend: 'any' }))
+  <p>{{ p.title }} - listed: {{ p.show_in_frontend }}</p>
+@endforeach
+```
+
+<Warning>
+**Hidden is not the same as unavailable.** A hidden product still resolves through `getProduct(code)`, still prices, still checks out and still fulfils, so every funnel that sells it keeps working. Use **Status: Archived** when you want to stop selling a product.
+</Warning>
+
+`getAllProducts()` is deliberately **not** filtered. It is the literal everything list, which is what member areas and order pages need to resolve a product a customer has already bought, even after you have taken it off the shop.
+
+The flag also travels on the product object as **`show_in_frontend`** (boolean), so you can branch on it yourself.
 
 ### Fields you can use on a product
 
@@ -32,17 +66,17 @@ Typical fields include **code**, **title**, **checkout_title**, **slug**, **pric
 - **`bonus_files`** / **`digital_files`** — purpose-filtered views of `product_files`.
 - **`primary_download_url`** — convenience URL for the product’s first primary downloadable file.
 
-Use **`ProductDownloads(product)`** when you want a single rolled-up array of everything the customer can download — `digital_files` then `bonus_files` then anything else in `product_files`, with the legacy `digital_file` / `bonus_file` scalars filled in only when no file rows exist, deduplicated by URL. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`.
+Use **`productDownloads(product)`** when you want a single rolled-up array of everything the customer can download — `digital_files` then `bonus_files` then anything else in `product_files`, with the legacy `digital_file` / `bonus_file` scalars filled in only when no file rows exist, deduplicated by URL. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`.
 
-Use **`GetProducts`** with **`category_id`** to limit to products in that category or subcategory row (matches either primary or subcategory assignment). Use **`subcategory_id`** to require a specific subcategory id on the product.
+Use **`getProducts`** with **`category_id`** to limit to products in that category or subcategory row (matches either primary or subcategory assignment). Use **`subcategory_id`** to require a specific subcategory id on the product.
 
 ### Display helpers
 
 | Function / filter | Purpose |
 |-------------------|---------|
-| **`ProductSavings(product)`** | Object with savings **amount**, **percent**, and formatted strings for marketing copy. |
-| **`SubscriptionSummary(product)`** | Short human-readable subscription line (trial, billing interval). |
-| **`ProductDownloads(product)`** | Flat, deduplicated array of every downloadable file for the product. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`. `kind` is one of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`. |
+| **`productSavings(product)`** | Object with savings **amount**, **percent**, and formatted strings for marketing copy. |
+| **`subscriptionSummary(product)`** | Short human-readable subscription line (trial, billing interval). |
+| **`productDownloads(product)`** | Flat, deduplicated array of every downloadable file for the product. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`. `kind` is one of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`. |
 | **`formatPrice`** filter | Format a number with currency (e.g. `{{ product.price \| formatPrice:product.currency }}`). |
 | **`savings`**, **`compareAt`**, **`pricePerUnit`**, **`subscriptionLabel`**, **`merchantPriceId`** filters | Convenience formatting on a product object. |
 | **`productUrl`** filter | SEO-friendly product URL: `{{ product \| productUrl:'shop/product' }}` → `/shop/product/{slug}-{id}`. Use with [wildcard routes](/wildcard-routes) for product detail pages. |
@@ -52,10 +86,10 @@ Use **`GetProducts`** with **`category_id`** to limit to products in that catego
 
 | Function | What it returns |
 |----------|-----------------|
-| **`GetProductCategories()`** | Default: full category **tree** in order, each item includes **`depth`** (0 = top level). |
-| **`GetProductCategories({ parent_id: N })`** | Direct **children** of category `N` only (flat list, sorted). |
-| **`GetProductCategories({ tree: false })`** or **`{ flat: true }`** | Flat list of all categories (no `depth`). |
-| **`GetProductCategories({ top_level: true })`** | Only categories with no parent (then tree or flat as above). |
+| **`getProductCategories()`** | Default: full category **tree** in order, each item includes **`depth`** (0 = top level). |
+| **`getProductCategories({ parent_id: N })`** | Direct **children** of category `N` only (flat list, sorted). |
+| **`getProductCategories({ tree: false })`** or **`{ flat: true }`** | Flat list of all categories (no `depth`). |
+| **`getProductCategories({ top_level: true })`** | Only categories with no parent (then tree or flat as above). |
 
 Combine with **`@foreach`** to build category navigation or filter UI on landing pages.
 
@@ -66,11 +100,11 @@ Shipping profiles define **rates and rules** used at checkout. These functions h
 
 | Function | What it returns |
 |----------|-----------------|
-| **`GetShippingProfiles()`** | All shipping profiles for the brand. **`shipping_costs`** is a **parsed object** (e.g. regional keys, `default`, `overrides`). **`has_shipping_rates`** is true when that object has keys. |
-| **`GetShippingProfiles({ selectable_only: true })`** | Only profiles visitors can pick at checkout (when that option is enabled on the profile). |
-| **`GetShippingProfiles({ include_product_stats: true })`** | Same as list mode, but each row also includes **`products_count`** and **`tax_categories`**. Use only when you need counts or tax-code summaries—extra queries run per profile. |
-| **`GetShippingProfile(profileId)`** | One profile by id, **including** product stats (**`products_count`**, **`tax_categories`**). |
-| **`GetDefaultShippingProfile()`** | The profile marked default, with the same enrichment as a single **`GetShippingProfile`**. |
+| **`getShippingProfiles()`** | All shipping profiles for the brand. **`shipping_costs`** is a **parsed object** (e.g. regional keys, `default`, `overrides`). **`has_shipping_rates`** is true when that object has keys. |
+| **`getShippingProfiles({ selectable_only: true })`** | Only profiles visitors can pick at checkout (when that option is enabled on the profile). |
+| **`getShippingProfiles({ include_product_stats: true })`** | Same as list mode, but each row also includes **`products_count`** and **`tax_categories`**. Use only when you need counts or tax-code summaries—extra queries run per profile. |
+| **`getShippingProfile(profileId)`** | One profile by id, **including** product stats (**`products_count`**, **`tax_categories`**). |
+| **`getDefaultShippingProfile()`** | The profile marked default, with the same enrichment as a single **`getShippingProfile`**. |
 
 ### `tax_categories` on a shipping profile
 
@@ -88,7 +122,7 @@ Shipping profiles do **not** store a tax code themselves. **`tax_categories`** i
 **List products in a category** (replace `3` with a real category id from your store):
 
 ```html
-@foreach(p in GetProducts({ category_id: 3 }))
+@foreach(p in getProducts({ category_id: 3 }))
   <p>{{ p.title }} — {{ p.price | formatPrice:p.currency }}</p>
 @endforeach
 ```
@@ -96,7 +130,7 @@ Shipping profiles do **not** store a tax code themselves. **`tax_categories`** i
 **Category menu (tree):**
 
 ```html
-@foreach(c in GetProductCategories())
+@foreach(c in getProductCategories())
   <p style="padding-left: {{ c.depth * 12 }}px">{{ c.name }}</p>
 @endforeach
 ```
@@ -104,7 +138,7 @@ Shipping profiles do **not** store a tax code themselves. **`tax_categories`** i
 **List a product's downloads with type-aware icons** (no URL parsing required):
 
 ```html
-@foreach(file in ProductDownloads(GetProduct('my-sku')))
+@foreach(file in productDownloads(getProduct('my-sku')))
   <a href="{{ file.url }}" target="_blank">
     @if(file.kind eq 'audio')🎧
     @elseif(file.kind eq 'video')🎬
@@ -121,7 +155,7 @@ Shipping profiles do **not** store a tax code themselves. **`tax_categories`** i
 **Shipping methods (names only, fast):**
 
 ```html
-@foreach(s in GetShippingProfiles())
+@foreach(s in getShippingProfiles())
   <li>{{ s.name }}@if(s.is_default) (default)@endif</li>
 @endforeach
 ```
