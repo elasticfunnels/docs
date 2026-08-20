@@ -80,6 +80,7 @@
               "pages/overview",
               "pages/rendering-pipeline",
               "pages/create-landing-page",
+              "pages/wildcard-routes",
               {
                 "group": "Variants & Testing",
                 "pages": [
@@ -398,6 +399,12 @@
     "light": "/logo/light.svg",
     "dark": "/logo/light.svg"
   },
+  "redirects": [
+    {
+      "source": "/wildcard-routes",
+      "destination": "/pages/wildcard-routes"
+    }
+  ],
   "navbar": {
     "links": [
       {

@@ -1,0 +1,276 @@
+---
+title: 'Wildcard routes'
+description: 'Serve many URLs from one page by putting {placeholders} in its slug, then read the captured segments as route_params in templates and backend scripts.'
+---
+
+A **wildcard route** lets one page answer many URLs. You put `{placeholders}`
+in the page's slug, and every URL that fits the pattern renders that page with
+the URL's segments handed to your template as **`route_params`**.
+
+One "guided course" page can then serve
+`/app/guided-courses/foundations/module-1`,
+`/app/guided-courses/advanced/lesson-5`, and every other course and module.
+
+<Note>
+**Prefer a wildcard route over a query string.** For product, course, article
+and category detail pages, `/shop/product/blue-widget` beats
+`/shop/product?id=42` on every axis that matters — see
+[Use paths, not `?id=`](#use-paths-not-id) below.
+</Note>
+
+---
+
+## How a URL is matched
+
+When a request arrives, the runtime resolves it in three steps and stops at
+the first hit:
+
+1. **Exact slug.** A page whose slug is literally the requested path.
+2. **Wildcard patterns.** Pages whose slug contains `{…}`, tried
+   **longest URL prefix first**.
+3. **Folder index.** `/<path>` and `/<path>/` fall back to a page saved as
+   `<path>/index`. This is a last resort, so `ecom/{slug}` still wins over
+   `ecom/index` for `/ecom/cart`.
+
+A pattern matches only when **both** of these hold:
+
+- Its **static prefix** — everything before the first `{` — is exactly the URL
+  prefix being tested.
+- Its **number of placeholders** equals the number of segments left over.
+
+A page whose slug has no braces is never wildcard-matched. A plain page at
+`app` will not catch `/app/anything`; only `app/{slug}` will.
+
+---
+
+## Setting up a wildcard route
+
+### 1. Create the page
+
+Give the page a slug that contains the placeholders, e.g.
+
+```
+app/guided-courses/{course}/{module}
+```
+
+- **Fixed part:** `app/guided-courses`
+- **Dynamic parts:** `{course}` and `{module}`
+
+```bash
+ef pages create "app/guided-courses/{course}/{module}"
+```
+
+### 2. What matches
+
+| URL | `route_params.course` | `route_params.module` |
+|-----|------------------------|------------------------|
+| `/app/guided-courses/foundations/module-1` | `foundations` | `module-1` |
+| `/app/guided-courses/advanced/lesson-5`    | `advanced`    | `lesson-5` |
+| `/app/guided-courses/intro/welcome`        | `intro`       | `welcome`  |
+
+<Warning>
+The bare prefix `/app/guided-courses` does **not** match this page — two
+placeholders require exactly two trailing segments. If you want a landing page
+at the prefix, create a separate page with the slug `app/guided-courses` or
+`app/guided-courses/index`.
+</Warning>
+
+---
+
+## Rules and limits
+
+**Placeholders must all be trailing.** The static prefix stops at the first
+`{`, so any literal segment written *after* a placeholder is ignored when
+matching:
+
+| Slug | Behaves as | Matches | Does **not** match |
+|------|------------|---------|--------------------|
+| `blog/{slug}` | prefix `blog`, 1 param | `/blog/hello` | `/blog/2024/hello` |
+| `blog/{cat}/posts/{id}` | prefix `blog`, 2 params | `/blog/tech/5` | `/blog/tech/posts/5` |
+
+To keep a literal segment in the middle, put it in the fixed part instead:
+`blog/tech/posts/{id}`.
+
+**A slug cannot start with a placeholder.** Matching always tests at least one
+literal leading segment, so a slug like `{hl}/about` never matches any URL.
+Start the pattern with a real segment (`docs/{topic}`).
+
+**Sibling patterns are disambiguated by prefix.** `blog/{slug}` and
+`blog/category/{slug}` can coexist: `/blog/hello` picks the first,
+`/blog/category/news` picks the second, because each pattern's static prefix
+must equal the URL prefix exactly.
+
+**Offline and deleted pages are skipped**, and at most 50 candidate patterns
+are considered per prefix.
+
+**Wildcard pages are never listed in `sitemap.xml` or `llms.txt`** — a
+`{param}` slug stands for many URLs, not one. Link to concrete URLs from a
+listing page you *do* publish.
+
+---
+
+## Reading the segments
+
+Two values are available once a wildcard route matches:
+
+- **`route_params`** — an object keyed by your placeholder names, e.g.
+  `{ course: 'foundations', module: 'module-1' }`.
+- **`route_slug`** — the whole remainder as one string, e.g.
+  `foundations/module-1`.
+
+Both are `null` when the page was reached by an exact slug, the domain index,
+or the folder-index fallback.
+
+<Note>
+The keys of `route_params` are always your placeholder names. There is no
+`segment_0` / `segment_1` — name the placeholder whatever you want to read
+(`{slug}` → `route_params.slug`).
+</Note>
+
+### In a template
+
+```html
+<p>Course: {{ route_params.course }}</p>
+<p>Module: {{ route_params.module }}</p>
+```
+
+### In a backend script
+
+`route_params` arrives on the request object:
+
+```js
+// efmeta:{...}
+const { course, module } = request.route_params || {};
+```
+
+### Guarding
+
+On a non-wildcard URL `route_params` is null, so guard before reading it:
+
+```html
+@if(route_params and route_params.course)
+  @set(course = getCourseBySlug(route_params.course))
+@endif
+```
+
+---
+
+## Use paths, not `?id=`
+
+For any page that renders **one of many** records — a product, a course, a
+blog post, a category — put the identifier in the **path** via a wildcard
+route rather than in a query string.
+
+| | Wildcard route | Query string |
+|---|---|---|
+| URL | `/shop/product/blue-widget` | `/shop/product?code=blue-widget` |
+| Indexed by search engines | Yes, as distinct pages | Usually collapsed to one URL |
+| Shareable / readable | Yes | Poorly |
+| Analytics | One row per product | One row for every product |
+| Cacheable at the edge | Yes | Query strings often bypass the cache |
+| Ad platforms | Clean destination URLs | Params get stripped or rewritten |
+
+Query strings still make sense for things that **modify** a view rather than
+identify it: `?page=2`, `?sort=price`, `?hl=en`, and UTM tags.
+
+### Product detail pages
+
+Build the page once with a placeholder:
+
+- **Page slug:** `shop/product/{code}`
+- **Template:**
+
+  ```html
+  @set(product = getProduct(route_params.code))
+  @if(product)
+    <h1>{{ product.title }}</h1>
+    <p>{{ product.price | formatPrice:product.currency }}</p>
+  @endif
+  ```
+
+`getProduct()` accepts a product **id or code**, so the segment can be either.
+
+Link to it from your catalog with the **`productUrl`** filter, which emits
+`/<base>/<slug>-<id>`:
+
+```html
+@foreach(product in getProducts())
+  <a href="{{ product | productUrl:'shop/product' }}">{{ product.title }}</a>
+@endforeach
+```
+
+That produces `/shop/product/blue-widget-42`, so pair it with the slug
+`shop/product/{handle}` and split the trailing id in a backend script:
+
+```js
+const handle = (request.route_params || {}).handle || '';
+const id = handle.split('-').pop();
+```
+
+See [Products and shipping](/backend-template-engine/products-and-shipping)
+for the full product API.
+
+### Course detail pages
+
+- **Page slug:** `app/guided-course/{course}`
+- **Template:**
+
+  ```html
+  @set(course = getCourseBySlug(route_params.course))
+  @if(course)
+    <h1>{{ course.title }}</h1>
+  @endif
+  ```
+
+`getCourseBySlug()` also falls back to the URL on its own when you call it
+with no argument: it reads `?slug=`, then `route_params.course`, then
+`route_slug`. Passing the value explicitly is clearer, and required when your
+placeholder is named anything other than `course`.
+
+---
+
+## Examples
+
+### One placeholder — record by slug
+
+- **Page slug:** `app/guided-course/{slug}`
+- **URLs:** `/app/guided-course/foundations`, `/app/guided-course/advanced`
+- **In template:** `route_params.slug` (or `route_slug`, same value here)
+
+### Two placeholders — course + module
+
+- **Page slug:** `app/guided-courses/{course}/{module}`
+- **URLs:** `/app/guided-courses/foundations/module-1`
+- **In template:** `route_params.course`, `route_params.module`
+
+### Three placeholders
+
+- **Page slug:** `learn/{topic}/{level}/{lesson}`
+- **URL:** `/learn/javascript/beginner/01-variables`
+- **In template:** `route_params.topic`, `route_params.level`,
+  `route_params.lesson`
+
+---
+
+## Summary
+
+| You want… | Page slug | In template |
+|-----------|-----------|-------------|
+| One dynamic segment | `shop/product/{code}` | `route_params.code` |
+| Named segments | `app/guided-courses/{course}/{module}` | `route_params.course`, `route_params.module` |
+| The whole remainder as one string | any wildcard page | `route_slug` |
+| A landing page at the prefix | `shop/product` or `shop/product/index` | — |
+
+Use **`{name}`** in the slug for each dynamic part, then read
+**`route_params.name`** (or **`route_slug`**) in the template or
+`request.route_params` in a backend script.
+
+## Related
+
+- [Products and shipping](/backend-template-engine/products-and-shipping) —
+  `productUrl`, `getProduct`, and the product fields to render.
+- [Internationalization (i18n)](/pages/internationalization) — `route_params.hl`
+  and `route_params.locale` are the highest-priority locale hints, ahead of
+  `?hl=`.
+- [Rendering pipeline](/pages/rendering-pipeline) — where route resolution sits
+  relative to the template engines.

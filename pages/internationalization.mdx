@@ -85,9 +85,10 @@ it to a language row configured for the brand (when any exist).
 
 **Locale hint priority** (first match wins):
 
-1. **Wildcard / route params** — `hl` or `locale` from the matched slug
-   (e.g. `{hl}` in [wildcard routes](../wildcard-routes)), also merged
-   Express `params` when present.
+1. **Wildcard / route params** — `hl` or `locale` captured by a
+   [wildcard route](/pages/wildcard-routes) (e.g. the slug `docs/{hl}`), also
+   merged Express `params` when present. Note that a slug cannot *start* with a
+   placeholder, so `/en/about` cannot be matched this way — use `?hl=en`.
 2. **Query string** — `hl`, then `locale`, then `lang`.
 3. **Session** — `session.locale`.
 4. **Domain** — `locale` / `language` from domain config.
@@ -206,8 +207,8 @@ the next request reloads from the database.
 
 ## Related
 
-- [Wildcard routes](../wildcard-routes) — capture an `hl` path segment
-  for clean URLs like `/en/about`.
+- [Wildcard routes](/pages/wildcard-routes) — capture an `hl` path segment
+  (e.g. the slug `docs/{hl}`); the placeholder cannot be the first segment.
 - [Page variables](./page-variables) — non-translation per-locale
   switches (currency formatting, date masks, etc.).
 - [Backend scripts → data functions](../backend-scripts/data-functions)

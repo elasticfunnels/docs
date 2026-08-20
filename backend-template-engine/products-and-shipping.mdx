@@ -59,7 +59,7 @@ The flag also travels on the product object as **`show_in_frontend`** (boolean),
 Typical fields include **code**, **title**, **checkout_title**, **slug**, **price**, **retail_price**, **currency**, **image**, **description**, **classification**, **tax_category** (tax provider code), **tax_exempt**, subscription fields when applicable, downloadable files, and merchandising categories:
 
 - **`title`** — The customer-facing display title: uses **checkout_title** when set, otherwise the internal title.
-- **`slug`** — SEO-friendly URL slug. Auto-generated from checkout_title/title if not manually set in the SEO tab. Used with [wildcard routes](/wildcard-routes) for clean product URLs (e.g. `{{ product | productUrl:'shop/product' }}` → `/shop/product/my-product-123`).
+- **`slug`** — SEO-friendly URL slug. Auto-generated from checkout_title/title if not manually set in the SEO tab. Used with [wildcard routes](/pages/wildcard-routes) for clean product URLs (e.g. `{{ product | productUrl:'shop/product' }}` → `/shop/product/my-product-123`).
 - **`product_category_id`** / **`product_subcategory_id`** — ids in your **product category** tree (configured in the Products area).
 - **`category_name`** / **`subcategory_name`** — display names for those ids (when set on the product).
 - **`product_files`** — downloadable files attached to the product. Each row includes **`purpose`** (`digital` or `bonus`), **`title`**, **`description`**, **`image`**, **`file`**, **`kind`** (one of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'` — derived from extension/mime so you don't have to classify yourself), **`is_primary`**, **`sort_order`**, and **`metadata`** (`mime_type`, `size`, `checksum`, `extension`).
@@ -79,7 +79,7 @@ Use **`getProducts`** with **`category_id`** to limit to products in that catego
 | **`productDownloads(product)`** | Flat, deduplicated array of every downloadable file for the product. Each entry: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`. `kind` is one of `'audio'`, `'video'`, `'document'`, `'image'`, `'archive'`, `'file'`. |
 | **`formatPrice`** filter | Format a number with currency (e.g. `{{ product.price \| formatPrice:product.currency }}`). |
 | **`savings`**, **`compareAt`**, **`pricePerUnit`**, **`subscriptionLabel`**, **`merchantPriceId`** filters | Convenience formatting on a product object. |
-| **`productUrl`** filter | SEO-friendly product URL: `{{ product \| productUrl:'shop/product' }}` → `/shop/product/{slug}-{id}`. Use with [wildcard routes](/wildcard-routes) for product detail pages. |
+| **`productUrl`** filter | SEO-friendly product URL: `{{ product \| productUrl:'shop/product' }}` → `/shop/product/{slug}-{id}`. Use with [wildcard routes](/pages/wildcard-routes) for product detail pages. |
 
 ## Product categories
 {/* SCREENSHOT: Product categories · code editor or rendered example · desktop */}
