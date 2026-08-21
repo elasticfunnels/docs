@@ -238,12 +238,14 @@
             "group": "Emails",
             "pages": [
               "emails/overview",
+              "emails/sending-setup",
               "emails/template-variables",
               "emails/order-emails",
               "emails/subscription-emails",
               "emails/dunning",
               "emails/course-emails",
-              "emails/login-emails"
+              "emails/login-emails",
+              "emails/troubleshooting"
             ]
           },
           {

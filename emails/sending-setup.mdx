@@ -1,0 +1,206 @@
+---
+title: "Sending Setup"
+description: "Connect a sender, wire templates to a merchant, and send a test before your first real order."
+---
+
+## Three things have to be true
+{/* SCREENSHOT: Settings Emailing tab · the saved SMTP card with a green Verified badge · desktop */}
+
+An order confirmation only reaches a customer when all three of these are in place:
+
+1. **A sender.** SMTP credentials on the brand, or an email integration on the merchant.
+2. **A template.** The email itself, from **Emails** in your brand dashboard.
+3. **That template selected on the merchant.** Merchant → **Email** tab → **Order Emails**.
+
+Miss any one of them and nothing sends. There is no built-in fallback email, and for
+shipping and cancellation notices there is no warning either. The order goes through, the
+customer is charged, and the inbox stays empty.
+
+<Warning>
+ElasticFunnels never sends a generic default on your behalf. If the slot is empty, the
+customer gets no email at all.
+</Warning>
+
+---
+
+## Step 1: connect a sender
+{/* SCREENSHOT: Settings Emailing tab · empty SMTP form before credentials are entered · desktop */}
+
+Go to **Settings** → **Emailing**. This is the SMTP relay ElasticFunnels connects to for
+every transactional email this brand sends.
+
+<Steps>
+<Step title="Enter the server details">
+Your email provider gives you these. This example uses Mailgun:
+
+| Field | Value | Notes |
+|---|---|---|
+| SMTP host | `smtp.mailgun.org` | From your provider's SMTP page |
+| Port | `587` | 587 for TLS, 465 for SSL, 25 unencrypted |
+| Encryption | `TLS` | Match the port |
+| Username | `team@example.com` | Usually the full mailbox address, not your provider login |
+| Password | The SMTP password | Stored encrypted. Leave blank on later saves to keep it |
+
+Mailgun, Postmark, Amazon SES, SendGrid, Gmail, and any other relay that speaks SMTP all
+work here.
+</Step>
+
+<Step title="Set the sender identity">
+This is what the customer sees in their inbox:
+
+| Field | Example | What it does |
+|---|---|---|
+| From name | `Acme Health Team` | The display name on the message |
+| From email | `team@example.com` | Must be on a domain your provider is allowed to send for |
+| Reply-to email | `support@example.com` | Where customer replies land |
+
+Set **Reply-to** to a mailbox someone reads. Customers reply to order emails constantly,
+asking to change an address or cancel. Leave it blank and their replies go to the From
+address instead, which is often an unmonitored sending mailbox.
+</Step>
+
+<Step title="Save, then send a test">
+**Save SMTP**, then **Send test**. The test message goes to the email address of the user
+who is logged in, not to the From address.
+
+If it arrives, the card shows a green **Verified** badge.
+</Step>
+</Steps>
+
+<Note>
+**"Verified" means one test message was accepted by your SMTP server.** It is not domain
+verification. It does not check SPF, DKIM, or DMARC, and it does not confirm your provider
+will accept the From address you entered. Send a real test order before you trust it.
+</Note>
+
+### The From address on the template is ignored
+
+Email templates have their own `from_name`, `from_email`, and `reply_to_email` fields. When
+the brand sends over SMTP, those are not used. The three values on the **Emailing** tab win
+for every template. Change the sender in one place and every transactional email follows.
+
+### Alternative: a per-merchant email integration
+
+Instead of brand SMTP, a merchant can carry its own sending service. Merchant → **Email**
+tab → **Email Integration** lists your Mailgun, SendGrid, and Mailrelay integrations from
+**Integrations**.
+
+**Brand SMTP takes priority.** If the brand has SMTP configured, the merchant integration
+is ignored for order emails. Use the merchant integration when a single brand sells through
+merchants that need to mail from different providers.
+
+---
+
+## Step 2: create the templates
+{/* SCREENSHOT: Emails list · brand templates with names and subjects · desktop */}
+
+Open **Emails** in the brand dashboard. Every brand ships with system templates for the
+standard transaction types, and you can create your own. See
+[Email Templates](/emails/overview) for the builder and
+[Template Variables](/emails/template-variables) for the merge tags.
+
+The fastest route is Step 3: the merchant screen can create a pre-built template and select
+it in one click.
+
+---
+
+## Step 3: wire the templates to the merchant
+{/* SCREENSHOT: Merchant detail Email tab · Order Emails rows with template pickers · desktop */}
+
+Go to **Merchants**, open the merchant, and switch to the **Email** tab. This is the step
+people miss.
+
+Templates live on the brand. Sending is decided per merchant. A brand with three merchants
+has three separate sets of these slots, and filling them in for one does nothing for the
+other two.
+
+### Order Emails
+
+| Slot | Fires when |
+|---|---|
+| New Purchase | A purchase conversion is recorded, including every upsell |
+| Refund | A refund is processed, from the gateway or from ElasticFunnels |
+| Order Shipped | Fulfillment reports the order as shipped and a tracking number arrives |
+| Order Cancelled | A cancellation is recorded for the order |
+
+### Subscription Emails
+
+Visible for NMI and Stripe merchants:
+
+| Slot | Fires when |
+|---|---|
+| Renewal Success | A rebill is charged successfully |
+| Renewal Failed | A rebill is declined. The template escalates by retry count |
+| Pre-Renewal Reminder | 3 days before the next charge, from a daily job |
+| Subscription Paused | A subscription is paused |
+| Subscription Canceled | A subscription is canceled |
+
+Each row has a **Create template** button that seeds a ready-made template for that type and
+selects it immediately. A row showing **Not set** sends nothing.
+
+<Tip>
+The usual setup is all four order slots filled on the merchant, with a custom purchase
+template rather than the stock one. Create from the button, then edit the copy in the
+builder.
+</Tip>
+
+### Which template actually gets used
+
+There are two places a subscription template can be chosen, and they are checked in order:
+
+1. The merchant's **Email** tab. This wins.
+2. **Settings** → **Subscriptions**, which holds brand-wide defaults for the same events.
+3. The brand's built-in system template for that event.
+
+Order emails are simpler. Set them on the merchant. The brand defaults under
+**Settings** → **Subscriptions** are not a reliable fallback for shipping and cancellation
+notices, and purchase and refund prefer the brand's locked system template over anything
+picked in a dropdown. If you want different purchase copy, edit the locked template rather
+than duplicating it.
+
+---
+
+## What sends, and from where
+
+Order emails are queued and sent by ElasticFunnels a couple of seconds after the conversion
+lands, so Elasticsearch has time to index the line items. Members area login codes are sent
+directly by the page runtime and arrive immediately.
+
+| Email | Triggered by |
+|---|---|
+| New purchase | The gateway postback for a purchase conversion |
+| Upsell purchase | Each upsell is its own conversion, so each one sends its own email |
+| Order bump | No separate email. Bump lines appear inside the purchase email |
+| Refund | A refund postback, or a refund issued inside ElasticFunnels |
+| Order shipped | The fulfillment provider flipping the order to shipped |
+| Order cancelled | A cancellation postback |
+| Renewal success and failure | The rebill result posted back from the gateway |
+| Pre-renewal reminder | A scheduled daily job |
+| Members area login code and magic link | The customer requesting one on your site |
+
+---
+
+## Deliverability
+
+The SMTP form gets the message to your provider. Getting it to the inbox is your provider's
+job, and it depends on DNS records you set once:
+
+- **SPF and DKIM** for the sending domain, at your email provider. Every provider documents
+  the exact records. Without them, order confirmations land in spam or get rejected.
+- **A From address on a domain your provider is authorised to send for.** `team@example.com`
+  only works once `example.com` is added and verified as a sending domain at your provider.
+- **A real reply-to mailbox.** Providers score unmonitored senders poorly, and customers who
+  cannot reach you open chargebacks instead.
+
+Use a subdomain for transactional mail if you also send marketing campaigns. A complaint on
+a promotional blast should not put order confirmations at risk.
+
+---
+
+## Related docs
+
+- [Order Emails](/emails/order-emails) - What each order email contains
+- [Subscription Emails](/emails/subscription-emails) - Renewals, paused, canceled, dunning
+- [Emails Not Sending](/emails/troubleshooting) - Checklist when a customer got nothing
+- [Template Variables](/emails/template-variables) - Complete merge tag reference
+- [Email Marketing Integrations](/integrations/email-marketing) - Mailgun, SendGrid, generic SMTP

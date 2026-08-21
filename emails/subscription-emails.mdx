@@ -115,6 +115,17 @@ For a deep dive on dunning configuration, see [Dunning](/emails/dunning).
 ## Configuring subscription emails
 {/* SCREENSHOT: Configuring subscription emails · email editor or template settings · desktop */}
 
-Subscription email templates are configured in **Brand Settings > Subscriptions**. Each subscription event has a dropdown to select which email template to use.
+Subscription email templates are chosen in two places, checked in this order:
 
-See also: [Emails & Dunning settings](/subscriptions/emails-and-dunning)
+1. **Merchants** -> open the merchant -> **Email** tab -> **Subscription Emails**. This wins.
+2. **Settings** -> **Subscriptions**, which holds brand-wide defaults for the same events.
+3. The brand's built-in system template for that event.
+
+A merchant with an empty slot and no brand default still sends, using the system template.
+Subscription slots only appear for merchants that bill recurring charges through
+ElasticFunnels (NMI and Stripe).
+
+Nothing sends until the brand has a sender configured. See [Sending Setup](/emails/sending-setup).
+
+See also: [Emails & Dunning settings](/subscriptions/emails-and-dunning) and
+[Emails Not Sending](/emails/troubleshooting)

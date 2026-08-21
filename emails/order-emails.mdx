@@ -8,10 +8,15 @@ description: "Purchase confirmation, refund, shipping notification, and cancella
 
 Order emails are sent automatically when key events happen in your store. Each email type has a corresponding system template that you can customize.
 
+Before any of them send, the brand needs a sender and the merchant needs a template selected
+in each slot. See [Sending Setup](/emails/sending-setup) for that path. A slot left empty
+sends nothing, and for shipping and cancellation notices there is no warning.
+
 ## Purchase Confirmation
 {/* SCREENSHOT: Purchase Confirmation · email editor or template settings · desktop */}
 
-**Trigger:** Sent immediately after a successful purchase.
+**Trigger:** Sent after a successful purchase. Each upsell is recorded as its own purchase,
+so each one sends its own confirmation. Order bumps ride along inside the main email.
 
 **Template:** `purchase`
 
@@ -43,7 +48,8 @@ Order emails are sent automatically when key events happen in your store. Each e
 ## Shipping Notification
 {/* SCREENSHOT: Shipping Notification · email editor or template settings · desktop */}
 
-**Trigger:** Sent when an order is marked as shipped.
+**Trigger:** Sent when your fulfillment provider reports the order as shipped. Creating the
+shipment is not enough on its own, the status has to change.
 
 **Template:** `shipped`
 
@@ -82,3 +88,15 @@ If no tracking URL is provided, the CTA falls back to "View Order Details".
 <Tip>
 System templates cannot be deleted, but you can fully customize their content and design. Changes apply to all future emails of that type.
 </Tip>
+
+<Warning>
+For purchase and refund, edit the system template in place. Duplicating it produces an
+ordinary copy, and the system template still wins even after you select the copy on the
+merchant. Shipped and cancelled always use whatever the merchant has selected.
+</Warning>
+
+## Related docs
+
+- [Sending Setup](/emails/sending-setup) - Sender, templates, and merchant wiring
+- [Emails Not Sending](/emails/troubleshooting) - Checklist when a customer got nothing
+- [Template Variables](/emails/template-variables) - Complete merge tag reference

@@ -1,0 +1,164 @@
+---
+title: "Emails Not Sending"
+description: "A checklist for when a customer did not receive an order, refund, shipping, or renewal email."
+---
+
+## Start with the send log
+{/* SCREENSHOT: Email Send Logs · list of sends with recipient, subject, source and status · desktop */}
+
+Open **Email Send Logs** at `/{brand}/emails/smtp-logs`. It records every email sent through
+your brand's SMTP configuration, with the recipient, the subject, the template used, the
+source that triggered it, and whether it was delivered or failed.
+
+Filter by **Source** to see one type at a time. `Purchase` and `Refund` are the order jobs,
+`Members Login` is the members area, `SMTP Test` is the button on the Emailing tab.
+
+Two different answers, two different problems:
+
+- **The send is listed and failed.** Your credentials or your provider are the issue. Go to
+  [Sender problems](#sender-problems).
+- **The send is not listed at all.** Nothing was ever attempted. Go to
+  [The email was never triggered](#the-email-was-never-triggered).
+
+<Note>
+The log covers the SMTP path. Merchants sending through a Mailgun or SendGrid integration
+instead of brand SMTP write to a separate log and will not appear here.
+</Note>
+
+---
+
+## The email was never triggered
+
+Work down this list in order. The first miss is almost always the answer.
+
+<Steps>
+<Step title="Is the slot filled on the right merchant?">
+Merchant → **Email** tab. A row showing **Not set** sends nothing, ever.
+
+This is the most common cause by a wide margin. Templates belong to the brand, but the
+choice of which one to send belongs to each merchant. Adding a merchant, or switching an
+offer to a different merchant, leaves you with a fresh set of empty slots.
+</Step>
+
+<Step title="Does the order have a customer email?">
+Open the conversion. If the email field is empty, every email for that order is skipped
+silently. Abandon records from some gateways carry no customer data at all, so they can
+never resolve into a confirmation email.
+</Step>
+
+<Step title="Is a sender configured?">
+**Settings** → **Emailing** needs SMTP credentials, or the merchant needs an **Email
+Integration**. With neither, the job fails on every attempt.
+
+Check **Brand Actions** on your dashboard. Missing templates and missing integrations raise
+a task there for purchase and subscription emails.
+</Step>
+
+<Step title="For shipping emails, did fulfillment actually report shipped?">
+The Order Shipped email fires when the fulfillment provider flips the order to shipped, not
+when you create the shipment. No status change means no email. Check the order's fulfillment
+status and tracking number first.
+</Step>
+
+<Step title="For renewal emails, is the merchant on NMI or Stripe?">
+Subscription email slots only exist for merchants that bill recurring charges through
+ElasticFunnels. Other gateways have no subscription section on the Email tab.
+</Step>
+</Steps>
+
+<Warning>
+**Shipping and cancellation emails fail quietly.** Purchase and subscription emails raise a
+Brand Action when they cannot send. Order Shipped and Order Cancelled do not. If those two
+slots are empty, there is no warning anywhere in the app. Check them by eye.
+</Warning>
+
+---
+
+## Sender problems
+
+The send is in the log with a **Failed** status.
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Authentication failed | Wrong username or password | The username is usually the full mailbox address your provider issued, not your account login |
+| Connection refused or timeout | Port and encryption do not match | 587 with TLS, 465 with SSL. Check your provider's SMTP page |
+| Sender address rejected | The From domain is not authorised at your provider | Add and verify the sending domain with the provider, then retry |
+| Delivered but landing in spam | SPF and DKIM missing | Add the DNS records your provider specifies for the sending domain |
+| Customer replies vanish | Reply-to is blank | Set **Reply-to email** to a monitored mailbox |
+
+<Note>
+The green **Verified** badge only means one test message was accepted by your SMTP server.
+It does not check SPF, DKIM, DMARC, or whether your provider will accept your From address
+on real volume. A brand can be Verified and still land in spam.
+</Note>
+
+---
+
+## Known limitations
+
+These are current behaviours worth knowing before you spend an hour debugging.
+
+<AccordionGroup>
+<Accordion title="I edited a copy of the purchase template, but the old one still sends">
+Purchase and refund emails prefer your brand's built-in system template over whatever is
+selected in the merchant dropdown. Duplicating a system template produces an ordinary copy,
+so selecting that copy on the merchant has no effect while the system template still exists.
+
+Edit the system template directly. It is marked with a **Locked** badge in the Emails list.
+Its content and design are fully editable, it just cannot be deleted.
+
+This applies to purchase and refund only. Shipped and cancelled always use the merchant
+dropdown.
+</Accordion>
+
+<Accordion title="Resending an email from a conversion says the merchant has no email integration">
+The manual resend action requires a merchant **Email Integration**, even when the brand is
+sending fine over SMTP. Automatic sends are unaffected. To resend on an SMTP-only brand, add
+an email integration to the merchant.
+</Accordion>
+
+<Accordion title="Send test inside the email builder does nothing on an SMTP-only brand">
+The **Send test** button on a template needs a Mailgun, SendGrid, or Mailrelay integration.
+It does not use brand SMTP. The **Send test** button on **Settings** → **Emailing** does use
+SMTP, so use that one to confirm the sender, and a real test order to confirm the template.
+</Accordion>
+
+<Accordion title="Pre-renewal reminders never arrive on an SMTP-only brand">
+The pre-renewal job checks for a merchant **Email Integration** specifically, so brand SMTP
+alone is not enough for that one email. Other subscription emails work over SMTP normally.
+Add an email integration to the merchant if you need pre-renewal reminders.
+</Accordion>
+
+<Accordion title="A template renders with blank fields">
+Each template is written for one scope. A subscription template dropped into the Shipped slot
+renders with empty subscription values and no error, because the shipping context carries no
+subscription data. The merchant dropdowns list every template on the brand, so nothing stops
+the mismatch.
+
+Match the template to the slot, and check the scope in
+[Template Variables](/emails/template-variables).
+</Accordion>
+
+<Accordion title="Support phone and email are missing from the footer">
+Seeded templates print the support block only when the brand has those values set. Add them
+in **Settings** under your brand variables and they appear on the next send.
+</Accordion>
+</AccordionGroup>
+
+---
+
+## Nothing at all is sending, for any brand
+
+Order emails are queued. If the email queue worker is stopped, every send waits in the queue
+and nothing surfaces in the interface. The send log stays empty because no attempt is ever
+made. If several brands go quiet at the same moment, this is the first thing to check with
+your administrator.
+
+---
+
+## Related docs
+
+- [Sending Setup](/emails/sending-setup) - Sender, templates, and merchant wiring
+- [Order Emails](/emails/order-emails) - What each order email contains
+- [Subscription Emails](/emails/subscription-emails) - Renewals, paused, canceled, dunning
+- [Dunning](/emails/dunning) - Retry schedule and escalation
