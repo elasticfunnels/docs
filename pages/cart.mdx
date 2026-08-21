@@ -246,7 +246,31 @@ window.addEventListener('cart-updated', (e) => {
 });
 ```
 
-The event `detail` contains `{ brandId, cart }` where `cart` is the updated array.
+The event `detail` contains `{ brandId, cart }` where `cart` is the updated array. It bubbles, so
+you can listen on either `window` or `document`.
+
+The cart is **already rendered** when the event fires: `window.efScope` and every `[[ ]]`,
+`ef-text`, `template-if` and `template-foreach` binding on the page hold the new cart by the time
+your handler runs. That means reading the rendered values in the handler is safe:
+
+```js
+window.addEventListener('cart-updated', () => {
+  // The badge already shows the new count here.
+  const badge = document.querySelector('[ef-text="efCart.count"]');
+  badge.setAttribute('data-empty', parseInt(badge.textContent, 10) > 0 ? 'false' : 'true');
+});
+```
+
+<Tip>
+Prefer `e.detail.cart` over reading the DOM when you only need the numbers — it is the same data
+without a layout read:
+
+```js
+window.addEventListener('cart-updated', (e) => {
+  const count = e.detail.cart.reduce((n, item) => n + (item.quantity || 0), 0);
+});
+```
+</Tip>
 
 <Tip>
 `cart-updated` fires on **any** cart change (add, remove, quantity). If you only care about items being **added** — and want the `/b` buy links covered too — use [`window.ef.onAddToCart(callback)`](/funnels/ef-api#cart) instead.
