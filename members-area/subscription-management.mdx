@@ -1,0 +1,114 @@
+---
+title: 'Subscription Management Page'
+description: 'Build a members-area page where customers can see, change and cancel their subscriptions, and record why they left.'
+---
+
+A subscription management page lists a customer's plans and lets them cancel one.
+This page is the only place a cancellation reason can come from, so it is worth
+building properly: without it your churn reporting can only ever say "Not
+specified".
+
+Enable **Manage** first in **Merchant settings → Customer care**. Without it the
+helpers below return nothing.
+
+## Listing subscriptions
+
+`getSubscriptions(status, limit)` returns the logged-in customer's subscriptions.
+Call it once per status you want to show.
+
+```twig
+@set(active_subs = getSubscriptions('active', 20))
+@set(canceled_subs = getSubscriptions('canceled', 20))
+
+@foreach(sub in active_subs)
+  <div class="plan">
+    <strong>{{ sub.product_name }}</strong>
+    <small>{{ sub.amount | currency }} every {{ sub.frequency }} {{ sub.frequency_unit }}</small>
+    <button type="button" data-cancel="{{ sub.original_transaction_id }}">Cancel</button>
+  </div>
+@endforeach
+```
+
+Each subscription carries `original_transaction_id`, which identifies it to every
+call below. Keep it on the button.
+
+## Asking why, before cancelling
+
+`cc.getManageData(transactionId)` returns what the customer is allowed to do,
+including `exit_survey_reasons` - the list to put in your dropdown.
+
+```js
+cc.getManageData(transactionId).then(function (data) {
+  data.exit_survey_reasons.forEach(function (reason) {
+    var option = document.createElement('option');
+    option.value = reason;
+    option.textContent = labelFor(reason);
+    select.appendChild(option);
+  });
+});
+```
+
+If the merchant has not configured its own list, you get the standard set:
+
+| Key | Meaning |
+| --- | --- |
+| `too_expensive` | Price |
+| `not_using` | Low engagement |
+| `results` | Did not work for them |
+| `side_effects` | Reaction to the product |
+| `too_much_product` | Oversupplied, often a shipping-frequency problem |
+| `temporary_pause` | Wants to come back |
+| `found_alternative` | Went to a competitor |
+| `other` | Anything else |
+
+These keys are identifiers, not copy. Show your own wording to the customer and
+send the key back.
+
+`temporary_pause` and `too_much_product` are worth watching: both usually mean the
+plan interval is wrong rather than the product being wrong, and both are
+recoverable with a retention offer.
+
+## Cancelling, with the reason attached
+
+Pass the selected reason as the second argument. **This is the step that is easy
+to miss, and missing it silently costs you the whole survey** - the cancellation
+still succeeds, so nothing looks broken, and every row in your Cancel Reasons
+report reads "Not specified".
+
+```js
+var reason = document.getElementById('cancel-reason').value || null;
+window.ef.sub.cancelThenNavigate('/members-subscriptions?canceled=1', reason);
+```
+
+Use `ef.sub.cancel(reason)` instead if you want to stay on the page and handle the
+result yourself. Both accept the reason; both work without it.
+
+## Offering something before they go
+
+If retention offers are enabled, `getManageData` also returns `offers`. An offer
+can be matched to the reason the customer picked, so a price complaint gets a
+discount and an oversupply complaint gets a longer interval.
+
+```js
+var offer = data.offers.find(function (o) { return o.cancel_reason === reason; });
+
+cc.applyOffer({
+  transactionId: transactionId,
+  offerType: offer.offer_type,
+  offerValue: offer.offer_value,
+  durationCycles: offer.offer_duration_cycles,
+  productCode: offer.offer_product_code,
+  cancelReason: reason
+});
+```
+
+See [Retention Offers](/subscriptions/retention-offers) for configuring them.
+
+## Checking it worked
+
+Cancel a test subscription, choose a reason, then open **Reports → Subscriptions**
+and look at the Cancel Reasons card. The reason should appear by name within a
+minute or two.
+
+If it says "Not specified", the reason is not reaching the server. In almost every
+case that is the second argument missing from `cancelThenNavigate`.

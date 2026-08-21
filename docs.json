@@ -214,7 +214,9 @@
             "pages": [
               "members-area/overview",
               "members-area/login",
-              "members-area/order-details"
+              "members-area/order-details",
+              "members-area/subscription-management",
+              "members-area/customer-care"
             ]
           },
           {
