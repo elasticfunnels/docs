@@ -46,8 +46,7 @@ If you want text to always be treated as literal, quote it.
 
 ---
 
-## Translation filter: `t` {#translation-filter-t}
-
+## Translation filter: `t`
 For [brand translations](/pages/internationalization), **`| t`** treats the piped value as a **translation key** string. Resolution matches **`t()`**: brand dictionary for the resolved locale first, then built-in locale strings. Optional **`| t:params`** passes a context variable or safe expression that resolves to a **plain object** for built-in placeholder interpolation (same rules as **`t(key, params)`**).
 
 ```html

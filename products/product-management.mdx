@@ -255,8 +255,7 @@ Each item in `product_files`, `digital_files`, and `bonus_files`:
 
 ### Data Functions
 
-#### `getProduct(code)` {#fn-getproduct}
-
+#### `getProduct(code)`
 Loads a single product by its **code** for the current brand. Also pre-loads structured attribute values so the `attr` and `attrLabel` filters work immediately on the returned object.
 
 ```
@@ -268,8 +267,7 @@ Loads a single product by its **code** for the current brand. Also pre-loads str
 
 ---
 
-#### `getProducts(filters?)` {#fn-getproducts}
-
+#### `getProducts(filters?)`
 Returns the brand's products, with optional filters. Products with **Show in frontend** off are left out unless you ask for them, see [Storefront visibility](/backend-template-engine/products-and-shipping#storefront-visibility).
 
 | Filter key | Type | Description |
@@ -292,8 +290,7 @@ Returns the brand's products, with optional filters. Products with **Show in fro
 
 ---
 
-#### `getAllProducts()` {#fn-getallproducts}
-
+#### `getAllProducts()`
 Returns every product for the brand without filters. Fastest when you need to iterate all products and filter in the template.
 
 ```
@@ -307,8 +304,7 @@ Returns every product for the brand without filters. Fastest when you need to it
 
 ---
 
-#### `getProductCategories(filters?)` {#fn-getproductcategories}
-
+#### `getProductCategories(filters?)`
 Returns product categories. By default returns a full tree ordered by position, then name, with a `depth` field.
 
 | Filter key | Type | Description |
@@ -333,8 +329,7 @@ Each item: `{ id, name, position, parent_id, depth? }`
 
 ---
 
-#### `productDownloads(product)` {#fn-productdownloads}
-
+#### `productDownloads(product)`
 Flattens all downloadable files attached to a product into a single deduplicated array. Useful for rendering download lists on digital product pages.
 
 ```
@@ -350,8 +345,7 @@ Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary,
 
 ---
 
-#### `productSavings(product)` {#fn-productsavings}
-
+#### `productSavings(product)`
 Returns a structured savings breakdown comparing `retail_price` to `price`. Returns `null` if there is no saving.
 
 ```
@@ -365,8 +359,7 @@ Returns a structured savings breakdown comparing `retail_price` to `price`. Retu
 
 ---
 
-#### `subscriptionSummary(product)` {#fn-subscriptionsummary}
-
+#### `subscriptionSummary(product)`
 Generates a human-readable billing summary string for a subscription product (e.g. `"7-day free trial · Every 1 month"`).
 
 ```
@@ -379,8 +372,7 @@ Generates a human-readable billing summary string for a subscription product (e.
 
 ---
 
-#### `getProductAttributes(filters?)` {#fn-getproductattributes}
-
+#### `getProductAttributes(filters?)`
 Returns the brand's structured attribute definitions. See [Product Attributes](/products/product-attributes) for details on attribute types and scoping.
 
 | Filter key | Type | Description |
@@ -395,8 +387,7 @@ Each item: `{ id, name, slug, type, applies_to, options, filterable, visible_on_
 
 ---
 
-#### `getProductAttributeValues(product)` {#fn-getproductattributevalues}
-
+#### `getProductAttributeValues(product)`
 Returns all attribute values for a product as a `{ slug: value }` map.
 
 ```
@@ -414,8 +405,7 @@ Returns all attribute values for a product as a `{ slug: value }` map.
 
 ### Filters
 
-#### `formatPrice` {#filter-formatprice}
-
+#### `formatPrice`
 Formats a numeric price using the brand's active currency locale.
 
 ```
@@ -428,8 +418,7 @@ Formats a numeric price using the brand's active currency locale.
 
 ---
 
-#### `savings` {#filter-savings}
-
+#### `savings`
 Computes the saving between `retail_price` and `price` and returns a formatted string.
 
 | Format | Example output |
@@ -448,8 +437,7 @@ Returns `""` when `retail_price` is not set or not greater than `price`.
 
 ---
 
-#### `compareAt` {#filter-compareat}
-
+#### `compareAt`
 Formats `retail_price` as a "Was $X" string.
 
 ```
@@ -461,8 +449,7 @@ Returns `""` when `retail_price` is not set.
 
 ---
 
-#### `pricePerUnit` {#filter-priceperunit}
-
+#### `pricePerUnit`
 Divides `price` by `physical_units_per_product` to give the per-unit price. Useful for "per bottle" or "per capsule" displays.
 
 ```
@@ -474,8 +461,7 @@ Divides `price` by `physical_units_per_product` to give the per-unit price. Usef
 
 ---
 
-#### `subscriptionLabel` {#filter-subscriptionlabel}
-
+#### `subscriptionLabel`
 Short-form billing label. Returns trial info if present, otherwise the billing frequency.
 
 ```
@@ -487,8 +473,7 @@ Returns `""` for non-subscription products.
 
 ---
 
-#### `merchantPriceId` {#filter-merchantpriceid}
-
+#### `merchantPriceId`
 Looks up the merchant-specific product identifier from `merchant_product_ids` (configured in the Merchants tab).
 
 ```
@@ -500,8 +485,7 @@ Looks up the merchant-specific product identifier from `merchant_product_ids` (c
 
 ---
 
-#### `attr` {#filter-attr}
-
+#### `attr`
 Returns the value of a structured attribute by its slug. Only works on products loaded via `getProduct` (which pre-loads attribute values).
 
 ```
@@ -514,8 +498,7 @@ Returns `""` when the attribute is not set.
 
 ---
 
-#### `attrLabel` {#filter-attrlabel}
-
+#### `attrLabel`
 Returns the human-readable **label** (name) of a structured attribute definition by slug.
 
 ```
@@ -525,8 +508,7 @@ Returns the human-readable **label** (name) of a structured attribute definition
 
 ---
 
-### Gallery {#gallery}
-
+### Gallery
 `product.gallery` is a `string[]` — an array of CDN image URLs. It is always an array (never `null` or a JSON string). `product.has_gallery` is `true` when the array has at least one entry.
 
 ```html
