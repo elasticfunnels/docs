@@ -14,6 +14,64 @@ Variants are built from **Variant Options** — brand-level axis definitions (e.
 
 ---
 
+## Linking a Variant to an Existing Product
+
+A variant normally **points at a product you already have** rather than owning its own
+commercial data. Set **Linked product** on the variant row and everything downstream —
+SKU, inventory, fulfilment, payouts, `merchant_product_ids`, postback matching — keeps
+resolving through that product's code, exactly as it did before.
+
+This is the difference from Shopify, and it is deliberate. In ElasticFunnels the product
+code is the identity the whole system is keyed on, so a variant that owned a separate
+price and SKU would need all of that duplicated. Linking keeps one source of truth:
+
+- **The variant** is presentation — which option values it represents, what order it
+  appears in, which one is selected by default.
+- **The linked product** stays the sellable thing, unchanged.
+
+### Worked example: pack sizes
+
+A supplement sold as 1, 3 and 6-bottle packs, where each pack is already its own product:
+
+| Variant | Option value | Linked product | Resolves to |
+|---|---|---|---|
+| 1 | `Pack size: 1 Bottle` | `menosoothe-1` | $69.00 |
+| 2 | `Pack size: 3 Bottles` | `menosoothe-3` | $177.00 |
+| 3 | `Pack size: 6 Bottles` | `menosoothe-6` | $294.00 |
+
+The dashboard product list shows one **MenoSoothe** row instead of three, the storefront
+renders one page with a picker, and add-to-cart still submits `menosoothe-3`.
+
+<Note>
+Leave **Linked product** empty for a standalone variant that carries its own price, SKU
+and inventory. Mixing both styles on one product is supported — each variant resolves
+independently.
+</Note>
+
+### Field resolution order
+
+For every commercial field the variant's own value wins when set, and the linked
+product fills in the rest:
+
+```
+price          variant.price          -> linked product.price
+retail_price   variant.retail_price   -> linked product.retail_price
+sku            variant.sku            -> linked product.sku
+units          variant.units          -> linked product.units
+image          variant.image          -> linked product.image
+code           variant.code           -> linked product.code -> variant id
+```
+
+---
+
+## Default Variant
+
+Every product with variants has exactly **one** default — the variant used when no
+selection is made. If you do not flag one, the lowest **Position** wins. This guarantees
+a product can always be added to a cart without an explicit choice.
+
+---
+
 ## Setting Up Variant Options
 {/* SCREENSHOT: Setting Up Variant Options · product form, builder panel, or checkout example · desktop */}
 

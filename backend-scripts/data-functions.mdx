@@ -598,6 +598,61 @@ if (product) {
 }
 ```
 
+### `resolveVariant(product, code?)`
+
+Pick which variant a page should start on. Returns `null` for a product with no
+variants, so you can branch on it.
+
+```javascript
+var product = getProduct('menosoothe');
+var picked  = resolveVariant(product, request.route_params.code);
+
+if (picked) {
+  setVariable('price', picked.price);
+  setVariable('buy_code', picked.code);   // what add-to-cart submits
+}
+```
+
+`code` may be a **variant code** or the **linked product's code**, so a URL like
+`/shop/product/menosoothe-3` resolves without you mapping it yourself. With no match,
+or no code, the product's default variant is returned.
+
+### Variants on a product
+
+Every product returned by `getProduct`/`getProducts` carries a normalised `variants`
+array, ordered by position, plus `product_fields` (the option axes) and `has_variants`.
+
+```javascript
+var product = getProduct('menosoothe');
+
+@foreach(v in product.variants)
+  {{ v.title }}          // "3 Bottles"  - joined option values
+  {{ v.code }}           // "menosoothe-3" - resolved through the linked product
+  {{ v.price }}          // 177
+  {{ v.retail_price }}   // 297
+  {{ v.per_unit_price }} // 59  - price / units, precomputed
+  {{ v.on_sale }}        // true when retail_price > price
+  {{ v.is_default }}     // exactly one variant is true
+@endforeach
+```
+
+| Field | Notes |
+|---|---|
+| `code` | Variant code, else the linked product's code, else the variant id. This is what you submit to the cart. |
+| `linked_product_id` / `linked_product_code` | The product this variant resolves to. `null` for a standalone variant. |
+| `title` | Option values joined with ` / `, or `Default` when the product has no option axes. |
+| `option_values` | Object keyed by option name, e.g. `{ "Pack size": "3 Bottles" }`. |
+| `per_unit_price` | `price / units`, or `null` when `units` is unset. |
+| `on_sale` | `true` when `retail_price` is greater than `price`. |
+| `position` | Display order. The array is already sorted by it. |
+| `is_default` | Exactly one variant per product is `true`. |
+
+<Note>
+Commercial fields resolve through the linked product (see
+[Product Variants](/products/variants)), so `price`, `sku` and `image` are already the
+values you should show — no second lookup needed.
+</Note>
+
 ### `getProducts(filters?)`
 
 Fetch products with optional filters.
