@@ -290,7 +290,7 @@ Checks whether the visitor currently counts as whitelisted.
 
 **Type** `has_tag` · **1 in / 2 out** · Server + Browser · pass-through
 
-Checks for a tag set by **Tag User** (or `ef.addTag()`).
+Checks for a tag set by **Tag User**, `ef.addTag()`, or [`addTag()` in a backend script](/backend-scripts/tags).
 
 **Fields:** `value` — tag name.
 
@@ -507,6 +507,8 @@ The flow does **not** advance automatically after a client script. Call `ef.next
 **Fields:** `value` (tag name), `expiration_minutes` (omit or `0` for a session cookie; a positive number expires the tag after that many minutes — `10080` = 7 days).
 
 <Warning>
+A backend script can read and write the same tags with [`hasTag()` / `addTag()` / `removeTag()`](/backend-scripts/tags), which handle the naming split below for you.
+
 **Server and browser write the tag cookie under different names.** When the node runs on the server the cookie is named exactly `value`; when it runs in the browser it is named `tag_<value>`. **Has Tag** on the server reads the bare name, while the `tags` array exposed to Script Rules is built from `tag_`-prefixed cookies only. Keep a tag's set/read pair on the same side of the fence, or set tags from the browser with `ef.addTag()` and read them with `tags.includes(...)`.
 </Warning>
 

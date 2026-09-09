@@ -334,6 +334,7 @@
                 "pages": [
                   "backend-scripts/context",
                   "backend-scripts/actions",
+                  "backend-scripts/tags",
                   "backend-scripts/data-functions",
                   "backend-scripts/validation",
                   "backend-scripts/http",

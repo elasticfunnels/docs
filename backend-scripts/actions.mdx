@@ -104,6 +104,10 @@ Clears the cookie by name.
 Some cookie names are reserved and cannot be set or deleted. Use your own cookie names for custom data.
 </Note>
 
+<Note>
+Visitor **tags** are cookies too, but do not set them with `cookie.set()` — use [`addTag()` / `hasTag()` / `removeTag()`](/backend-scripts/tags), which write the naming both the funnel nodes and the browser expect.
+</Note>
+
 ## Redirect
 {/* SCREENSHOT: Redirect · code editor or rendered example · desktop */}
 

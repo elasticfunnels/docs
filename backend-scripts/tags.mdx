@@ -1,0 +1,130 @@
+---
+title: 'Tags'
+description: 'Read, add and remove visitor tags from a backend script — the same tags the Tag User and Has Tag funnel nodes use.'
+---
+
+Tags mark a visitor so a later page or funnel step can branch on them: `seen_vsl`, `declined_upsell`, `vip`. Backend scripts get four functions for working with the same tags the [Tag User and Has Tag nodes](/funnels/page-events-nodes) set and read.
+
+```javascript
+if (!hasTag('seen_offer')) {
+  addTag('seen_offer', 10080); // 7 days
+  setVariable('first_visit', true);
+}
+```
+
+## `hasTag(name)`
+
+Returns `true` if the visitor carries the tag, `false` otherwise. Finds tags set by the Tag User node, by `ef.addTag()` in the browser, and by `addTag()` below.
+
+```javascript
+if (hasTag('vip')) {
+  setVariable('discount', 20);
+}
+```
+
+## `addTag(name, expirationMinutes?)`
+
+Adds a tag. Returns `true` if it was added, `false` if the name was rejected or the per-execution cap was hit.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `name` | string | — | Tag name. Letters, digits, `_`, `-`, `.`, `:`; max 120 characters |
+| `expirationMinutes` | number | — | Omit or pass `0` for a session tag; a positive number expires the tag after that many minutes |
+
+```javascript
+addTag('abandoned_cart');           // until the browser session ends
+addTag('trial_started', 10080);     // 7 days
+addTag('promo_seen', 60);           // 1 hour
+```
+
+## `removeTag(name)`
+
+Removes a tag. Returns `true` if the removal was queued, `false` if the name was rejected. Removing a tag the visitor does not have is not an error.
+
+```javascript
+removeTag('abandoned_cart');
+```
+
+## `getTags()`
+
+Returns an array of the visitor's tag names.
+
+```javascript
+setVariable('tag_count', getTags().length);
+```
+
+<Note>
+`getTags()` lists tags written by `addTag()` and by `ef.addTag()` in the browser. Tags written by the **Tag User** node are stored under a bare cookie name that is indistinguishable from any other cookie, so they cannot be enumerated — `hasTag('name')` still finds them.
+</Note>
+
+## Reserved and invalid names
+
+`addTag()` and `removeTag()` return `false` without doing anything when the name is empty, longer than 120 characters, contains characters that are not valid in a cookie name (spaces, `;`, `=`), or collides with a reserved cookie such as `hop`, `subid`, `aff` or the session cookie. This stops a tag from overwriting affiliate or session state.
+
+```javascript
+addTag('hop');          // false — reserved
+addTag('my tag');       // false — space is not a valid cookie-name character
+addTag('cart_started'); // true
+```
+
+## A tag is visible immediately
+
+A tag added by a backend script is visible to the rest of that same script, and to funnel nodes that run after it on the same request:
+
+```javascript
+addTag('qualified');
+hasTag('qualified'); // true — right away
+```
+
+<Warning>
+The **Tag User** node behaves differently: a tag it sets is only visible to a **Has Tag** node on the *next* request, not the one it was set on. If you need set-then-branch inside a single page load, set the tag with `addTag()` in a backend script rather than with a Tag User node.
+</Warning>
+
+## How tags are stored
+
+Tags are plain, unencrypted cookies. Two naming conventions exist for historical reasons:
+
+| Written by | Cookie name |
+|------------|-------------|
+| **Tag User** node (server) | `vip` |
+| `ef.addTag()` (browser) | `tag_vip` |
+| `addTag()` (backend script) | both `vip` and `tag_vip` |
+
+`addTag()` writes both names so a tag set from a backend script is visible everywhere — the Has Tag node, `ef.hasTag()` in the browser, and the `tags` array in Script Rules. `hasTag()` and `removeTag()` accept either spelling, so you do not have to think about which side set a tag.
+
+<Warning>
+Because tags are unencrypted cookies, a visitor can add or remove their own tags from the browser console. Use them for funnel flow and personalization — never as the only gate on paid content, pricing, or anything else where forging a tag would cost you.
+</Warning>
+
+## Example: one-time offer
+
+Show an offer once, then never again for 30 days.
+
+```html
+<script scope="backend">
+if (hasTag('flash_offer_seen')) {
+  setVariable('show_offer', false);
+} else {
+  addTag('flash_offer_seen', 43200); // 30 days
+  setVariable('show_offer', true);
+}
+</script>
+```
+
+## Example: clearing a tag after purchase
+
+```html
+<script scope="backend">
+if (is_customer && hasTag('abandoned_cart')) {
+  removeTag('abandoned_cart');
+  queue.cancel('abandon:' + customer.email);
+}
+</script>
+```
+
+See [Queue](/backend-scripts/queue) for the cancellation tag used here — that is a job-grouping label, unrelated to visitor tags.
+
+## Limits
+
+- **50** tag writes per script execution. `addTag()` and `removeTag()` return `false` past that.
+- Each `addTag()` and `removeTag()` emits an `add-tag` / `remove-tag` tracking event, the same as the Tag User node and `ef.addTag()`.
