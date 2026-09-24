@@ -81,6 +81,7 @@
               "pages/rendering-pipeline",
               "pages/create-landing-page",
               "pages/wildcard-routes",
+              "pages/seo",
               {
                 "group": "Variants & Testing",
                 "pages": [

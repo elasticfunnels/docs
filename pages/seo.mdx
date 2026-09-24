@@ -1,0 +1,184 @@
+---
+title: 'SEO: sitemap.xml, robots.txt and llms.txt'
+description: 'Publish sitemap.xml, robots.txt and llms.txt for a brand, choose which pages they list, and pin the site to one https address with www/non-www redirects.'
+---
+
+Every domain of a brand can serve three **discovery files**. They tell search
+engines and AI crawlers which of your pages exist:
+
+| File | What it is for |
+| --- | --- |
+| `/sitemap.xml` | One entry per listed page, with its last update date. Read by Google, Bing and other search engines. |
+| `/robots.txt` | Crawl rules. Points crawlers at the sitemap and keeps them out of checkout and redirect paths. |
+| `/llms.txt` | A plain-text index of the site that AI crawlers read to work out what the site is about ([llmstxt.org](https://llmstxt.org)). |
+
+<Warning>
+**All three are off by default.** Until you turn them on, each path returns
+`404 Not found` on every domain of the brand. The same goes for listing a
+page: turning a file on doesn't list anything until you tick individual pages.
+</Warning>
+
+It's opt-in because most of a brand's pages are funnel steps, upsells and
+checkouts. A sitemap that turned itself on would publish a map of all of them.
+
+---
+
+## Setting it up
+
+<Steps>
+  <Step title="Turn the files on for the brand">
+    Go to **Settings → SEO**. Under **Discovery files**, switch on
+    **Serve sitemap.xml**, **Serve robots.txt** and, if you want it,
+    **Serve llms.txt**. Then click **Save**.
+
+    Turn on robots.txt whenever you turn on the sitemap. robots.txt is what
+    points crawlers at the sitemap, and without it most of them never find it.
+  </Step>
+  <Step title="Tick the pages you want listed">
+    Open each public content page (home page, blog, articles, product and
+    about pages), go to its **SEO** tab and tick
+    **List this page in sitemap.xml and llms.txt**. Then save the page.
+  </Step>
+  <Step title="Check the preview">
+    Back in **Settings → SEO**, the page list at the bottom shows exactly what
+    the files contain right now. It runs the same rules as the live files. A
+    page you ticked that still can't be listed shows a **Not listed** badge
+    with the reason.
+  </Step>
+  <Step title="Verify on the live domain">
+    Open `https://your-domain.com/sitemap.xml` and `/robots.txt`. Then submit
+    the sitemap URL in Google Search Console.
+  </Step>
+</Steps>
+
+---
+
+## Which pages are listed
+
+A page appears in `sitemap.xml` and `llms.txt` only when **all** of these are
+true:
+
+- **List this page in sitemap.xml and llms.txt** is ticked on the page, or on
+  one of its [variants](/pages/page-variants).
+- The page is **published**.
+- **Prevent Search Engine Indexing** is **off**.
+- The page isn't a **checkout** or **upsell** page.
+- It doesn't require **login** or a **password**.
+- It isn't set to be visible only through a funnel.
+- Its slug has no `{placeholder}`. A [wildcard route](/pages/wildcard-routes)
+  stands for many URLs, not one.
+- It belongs to the domain being requested (or its www/non-www twin), or it's
+  a global page with no domain.
+
+Each page is listed at the same URL as its `<link rel="canonical">`: `/` for
+the index page, `/<slug>` for everything else. Variants are never listed
+separately. The parent page stands for them. Each file lists at most 5,000
+pages.
+
+<Note>
+**Hiding a page:** turn on **Prevent Search Engine Indexing**. Don't add a
+`Disallow:` line for it. robots.txt is public, so a Disallow list is a
+directory of the pages you wanted hidden. It also stops crawlers from reading
+the page's `noindex` tag, so a page linked from somewhere else can still get
+indexed.
+</Note>
+
+---
+
+## robots.txt
+
+The generated file allows everything, blocks EF's system paths (checkout
+processing, previews, redirect shims, `/affiliates/`, `/upsell*` and
+`/decline*`), and ends with a `Sitemap:` line when the sitemap is on:
+
+```text
+User-agent: *
+Allow: /
+Disallow: /process-checkout$
+Disallow: /process-checkout?
+...
+Disallow: /upsell
+Disallow: /decline
+
+Sitemap: https://example.com/sitemap.xml
+```
+
+Each system path is anchored (`$`, `?`, `/`), so a rule like `/b` never blocks
+a content page such as `/blogs`.
+
+**Additional directives** (shown once robots.txt is on) adds your own lines
+verbatim, one directive per line. Don't add a `Sitemap:` line. One is written
+for you.
+
+<Tip>
+If the domain is on Cloudflare with **Managed robots.txt** turned on, Cloudflare
+serves its own content-signals file when yours returns 404. Once you turn on
+**Serve robots.txt**, check the live file to see what Cloudflare adds to it.
+</Tip>
+
+---
+
+## llms.txt
+
+Shown once llms.txt is on:
+
+| Field | Used as |
+| --- | --- |
+| **Site name** | The `#` heading. Defaults to the brand name. |
+| **Site summary** | The `>` summary line. One or two sentences on what the site offers, and the first thing an AI crawler reads. |
+| **Additional notes** | Free text added to the end: contact details, licensing, anything a crawler should know. |
+
+Between the summary and the notes, each listed page becomes a link line, using
+its SEO title and meta description:
+
+```markdown
+# Example Store
+
+> Handmade leather goods, shipped worldwide.
+
+## Pages
+
+- [Home](https://example.com/): Handmade leather wallets and bags.
+- [About us](https://example.com/about)
+```
+
+---
+
+## Site address: www, non-www and https
+
+Search engines treat `www.example.com` and `example.com`, and `http` and
+`https`, as four different sites. The **Site address** section picks one:
+
+- **Preferred domain:** *Don't redirect*, *Without www* or *With www*. The
+  other version gets a permanent **301** redirect to it. It only applies when
+  **both** versions are added to the brand as domains. A domain with only one
+  version is left alone.
+- **Redirect http to https:** visitors and crawlers arriving over http get a
+  301 to https.
+
+Only `GET` and `HEAD` requests are redirected. Checkout and tracking `POST`s
+are never redirected, because a browser replays a redirected POST as a GET and
+loses the body. The path and query string carry over exactly, so affiliate
+parameters arrive unchanged.
+
+Whatever you choose here, `sitemap.xml`, `robots.txt`, `llms.txt` and every
+page's canonical link always use **https** and the preferred domain.
+
+---
+
+## Caching
+
+Crawlers get the files with a one-hour `Cache-Control`. Saving a page or the
+brand's settings clears the server-side copy right away, so a newly ticked
+page shows up on the next fetch. If you still see an old copy, it's coming
+from Cloudflare or the browser cache.
+
+## Troubleshooting
+
+| Symptom | Cause |
+| --- | --- |
+| `/sitemap.xml` returns `404 Not found` | **Serve sitemap.xml** is off for the brand that owns this domain. |
+| The sitemap loads but has no `<url>` entries | No page has **List this page…** ticked, or every ticked page is excluded. The preview in **Settings → SEO** shows why. |
+| A page you ticked is missing | See [Which pages are listed](#which-pages-are-listed). The **Not listed** badge gives the reason. |
+| robots.txt has no `Sitemap:` line | The sitemap is off. The line only appears when the sitemap is actually served. |
+| URLs use the wrong www/non-www host | Set **Preferred domain**, and make sure both versions are added to the brand. |
