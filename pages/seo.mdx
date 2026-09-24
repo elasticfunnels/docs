@@ -53,6 +53,76 @@ checkouts. A sitemap that turned itself on would publish a map of all of them.
 
 ---
 
+## Setting it up with the `ef` CLI
+
+The same setup works from the [`ef` CLI](https://www.npmjs.com/package/@elasticfunnels/cli)
+(version 0.16.0 or later), run inside a folder linked to the brand.
+
+```bash
+# 1. Turn the files on for the brand
+ef seo set sitemap true
+ef seo set robots true
+ef seo set llms true            # optional
+
+# 2. List pages, one at a time, by slug
+ef pages settings pricing --sitemap
+ef pages settings about --sitemap
+ef pages settings pricing --no-sitemap   # remove one again
+
+# 3. Check what the files contain
+ef seo status
+ef seo pages
+```
+
+`ef seo status` shows which files are on, how many pages are listed, and warns
+when robots.txt is off or a page you ticked is excluded. `ef seo pages` prints
+every page that opted in, the exact URL it publishes, and for each excluded
+page, the reason.
+
+### `ef seo` reference
+
+| Command | What it does |
+| --- | --- |
+| `ef seo status` | Which files are served and how many pages they list. `--json` for scripts. |
+| `ef seo pages` | The pages that opted in, their URLs, and `listed` / `NOT LISTED — <reason>`. |
+| `ef seo get [key]` | Print every setting as `key=value`, or a single key's value on stdout. |
+| `ef seo set <key> <value>` | Change one setting. |
+
+| Key | Type | Admin label |
+| --- | --- | --- |
+| `sitemap` | boolean | Serve sitemap.xml |
+| `robots` | boolean | Serve robots.txt |
+| `llms` | boolean | Serve llms.txt |
+| `site-name` | text | Site name (llms.txt heading) |
+| `site-summary` | text | Site summary (llms.txt) |
+| `llms-notes` | text | Additional notes (llms.txt) |
+| `robots-extra` | text | Additional directives (robots.txt) |
+
+Booleans take `true`/`false`, `on`/`off`, `yes`/`no` or `1`/`0`. To clear a
+text key, pass `""`:
+
+```bash
+ef seo set site-name "Acme Supplements"
+ef seo set site-summary "Direct-to-consumer supplements and guides."
+ef seo set robots-extra "Disallow: /internal"
+ef seo set llms-notes ""
+```
+
+While you're at it, `ef pages settings` can also set a page's SEO title and
+meta description. llms.txt uses both:
+
+```bash
+ef pages settings pricing --seo-title "Pricing" --seo-description "Plans and what each includes." --sitemap
+```
+
+<Note>
+The [site address](#site-address-www-non-www-and-https) settings (**Preferred
+domain** and **Redirect http to https**) are only in the admin, under
+**Settings → SEO**. The CLI doesn't set them yet.
+</Note>
+
+---
+
 ## Which pages are listed
 
 A page appears in `sitemap.xml` and `llms.txt` only when **all** of these are
@@ -177,8 +247,8 @@ from Cloudflare or the browser cache.
 
 | Symptom | Cause |
 | --- | --- |
-| `/sitemap.xml` returns `404 Not found` | **Serve sitemap.xml** is off for the brand that owns this domain. |
-| The sitemap loads but has no `<url>` entries | No page has **List this page…** ticked, or every ticked page is excluded. The preview in **Settings → SEO** shows why. |
+| `/sitemap.xml` returns `404 Not found` | **Serve sitemap.xml** is off for the brand that owns this domain (`ef seo set sitemap true`). |
+| The sitemap loads but has no `<url>` entries | No page has **List this page…** ticked, or every ticked page is excluded. The preview in **Settings → SEO**, or `ef seo pages`, shows why. |
 | A page you ticked is missing | See [Which pages are listed](#which-pages-are-listed). The **Not listed** badge gives the reason. |
 | robots.txt has no `Sitemap:` line | The sitemap is off. The line only appears when the sitemap is actually served. |
 | URLs use the wrong www/non-www host | Set **Preferred domain**, and make sure both versions are added to the brand. |
