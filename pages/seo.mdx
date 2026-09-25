@@ -236,6 +236,77 @@ page's canonical link always use **https** and the preferred domain.
 
 ---
 
+## Canonical links
+
+A page listed in the sitemap gets a `<link rel="canonical">` in its `<head>`
+that points at its one address. There is only ever **one** canonical tag per
+page:
+
+- If your page's own HTML already declares a canonical (in its layout, its head
+  code or **Custom header code**), ElasticFunnels adds none, and yours is the
+  one search engines read. Make sure it points at your own domain.
+- Otherwise ElasticFunnels adds it, using the same address the sitemap lists.
+
+Pages that aren't listed in the sitemap get no canonical from ElasticFunnels.
+
+### Your platform subdomain
+
+Every brand has a free platform subdomain, such as `yourbrand.elasticfunnels.io`
+or `yourbrand.elasticpages.co`. Pages without a domain of their own show on
+**every** domain of the brand, so once you connect your own domain the
+subdomain is an exact copy of your site. Search engines would count the copy as
+duplicate content.
+
+When your brand has its own domain, the platform subdomain handles this for you:
+
+- Each shared page's canonical points at **your domain**
+  (`https://yourdomain.com/about`, not `https://yourbrand.elasticfunnels.io/about`).
+- Those pages are sent with an `X-Robots-Tag: noindex, follow` header. The copy
+  drops out of search results, and links on it still count.
+- On the subdomain, `/sitemap.xml` and `/llms.txt` redirect (301) to your
+  domain's, and `/robots.txt` points at your domain's sitemap.
+
+Your funnels, ads and links on the subdomain keep working exactly as before.
+Only search engines are affected.
+
+**Which domain is "yours":** the brand's only connected domain (`www.` and
+non-www count as one). If the brand has several unrelated domains, set
+**Settings → SEO → Primary domain**. Until you do, the subdomain keeps its own
+address and stays indexable.
+
+These are left alone:
+- A brand with **no** domain of its own. The subdomain *is* the site, so it
+  stays self-canonical and indexable.
+- A page attached to the subdomain only. It exists nowhere else, so it keeps its
+  own address.
+
+---
+
+## IndexNow: tell search engines about new pages
+
+[IndexNow](https://www.indexnow.org) lets a site tell Bing, Yandex, Seznam,
+Naver and other participating engines that a URL is new or has changed, instead
+of waiting for them to crawl it. Google does not use IndexNow. Submit your
+sitemap in Search Console for Google.
+
+It's on for every brand that serves `sitemap.xml`:
+
+1. When you publish a page listed in the sitemap, or change one (its address,
+   content or listing), its address is queued.
+2. Every 10 minutes the queue is sent in one batch per domain. If the engine is
+   busy, it's retried later.
+3. To prove the site is yours, your domain serves a key file at
+   `https://yourdomain.com/<key>.txt`. The key is created automatically the
+   first time something is sent.
+
+Only addresses on **your own domain** are sent. Pages on the platform subdomain
+never are.
+
+To turn it off, switch off **Notify search engines on publish (IndexNow)** in
+**Settings → SEO**.
+
+---
+
 ## Caching
 
 Crawlers get the files with a one-hour `Cache-Control`. Saving a page or the
@@ -252,3 +323,5 @@ from Cloudflare or the browser cache.
 | A page you ticked is missing | See [Which pages are listed](#which-pages-are-listed). The **Not listed** badge gives the reason. |
 | robots.txt has no `Sitemap:` line | The sitemap is off. The line only appears when the sitemap is actually served. |
 | URLs use the wrong www/non-www host | Set **Preferred domain**, and make sure both versions are added to the brand. |
+| The subdomain still shows up in search | It has to be recrawled before the `noindex` takes effect, which can take weeks. If the brand has several domains, set **Primary domain**. Without it the subdomain stays indexable. |
+| Two canonical tags on a page | Can't happen any more: when your HTML declares one, ElasticFunnels adds none. If you see two, both come from your own layout or header code. |
