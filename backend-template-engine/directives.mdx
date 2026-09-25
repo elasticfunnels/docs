@@ -63,8 +63,59 @@ Repeat a block once per element in an array.
 
 - **`@foreach(item in array)`** — `item` is the variable name for the current element; `array` is an expression that must evaluate to an array (e.g. `posts`, `related_articles`).
 - **`@endforeach`** — Required; ends the loop.
+- **`@each(item in array)` … `@endeach`** — Same loop under another name; either closer works.
+- **`@foreach((key, value) in object)`** — Loop over an object's keys and values.
 
 Inside the block you can use `{{ item.property }}`, `@if`, nested `@foreach`, and filters.
+
+### The `loop` variable
+
+Inside every loop, `loop` describes the current pass:
+
+| Property | Value |
+|----------|-------|
+| `loop.index` | Position, counting from **0** |
+| `loop.iteration` | Position, counting from **1** |
+| `loop.first` / `loop.last` | `true` on the first / last pass |
+| `loop.count` | Number of items |
+| `loop.remaining` | Items still to come after this one |
+| `loop.even` / `loop.odd` | Based on `loop.iteration` |
+| `loop.depth` | `1` for an outer loop, `2` inside it, and so on |
+| `loop.parent` | The enclosing loop's `loop`, in a nested loop |
+
+For example, an `ItemList` with a position and no trailing comma:
+
+```html
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ItemList","itemListElement":[@foreach(post in posts){"@type":"ListItem","position":{{ loop.iteration }},"url":"{{ post.url }}"}@if(!loop.last),@endif@endforeach]}
+</script>
+```
+
+`loop`, like the item variable, exists only inside the loop.
+
+### Variables set inside a loop
+
+A variable you `@set` inside a loop keeps its value after `@endforeach`, and each pass sees the value the previous pass left. Use it for counts and totals:
+
+```html
+@set(shown = 0)
+@set(total = 0)
+@foreach(product in products)
+  @set(shown = shown + 1)
+  @set(total = total + product.price)
+@endforeach
+<p>{{ shown }} products, {{ total }} in total</p>
+```
+
+Because the value carries over, reset a per-item variable at the top of the loop body when only some items set it:
+
+```html
+@foreach(product in products)
+  @set(badge = '')
+  @if(product.on_sale)@set(badge = 'Sale')@endif
+  <span>{{ badge }}</span>
+@endforeach
+```
 
 ---
 
@@ -79,6 +130,44 @@ Define a variable for use later in the template.
 ```
 
 Use when you need a reusable value or a clearer expression.
+
+To put a quote of the same kind inside a string, escape it with a backslash, or use the other kind of quote around it:
+
+```html
+@set(title = "He said \"hi\"")
+@set(title = 'It\'s here')
+@set(title = 'The "best" plan')
+```
+
+---
+
+## Directives on one line
+
+Directives work on a line of their own or inline, next to other directives and text. These two are the same:
+
+```html
+@if(lang eq 'en')@set(show_banner = 'yes')@endif
+
+@if(lang eq 'en')
+@set(show_banner = 'yes')
+@endif
+```
+
+Inline you can use `@if(` `@elseif(` `@else` `@endif`, `@foreach(` `@endforeach`, `@each(` `@endeach`, `@set(`, `@setSessionItem(` `@clearSessionItem(`, `@component(` and `@yield(`:
+
+```html
+<ul>@foreach(item in items)<li>@if(loop.first)<b>{{ item }}</b>@else{{ item }}@endif</li>@endforeach</ul>
+<a class="btn@if(active) btn--active@endif" href="/">Home</a>
+```
+
+Two directives need their own line:
+
+- **`@extends(…)`** — On its own line, at the top of the file.
+- **`@block(…)`** — On its own line, directly after a tag (`</style> @block("head")`), or with its `@endblock` on the same line (`<title>@block("title")About@endblock</title>`).
+
+In any other position they are printed as text, and `ef lint` warns about it.
+
+An `@` that doesn't start one of these directives is left as it is, so emails (`support@example.com`), handles (`@yourbrand`), CSS at-rules (`@media`, `@font-face`, `@import`) and `@` in scripts need no escaping. A word such as `@settings` or `use @set to` is text too: a directive needs its `(`.
 
 ---
 
@@ -227,7 +316,8 @@ You can store and read simple values in the visitor’s session from templates. 
 |-----------|---------|
 | `@if(condition)` … `@endif` | Conditional block |
 | `@else` / `@elseif(condition)` | Else branches |
-| `@foreach(item in array)` … `@endforeach` | Loop |
+| `@foreach(item in array)` … `@endforeach` | Loop (`@each` … `@endeach` is the same) |
+| `loop.index` / `loop.iteration` / `loop.first` / `loop.last` | Position inside a loop |
 | `@set(variable = expression)` | Set variable |
 | `@setSessionItem('key', value)` | Store (or clear with null) session value |
 | `{{ getSessionItem('key') }}` | Output session value |

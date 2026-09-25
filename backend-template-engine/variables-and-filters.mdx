@@ -434,6 +434,8 @@ Your trial ends on {{ subscription.start_date | date_add:14 | date:'MMM d, yyyy'
 
 Use the **`+`** operator to join strings, variables, and filtered expressions together.
 
+`+` works left to right as in JavaScript: two numbers are **added**, and as soon as a string is involved the values are **joined**. `{{ 1 + 2 }}` is `3`, `{{ "Order #" + 42 }}` is `Order #42`, and `{{ qty + extra + " items" }}` adds the two numbers first. A missing value joins as an empty string. That is what lets a loop keep a counter: `@set(n = n + 1)`.
+
 ```html
 {{ "(" + var.guarantee_title + ")" }}
 ```
