@@ -82,6 +82,7 @@
               "pages/create-landing-page",
               "pages/wildcard-routes",
               "pages/seo",
+              "pages/privacy-consent",
               {
                 "group": "Variants & Testing",
                 "pages": [

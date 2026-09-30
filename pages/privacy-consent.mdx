@@ -1,0 +1,300 @@
+---
+title: 'Privacy & consent'
+description: 'Ask visitors for cookie and marketing consent on your funnel pages, hold ad pixels until they say yes, and read the choice from your own scripts.'
+---
+
+ElasticFunnels can show a cookie consent banner on your funnel pages, hold
+advertising pixels until the visitor agrees, and record what each visitor chose.
+You decide where it applies, how it looks and what it says.
+
+<Warning>
+**Consent is off by default.** Until you turn it on under **Settings → Privacy &
+consent**, nothing changes on your pages: no banner, and every pixel runs as
+before. If your brand gets visitors from the EU, the EEA or the UK, the settings
+tab shows what share of your visitors came from there in the last 30 days.
+</Warning>
+
+<Note>
+This page explains what the product does. It is not legal advice. The built-in
+banner texts and the default regions are a starting point: check them, and your
+cookie and privacy policies, with your own counsel.
+</Note>
+
+---
+
+## Turning it on
+
+<Steps>
+  <Step title="Pick how consent is collected">
+    Go to **Settings → Privacy & consent**. Under **Consent banner**, set **How
+    consent is collected**:
+
+    | Option | What happens |
+    | --- | --- |
+    | **ElasticFunnels banner** | We show a banner to visitors in the regions you choose. Ad pixels wait until they accept. |
+    | **My own consent tool** | You run your own consent tool (Cookiebot, OneTrust, Usercentrics and so on). We show no banner and read the choice it reports. See [Using your own consent tool](#using-your-own-consent-tool). |
+    | **Not required** | The default. No banner anywhere and nothing is held back. |
+  </Step>
+  <Step title="Choose where to ask">
+    Under **Where to ask**, switch regions on or off. Visitors are placed by the
+    country of their IP address.
+
+    | Region | Default |
+    | --- | --- |
+    | **European Union and EEA** (the 27 EU countries plus Iceland, Liechtenstein and Norway) | On |
+    | **United Kingdom** (with the Channel Islands, the Isle of Man and Gibraltar) | On |
+    | **Switzerland** | Off |
+    | **Everywhere else** | Off |
+    | **Visitors whose country cannot be detected** | On |
+
+    Outside the regions you switch on, pages behave as if consent were off.
+  </Step>
+  <Step title="Add your policy links and save">
+    Under **Policy links**, add your **Cookie policy URL** and **Privacy policy
+    URL** (a full `https://` address, or a path on your own domain such as
+    `/privacy`). They appear in the banner. Press **Save**.
+  </Step>
+</Steps>
+
+---
+
+## What is held until the visitor agrees
+
+In a region where you ask for consent:
+
+- **Ad pixels from your tracking integrations** (Meta, Google Ads, TikTok,
+  LinkedIn, Bing, Snapchat, Pinterest, Reddit, X, Outbrain) are sent to the page
+  switched off and start only after the visitor accepts **marketing**.
+- **Google Analytics** from your integrations waits for an **analytics** yes.
+- **Your custom tracking scripts** (Pages → Tracking scripts) run as usual,
+  because they are often needed for the page to work (affiliate link rewriting,
+  for example). Switch on **Also hold my custom tracking scripts** under **Before
+  the visitor chooses** to hold them for marketing consent too.
+- **Persistent identifiers.** Until the visitor accepts analytics, ElasticFunnels
+  sets no long-lived visitor cookie and uses no device id: your funnel reports
+  still count the visit, tied to that one visit only.
+
+**ElasticFunnels analytics** (under **Before the visitor chooses**) decides what
+happens to our own first-party page analytics before a choice:
+
+| Option | What happens |
+| --- | --- |
+| **Keep running, without persistent IDs until consent** | The default. Page views and events are recorded for the visit, with no long-lived id. |
+| **Wait for analytics consent** | Nothing from the visitor's browser is recorded until they accept analytics. |
+
+A visitor who declines analytics is never tracked by the browser, whichever
+option you pick. Orders are always recorded.
+
+### Holding a script of your own by hand
+
+You can hold any script or pixel in your page HTML the same way. Write it with
+`type="text/plain"`, a `data-ef-consent` category and `data-ef-src` instead of
+`src`:
+
+```html
+<!-- Runs only after the visitor accepts marketing -->
+<script type="text/plain" data-ef-consent="marketing"
+        data-ef-src="https://example.com/pixel.js"></script>
+
+<!-- Inline code works too -->
+<script type="text/plain" data-ef-consent="analytics">
+  console.log('analytics allowed');
+</script>
+
+<!-- Images and iframes: data-ef-src instead of src -->
+<img data-ef-consent="marketing" data-ef-src="https://example.com/p.gif" alt="">
+```
+
+The category is `marketing` or `analytics`. When the visitor agrees, the element
+is switched on in page order.
+
+<Warning>
+Held elements are switched on by the consent script, which is only on the page
+when consent is on for the brand. If you set the brand back to **Not required**,
+remove `type="text/plain"` and use `src` again, or these elements never run.
+</Warning>
+
+---
+
+## How the banner looks
+
+Under **Display style**:
+
+| Style | What it looks like |
+| --- | --- |
+| **Floating card** | A rounded card at the bottom of the page. The default. |
+| **Bottom bar** | A full-width strip along the bottom. |
+| **Blocking (card over a dimmed page)** | The card over a dimmed page until the visitor chooses. |
+
+A blocking banner gets more choices made; the card and the bar interrupt less. In
+every style, **Reject all** sits next to **Accept all** at the same size, and
+**Choose** opens the category switches (necessary, analytics, marketing). The
+blocking style keeps keyboard focus inside the card and ignores Escape until a
+choice is made, and declining still lets the visitor into the page.
+
+**Button colour** sets the colour of **Accept all**. Leave it empty to use your
+brand colour, or near-black when there is none. The banner uses your page's font.
+
+---
+
+## Texts and languages
+
+The banner has built-in texts in 38 languages: every official language of the
+EU and EEA, plus Turkish, Russian, Ukrainian, Arabic, Hebrew, Japanese, Korean,
+Chinese, Hindi, Indonesian, Thai and Vietnamese. It picks one per visitor:
+
+1. the language of the page (its `<html lang>`, or the language it is served in
+   when you use translations);
+2. otherwise, the visitor's browser language;
+3. otherwise, English.
+
+Arabic and Hebrew are shown right to left.
+
+Under **Banner text**, pick a **Language** and write your own text for any field.
+Each empty field shows the built-in text in grey and uses it; **Reset to
+default** clears your text. A field you leave empty in one language falls back
+to that language's built-in text, then to your English text, then to ours.
+
+**Translate with AI** fills the selected language from your English texts (or
+from your own texts when the target is English). It shows how many AI credits it
+will use before it runs, and nothing is saved until you press **Save**.
+
+<Note>
+The built-in texts were machine-written and have not all been reviewed by native
+speakers yet. Read them in the languages your visitors use.
+</Note>
+
+**Ask everyone again** (switch on **Ask all visitors again after saving**) makes
+every stored choice obsolete, so the banner shows again. Use it after you change
+what you track or who you share it with.
+
+---
+
+## Checkout email opt-in
+
+Separate from cookie consent, **Checkout email opt-in** records whether a buyer
+agreed to receive marketing email from you. Switch on **Show an email opt-in box
+on checkout pages** to add an unticked box above the order button. Its text is
+under **Banner text** as **Checkout email opt-in box text**, per language. A
+checkout page that already has its own `allow_emails` box keeps it.
+
+---
+
+## For developers: the `window.ef.consent` API
+
+On pages where consent is on for the brand, `window.ef.consent` is available
+from the `<head>` onwards.
+
+| Method | What it does |
+| --- | --- |
+| `get()` | Returns `{ analytics, marketing, required, region, has_choice }`. |
+| `set({ analytics, marketing })` | Stores a choice, as if the visitor made it, and switches on what it allows. |
+| `allowed(category)` | `true` when `'analytics'`, `'marketing'` or `'necessary'` may run now. |
+| `open()` | Opens the banner with the category switches (ElasticFunnels banner only). |
+| `onChange(fn)` | Calls `fn(state)` with the same object as `get()` whenever the choice changes. |
+
+`required` is `true` when the visitor is in a region where you ask. `region` is
+one of `eea`, `uk`, `ch`, `rest`, `unknown`.
+
+```js
+const consent = window.ef.consent;
+
+if (consent.allowed('marketing')) {
+  // load something that needs marketing consent
+}
+
+consent.onChange((state) => {
+  if (state.marketing) {
+    // the visitor just said yes to marketing
+  }
+});
+```
+
+<Note>
+`window.efConsent` is the same object, kept for integrations written against it.
+Use `window.ef.consent` in new code.
+</Note>
+
+### Events
+
+On every change, and once when the page loads with a choice the visitor made
+earlier, the page fires these events on `window`:
+
+| Event | When |
+| --- | --- |
+| `ef-consent` | Every time. |
+| `ef-consent-accepted` | Analytics and marketing are both allowed. |
+| `ef-consent-rejected` | Analytics and marketing are both refused. |
+
+Each carries the same `detail`:
+
+```js
+{
+  analytics: true,     // analytics allowed
+  marketing: false,    // marketing allowed
+  required: true,      // the visitor is in a region where you ask
+  region: 'eea',       // eea | uk | ch | rest | unknown
+  source: 'banner'     // banner | api | cmp | stored
+}
+```
+
+`source` is `banner` for a click in our banner, `api` for `window.ef.consent.set`,
+`cmp` for a choice read from your own consent tool, and `stored` for the choice
+announced on page load.
+
+```js
+window.addEventListener('ef-consent', (event) => {
+  console.log('consent now', event.detail);
+});
+
+window.addEventListener('ef-consent-accepted', () => {
+  // everything is allowed
+});
+```
+
+### Google Tag Manager
+
+Every change (and the stored choice on page load) is also pushed to `dataLayer`:
+
+```js
+{ event: 'ef_consent_update', ef_consent: { analytics: true, marketing: true } }
+```
+
+In Google Tag Manager, create a **Custom Event** trigger with the event name
+`ef_consent_update`, and two **Data Layer Variables** named
+`ef_consent.analytics` and `ef_consent.marketing`. Then fire a tag only when, for
+example, `ef_consent.marketing` equals `true`.
+
+With **Send Google Consent Mode signals** on (the default), the page also sets
+Google Consent Mode defaults (`denied` until the visitor chooses, in regions
+where you ask) and sends an update after each choice, so Google tags you add
+yourself follow it.
+
+### A "Cookie settings" link
+
+Give visitors a way to change their mind. Any element with
+`data-ef-consent-open` reopens the banner (for visitors in a region where you
+ask, or who made a choice before):
+
+```html
+<a href="#" data-ef-consent-open>Cookie settings</a>
+```
+
+### Using your own consent tool
+
+Set **How consent is collected** to **My own consent tool**. We show no banner,
+and pixels wait as described above until your tool reports a choice. Report it
+with:
+
+```js
+window.ef.consent.set({ analytics: true, marketing: false });
+```
+
+Call it whenever the visitor makes or changes a choice. Two signals are picked
+up without any code:
+
+- **Google Consent Mode**: a `gtag('consent', 'update', ...)` from your tool.
+  `analytics_storage` sets analytics; `ad_storage` (with `ad_user_data` not
+  denied) sets marketing.
+- **IAB TCF v2**: when your tool exposes `__tcfapi`, marketing needs purposes
+  1, 3 and 4, and analytics needs purposes 1 and 8.
