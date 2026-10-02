@@ -180,6 +180,38 @@ checkout page that already has its own `allow_emails` box keeps it.
 
 ---
 
+## SMS and email opt-in boxes on checkout and upsell pages
+
+You can add your own opt-in boxes to a **checkout page** or an **upsell page**. In the page builder,
+drag the **Customer Flag** block (Checkout category) onto the page and pick **SMS marketing** or
+**Email marketing** in its settings; in the
+code editor, write the checkbox yourself:
+
+```html
+<label>
+  <input type="checkbox" name="allow_sms" value="1">
+  Yes, text me offers and order updates. Msg & data rates may apply. Reply STOP to opt out.
+</label>
+```
+
+| Box | Records |
+| --- | --- |
+| `name="allow_sms"` | The buyer agreed to SMS marketing |
+| `name="allow_emails"` | The buyer agreed to email marketing |
+
+A ticked box is stored on that order as a flag (`allow_sms` or `allow_emails`). An unticked box stores
+nothing. On an **upsell page**, the box is read when the buyer clicks the accept link (`[UPSELL=...]`),
+for one-click and redirect upsells alike, and stored on the upsell order. A buyer who declines the
+upsell is not recorded either way.
+
+<Note>
+The flag records **that** the buyer ticked the box, not the words next to it. If you send SMS in the
+US, keep a copy of the exact opt-in text each page used, with the date it went live, for your consent
+records.
+</Note>
+
+---
+
 ## For developers: the `window.ef.consent` API
 
 On pages where consent is on for the brand, `window.ef.consent` is available
