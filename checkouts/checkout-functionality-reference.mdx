@@ -386,8 +386,8 @@ Written on the custom tag, these are read server-side and re-emitted onto the ge
 | `data-accepted-cards` | Comma-separated card names | `visa,mastercard,amex,discover` | Card brands shown in the payment tab and validated during input. Supported: `visa`, `mastercard`, `amex`, `discover`, `diners`, `jcb` |
 | `data-applepay` | `"false"` to disable | enabled | When `"false"`, Apple Pay is not rendered inside this panel. See the caveat below. |
 | `data-applepay-force` | `"true"` | — | Pre-renders a native `<apple-pay-button>` placeholder and sets `checkout.wallet_visible` immediately |
-| `data-paypal` | Merchant ID | — | Enables PayPal tab (resolved server-side) |
-| `data-klarna` | Merchant ID | — | Enables Klarna tab (resolved server-side) |
+| `data-paypal` | Merchant ID | — | Enables the PayPal tab (resolved server-side). Ignored unless the ID is a PayPal merchant in this brand. See [PayPal](/merchants/paypal). |
+| `data-klarna` | Merchant ID | — | Enables the Klarna tab (resolved server-side). Ignored unless the ID is a Klarna merchant in this brand. |
 
 The panel builds its UI client-side from these attributes and `efScope.checkout`. When PayPal, Klarna, or the Apple Pay tab is active, the panel renders as a tabbed accordion; otherwise it renders card fields only.
 

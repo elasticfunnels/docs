@@ -336,6 +336,23 @@ What happens:
 |-----------|---------|
 | `data-accepted-cards` | Comma list of brands, e.g. `visa,mastercard,amex,discover` |
 | `data-applepay` | `"false"` hides the panel's own wallet tab |
+| `data-paypal` | ID of a PayPal merchant: adds a **PayPal** tab next to the card form |
+| `data-klarna` | ID of a Klarna merchant: adds a **Klarna** tab next to the card form |
+
+### Adding PayPal
+
+PayPal is a tab inside the same panel, not a separate form. Give the panel your PayPal merchant's ID:
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-applepay="false" data-paypal="171"></checkout-cc-panel>
+<div data-checkout-message></div>
+```
+
+The panel renders **Credit Card** and **PayPal** as tabs, and the same `[data-checkout-submit]` button pays with whichever the buyer picked. With PayPal, the buyer is sent to PayPal to approve and returns to the next funnel step. The customer fields, bumps and totals need no changes. Setup, vaulting for one-click upsells and subscriptions, and sandbox testing are covered in [PayPal](/merchants/paypal).
+
+<Note>
+The card form always comes from the **domain's** merchant, which must be a card gateway (Stripe, NMI, Authorize.Net). PayPal and Klarna cannot be a domain's merchant; they are only ever added this way.
+</Note>
 
 <Warning>
 `<checkout-cc-panel>` **requires an explicit closing tag.** Written self-closing (`<checkout-cc-panel/>`) it is neither expanded nor stripped and passes through to the browser as inert markup. (Only `<checkout-wallet>` / `<checkout-apple-pay>` may self-close.) Any children you write inside the panel are discarded.

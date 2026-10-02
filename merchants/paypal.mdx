@@ -1,0 +1,120 @@
+---
+title: 'PayPal'
+description: 'Offer PayPal as a payment option next to the card form on your checkout, with one-click upsells and subscriptions when your PayPal app can vault buyer wallets.'
+---
+
+PayPal is a **payment option on your checkout**, shown as a tab next to the card form. The buyer picks PayPal, approves the payment on PayPal's own pages, and comes back to your funnel. Your card merchant (Stripe, NMI or Authorize.Net) still runs the card form on the same page.
+
+<Info>
+PayPal is **never the main merchant of a domain or funnel**. A domain needs a card merchant, because the checkout's card form is built from it, and PayPal has no card form. The app does not let you pick PayPal (or Klarna) as a domain's merchant, a funnel's merchant, or the merchant a **Set Merchant** node switches to. You add PayPal to a checkout page instead, as shown below.
+</Info>
+
+---
+
+## Before you start
+
+You need:
+
+1. A **PayPal Business** account.
+2. An app in the [PayPal Developer Dashboard](https://developer.paypal.com/dashboard/applications), with its **Client ID** and **Secret**. Use a **Sandbox** app to test and a **Live** app to take real payments.
+3. A card merchant on the domain the checkout runs on. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+<Tip>
+If PayPal shows a "No-Code Checkout" page when you open your Live account, click **Manage API credentials** (or **Invite your developer**) to reach the Developer Dashboard.
+</Tip>
+
+---
+
+## Step 1 - add the PayPal merchant
+
+1. Go to **Merchants** → **Add Merchant** and choose **PayPal**.
+2. Paste the **Client ID** and **Secret**. Sandbox and Live credentials have their own fields, and the **Mode** toggle decides which pair is used.
+3. Save.
+
+When you save, ElasticFunnels:
+
+- **Creates the webhook on your PayPal app** for captures, refunds, voids and disputes, so refunds and chargebacks reach your reports without any setup on your side.
+- **Checks whether your PayPal app can vault buyer wallets.** Vaulting is what makes one-click upsells and subscriptions possible (see below). The check places a $1.00 test order that the buyer never approves, so nothing is charged.
+
+---
+
+## Step 2 - add the PayPal tab to your checkout page
+
+Add `data-paypal` to the card panel, with your PayPal merchant's **ID** (shown on the Merchants list):
+
+```html
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover" data-paypal="171"></checkout-cc-panel>
+<div data-checkout-message></div>
+
+<button type="button" data-checkout-submit>Complete my order</button>
+```
+
+The panel now renders as two tabs: **Credit Card** (from the domain's merchant) and **PayPal**. The same **Complete my order** button submits either one. Nothing else on the page changes: the order summary, bumps, totals and the customer fields all work the same way. See [How to design a checkout page](/guides/how-to-design-a-checkout-page) for the full page.
+
+In the **page builder**, select the **Credit Card Form** block and pick the merchant under **PayPal Options → PayPal Merchant**.
+
+<Note>
+`data-paypal` is set per page on purpose. A checkout only offers PayPal where you add it, so you can keep PayPal off a page (for example a subscription offer you only want on cards) without touching the merchant.
+</Note>
+
+<Warning>
+`data-paypal` only counts when the ID belongs to a **PayPal** merchant in the same brand. A deleted merchant or a typo in the ID hides the PayPal tab, and the card form keeps working.
+</Warning>
+
+---
+
+## What the buyer sees
+
+1. The buyer fills in their email and name, picks the **PayPal** tab and clicks the button.
+2. They are sent to PayPal, log in and approve the payment. The amount PayPal shows includes bumps, tax and shipping.
+3. PayPal sends them back to your funnel, the payment is captured, and they continue to the next step (an upsell or the thank-you page), exactly as after a card payment.
+
+If the buyer cancels on PayPal, they return to the checkout and can pay with a card instead. If PayPal cannot start the payment, the buyer stays on the checkout with a message to pay by card or try again; the cause is recorded for your support team.
+
+---
+
+## One-click upsells and subscriptions (vaulting)
+
+When your PayPal app can **vault** buyer wallets, the first PayPal payment also saves the buyer's PayPal wallet for later charges that the buyer agreed to:
+
+| | With vaulting | Without vaulting |
+|---|---|---|
+| **Upsells** after a PayPal checkout | Charged to the saved PayPal wallet in one click, without leaving the funnel | The buyer is sent to PayPal to approve each upsell |
+| **Subscriptions** paid with PayPal | Renewals are charged automatically to the saved wallet | The first payment works, but renewals cannot be charged |
+
+If a one-click upsell charge fails, the buyer is sent to PayPal to approve it instead of seeing a decline.
+
+### Turning vaulting on
+
+Vaulting is a feature PayPal enables on your app. ElasticFunnels checks it every time you save the merchant. If it is off:
+
+- Checkout still works. Payments complete normally without vaulting.
+- One-click upsells fall back to the PayPal approval page, and subscription renewals cannot be charged until vaulting is on.
+
+To enable it, open your app in the PayPal Developer Dashboard and turn on **Save payment methods** (PayPal's vault feature) under the app's features. On Live accounts PayPal may need to approve it. Then save the PayPal merchant again so the check runs again.
+
+---
+
+## Testing with the PayPal sandbox
+
+1. Create a **Sandbox** app in the Developer Dashboard and copy its Client ID and Secret into the sandbox fields of the PayPal merchant.
+2. Set **Mode** to **Sandbox**, or keep Live and use the merchant's test key: see [Test mode](/merchants/test-mode).
+3. Open your checkout, choose PayPal, and log in with a **sandbox personal account** from **Testing Tools → Sandbox Accounts** in the Developer Dashboard.
+
+Sandbox payments are recorded as **test** orders.
+
+---
+
+## Klarna
+
+Klarna works the same way: add `data-klarna="<merchant id>"` to the card panel to show a Klarna tab, and like PayPal it cannot be a domain's or funnel's main merchant.
+
+---
+
+## Related
+
+- [How to design a checkout page](/guides/how-to-design-a-checkout-page)
+- [Checkout functionality reference](/checkouts/checkout-functionality-reference) - every `<checkout-cc-panel>` attribute
+- [Test mode](/merchants/test-mode)
+- [Apple Pay and Google Pay](/merchants/apple-pay-google-pay)
+- [Postback URLs](/merchants/postback-urls) - PayPal sales, refunds and disputes fire the same payload as card sales

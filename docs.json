@@ -138,6 +138,7 @@
                 "group": "Express Checkout",
                 "pages": [
                   "merchants/shop-pay",
+                  "merchants/paypal",
                   "merchants/apple-pay-google-pay"
                 ]
               }
