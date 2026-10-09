@@ -38,6 +38,11 @@ Using a custom domain provides a branded URL and increases user trust through SS
 - **Namecheap**: User-friendly DNS management
 - **Google Domains**: Clean interface with Google integration
 
+### Using Cloudflare
+If your domain's DNS is on Cloudflare and the records are proxied (orange cloud), open **SSL/TLS > Overview** in Cloudflare and set the encryption mode to **Full**. Do not use **Full (strict)** or **Automatic**: with those, Cloudflare refuses the certificate on our servers and visitors see Cloudflare **error 526** instead of your pages. Traffic between Cloudflare and ElasticFunnels stays encrypted in Full mode.
+
+If you switch the records to DNS only (grey cloud), no Cloudflare SSL setting applies and we issue the certificate for the domain ourselves.
+
 ## SSL Certificate Benefits
 {/* SCREENSHOT: SSL Certificate Benefits · domain settings or DNS setup screen · desktop */}
 
@@ -65,6 +70,9 @@ Using a custom domain provides a branded URL and increases user trust through SS
 - Check for mixed content issues (HTTP resources on HTTPS pages)
 - Clear browser cache and cookies
 - Verify all subdomains are covered by the certificate
+
+### Cloudflare Error 526 (Invalid SSL Certificate)
+Your domain is on Cloudflare with SSL/TLS set to **Full (strict)**. Change it to **Full** under **SSL/TLS > Overview** and save; the pages come back right away. We check every live domain hourly and email you if this happens.
 
 ### Buy Link Issues
 - Confirm merchant association is properly configured
