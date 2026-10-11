@@ -12,8 +12,9 @@ This guide explains how to set up Shop Pay as a merchant. When a visitor clicks 
 ## Prerequisites
 {/* SCREENSHOT: Prerequisites · merchant setup screen or postback state · desktop */}
 
-- A Shopify store (same connection as Order Sync)
+- A Shopify store (same connection as Order Sync). One store per brand
 - Admin access to your Shopify store and to ElasticFunnels
+- The ElasticFunnels team sets up the Shopify app for your brand and sends you the install link (see [Shopify Order Sync](/integrations/shopify-order-sync#set-up))
 
 ## Step 1: Connect Shopify and enable Shop Pay
 {/* SCREENSHOT: Step 1: Connect Shopify and enable Shop Pay · merchant setup screen or postback state · desktop */}
@@ -36,6 +37,12 @@ When you enable **Shop Pay**, a **Shop Pay** merchant is created automatically a
 {/* SCREENSHOT: Step 3: Map products · merchant setup screen or postback state · desktop */}
 
 Each product must be linked to a **Shopify variant ID** (a numeric ID from your Shopify store).
+
+<Note>
+If **Enable Shop Pay Merchant** was on when you connected the store, ElasticFunnels creates your products in Shopify (one variant each, inventory not tracked) and fills in the variant ID for you; later edits to a product are sent to Shopify too. With **Sync orders to Shopify** on, the **Sync products** button on the Shopify card does the same for products not in Shopify yet. Enter a variant ID by hand when the field is still empty, or to use a product that already exists in your Shopify store.
+</Note>
+
+To enter it by hand:
 
 1. Go to **Settings** → **Products** → **Edit** the product
 2. Open the **Merchant information** tab
@@ -61,6 +68,9 @@ When a visitor clicks a buy link on your funnel:
 - The customer is redirected to Shopify checkout to complete payment
 - Returning customers can use **Shop Pay** one-click checkout when available
 - Bumps are supported. Multiple line items can be added to the same draft order
+- When the order is paid, Shopify notifies ElasticFunnels and the sale is recorded with its click ID, products and bonuses. Refunds are linked to the sale
+- There are no one-click upsells: payment happens on Shopify, so each purchase goes through Shopify checkout
+- These orders already exist in Shopify, so [Shopify Order Sync](/integrations/shopify-order-sync) does not send them again
 
 There is no “decline” link; if the customer does not complete checkout, they simply leave. Use the **Setup** modal in the **Merchants** list for postback configuration and validation.
 
@@ -82,6 +92,6 @@ Use the **Setup** modal in the **Merchants** list for step-by-step postback inst
 {/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
 
 - **"Product missing Shopify product ID"** or **"missing Shopify product ID"**: In the product's **Merchant information** tab, enter the Shopify variant ID for the Shop Pay merchant. Use the steps above to find the variant ID in Shopify Admin.
-- **"Shop Pay gateway requires a Shopify integration"** or **"requires a Shopify store domain"**: Connect Shopify under **Integrations** → **Operations** and ensure the merchant is linked to that integration (e.g. via the Order Sync tab on the merchant).
+- **"Shop Pay gateway requires a Shopify integration"** or **"requires a Shopify store domain"**: Connect Shopify under **Integrations** → **Operations** and turn on **Enable Shop Pay Merchant** on the Shopify card, so the Shop Pay merchant is created and linked to your store.
 - **Wrong gateway on checkout**: Verify the domain is assigned to your Shop Pay merchant.
 - **Link not working**: Confirm the product has the correct Shopify variant ID in **Merchant information** for this merchant.

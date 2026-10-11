@@ -6,7 +6,7 @@ description: 'Set up Shopify Checkout (cart redirect) as a merchant, assign to a
 This guide explains how to set up Shopify Checkout as a merchant. When a visitor clicks a buy link, they are redirected to your Shopify store's cart and then to Shopify's native checkout. The overall flow matches the generic merchant setup; use this page for Shopify Checkout-specific notes.
 
 <Note>
-**Shopify Checkout** sends customers to your Shopify cart (cart redirect). For draft-order checkout with Shop Pay one-click and bump support, see [Shop Pay](/merchants/shop-pay) instead.
+**Shopify Checkout** sends customers to your Shopify cart (cart redirect). For a draft-order checkout with Shop Pay for returning customers and bump support, see [Shop Pay](/merchants/shop-pay) instead.
 </Note>
 
 ## Prerequisites
@@ -14,6 +14,7 @@ This guide explains how to set up Shopify Checkout as a merchant. When a visitor
 
 - A Shopify store with products (and variants, if you use multiple variants)
 - Admin access to your Shopify store and to ElasticFunnels
+- The ElasticFunnels team sets up the Shopify app for your brand and sends you the install link (see [Shopify Order Sync](/integrations/shopify-order-sync#set-up)). One store per brand
 
 ## Step 1: Connect Shopify and enable Shopify Checkouts
 {/* SCREENSHOT: Step 1: Connect Shopify and enable Shopify Checkouts · merchant setup screen or postback state · desktop */}
@@ -59,7 +60,9 @@ In your funnel, buy links use your **product code** (the same code you use for o
 - The click ID is passed as a cart attribute so conversions can be tracked
 - From the cart they proceed to Shopify's native checkout
 
-Shopify Checkout does **not** support upsells in the same flow. It is a simple cart redirect. For upsells and one-click Shop Pay, use [Shop Pay](/merchants/shop-pay) instead.
+Shopify Checkout does **not** support one-click upsells. It is a simple cart redirect and payment happens on Shopify. [Shop Pay](/merchants/shop-pay) adds bump support but has no one-click upsells either.
+
+Orders placed this way already exist in Shopify, so [Shopify Order Sync](/integrations/shopify-order-sync) does not send them again.
 
 ## Links and Funnels
 {/* SCREENSHOT: Links and Funnels · merchant setup screen or postback state · desktop */}
