@@ -31,7 +31,11 @@ The fulfillment integrations push completed orders to a 3PL (Third-Party Logisti
 3. **Fulfillment provider lookup** — The product's `fulfillment_provider_id` (or merchant default) decides where the order goes. Each product can route to a different provider.
 4. **Job queued** — A fulfillment job is queued ~10 seconds after the conversion is finalized so refunds in the first window can short-circuit it.
 5. **Order pushed** — Customer info, shipping address, line items (with mapped SKUs), shipping method, and order total are sent to the provider.
-6. **Tracking sync** — When the provider returns shipment status and tracking, EF stores it on the conversion and surfaces it in the dashboard.
+6. **Tracking sync** — When the provider returns shipment status and tracking, EF stores it on the conversion and surfaces it in the dashboard. If the order was paid through a [PayPal](/merchants/paypal#tracking-numbers-are-sent-to-paypal) merchant, the tracking number is also sent to PayPal.
+
+<Note>
+Shipping from Shopify instead? With [Shopify Order Sync](/integrations/shopify-order-sync#tracking-back-from-shopify), the tracking your store or its 3PL app adds in Shopify comes back to ElasticFunnels too, and is sent to PayPal for PayPal-paid orders.
+</Note>
 
 ## Setup — ShipOffers
 {/* SCREENSHOT: ShipOffers setup · integration settings · desktop */}

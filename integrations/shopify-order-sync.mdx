@@ -21,6 +21,9 @@ Shopify Order Sync creates an order in your Shopify store for every purchase mad
   <Card title="Your prices" icon="dollar-sign">
     The order shows what the customer paid in ElasticFunnels, whatever the price in your Shopify catalog.
   </Card>
+  <Card title="Tracking comes back" icon="truck-fast">
+    When Shopify or its 3PL app ships the order, the tracking number comes back to ElasticFunnels and the buyer gets a shipped email.
+  </Card>
 </CardGroup>
 
 ## Limits to know first
@@ -30,7 +33,7 @@ Shopify Order Sync creates an order in your Shopify store for every purchase mad
 - **Installed through the ElasticFunnels team.** ElasticFunnels is not listed in the Shopify App Store. Each brand connects through its own custom Shopify app, which our team sets up for you (see [Set up](#set-up)).
 - **Shopify stock is not reduced.** Order lines are custom line items matched by SKU. They are not linked to your Shopify products or variants, so Shopify does not lower its inventory count for these orders. Track stock in ElasticFunnels (the product's **Inventory** settings) or in your 3PL.
 - **No product import from Shopify.** ElasticFunnels does not read your Shopify catalog. Products are created in ElasticFunnels; they can be pushed to Shopify (see [Products in Shopify](#products-in-shopify)).
-- **Changes made in Shopify do not come back.** Cancelling or refunding an order in the Shopify admin does not refund it in ElasticFunnels. Refund in ElasticFunnels and the refund reaches Shopify.
+- **Cancellations and refunds made in Shopify do not come back.** Cancelling or refunding an order in the Shopify admin does not refund it in ElasticFunnels. Refund in ElasticFunnels and the refund reaches Shopify. Only shipment tracking comes back from Shopify (see [Tracking back from Shopify](#tracking-back-from-shopify)).
 </Warning>
 
 ## Set up
@@ -152,10 +155,23 @@ When you refund a synced purchase in ElasticFunnels:
 
 - **Full refund:** the Shopify order is cancelled, which stops a 3PL app from shipping it. Shopify does not email the customer.
 - **Partial refund:** a refund for that amount is created on the Shopify order. Items are not restocked and Shopify does not email the customer.
+- **Full refund of one purchase on a merged order** (for example only the upsell): only that purchase's lines are refunded on the Shopify order, and the rest of the order still ships. The Shopify order is cancelled only once every purchase on it has been refunded.
 
 ElasticFunnels only cancels or refunds orders it created. Orders you created yourself in Shopify, or that came from your Shopify store, are never touched. If ElasticFunnels cannot confirm that it created an order, it does nothing.
 
 This works one way only: a cancellation or refund made in the Shopify admin is not carried back to ElasticFunnels.
+
+## Tracking back from Shopify
+{/* SCREENSHOT: Tracking back from Shopify · a conversion in ElasticFunnels showing the tracking number and shipped status from a Shopify fulfillment · desktop */}
+
+When your store or the 3PL app connected to it fulfills a synced order in Shopify with a tracking number, ElasticFunnels picks it up:
+
+- Every ElasticFunnels purchase on that Shopify order gets the **tracking number**, **carrier** and **tracking URL**, and is marked **shipped**.
+- The buyer gets **one** shipped email per Shopify order, even when the order merges several purchases. It uses the shipped email set up on the merchant. No email is sent for a shipment older than 3 days (for example when an old order is edited in Shopify); its tracking is still recorded.
+- If the order was paid through a [PayPal](/merchants/paypal) merchant, the tracking number is also sent to PayPal.
+- Purchases already shipped by one of the ElasticFunnels fulfillment integrations (ShipOffers, Jetpack) keep the tracking from that integration.
+
+There is nothing to turn on: ElasticFunnels registers the Shopify notifications it needs when order sync is on. Only the first fulfillment with a tracking number is used.
 
 ## Orders that are not synced
 
@@ -264,7 +280,11 @@ If you uninstall the app from Shopify, the integration is disabled and syncing s
   </Accordion>
 
   <Accordion title="What if my 3PL is connected to Shopify?">
-    Your 3PL sees the synced orders in Shopify and fulfills them as usual.
+    Your 3PL sees the synced orders in Shopify and fulfills them as usual. When it adds the tracking number in Shopify, the tracking comes back to ElasticFunnels and the buyer gets a shipped email. See [Tracking back from Shopify](#tracking-back-from-shopify).
+  </Accordion>
+
+  <Accordion title="I refunded only the upsell. Does the whole Shopify order get cancelled?">
+    No. On a merged order, a full refund of one purchase refunds only its lines. The order is cancelled only once every purchase on it is refunded.
   </Accordion>
 </AccordionGroup>
 

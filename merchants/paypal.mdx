@@ -95,6 +95,17 @@ To enable it, open your app in the PayPal Developer Dashboard and turn on **Save
 
 ---
 
+## Tracking numbers are sent to PayPal
+
+When an order paid through a PayPal merchant gets a tracking number, ElasticFunnels adds it to the PayPal transaction. PayPal uses it to settle "item not received" disputes. The tracking number can come from:
+
+- a fulfillment integration ([ShipOffers or Jetpack](/integrations/fulfillment)), or
+- your Shopify store, when the order was sent there with [Shopify Order Sync](/integrations/shopify-order-sync#tracking-back-from-shopify) and shipped from Shopify.
+
+There is nothing to set up. Each tracking number is sent once per payment. A carrier PayPal does not recognise is sent as "Other". If PayPal rejects the call, the order itself is not affected.
+
+---
+
 ## Testing with the PayPal sandbox
 
 1. Create a **Sandbox** app in the Developer Dashboard and copy its Client ID and Secret into the sandbox fields of the PayPal merchant.
