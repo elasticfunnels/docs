@@ -33,7 +33,7 @@ Everything is driven by CSS classes. The builder adds them for you; in code you 
 | `focus-on-cta` | A `video-cta-container` | When `getStarted()` is called with scrolling on, the page scrolls smoothly to the **first** `.video-cta-container.focus-on-cta` in page order. It scrolls once per reveal and never on a page load where the CTA was restored for a returning visitor. |
 | `hide-on-video-cta` | Content to remove at the pitch | Visible at page load. `getStarted()` sets it to `display: none !important`. Also hidden on load for returning visitors. |
 | `show-on-video-cta` | Content to force visible | `getStarted()` sets it to `display: block !important`. Nothing hides it at page load, and every TrackPlay embed sets it to `display: block` as soon as the embed loads, so treat it as visible from the start. Use `video-cta-container` for anything that must wait for the pitch. |
-| `cta-keep-visible-on-reload` | A `video-cta-container` | Added by the builder toggle **Show to returning viewers**. The current page runtime does not read this class: returning visitors get the CTA back whether or not it is set. |
+| `cta-keep-visible-on-reload` | A `video-cta-container` | Added by the builder toggle **Show to returning viewers**: the open-on-return setting (see [Returning visitors](#returning-visitors)). Today open on return applies to every page with a TrackPlay video, with or without this class. |
 | `cta-keep-invisible-on-cta-shown` | A `hide-on-video-cta` | Added by the builder toggle **Keep invisible once CTA is shown. Even on reload.** Not read by the runtime either: hidden-on-CTA content always stays hidden for returning visitors. |
 
 <Note>
@@ -70,11 +70,11 @@ Event names must match exactly, including case.
 Two mechanisms bring the CTA back on later visits:
 
 - **Saved reveal.** On every page load the main script checks `localStorage` for `video_cta_shown`. If it is set, CTA containers open and hide-on-CTA content hides immediately, with no scroll and no `video-cta-shown` event. This key belongs to the domain, not to one page or one video, and it does not expire.
-- **Per-video key.** Every TrackPlay embed writes `showed_cta_<video code>` to `localStorage` when the page loads, before anything plays. If the key was already there from an earlier load, the embed calls `getStarted(false)` about one second after load.
+- **Open on return.** Every TrackPlay embed writes `showed_cta_<video code>` to `localStorage` when the page loads. If the key was already there from an earlier load, the embed calls `getStarted(false)` about one second after load. A returning visitor gets the CTA whether or not they reached the pitch on the first visit, so someone who left early and came back to buy does not have to sit through the video again.
 
-<Warning>
-The per-video key is written on load, not at the pitch. The second time a browser loads a page with that TrackPlay video, the CTA opens after about a second **even if the visitor never reached the pitch** on the first visit. The **Show to returning viewers** toggle does not change this. If you are testing pitch timing, use a fresh private window for every run.
-</Warning>
+<Tip>
+Open on return is why the offer is already open when you reload your own page. To see the page as a first-time visitor, use a fresh private window for every run.
+</Tip>
 
 To reset a test browser, delete `video_cta_shown` and `showed_cta_<video code>` from `localStorage`, the `video_cta_shown` cookie, and TrackPlay's `trackplay_<event code>` cookie.
 
@@ -148,7 +148,7 @@ To open the CTA from a button that is visible before the pitch (a "Skip to the o
 1. **Add the video.** Drag **Trackplay Video V2** (category **External Integrations**) onto the page. In its **TrackPlay Video** settings, pick your integration under **Select TrackPlay Integration**, then pick the video under **Select a video**.
 2. **Choose which events open the CTA.** The settings list the video's timed events under **CTA Events Available**, each with its time. Every event listed opens the CTA. Tick **Scroll to CTA Container** on the events that should also scroll.
 3. **Add the CTA Container.** Drag **CTA Container** (category **Offer**) where the offer goes and build the packages inside it. The **Container Settings** panel confirms it is hidden when the page loads.
-4. **Set its toggles.** **Focus on this when CTA is called** adds `focus-on-cta`, the scroll target. **Show to returning viewers** adds `cta-keep-visible-on-reload` (see the classes table for what it does today).
+4. **Set its toggles.** **Focus on this when CTA is called** adds `focus-on-cta`, the scroll target. **Show to returning viewers** adds `cta-keep-visible-on-reload`, the open-on-return setting.
 5. **Optional: hide content at the pitch.** Wrap it in **Container: Hide on Video CTA** (category **Offer**).
 
 The page only scrolls when both are on: **Scroll to CTA Container** on the event, and **Focus on this when CTA is called** on a container.
@@ -158,10 +158,10 @@ The page only scrolls when both are on: **Scroll to CTA Container** on the event
 - **Everything inside is invisible until the pitch.** The head CSS hides the container before any script runs, so its content does not show in a quick look at the live page, in a screenshot taken early, or to a visitor whose video never fired. Always give it a fallback (a timer, a skip link or a Page Events flow).
 - **Widgets that measure themselves at load.** A slider, carousel or countdown inside the container starts while it has no size. Check it after the reveal, or start it from `ef.onCta()`.
 - **Do not set `display` on the container yourself.** On code pages the hiding rule is a plain `display: none`, so your own `display: flex` on `.video-cta-container` can show it at load. Put layout on a wrapper inside it. After the reveal the container is `display: block !important`.
-- **Several videos on one page.** There is one CTA for the whole page. Whichever video reaches a CTA event first opens every `.video-cta-container`, and there is no way to pair a container with one video. Each embed's listener is attached to every TrackPlay player that loads on the page, so a timed event name used by a second video (a testimonial with its own `cta` event, for example) opens the offer too. Give events on secondary videos different names. The per-video key also means any of the page's videos can reopen the CTA on a later load.
+- **Several videos on one page.** There is one CTA for the whole page. Whichever video reaches a CTA event first opens every `.video-cta-container`, and there is no way to pair a container with one video. Each embed's listener is attached to every TrackPlay player that loads on the page, so a timed event name used by a second video (a testimonial with its own `cta` event, for example) opens the offer too. Give events on secondary videos different names. Open on return also works per video, so any of the page's videos can open the CTA on a later load.
 - **The saved reveal covers the whole domain.** A visitor who reached the pitch on one page sees CTA containers open at load on every other page of that domain, including the other arm of a split test. Test pitch timing in a fresh private window.
 - **The builder lists every timed event.** If the video has timed events for other jobs (a pixel, a bonus reveal), they open the CTA as well. Keep CTA events on the pitch, or remove the others from the video. A video with no timed events never opens the CTA by itself.
-- **CTA: On Shown runs on every `getStarted()` call**, including the about-one-second reopen for returning visitors and `_subsequent` events. Keep the nodes after it safe to repeat.
+- **CTA: On Shown runs on every `getStarted()` call**, including the open-on-return call about one second after load and `_subsequent` events. Keep the nodes after it safe to repeat.
 - **Page classification.** ElasticFunnels' page analysis counts a builder video block, CTA Container or Hide on CTA as one of the signals that a page is a VSL. It reads builder component types, so a code page that uses only the class names does not give that signal. Its buy links still count.
 
 **Common Use Cases:**
@@ -530,7 +530,7 @@ Result:
 
 **Possible Causes:**
 - The browser already saw the CTA on this domain (`video_cta_shown` in `localStorage`)
-- The browser loaded this video's page before (`showed_cta_<video code>`), which reopens the CTA about one second after load
+- Open on return: the browser loaded this video's page before (`showed_cta_<video code>`), so the CTA opens about one second after load. This is intended for returning visitors
 - Another timed event on the video, or on a second video on the page, opens it
 - Your own CSS sets `display` on `.video-cta-container`
 
