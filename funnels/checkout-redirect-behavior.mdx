@@ -15,6 +15,20 @@ The system redirects customers to a generic thank you page (`/thank-you`) in the
 1. **Page Not in Expected Funnel**: The customer purchases from a VSL page, homepage, or landing page that isn't part of any active funnel
 2. **No Active Funnel on Domain**: There's no funnel assigned to the current domain the customer is purchasing from
 3. **Missing Funnel Parameter**: The customer accessed the page without the `?f=funnel_code` parameter and no default funnel is set
+4. **Checkout Not in the Funnel**: The customer browsed one funnel, then opened a checkout page that is not part of it (for example a checkout you are testing directly). A funnel is only followed after the purchase when the checkout belongs to it: the checkout is a page in the funnel's flow or page rule, it is the funnel's checkout page override, a **Set Checkout Page** node in that funnel chose it, or the buyer reached it from a buy link on one of the funnel's pages.
+5. **No Next Step**: The funnel has no step after the purchase (or after an upsell's accept or decline), or the page that step points to was deleted.
+
+### What the Customer Sees at `/thank-you`
+
+The redirect never ends on a "page not found" error after a successful payment. ElasticFunnels picks the first of these that exists:
+
+1. **The funnel's next step**, when the purchase came through a funnel that has one.
+2. **Your own thank-you page**: a page with the slug `thank-you` in your brand.
+3. **The built-in order confirmation**: a plain page with your brand name, the order number, the items and total from the order, and a note that a receipt was sent to the customer's email. It is shown only to the visitor who placed the order; anyone else opening `/thank-you` gets the normal "page not found" response.
+
+<Tip>
+To control what customers see when no funnel step applies, create a page with the slug `thank-you`. It replaces the built-in confirmation.
+</Tip>
 
 ### Why This Happens
 
