@@ -15,78 +15,196 @@ Containers wrap page content and add behavior based on visitor actions, page eve
 
 ### CTA Container
 
-The **CTA Container** (Call-to-Action Container) is hidden by default and only appears when the CTA is triggered, typically used to reveal purchase buttons, pricing tables, or order forms after a visitor watches your Video Sales Letter (VSL).
+The **CTA Container** (call-to-action container) holds the part of a video sales letter (VSL) page that should stay hidden until the pitch: packages, prices, buy buttons, the guarantee. It opens when the page calls `getStarted()`. Most of the time that call comes from the video player at the pitch timestamp, and you can also call it from a button, a Page Events flow or your own script.
 
 **Key Features:**
-- Hidden by default (`display: none`)
-- Transforms to visible (`display: block`) when CTA is executed
-- Can persist once triggered during the session
-- Commonly contains buy buttons, pricing, checkout forms
+- Hidden when the page loads, by the page head CSS (`display: none`)
+- Opens (`display: block`) when `getStarted()` runs
+- Can scroll the visitor to itself when it opens
+- Stays open for returning visitors (see [Returning visitors](#returning-visitors))
 
-**How to Trigger:**
+#### The classes
 
-The CTA can be executed in three ways:
+Everything is driven by CSS classes. The builder adds them for you; in code you write them yourself.
 
-1. **VSL CTA**: At a specific timestamp in your Video Sales Letter, you call `getStarted()` to trigger the CTA when that point is reached in the video
-2. **Manual Button Click**: Add a button with click interaction that executes `getStarted()` JavaScript function
-3. **Timed Event**: Use Page Events with JavaScript to execute `getStarted()` after a delay
-
-**Example Button Click Setup:**
-
-```javascript
-// In Interactions Panel (Ctrl+I) on your button:
-// Trigger: On Click
-// Action: Execute JavaScript
-
-getStarted();
-```
-
-**Common Use Cases:**
-- Reveal order button after VSL completes
-- Show pricing after engagement threshold
-- Display purchase options on manual trigger
-- Progressive disclosure of sales information
+| Class | Put it on | What it does |
+|---|---|---|
+| `video-cta-container` | The block to reveal | Hidden at page load. `getStarted()` sets it to `display: block !important`. Every element with this class opens at the same time. |
+| `focus-on-cta` | A `video-cta-container` | When `getStarted()` is called with scrolling on, the page scrolls smoothly to the **first** `.video-cta-container.focus-on-cta` in page order. It scrolls once per reveal and never on a page load where the CTA was restored for a returning visitor. |
+| `hide-on-video-cta` | Content to remove at the pitch | Visible at page load. `getStarted()` sets it to `display: none !important`. Also hidden on load for returning visitors. |
+| `show-on-video-cta` | Content to force visible | `getStarted()` sets it to `display: block !important`. Nothing hides it at page load, and every TrackPlay embed sets it to `display: block` as soon as the embed loads, so treat it as visible from the start. Use `video-cta-container` for anything that must wait for the pitch. |
+| `cta-keep-visible-on-reload` | A `video-cta-container` | Added by the builder toggle **Show to returning viewers**. The current page runtime does not read this class: returning visitors get the CTA back whether or not it is set. |
+| `cta-keep-invisible-on-cta-shown` | A `hide-on-video-cta` | Added by the builder toggle **Keep invisible once CTA is shown. Even on reload.** Not read by the runtime either: hidden-on-CTA content always stays hidden for returning visitors. |
 
 <Note>
-The CTA Container uses the `getStarted()` global function which is available throughout your page. Once triggered, the container can remain visible for the visitor's session.
+The TrackPlay V2 embed also ships a fallback `getStarted()` that remembers the `focus-on-cta` scroll in a `scrolled_<video code>` cookie for one day. The page's main script replaces that fallback as soon as it loads, so on a normal page the rules in the table apply.
 </Note>
+
+#### What getStarted() does
+
+`getStarted(focusOnCta = true)` is a global function on every published page. Each call:
+
+1. Sets `window.showed_video_cta = true`.
+2. Saves the reveal for this browser: `localStorage` key `video_cta_shown` = `true`, plus a `video_cta_shown` cookie for 365 days.
+3. Opens every `.video-cta-container` and `.show-on-video-cta`, and hides every `.hide-on-video-cta` (all with `!important`).
+4. If `focusOnCta` is true and the CTA was not restored on this page load, scrolls to the first `.video-cta-container.focus-on-cta`. Without that class nothing scrolls.
+5. Fires the `video-cta-shown` window event with `{ focus_on_cta, timestamp }`. [`ef.onCta()`](/funnels/window-api) listens for it.
+6. Runs the nodes after any **CTA: On Shown** node in [Page Events](/funnels/page-events).
+
+Calling it again is harmless for the containers. `getStarted(false)` opens the CTA without scrolling.
+
+**`window.showed_video_cta`** is `true` once the CTA has been shown on this page load, either by `getStarted()` or by the returning-visitor restore. Read it in your own scripts to check whether the visitor reached the pitch. The **If Showed CTA** Page Events node and live order popups set to wait for the CTA read the same flag.
+
+#### How TrackPlay fires it at the pitch
+
+1. In TrackPlay, open the video's **Timed events** tab and add an event: **Event Name** (for example `cta`) and **Time** (the pitch timestamp). When playback reaches that time the player emits an event with that name. Skipping ahead past the time fires it too.
+2. The ElasticFunnels embed listens for that name and calls `getStarted()`:
+   - **TrackPlay Video** (`<trackplay-video>`): listens for `data-cta-event-name` (default `cta`). Scrolling follows `data-focus-on-cta`, which defaults to on. Only the value `0` turns it off; `false` still scrolls.
+   - **TrackPlay Video V2** (`<trackplay-video-v2>`): listens for every event in its `data-cta` list, each with its own scroll setting. The builder fills that list with all of the video's timed events. If the attribute is missing, it listens for `cta` without scrolling.
+3. Turn on **Call Once Per Session** and **Call on Subsequent Visits** in TrackPlay and a returning viewer who already passed the pitch gets a `<event name>_subsequent` event straight away. The embed answers it with `getStarted(false)`, so the CTA opens without a scroll.
+
+Event names must match exactly, including case.
+
+#### Returning visitors
+
+Two mechanisms bring the CTA back on later visits:
+
+- **Saved reveal.** On every page load the main script checks `localStorage` for `video_cta_shown`. If it is set, CTA containers open and hide-on-CTA content hides immediately, with no scroll and no `video-cta-shown` event. This key belongs to the domain, not to one page or one video, and it does not expire.
+- **Per-video key.** Every TrackPlay embed writes `showed_cta_<video code>` to `localStorage` when the page loads, before anything plays. If the key was already there from an earlier load, the embed calls `getStarted(false)` about one second after load.
+
+<Warning>
+The per-video key is written on load, not at the pitch. The second time a browser loads a page with that TrackPlay video, the CTA opens after about a second **even if the visitor never reached the pitch** on the first visit. The **Show to returning viewers** toggle does not change this. If you are testing pitch timing, use a fresh private window for every run.
+</Warning>
+
+To reset a test browser, delete `video_cta_shown` and `showed_cta_<video code>` from `localStorage`, the `video_cta_shown` cookie, and TrackPlay's `trackplay_<event code>` cookie.
+
+#### Use it in a code page (.ef)
+
+In a page you write in code, use the class names directly. A minimal VSL page:
+
+```html
+<section class="hero">
+  <h1>The 7-second morning habit that changed how I sleep</h1>
+  <p>Watch the short video below. The offer appears when the video gets to it.</p>
+</section>
+
+<!-- TrackPlay video. Timed event "cta" is set at the pitch in TrackPlay. -->
+<trackplay-video
+  id="vsl"
+  data-workspace-code="YOUR_WORKSPACE_CODE"
+  data-video-code="YOUR_VIDEO_CODE"
+  data-cta-event-name="cta"
+  data-focus-on-cta="true"></trackplay-video>
+
+<!-- Visible until the pitch, then hidden -->
+<p class="hide-on-video-cta">The offer below the video opens at the right moment. Keep watching.</p>
+
+<!-- Hidden until the pitch. focus-on-cta scrolls the visitor here. -->
+<div class="video-cta-container focus-on-cta" id="offer">
+  <div class="packages">
+    <div class="package">
+      <h3>1 bottle</h3>
+      <p>$69</p>
+      <a class="buy" href="[BUY=sleep-1]">Buy 1 bottle</a>
+    </div>
+    <div class="package best">
+      <h3>6 bottles</h3>
+      <p>$49 per bottle</p>
+      <a class="buy" href="[BUY=sleep-6]">Buy 6 bottles</a>
+    </div>
+    <div class="package">
+      <h3>3 bottles</h3>
+      <p>$59 per bottle</p>
+      <a class="buy" href="[BUY=sleep-3]">Buy 3 bottles</a>
+    </div>
+  </div>
+  <p>60-day money-back guarantee.</p>
+</div>
+
+<!-- Fallback: open the offer after 25 minutes on the page if the video never fired it -->
+<script>
+  setTimeout(function () {
+    if (!window.showed_video_cta && typeof window.getStarted === 'function') {
+      window.getStarted(false);
+    }
+  }, 25 * 60 * 1000);
+</script>
+```
+
+The same fallback without code is a Page Events flow: **Loaded** → **Wait Seconds** (`1500`) → **If Showed CTA** → output 2 → **Show Video CTA**. Tick **Scroll to CTA** on the last node if the page should jump. See [Page Events nodes](/funnels/page-events-nodes).
+
+<Tip>
+A fallback timer reveals the offer the same way the video does, so it is saved for that browser too. Set it later than the pitch timestamp so it only catches visitors whose video never fired.
+</Tip>
+
+To open the CTA from a button that is visible before the pitch (a "Skip to the offer" link, for example), call `getStarted()` from its click handler or from the [Interactions Panel](/pages/interactions-panel):
+
+```html
+<button type="button" onclick="getStarted()">Skip to the offer</button>
+```
+
+#### Use it in the builder
+
+1. **Add the video.** Drag **Trackplay Video V2** (category **External Integrations**) onto the page. In its **TrackPlay Video** settings, pick your integration under **Select TrackPlay Integration**, then pick the video under **Select a video**.
+2. **Choose which events open the CTA.** The settings list the video's timed events under **CTA Events Available**, each with its time. Every event listed opens the CTA. Tick **Scroll to CTA Container** on the events that should also scroll.
+3. **Add the CTA Container.** Drag **CTA Container** (category **Offer**) where the offer goes and build the packages inside it. The **Container Settings** panel confirms it is hidden when the page loads.
+4. **Set its toggles.** **Focus on this when CTA is called** adds `focus-on-cta`, the scroll target. **Show to returning viewers** adds `cta-keep-visible-on-reload` (see the classes table for what it does today).
+5. **Optional: hide content at the pitch.** Wrap it in **Container: Hide on Video CTA** (category **Offer**).
+
+The page only scrolls when both are on: **Scroll to CTA Container** on the event, and **Focus on this when CTA is called** on a container.
+
+#### Pitfalls
+
+- **Everything inside is invisible until the pitch.** The head CSS hides the container before any script runs, so its content does not show in a quick look at the live page, in a screenshot taken early, or to a visitor whose video never fired. Always give it a fallback (a timer, a skip link or a Page Events flow).
+- **Widgets that measure themselves at load.** A slider, carousel or countdown inside the container starts while it has no size. Check it after the reveal, or start it from `ef.onCta()`.
+- **Do not set `display` on the container yourself.** On code pages the hiding rule is a plain `display: none`, so your own `display: flex` on `.video-cta-container` can show it at load. Put layout on a wrapper inside it. After the reveal the container is `display: block !important`.
+- **Several videos on one page.** There is one CTA for the whole page. Whichever video reaches a CTA event first opens every `.video-cta-container`, and there is no way to pair a container with one video. Each embed's listener is attached to every TrackPlay player that loads on the page, so a timed event name used by a second video (a testimonial with its own `cta` event, for example) opens the offer too. Give events on secondary videos different names. The per-video key also means any of the page's videos can reopen the CTA on a later load.
+- **The saved reveal covers the whole domain.** A visitor who reached the pitch on one page sees CTA containers open at load on every other page of that domain, including the other arm of a split test. Test pitch timing in a fresh private window.
+- **The builder lists every timed event.** If the video has timed events for other jobs (a pixel, a bonus reveal), they open the CTA as well. Keep CTA events on the pitch, or remove the others from the video. A video with no timed events never opens the CTA by itself.
+- **CTA: On Shown runs on every `getStarted()` call**, including the about-one-second reopen for returning visitors and `_subsequent` events. Keep the nodes after it safe to repeat.
+- **Page classification.** ElasticFunnels' page analysis counts a builder video block, CTA Container or Hide on CTA as one of the signals that a page is a VSL. It reads builder component types, so a code page that uses only the class names does not give that signal. Its buy links still count.
+
+**Common Use Cases:**
+- Reveal packages and buy buttons at the VSL pitch
+- Remove "keep watching" copy once the offer is on screen
+- Give visitors who skip around a button that opens the offer
+- Open the offer on a timer for visitors whose video never reaches the pitch
 
 ---
 
 ### Hide on CTA Container
 
-The **Hide on CTA Container** is the opposite of the CTA Container - it's visible by default and gets hidden when the CTA is executed.
+The **Hide on CTA Container** is the opposite of the CTA Container. It is visible when the page loads and hidden when `getStarted()` runs. In code it is any element with the class `hide-on-video-cta`; in the builder it is the **Container: Hide on Video CTA** block.
 
 **Key Features:**
 - Visible by default
-- Hides automatically when `getStarted()` is executed
-- Useful for removing content that shouldn't appear with purchase options
-- Often used in conjunction with CTA Container
-
-**How It Works:**
-
-When `getStarted()` is called (via VSL, button, or JavaScript), this container automatically hides while the CTA Container shows.
+- Hidden (`display: none !important`) when `getStarted()` runs
+- Stays hidden for returning visitors once the CTA has been shown in that browser
+- The **Hide Video CTA** Page Events node shows it again (and hides the CTA Container)
 
 **Common Use Cases:**
-- Hide video player when purchase form appears
-- Remove promotional content after CTA
-- Clear page space for checkout elements
-- Move visitors from sales content to the purchase step without extra clutter
+- "Keep watching" or "the offer appears below" notes
+- A lead-in headline that should give way to the offer
+- Content that should not sit next to the buy buttons
+
+<Warning>
+Hiding the video itself with this container stops the visitor from finishing the VSL, and returning visitors never see the video again in that browser. Hide copy around the video, not the player, unless that is what you want.
+</Warning>
 
 **Example Pattern:**
 
 ```
 Before CTA:
-  ✓ Hide on CTA Container (visible) - Contains VSL video
-  ✗ CTA Container (hidden) - Contains buy button
+  ✓ Hide on CTA Container (visible) - "Keep watching" note
+  ✗ CTA Container (hidden) - Packages and buy buttons
 
 After CTA triggered:
-  ✗ Hide on CTA Container (hidden) - VSL disappears
-  ✓ CTA Container (visible) - Buy button appears
+  ✗ Hide on CTA Container (hidden) - note disappears
+  ✓ CTA Container (visible) - Packages and buy buttons appear
 ```
 
 <Tip>
-Use both containers together to create smooth transitions from your sales content to purchase forms. This creates a clean, focused buying experience.
+Use both containers together to move visitors from the sales content to the offer without clutter.
 </Tip>
 
 ---
@@ -298,9 +416,9 @@ Combine multiple containers for a complete sales experience:
 
 ```
 Initial Page Load:
+  ✓ VSL video (outside both containers)
   ✓ Hide on CTA Container
-    - VSL video
-    - Sales copy
+    - "Keep watching" note
   ✗ CTA Container (hidden)
     - Pricing
     - Buy button
@@ -395,15 +513,31 @@ Result:
 **Symptoms**: CTA container remains hidden after trigger
 
 **Possible Causes:**
-- `getStarted()` not being called correctly
-- JavaScript errors preventing execution
-- Container selector issues
+- The TrackPlay timed event name does not match the name the embed listens for (exact match, case included)
+- A builder TrackPlay Video V2 whose video has no timed events, so nothing calls `getStarted()`
+- The content sits outside the element with the `video-cta-container` class
+- A JavaScript error on the page stops the main script
 
 **Solutions:**
-1. Check browser console for JavaScript errors
-2. Verify button click triggers `getStarted()`
-3. Test VSL CTA timestamp is reached
-4. Confirm container has correct ID/class
+1. Run `getStarted()` in the browser console. If the container opens, the page is fine and the trigger is the problem.
+2. Compare the event name in TrackPlay's **Timed events** tab with `data-cta-event-name` (V1) or the **CTA Events Available** list (V2).
+3. Check the browser console for JavaScript errors
+4. Add a fallback timer or a skip button (see [Use it in a code page](#use-it-in-a-code-page-ef))
+
+### CTA Opens Too Early or on Load
+
+**Symptoms**: The offer is visible before the pitch, or right after the page loads
+
+**Possible Causes:**
+- The browser already saw the CTA on this domain (`video_cta_shown` in `localStorage`)
+- The browser loaded this video's page before (`showed_cta_<video code>`), which reopens the CTA about one second after load
+- Another timed event on the video, or on a second video on the page, opens it
+- Your own CSS sets `display` on `.video-cta-container`
+
+**Solutions:**
+1. Test in a fresh private window
+2. Check the video's timed events and rename the ones that are not the pitch
+3. Move layout CSS to a wrapper inside the container
 
 ### Merchant Container Not Displaying
 
