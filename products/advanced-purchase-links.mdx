@@ -116,6 +116,16 @@ Result: <a href="[BUY=supplement_3_bottles]">Buy 3 Bottles</a>
 <a href="[BUY=supplement_6_bottles]">6 Bottles - $197</a>
 ```
 
+These links suit a sales page that sends the buyer to the checkout. When the same choice sits on the checkout page, add `data-ef-package` to each row (inside a `data-ef-package-group`) so the [package selector](/checkouts/package-selector) switches the product without a reload:
+
+```html
+<div data-ef-package-group>
+  <a href="[BUY=supplement_1_bottle]" data-ef-package="supplement_1_bottle">1 Bottle - $49</a>
+  <a href="[BUY=supplement_3_bottles]" data-ef-package="supplement_3_bottles">3 Bottles - $127</a>
+  <a href="[BUY=supplement_6_bottles]" data-ef-package="supplement_6_bottles">6 Bottles - $197</a>
+</div>
+```
+
 ## Integration with Existing Systems
 {/* SCREENSHOT: Integration with Existing Systems · product form, builder panel, or checkout example · desktop */}
 

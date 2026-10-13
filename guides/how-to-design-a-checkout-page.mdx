@@ -27,6 +27,22 @@ If **"Is checkout page" is off** and the page's backend script sets no product, 
 
 ---
 
+## Lay out the page
+{/* SCREENSHOT: Checkout · full page, package selector on the left and the form on the right · desktop 1280px */}
+
+A direct-response checkout reads top to bottom in the order the buyer decides. Keep this order on desktop (two columns) and on mobile (one column, same order):
+
+1. **Package selector.** "Step 1: Select your quantity", one row per bundle, the most popular one picked. Show the price per unit and the saving on every row, and a picture of what arrives (one packshot per unit, or a bundle shot). Build it with the [package selector](/checkouts/package-selector): the buyer switches bundles without a reload and the total follows.
+2. **Order bump.** Directly under the packages, before the form, so it is read as part of the order. See Step 7.
+3. **Order summary.** Product, bump lines, shipping, tax and the total, bound to `checkout.*` so it follows every change.
+4. **Customer form.** Email first, then name, address, country and state.
+5. **Payment.** Wallet buttons first, then the card panel and the pay button. See Steps 4 and 5.
+6. **Trust.** Guarantee, secure checkout and card logos right under the pay button, then reviews and FAQ.
+
+On mobile, give each package row the full width, keep its name on one or two lines (put the price under the name rather than beside it), and make the whole row the tap target.
+
+---
+
 ## Prerequisites
 {/* SCREENSHOT: Prerequisites · page settings toggle and merchant assignment · desktop */}
 
@@ -138,13 +154,22 @@ Repeat a code and its quantities add up rather than producing a duplicate line; 
 <a href="[ADD-TO-CART=your-workbook-code]">Add the workbook - $47</a>
 ```
 
+**Packages the buyer picks on the checkout** - "1x / 2x / 4x" rows on the checkout itself. Use the [package selector](/checkouts/package-selector): set the default with `checkout_product`, and list every row's code in `checkout_packages` so the buyer's pick is charged:
+
+```html
+<script scope="backend">
+setVariable("checkout_product", "your-2-pack-code");
+setVariable("checkout_packages", ["your-1-pack-code", "your-2-pack-code", "your-4-pack-code"]);
+</script>
+```
+
 <Info>
 The buyer-filled cart lives in browser storage, so it survives a scroll but not a cleared browser. A fixed `checkout_cart` is resolved on the server every render and cannot be edited by the visitor at all - prefer it whenever the bundle is not the buyer's choice.
 </Info>
 
 ### What the buyer cannot change
 
-Whichever of the two the page sets, the resolved codes are pinned to the session against that page's id while it renders. On submit the runtime charges the pin, not the posted fields - so an edited form, a stale tab, or a hand-crafted POST cannot swap the product out from under a page that already showed a price. Pages that use `?p=` or a buyer-filled cart pin nothing and behave exactly as they always have.
+Whichever of the two the page sets, the resolved codes are pinned to the session against that page's id while it renders. On submit the runtime charges the pin, not the posted fields - so an edited form, a stale tab, or a hand-crafted POST cannot swap the product out from under a page that already showed a price. Pages that use `?p=` or a buyer-filled cart pin nothing and behave exactly as they always have. The one exception is `checkout_packages`: a posted code from that list is the buyer's pick from the package selector and is charged; any other posted code still falls back to the pin.
 
 <Info>
 Bumps are unaffected and stack on top of any of these. Configure them as in Step 7 - from page config or the **Set Checkout Bumps** node - and the buyer's selections are added to the pinned product or bundle at submit.
@@ -710,6 +735,7 @@ For a wallet-first layout, add a `<checkout-wallet force="true" wallets="applePa
 - [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` bindings, totals, subscription shape
 - [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) — wallet setup
 - [Shopify Checkout](/merchants/shopify-checkout) — where `is_cart` carts come from
+- [Package selector](/checkouts/package-selector) - quantity rows that switch the product in place
 - [Buy links](/products/buy-links) — building the `?p=` link
 - [Backend scripts: actions](/backend-scripts/actions) - `setVariable` and the rest of the `<script scope="backend">` surface used in Step 1b
 - [Set Checkout Bumps node](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing) — configuring / A/B-testing bumps

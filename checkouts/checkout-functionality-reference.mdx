@@ -514,8 +514,14 @@ A small JavaScript API for programmatic wallet control:
 | `ef.checkout.walletAvailable` | Getter returning the same `{ applePay, googlePay }` as `checkout.wallet_available` |
 | `ef.checkout.payWithWallet(method)` | Triggers `'applePay'` or `'googlePay'` by clicking the matching `[data-wallet]` button. Requires NMI Collect.js; logs a warning if the wallet or button is unavailable |
 | `ef.checkout.onWalletComplete(callback)` | Registers a callback fired after a wallet payment attempt |
+| `ef.checkout.packages.select(code)` | Picks a [package selector](/checkouts/package-selector) row: switches the main product in place. Resolves `true` when applied |
+| `ef.checkout.packages.get()` | `{ selected, codes, product }` for the package selector |
 
 See [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) for full setup, configuration, and layout examples.
+
+### Package selector
+
+Rows marked `data-ef-package="<code>"` inside a `data-ef-package-group` let the buyer switch the main product (1x / 2x / 4x) without a reload. The scope's product, the cart line, every total, bonuses, coupon, tax, shipping and the wallet amount follow the pick, and `?p=` in the address bar is updated. The server marks the row of the product the checkout sells with `data-selected="true"` before any JavaScript runs. Event: `checkout:packageChanged`. Full contract: [Package selector](/checkouts/package-selector).
 
 ### Styling checkout fields
 
@@ -637,6 +643,7 @@ The server always takes the customer details from the main order in the session;
 {/* SCREENSHOT: Related docs · relevant screen or example output · desktop */}
 
 - [How to design a checkout page](/guides/how-to-design-a-checkout-page) — build walkthrough and HTML patterns
+- [Package selector](/checkouts/package-selector) - quantity rows that switch the product in place
 - [Frontend Template Engine: Checkout](/frontend-template-engine/checkout) — `checkout.*` in templates
 - [Frontend Template Engine: Cart](/frontend-template-engine/cart) — cart lines, bumps, qty controls
 - [Checkout redirect behavior](/funnels/checkout-redirect-behavior) — post-checkout routing

@@ -1,0 +1,192 @@
+---
+title: 'Package selector'
+description: 'Let buyers pick a quantity or bundle (1x, 2x, 4x) on the checkout page itself. The product, totals, bonuses, tax and payment amounts switch in place, with no reload.'
+---
+
+Most direct-response checkouts open with **Step 1: Select your quantity**: one row per bundle, one row already picked, and a total that follows the choice. The package selector is the runtime feature behind that block. You mark up the rows with a few `data-ef-package` attributes; the checkout does the rest.
+
+When the buyer picks a row:
+
+- the checkout's main product becomes that package (`checkout.product_code`, `product_title`, `product_price`, `retail_price`, the cart line and every total);
+- ticked order bumps stay ticked;
+- bonus rules, coupon eligibility, tax, shipping and the Apple Pay / Google Pay amount are recalculated for the new package;
+- the address bar gets `?p=<code>` (no new history entry), so a reload keeps the choice;
+- the card submit, PayPal and Klarna all charge the package the buyer picked.
+
+Nothing reloads, so the form the buyer already filled stays filled.
+
+---
+
+## Copy-paste example
+{/* SCREENSHOT: Checkout · Step 1 Select your quantity with three rows, middle row selected · mobile 390px */}
+
+Three bundles of one product, `WRAP-1`, `WRAP-2` and `WRAP-4`. Each row is a `<label>` with a radio input, so it works with a keyboard and a screen reader without extra code.
+
+```html
+<section class="pk">
+  <h2 id="pk-title">Step 1: Select your quantity</h2>
+  <div data-ef-package-group aria-labelledby="pk-title">
+
+    <label class="pk-row" data-ef-package="WRAP-1"
+           data-ef-package-price="49" data-ef-package-retail-price="98"
+           data-ef-package-name="1x Heat Wrap" data-ef-package-currency="USD">
+      <input type="radio" name="ef_package">
+      <span class="pk-name">1x Heat Wrap</span>
+      <span class="pk-price">$49.00</span>
+    </label>
+
+    <label class="pk-row" data-ef-package="WRAP-2" data-ef-package-default
+           data-ef-package-price="78" data-ef-package-retail-price="196"
+           data-ef-package-name="2x Heat Wraps" data-ef-package-currency="USD">
+      <input type="radio" name="ef_package">
+      <span class="pk-badge">Most popular</span>
+      <span class="pk-name">2x Heat Wraps</span>
+      <span class="pk-price">$39.00 each</span>
+    </label>
+
+    <label class="pk-row" data-ef-package="WRAP-4"
+           data-ef-package-price="117" data-ef-package-retail-price="392"
+           data-ef-package-name="4x Heat Wraps" data-ef-package-currency="USD">
+      <input type="radio" name="ef_package">
+      <span class="pk-badge">Best value</span>
+      <span class="pk-name">4x Heat Wraps</span>
+      <span class="pk-price">$29.25 each</span>
+    </label>
+
+  </div>
+</section>
+
+<style>
+  .pk-row { display: flex; align-items: center; gap: 12px; padding: 14px 12px; margin-bottom: 12px;
+            border: 2px solid #dfe6ee; border-radius: 8px; cursor: pointer; }
+  .pk-row[data-selected="true"] { border-color: #1f6fd1; background: #f5f9ff; }
+  .pk-row input { accent-color: #1f6fd1; }
+</style>
+```
+
+The order summary needs no extra wiring. Bind it to the checkout scope as usual and it follows the selector:
+
+```html
+<div class="sum-row"><span ef-text="checkout.product_title"></span><b ef-text="checkout.product_price"></b></div>
+<div class="sum-row"><span>Total</span><b ef-text="checkout.total"></b></div>
+```
+
+<Tip>
+Style the picked row on `[data-selected="true"]`. The server writes that attribute on the row the checkout sells, so the right row is highlighted on first paint, before any JavaScript runs, and the browser moves it on every switch.
+</Tip>
+
+---
+
+## Attributes
+
+| Attribute | Where | What it does |
+|---|---|---|
+| `data-ef-package-group` | the wrapper | Marks the group. Gets `role="radiogroup"` and `data-ef-package-selected="<code>"`. |
+| `data-ef-package="CODE"` | each row | The product code this row sells. Any element works: `label`, `div`, `button`, `a`, or an `<input type="radio">`. A click anywhere in the row picks it. |
+| `data-ef-package-default` | one row | The row picked when the checkout sells nothing yet (no `?p=` and an empty cart). Without it, the first row is used. |
+| `data-ef-package-disabled` | a row | The row cannot be picked (sold out). `aria-disabled="true"` works too. |
+| `data-ef-package-price` | each row, optional | The price charged today, as a number (`78`, not `$78.00`). |
+| `data-ef-package-retail-price` | each row, optional | The crossed-out price. |
+| `data-ef-package-name` | each row, optional | Becomes `checkout.product_title`. |
+| `data-ef-package-image` | each row, optional | Becomes `checkout.product_image`. |
+| `data-ef-package-currency` | each row, optional | ISO code, e.g. `USD`. |
+
+The price attributes are optional. With them, the switch is instant and makes no request. When a row has no price, the checkout fetches the package prices once from the products API and the switch waits for that answer. Either way, the server prices the order from the product code, so a wrong attribute can never change what the buyer is charged, only what the page shows.
+
+<Note>
+The `data-ef-product-*` spellings used on add-to-cart buttons (`data-ef-product-price`, `data-ef-product-name`, ...) are read too.
+</Note>
+
+### Selected state
+
+On every row the runtime keeps these in step:
+
+- `data-selected="true"` or `"false"`
+- `aria-checked="true"` or `"false"` (and `role="radio"` on rows that are not inputs)
+- the class `is-selected`
+- `checked` on the row's radio input
+
+Rows that are not focusable get `tabindex="0"`, so <kbd>Tab</kbd> then <kbd>Space</kbd> or <kbd>Enter</kbd> picks a row.
+
+### Links as rows
+
+A row can be a buy link, for example `<a href="[BUY=WRAP-2]" data-ef-package="WRAP-2">`. The link is the fallback for a browser without JavaScript. With JavaScript, a click picks the package and never follows the link, and it is not recorded as a buy-link click.
+
+---
+
+## Product-code mode and cart mode
+
+A checkout sells either one product (from `?p=<code>` or from the page's backend script) or a cart. The selector works in both.
+
+| | Product-code mode | Cart mode |
+|---|---|---|
+| When | the URL has `?p=`, or the backend script sets `checkout_product` | no `?p=`, and the buyer's cart has items |
+| A pick | replaces the main product; `?p=` is updated in the address bar | replaces the package line in the cart; the other cart lines stay |
+| Reload | the server renders the picked package from `?p=` | the cart keeps the picked package |
+| Submit | posts `p=<picked code>` | posts the cart |
+
+A checkout that sells nothing yet (no `?p=`, empty cart) picks the default row and runs in product-code mode.
+
+<Warning>
+In product-code mode, a `?p=` that is not one of the rows (for example a product from another funnel) is left alone: no row is highlighted and nothing switches until the buyer picks one.
+</Warning>
+
+### Pages that set their product in a backend script
+
+A page whose backend script sets `checkout_product` pins that product to the session, and the submit charges the pin, whatever the browser posts. List the packages too, or the buyer's pick is ignored at payment:
+
+```html
+<script scope="backend">
+setVariable("checkout_product", "WRAP-2");                       // the default
+setVariable("checkout_packages", ["WRAP-1", "WRAP-2", "WRAP-4"]); // what the rows may switch to
+</script>
+```
+
+With `checkout_packages` set, a posted code from that list is charged, `?p=` naming one of them is rendered on reload, and any other posted code still falls back to `checkout_product`. See [How to design a checkout page](/guides/how-to-design-a-checkout-page).
+
+---
+
+## Order bumps
+
+Bumps the page offers stay offered, and ticked bumps stay ticked, across a switch. One exception: a bump whose product code is the package the buyer just picked is taken out of `checkout.bump_products` (it would sell the same product twice) and comes back when the buyer picks another package.
+
+---
+
+## Events and API
+
+```js
+document.addEventListener('checkout:packageChanged', (e) => {
+  const { code, previous, mode, product } = e.detail;
+  // mode: 'product' or 'cart'; product: { code, name, price, retail_price, image, currency }
+});
+```
+
+`checkout:packageChanged` fires on every switch the buyer makes, not when the page loads. Each switch is also recorded in analytics as a `package-selected` event with the picked code.
+
+From your own scripts:
+
+```js
+window.ef.checkout.packages.select('WRAP-4'); // resolves true when applied
+window.ef.checkout.packages.get();            // { selected, codes, product }
+window.ef.checkout.packages.codes();          // ['WRAP-1', 'WRAP-2', 'WRAP-4']
+```
+
+---
+
+## Troubleshooting
+
+| What you see | Why | Fix |
+|---|---|---|
+| The pick changes the page, but the charge is the old product | The page's backend script sets `checkout_product` without `checkout_packages` | Add `setVariable("checkout_packages", [...])` with every row's code |
+| No row is highlighted on load | The URL's `?p=` is not one of the rows | Use the same product codes in the rows and in the funnel's buy links |
+| A click opens another page | The click target is outside the element with `data-ef-package` | Put `data-ef-package` on the element that wraps the whole row |
+| The total flickers to `$0.00` | A row's `data-ef-package-price` holds a formatted price or a template that did not render | Write a plain number, or remove the attribute and let the checkout fetch it |
+
+---
+
+## Related docs
+
+- [How to design a checkout page](/guides/how-to-design-a-checkout-page)
+- [Checkout functionality reference](/checkouts/checkout-functionality-reference)
+- [Buy links](/products/buy-links)
+- [Advanced purchase links](/products/advanced-purchase-links)

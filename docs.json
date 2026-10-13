@@ -44,6 +44,7 @@
               "funnels/create-funnel",
               "guides/how-to-design-a-checkout-page",
               "checkouts/checkout-functionality-reference",
+              "checkouts/package-selector",
               "funnels/checkout-redirect-behavior",
               "funnels/trigger-pages",
               "funnels/trigger-rules",
