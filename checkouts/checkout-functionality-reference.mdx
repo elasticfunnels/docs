@@ -586,8 +586,41 @@ Details: [Checkout redirect behavior](/funnels/checkout-redirect-behavior).
 
 ---
 
-## 8) Troubleshooting
-{/* SCREENSHOT: 8) Troubleshooting · relevant screen or example output · desktop */}
+## 8) Free orders and upsells
+{/* SCREENSHOT: 8) Free orders and upsells · coupon form with "Free upsells after a free order" · desktop */}
+
+### 8.1 Orders that cost nothing
+
+When the order total is zero (a 100% coupon, or a $0 product with free shipping), the checkout records the order without charging the card. Stripe, NMI and Authorize.Net never see it, and no card is required.
+
+A subscription is the exception. Renewals are charged to the card the first payment saves, and a free first order saves none, so a $0 checkout that contains a subscription is refused with `error_code: FREE_SUBSCRIPTION_UNSUPPORTED`. Use the product's trial or intro price for a free first period instead.
+
+### 8.2 Upsells after a free order
+
+A one-click upsell charges the card from the main order. After a free order there is none, so what happens depends on the coupon that made it free:
+
+| Coupon setting **Free upsells after a free order** | Buyer clicks an upsell |
+|---|---|
+| On | The upsell is added to the order at $0. No card, no charge. The funnel moves to the next step. |
+| Off (default) | The buyer goes to your checkout page in upsell mode and pays with a card there. |
+
+Set it in **Products → Coupons → (coupon) → Free upsells after a free order**.
+
+### 8.3 Upsell mode on the checkout page
+
+The same page is used whenever an upsell needs a card the buyer has not saved yet (a free main order, or a gateway that kept no card). The checkout URL carries `ups=yes`, and when the visitor has a main order in this session the page:
+
+- fills name, email, phone, shipping and billing address from the main order, and hides them (the standard personal details and address blocks, or the row of any field with a matching `name` in a custom layout), so only the card is asked for;
+- sets `checkout.upsell_mode` to `true`, and `checkout.customer` to the main order's details, for templates that want their own layout;
+- records the payment as an upsell of the main order, not as a new order, so the thank-you page shows both;
+- saves the card, so the next upsells in the funnel are one-click again.
+
+The server always takes the customer details from the main order in the session; values typed into the form are ignored in upsell mode. After paying, the funnel continues from the upsell's step, exactly as after a one-click upsell. Declining follows the upsell's decline path.
+
+---
+
+## 9) Troubleshooting
+{/* SCREENSHOT: 9) Troubleshooting · relevant screen or example output · desktop */}
 
 | Issue | What to check |
 |-------|----------------|
@@ -595,6 +628,8 @@ Details: [Checkout redirect behavior](/funnels/checkout-redirect-behavior).
 | Abuse protection never triggers | `enabled: true`; visitor opened checkout page first; thresholds not too high; not upsell-only flow |
 | Too many captchas | Increase `captcha_requests` or `window_ms`; check shared IP / VPN concentration |
 | Hard blocks too aggressive | Increase `hard_block_requests` or `window_ms`; review `block_duration_ms` |
+| A 100% coupon order fails | The cart has a subscription (refused on purpose, see 8.1); otherwise check the coupon is active and covers the product |
+| Upsell after a free order asks for shipping again | The checkout page was opened without `ups=yes`, or the session lost the main order (different browser or domain) |
 
 ---
 
