@@ -32,6 +32,12 @@ Call it once per status you want to show.
 Each subscription carries `original_transaction_id`, which identifies it to every
 call below. Keep it on the button.
 
+A subscription product bought as an order bump is its own subscription, listed here
+like one bought as the main product: it bills on its own schedule for its own price,
+and the customer can pause or cancel it on its own. When the main product of the same
+order is also a subscription, the bump's `original_transaction_id` is the order's
+transaction id followed by `:` and the bump's product code, so each plan has its own.
+
 ## Asking why, before cancelling
 
 `cc.getManageData(transactionId)` returns what the customer is allowed to do,

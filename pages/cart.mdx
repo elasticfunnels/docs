@@ -58,6 +58,11 @@ These apply to the cart as a whole:
 | **`[[ efCart.item_count ]]`** | Number of distinct product lines in the cart |
 | **`[[ efCart.discount_total ]]`** | Total savings across all items (formatted) |
 | **`[[ efCart.currency ]]`** | Currency code (e.g. "USD") |
+| **`[[ efCart.tax ]]`** | Tax on the cart (formatted), from the same tax calculation the checkout uses. Before the visitor gives an address it is an estimate for their IP country |
+| **`[[ efCart.total_with_tax ]]`** | `efCart.total` plus `efCart.tax` (formatted) |
+| **`[[ efCart.tax_estimated ]]`** | `true` while the tax is estimated from the IP country (show "estimated tax"), `false` once it is for a known address |
+
+`efCart.total` stays the sum of the items. `efCart.tax` and `efCart.total_with_tax` (and their `_raw` numbers) are worked out only on pages that use them, and on a checkout page they show the checkout's own tax.
 
 ### Per-item row variables
 
@@ -197,6 +202,8 @@ The resolved URL is built as follows (in priority order):
 4. Falls back to `/checkout` if nothing else resolves.
 
 Current-page query parameters are automatically forwarded to the checkout URL (tracking/UTM parameters, etc.), with internal routing keys stripped.
+
+The link also carries the page's funnel context, the same way a buy link on that page does: `pg` (page), `b` (brand), `fid` (funnel), `fnid` (funnel step) and `pfnid` (previous step) when the page has them. The checkout then knows which funnel step the visitor came from, so after paying they continue to that funnel's next step (its first upsell) instead of the default thank-you page. Parameters you put in the link's own `href` win.
 
 <Info>
 The default Checkout button added by the builder already has `.ef-cart-checkout`. You only need to set a custom `href` if you want to override the merchant-configured checkout page.

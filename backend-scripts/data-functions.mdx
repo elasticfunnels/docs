@@ -147,6 +147,12 @@ Each order object contains:
   currency: 'USD',
   customer_name: 'John Doe',
   customer_email: 'john@example.com',
+  // subtotal - discount + shipping + tax = total (what was charged)
+  subtotal: 49.99,
+  discount: 0,
+  shipping: 5.00,
+  tax: 4.50,
+  total: 59.49,
   products: [
     { name: 'Premium Plan', price: 49.99, quantity: 1, image_url: '...', currency_code: 'USD' }
   ],
@@ -346,6 +352,7 @@ Each purchased product contains:
       code: 'integration-journal',
       title: 'The Theta Clear Integration Journal',
       classification: 'bonus',
+      quantity: 1,                // how many of it the order shipped
       bonus_url: 'https://cdn/journal.pdf',
       downloads: [ /* same shape as above */ ],
       // ...full catalog fields
