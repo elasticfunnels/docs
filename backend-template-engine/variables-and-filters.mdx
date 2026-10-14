@@ -21,7 +21,9 @@ Values are resolved from the current context (e.g. page data, article, posts, fe
 | `{{ featured[0].title }}` | First featured item's title |
 | `{{ blog_base_url \| default:'/blog' }}` | URL with fallback |
 
-Paths can use dot notation and array indexing. If a value is missing, it usually renders as empty unless you use the **`default`** filter.
+Paths can use dot notation and array indexing. A missing value (a path that does not exist, a component argument that was not passed) prints nothing, and so does `null`; use the **`default`** filter or `??` for a fallback (`{{ title ?? 'Our story' }}`).
+
+A missing value is not equal to `0` or `false`: `@if(count eq 0)` is false when `count` was never set, so check for it with `@if(!count)` or `@if(count eq '')`. Ordering comparisons (`lt`, `gt`) treat it as an empty value, as before.
 
 ---
 
@@ -64,27 +66,20 @@ Use **`t()`** and **`| t`** in templates for the same resolution order (brand fi
 
 ### `default` — fallback when value is empty
 
-If the value is empty (null, undefined, or empty string), the filter returns the argument instead. The argument is always **literal text**: quote it.
+If the value is empty (null, undefined, or empty string), the filter returns the argument instead. The argument can be:
+
+- **quoted text**: `default:'Author'`, `default:"See pricing"`
+- **a number**: `default:5`
+- **a variable or expression**: `default:var.support_email`, `default:brand.name`
 
 ```html
 {{ article.author_name | default:'Author' }}
 {{ article.reading_time | default:'5' }} min read
+<a href="mailto:{{ brand.support_email | default:var.support_email }}">Contact us</a>
+{{ customer.first_name | default:var.greeting_name | default:'there' }}
 ```
 
-<Warning>
-The argument is not looked up as a variable. `{{ brand.support_email | default:var.support_email }}` prints the text `var.support_email` when the brand has no support e-mail. To fall back to another variable, pick the value first with `@set` and `@if`:
-
-```html
-@set(support = 'help@example.com')
-@if(var.support_email)
-@set(support = var.support_email)
-@endif
-@if(brand.support_email)
-@set(support = brand.support_email)
-@endif
-<a href="mailto:{{ support }}">{{ support }}</a>
-```
-</Warning>
+Chained `default` filters give the first non-empty value. Quote text you mean literally: an unquoted single word that names a variable is read as that variable, and one that names nothing is printed as written (`default:Offer` gives `Offer`).
 
 ### `default_if_none` — fallback only for null/undefined
 
@@ -383,16 +378,8 @@ Serialize any value to a JSON string. Safe: uses `JSON.stringify`, no code is ex
 **Date with fallbacks:**
 
 ```html
-@if(article.date_short)
-<span>{{ article.date_short }}</span>
-@elseif(article.published_at)
-<span>{{ article.published_at }}</span>
-@else
-<span>{{ article.created_at }}</span>
-@endif
+<span>{{ article.date_short | default:article.published_at | default:article.created_at }}</span>
 ```
-
-(`default:` takes literal text only, so a fallback to another field is an `@if` chain.)
 
 **Avatar initial when no image:**
 

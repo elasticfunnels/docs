@@ -37,8 +37,24 @@ Capture leads by creating a custom collection for storing user data, then embedd
 - **Phone Field**: Phone number formatting
 - **Textarea**: Multi-line text input
 - **Dropdown**: Selection from predefined options
-- **Checkbox**: Boolean yes/no options
+- **Checkbox**: Boolean yes/no options, or several choices (see below)
 - **Date Field**: Date picker functionality
+
+### Several choices in one field
+
+Give every checkbox of a question the same `name` (the field's code). The entry stores every ticked value, readable as `Bloating, Gas`:
+
+```html
+<label><input type="checkbox" name="symptoms" value="Bloating"> Bloating</label>
+<label><input type="checkbox" name="symptoms" value="Gas"> Gas</label>
+<label><input type="checkbox" name="symptoms" value="Fatigue"> Fatigue</label>
+```
+
+A `<select multiple>` and a name ending in `[]` (`name="symptoms[]"`) are sent the same way. A single checkbox sends its one value.
+
+## How a form is submitted
+
+A `<form>` whose `action` starts with `/api` (a collection form posts to `/api/collection/<code>/store`) is submitted by the page runtime: it sends the fields, shows the success message or redirects, and ignores a second click while the first submission is on its way. Don't add your own `fetch()` for it. If a script of yours handles the submit itself and calls `event.preventDefault()`, the runtime leaves that submission to your script, and the same goes for a validation check that cancels the submit.
 
 ## Advanced Features
 {/* SCREENSHOT: Advanced Features · form builder or submission list · desktop */}

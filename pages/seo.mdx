@@ -115,6 +115,11 @@ meta description. llms.txt uses both:
 ef pages settings pricing --seo-title "Pricing" --seo-description "Plans and what each includes." --sitemap
 ```
 
+The page itself gets them too: the SEO title becomes its `<title>` and the meta
+description its `<meta name="description">`. On a code page that is a full HTML
+document, a `<title>` or meta description already in its own `<head>` (or in its
+custom header code) is kept and the setting is not added.
+
 <Note>
 The [site address](#site-address-www-non-www-and-https) settings (**Preferred
 domain** and **Redirect http to https**) are only in the admin, under

@@ -155,7 +155,9 @@ Same pattern for other events: **`@submit`**, **`@change`**, **`@input`**, **`@b
 </button>
 ```
 
-Returning **`false`** from the expression calls **`preventDefault()`** on the event.
+Returning **`false`** from the expression calls **`preventDefault()`** on the event: `@click="return false"`, or a function call that returns `false`. An assignment never cancels, even when it stores `false` (`@click="opts.gift = $el.checked"` on a box being unticked).
+
+On a **checkbox or radio**, `$el.checked` in `@click` is already the new state. When the control also has `ef-value`, its value is in scope before your expression runs. See [Radio buttons and checkboxes with @click](/frontend-template-engine/syntax#radio-buttons-and-checkboxes-with-click).
 
 ### Cart and bumps
 
