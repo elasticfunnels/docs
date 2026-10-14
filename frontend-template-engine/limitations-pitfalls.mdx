@@ -41,6 +41,11 @@ This page covers **limitations** of the frontend template engine (compared to fu
 
 - Expressions run in a **merged context** (scope + loop vars) using **`with(scope) { return (expression); }`**. Very complex expressions or ones that rely on strict mode / undeclared variables can be fragile. Prefer simple paths and small expressions.
 - **Reserved names** in event handlers: **`$event`**, **`event`**, **`$el`**, **`$target`** are injected; avoid using them as scope keys if you need to read them from global scope.
+- An expression that throws renders nothing. With **`?efTemplateDebug=1`** in the page URL, each failing expression is logged to the console once with its error.
+
+### What you can keep in scope
+
+Plain objects and arrays in **`window.efScope`** are reactive. You can also keep a DOM element (a `<dialog>` you open from a button), a `Date` or a `Map` there: these are stored as they are and their methods work (`efScope.ui.dialog.showModal()`). Replacing one (`efScope.ui.dialog = otherEl`) updates bindings; changing something inside it (an attribute of the element, an entry of the Map) does not, so keep the state your bindings read in plain data (`efScope.ui.open = true`).
 
 ### Checkout and cart data
 

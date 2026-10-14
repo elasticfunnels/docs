@@ -116,6 +116,8 @@ Instead of wrapping content in a `<template-foreach>` tag, you can place `data-e
 
 Use `data-ef-value` to bind the option's `value` attribute and `data-ef-cloak` to hide the template row until the engine expands it.
 
+An element loops only when its `data-each` holds a loop expression (`item in list` or `(item, i) in list`). Any other value, such as `data-each="month"` used by your own CSS or script, is left alone.
+
 <Warning>
 **Do not use `<template-foreach>` inside `<select>`.** Safari and iOS strip unknown elements from `<select>`, so `<option>` elements wrapped in `<template-foreach>` will not appear. Always use inline `data-each` on the `<option>` tag directly.
 </Warning>
@@ -195,13 +197,17 @@ Include a component with the backend directive **`@component("code", { key: valu
 - **Text nodes:** `Price: [[ item.price ]]`
 - **Anywhere** inside processed template content (e.g. inside `template-if` or `template-foreach`)
 
-For an **attribute**, use a binding instead: `:src="item.image"`, `:data-code="item.code"`, `:class="item.open ? 'is-open' : ''"` (see [Attribute bindings](#attribute-bindings-attr)). The engine does evaluate `[[ ]]` inside an attribute value, but a binding gives the plugins the real value (for example the product code in `:data-code`) and keeps raw `[[ ]]` out of the HTML before the engine runs.
+For an **attribute**, prefer a binding: `:src="item.image"`, `:data-code="item.code"`, `:class="item.open ? 'is-open' : ''"` (see [Attribute bindings](#attribute-bindings-attr)). The engine also evaluates `[[ ]]` inside an attribute value and re-evaluates it when scope changes (`class="step [[ quiz.step === 1 ? 'is-on' : '' ]]"`). Until the engine runs, or without JavaScript, that attribute holds the raw text; a binding keeps the static value instead. `src`, `srcset` and `poster` holding `[[ ]]` are deferred so the browser never requests the raw URL.
 
 ### What you can write inside `[[ ]]`
 
 - **Dot paths:** `item.name`, `checkout.total`, `checkout.customer.email`
 - **Expressions:** `item.price * item.quantity`, `item.open ? 'Hide' : 'Show'`
 - **Function calls:** `formatPrice(item.price, currency)`, `upper(item.name)`, `cartCount(cartItems)`
+
+A `;` inside a string literal or an inline callback is fine: `[[ answers.join('; ') ]]`, `[[ list.filter(function (x) { return x.on; }).length ]]`. A sequence of statements (`n = 2; n * 3`) gives the value of its last statement. For anything longer, put the logic in a function on your scope object (`window.efScope.myPage = { total: function (items) { … } }`) and call it: `[[ myPage.total(cartItems) ]]`.
+
+An expression that throws renders nothing. Add `?efTemplateDebug=1` to the page URL to see each failing expression and its error in the browser console.
 
 Functions available in expressions include [built-in helpers](/frontend-template-engine/built-in-functions) and any registered via `registerTemplateFunction`.
 
@@ -255,6 +261,17 @@ Any attribute can be bound to an expression with a leading colon. The engine set
 
 Prefer `:attr` (or the `ef-*` shortcuts above) over `[[ ]]` inside an attribute value.
 
+### Radio buttons and checkboxes with `@click`
+
+`@click` on a radio or checkbox sees the new state: `$el.checked` is already the value the box is changing to. Set your state in the click and show it with a one-way `:checked`:
+
+```html
+<input type="radio" name="q1" value="often" @click="quiz.q1 = $el.value; quiz.step = 2" :checked="quiz.q1 === 'often'">
+<input type="checkbox" :checked="opts.gift" @click="opts.gift = $el.checked">
+```
+
+`ef-value` and `@click` can sit on the same control: the bound value is written to scope before your click expression runs. A click expression that is an assignment never cancels the click; only `return false` (or a function that returns `false`) does.
+
 ---
 
 ## Cloaking
@@ -262,6 +279,7 @@ Prefer `:attr` (or the `ef-*` shortcuts above) over `[[ ]]` inside an attribute 
 
 To avoid a flash of raw **`[[ ... ]]`** or the wrong branch before the template engine runs:
 
+- **Server cloak.** On hosted pages the platform adds `data-ef-cloak` to the element whose text holds unprocessed `[[ ]]` (its innermost parent), so raw tokens never flash. A `[[ ]]` inside an attribute value cloaks nothing: the element stays visible and the engine fills the attribute when it runs.
 - **`[data-ef-cloak]`** — Add this attribute to elements that should be hidden until processed. The engine may remove it after processing. Include CSS: **`[data-ef-cloak] { display: none !important; }`**.
 - **Template tags** — Include CSS that hides the custom elements until processed: **`template-foreach`**, **`template-if`**, **`template-else`**, **`template-set`** with **`display: none !important`**.
 - In some deployments, **`data-frontend-template="true"`** is used on **`template-if`**, **`template-else`**, and **`template-foreach`** to mark frontend-processed blocks.

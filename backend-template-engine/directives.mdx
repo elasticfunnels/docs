@@ -168,7 +168,7 @@ Two directives need their own line:
 
 In any other position they are printed as text, and `ef lint` warns about it.
 
-An `@` that doesn't start one of these directives is left as it is, so emails (`support@example.com`), handles (`@yourbrand`), CSS at-rules (`@media`, `@font-face`, `@import`) and `@` in scripts need no escaping. A word such as `@settings` or `use @set to` is text too: a directive needs its `(`.
+An `@` that doesn't start one of these directives is left as it is, so emails (`support@example.com`), handles (`@yourbrand`), CSS at-rules (`@media`, `@container`, `@supports`, `@layer`, `@font-face`, `@import`) and `@` in scripts need no escaping, including at the start of a line in a `<style>`. A word such as `@settings` or `use @set to` is text too: a directive needs its `(`.
 
 ---
 
@@ -182,6 +182,19 @@ Include a reusable component by name, with optional arguments.
 ```
 
 The engine looks up the component by name and renders it with the given arguments in context.
+
+Inside the component each argument is a variable (`{{ title }}`). An argument the caller did not pass is missing: it prints nothing, `@if(title)` is false, and `??` or `default` give its fallback:
+
+```html
+<h1>{{ title ?? 'Welcome' }}</h1>
+@if(count eq 0)
+<p>Sold out</p>
+@endif
+```
+
+A missing argument is not equal to `0`, so the `Sold out` line above shows only when the caller passed `count: 0`.
+
+Two pages may include the same component with different arguments; each page renders with its own, also in the moments after a publish.
 
 ---
 
