@@ -72,7 +72,8 @@
                   "funnels/script-rule",
                   "funnels/window-api",
                   "funnels/dynamic-content",
-                  "funnels/exit-popups"
+                  "funnels/exit-popups",
+                  "funnels/popups-from-code"
                 ]
               },
               {
