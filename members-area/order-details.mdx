@@ -376,6 +376,20 @@ Use **`getSessionOrders()`** on thank-you pages so that only the orders from the
 No auto-refresh or retry timer is needed. `getSessionOrders()` serves the current session's orders from the session, so every order — including all upsells and bumps — is present on the **first** page load, with each order's primary product already shown. Full line-item detail (for example, an order bump attached to the main order) may enrich a moment later once the conversion finishes indexing, but the order rows and their primary products never wait on the index. Avoid a JavaScript refresh loop: it only re-runs a query that already returns the complete list.
 </Tip>
 
+### Previewing a thank-you page without an order
+
+On your own brand, `getSessionOrders()` returns an empty list until the visitor has bought something, so keep an `@else` branch with a short empty state ("Your order details will appear here") and never hand-write an example order with fixed product names and prices. To see the page with real data, place a test order through the funnel's checkout.
+
+Pages in the ElasticFunnels template library behave differently: when the visitor has no order, `getSessionOrders()` returns one example order built from the page's funnel (the checkout's default package, its first order bump and the first upsell after the checkout, priced from the products). That order has `is_mock: true` and an order number starting with `PREVIEW-`, so a page can show a small "Preview order" note:
+
+```html
+@if(order.is_mock)
+  <p class="preview-note">Preview order</p>
+@endif
+```
+
+A real order always replaces the example, and customer brands never receive example data.
+
 ## Customer Data Outside of Orders
 {/* SCREENSHOT: Customer Data Outside of Orders · members area screen · desktop */}
 
