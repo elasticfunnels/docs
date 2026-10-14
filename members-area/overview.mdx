@@ -79,7 +79,11 @@ There are two ways to restrict a page to logged-in customers only.
 2. Enable **Requires Login**
 3. Set the **Redirect URL** to your login page (e.g., `/members-login`)
 
-When a visitor without a valid session tries to access the page they are automatically redirected to that URL. If no redirect is configured, a 404 page is shown.
+When a visitor without a valid session tries to access the page they are automatically redirected to that URL. If no redirect is configured, a 404 page is shown. A "valid session" is one with a customer (`is_customer`, from a purchase or the login form) or an e-mail on the session.
+
+From the `ef` CLI the same two settings are page fields: put `{"requires_login": true, "redirect_url": "/members-login"}` in a JSON file and run `ef pages settings <slug> --file settings.json`.
+
+Prefer the setting to a script: it is visible in the editor, survives edits in the page builder, and needs no code.
 
 ### Option 2: Backend scope script
 
@@ -278,3 +282,11 @@ Inside members-only pages, you can use the `customer` object to personalize cont
 ```
 
 See [Showing Order Details](/members-area/order-details) for how to display full order history with products and tracking.
+
+## Editing customer details
+
+There is no customer-facing way to change a name, e-mail or address from a members page: the `customer` fields are read-only in templates and scripts. Show the details, and give the customer a way to ask for a change (a contact form or your support e-mail, `brand.support_email`); your team updates the order or subscription in the dashboard.
+
+## Refer a friend
+
+There is no built-in per-customer referral link. If your offer has a referral program run elsewhere, put its link in a page variable and show the referral block only when that variable is set, so the page never shows a share button with nothing behind it.

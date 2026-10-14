@@ -1,0 +1,133 @@
+---
+title: "Package selector"
+description: "Let buyers switch between packages (1, 3 or 6 bottles, one-time or subscription) on the checkout page without a reload: data-ef-package markup, ?p= preselection, checkout_packages, events and the JavaScript API."
+---
+
+A package selector is a row of options on the checkout page ("1 bottle", "3 bottles", "6 bottles") that swaps the product being bought **in place**. The total, bonuses, coupon, tax and shipping update without reloading the page, and the address bar keeps `?p=<code>` so a reload shows the same choice.
+
+It is markup only: add the attributes below to any elements (cards, labels, radio inputs, links, buttons) and the checkout runtime does the rest. It works in code pages and in the page builder.
+
+For the rest of the checkout page, see [How to design a checkout page](/guides/how-to-design-a-checkout-page) and the [Checkout functionality reference](/checkouts/checkout-functionality-reference).
+
+---
+
+## Markup
+
+| Attribute | On | What it does |
+|---|---|---|
+| `data-ef-package-group` | the wrapper | Marks the group. One per page is the normal case. Gets `role="radiogroup"` and `data-ef-package-selected="<code>"`. |
+| `data-ef-package="CODE"` | each option | The product code this option sells. A click anywhere in the option selects it. Any element works: `div`, `label`, `a`, `button`, or an `<input type="radio">`. |
+| `data-ef-package-default` | one option | Selected when the page sells nothing yet (no `?p=`, empty cart). |
+| `data-ef-package-disabled` | an option | Cannot be picked (sold out). `aria-disabled="true"` or a disabled input count too. |
+| `data-ef-package-price` | an option (optional) | Price shown right after the click, with no request. |
+| `data-ef-package-retail-price` | an option (optional) | Compare-at price. |
+| `data-ef-package-name`, `data-ef-package-image`, `data-ef-package-currency` | an option (optional) | Name, image and currency for the order summary. |
+
+The `data-ef-product-*` spellings used by add-to-cart buttons are read as well.
+
+```html
+<div class="packs" data-ef-package-group>
+  <a class="pack" href="[BUY=BOTTLE-1]" data-ef-package="BOTTLE-1" data-ef-package-default
+     data-ef-package-price="49" data-ef-package-retail-price="69" data-ef-package-name="1 bottle">
+    1 bottle, $49
+  </a>
+  <a class="pack" href="[BUY=BOTTLE-3]" data-ef-package="BOTTLE-3"
+     data-ef-package-price="117" data-ef-package-retail-price="207" data-ef-package-name="3 bottles">
+    3 bottles, $39 each
+  </a>
+  <a class="pack" href="[BUY=BOTTLE-6]" data-ef-package="BOTTLE-6"
+     data-ef-package-price="198" data-ef-package-retail-price="414" data-ef-package-name="6 bottles">
+    6 bottles, $33 each
+  </a>
+</div>
+```
+
+Keep a buy link in each option's `href`. With JavaScript the click is handled in place; without it the link still opens the checkout for that package.
+
+### Selected state and styling
+
+The selected option gets `data-selected="true"`, `aria-checked="true"`, the class `is-selected`, and `checked` on a radio input (the option itself or a radio inside it). Every other option gets `data-selected="false"`. Style the selection with an attribute selector:
+
+```css
+.pack { border: 2px solid #ddd; }
+.pack[data-selected="true"] { border-color: #1f8a4c; background: #f1faf4; }
+```
+
+The server already writes `data-selected` and `aria-checked` on the option that matches the product the checkout sells, so the right package is highlighted on first paint, before any JavaScript runs. An option that sets `data-selected` itself is left alone.
+
+Options without a `role` get `role="radio"`, and an option with no focusable element inside gets `tabindex="0"`.
+
+---
+
+## Which package is selected on load
+
+1. **`?p=<code>`** in the URL (a buy link, or a reload after a switch): that option is selected.
+2. **A cart** (the visitor came from a cart page): the cart line whose code is one of the options is selected. If no line matches, the default option replaces the package line.
+3. **Nothing sold yet**: the option with `data-ef-package-default`, else the first option that is not disabled.
+
+Always preview a checkout with `?p=<code>` (or a default option) so the page has a product and the total is not `$0.00`.
+
+---
+
+## What a switch does
+
+- **Product mode** (`?p=` or a backend script names the product): the order's main product is replaced, the URL becomes `?p=<new code>` (`history.replaceState`, so the back button is unaffected), and the submit posts the new code. The server prices it by code.
+- **Cart mode** (the visitor has a cart): the package line in the cart is swapped for the new one. Other cart lines stay.
+- Bonuses, coupon, tax and shipping are recalculated for the new product.
+- An order bump whose code is the selected package is taken out of the bump list (unticked) while that package is selected, and put back when the buyer switches away. A product cannot be its own bump.
+- Prices come from the option attributes first, so the switch is instant. When an option carries no price, or when the catalog knows more (an intro price, subscription terms), the runtime asks `/api/cart-products` once for all package codes and corrects the summary.
+
+---
+
+## Pages that name the product in a backend script
+
+A page can sell without `?p=` by naming the product in its backend script ([Step 1b of the checkout guide](/guides/how-to-design-a-checkout-page)). Such a page **must also list the codes its selector offers** in `checkout_packages`:
+
+```html
+<script scope="backend">
+  setVariable('checkout_product', 'BOTTLE-1');
+  setVariable('checkout_packages', ['BOTTLE-1', 'BOTTLE-3', 'BOTTLE-6']);
+</script>
+```
+
+- `checkout_product` is the default. A `?p=` naming one of the `checkout_packages` codes selects that package instead, so a reload keeps the buyer's choice.
+- On submit, a posted code that is in `checkout_packages` is honoured. Any other code is ignored and the page's own product is charged: without `checkout_packages`, every switch would be charged as the default product.
+- Up to 20 codes. `checkout_packages` only applies next to `checkout_product`, not with `checkout_cart`.
+
+---
+
+## Events and JavaScript API
+
+Every switch the buyer makes (or `select()` below) fires a document event:
+
+```js
+document.addEventListener('checkout:packageChanged', function (e) {
+  // e.detail: { code, previous, mode: 'product' | 'cart', product: { code, name, price, retail_price, image, currency } }
+  console.log('Now selling', e.detail.code);
+});
+```
+
+Use it to update anything outside the checkout scope that depends on the package, for example a gift grid that shows what each package includes. The selection on page load does not fire the event; read the group's `data-ef-package-selected` (or `efScope.checkout.product_code`) for the initial state.
+
+| Call | Returns |
+|---|---|
+| `window.ef.checkout.packages.get()` | `{ selected, codes, product }` |
+| `window.ef.checkout.packages.select('BOTTLE-3')` | Promise of `true` when the switch was applied (a disabled or unknown code returns `false`) |
+| `window.ef.checkout.packages.codes()` | The package codes on the page, in page order |
+
+Analytics: every switch records a `package-selected` event with the product code.
+
+---
+
+## Bonuses per package
+
+Free gifts belong on each package product in the catalog (product **Bonuses** tab, see [Product management](/products/product-management)), not in the page. After a switch the checkout's `checkout.bonus_options` lists the new package's bonuses. To show what each package includes before the buyer picks it, read the bonuses of every package code from the catalog (each product's `bonuses` array, the same data as [`item.bonuses`](/frontend-template-engine/cart)) rather than typing the gift list into the page.
+
+---
+
+## Common mistakes
+
+- **One page per package, or a reload per click.** Use one checkout page with the selector.
+- **Pre-selecting a subscription.** Make the one-time package the default; put the subscription option beside it with its price, how often it bills and how to cancel.
+- **A backend script page without `checkout_packages`.** The selector looks like it works, but the buyer is charged the default product.
+- **The same code as a package and as an order bump.** The runtime hides the bump while that package is selected, but the offer reads oddly; give the bump its own product code.

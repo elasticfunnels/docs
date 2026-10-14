@@ -91,6 +91,10 @@ Repeat a block once per element in an array (or iterable). The element is replac
 - **`item`** — Variable name for the current element (you can choose any name).
 - **`cartItems`** — Expression that must evaluate to an array (or iterable) in scope.
 
+<Note>
+A loop tracks the **path** it reads. Loop over a scope path (`g in myPage.list`) and assign a new array to that path when the data changes; a loop over a method call (`g in myPage.list()`) renders once and is not refreshed when scope changes.
+</Note>
+
 ### Optional index
 
 Use **`(item, i) in array`** or **`item, i in array`** to get a zero-based index:
@@ -192,16 +196,19 @@ Include a component with the backend directive **`@component("code", { key: valu
 ### Where it works
 
 - **Text nodes:** `Price: [[ item.price ]]`
-- **Attribute values:** `src="[[ item.image ]]"`, `data-code="[[ item.code ]]"`, `required="[[ f.required ? 'required' : '' ]]"`
 - **Anywhere** inside processed template content (e.g. inside `template-if` or `template-foreach`)
 
-For cart/checkout control attributes, use **`data-code="[[ item.code ]]"`** so the plugin receives the actual product code string. Unquoted **`data-code="item.code"`** may still be supported by the engine in some contexts.
+For an **attribute**, use a binding instead: `:src="item.image"`, `:data-code="item.code"`, `:class="item.open ? 'is-open' : ''"` (see [Attribute bindings](#attribute-bindings-attr)). The engine does evaluate `[[ ]]` inside an attribute value, but on hosted pages the server hides content that still holds `[[ ]]` until the engine runs (see [Cloaking](#cloaking)), and for a `[[ ]]` inside an attribute it hides the element **before** the one carrying the attribute. Without JavaScript, or until the engine loads, a neighbouring element (a whole form, a heading) stays hidden.
 
 ### What you can write inside `[[ ]]`
 
 - **Dot paths:** `item.name`, `checkout.total`, `checkout.customer.email`
 - **Expressions:** `item.price * item.quantity`, `item.open ? 'Hide' : 'Show'`
 - **Function calls:** `formatPrice(item.price, currency)`, `upper(item.name)`, `cartCount(cartItems)`
+
+<Warning>
+**No `;` anywhere in an expression** used for a value (`[[ ]]`, `:attr`, `data-condition`, `ef-text`), not even inside a string literal or an inline callback. Source containing a `;` is run as a statement block and returns `undefined`, so the binding prints nothing. Put multi-step logic in a function on your scope object (`window.efScope.myPage = { total: function (items) { … } }`) and call it: `[[ myPage.total(cartItems) ]]`. Event handlers (`@click`) are statements and may use `;`.
+</Warning>
 
 Functions available in expressions include [built-in helpers](/frontend-template-engine/built-in-functions) and any registered via `registerTemplateFunction`.
 
@@ -238,6 +245,32 @@ Supported aliases include `ef-text`, `ef-html`, `ef-src`, `ef-href`, `ef-title`,
 
 These can be added from the page builder **Data Attributes** panel (right sidebar) when an element is selected.
 
+## Attribute bindings (`:attr`)
+
+Any attribute can be bound to an expression with a leading colon. The engine sets it on first render and again whenever scope changes:
+
+```html
+<img src="placeholder.png" :src="item.image" :alt="item.name">
+<button type="button" data-cart-qty-plus :data-code="item.code">+</button>
+<div class="step" :class="quiz.step === 2 ? 'is-on' : ''">…</div>
+<span class="bar" :style="'width: ' + progress.pct(cartItems) + '%'"></span>
+<input type="checkbox" :checked="bump.added" :disabled="!bump.available">
+```
+
+- **`:class`** keeps the element's static `class` and adds the result. It accepts a string, an object (`{ 'is-active': open }`) or an array.
+- **`:checked`**, **`:disabled`** and **`:value`** set the element's property (what a form submits), not only the attribute.
+- Any other name (`:style`, `:href`, `:aria-pressed`, `:data-plan`, `:data-code`) sets that attribute to the result.
+
+Prefer `:attr` (or the `ef-*` shortcuts above) over `[[ ]]` inside an attribute value.
+
+### Radio buttons and checkboxes with `@click`
+
+Don't put **`ef-value`** and **`@click`** on the same radio or checkbox. The click handler refreshes the element from scope before the browser's `change` event, so the box ends unticked and the value never reaches scope. Set the value in the click and show it with `:checked`:
+
+```html
+<input type="radio" name="q1" value="often" @click="quiz.q1 = $el.value" :checked="quiz.q1 === 'often'">
+```
+
 ---
 
 ## Cloaking
@@ -245,6 +278,7 @@ These can be added from the page builder **Data Attributes** panel (right sideba
 
 To avoid a flash of raw **`[[ ... ]]`** or the wrong branch before the template engine runs:
 
+- **Server cloak.** On hosted pages the platform adds `data-ef-cloak` to the element that holds unprocessed `[[ ]]`, so raw tokens never flash. For a `[[ ]]` inside an attribute value it marks the element before that one instead, which is one more reason to use `:attr` bindings for attributes.
 - **`[data-ef-cloak]`** — Add this attribute to elements that should be hidden until processed. The engine may remove it after processing. Include CSS: **`[data-ef-cloak] { display: none !important; }`**.
 - **Template tags** — Include CSS that hides the custom elements until processed: **`template-foreach`**, **`template-if`**, **`template-else`**, **`template-set`** with **`display: none !important`**.
 - In some deployments, **`data-frontend-template="true"`** is used on **`template-if`**, **`template-else`**, and **`template-foreach`** to mark frontend-processed blocks.

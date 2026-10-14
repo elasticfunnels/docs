@@ -114,12 +114,12 @@ Each bonus has: `code`, `name`, `image`, `price`, `retail_price`, `original_pric
 ```html
 <template-foreach data-each="item in cartItems">
   <div class="cart-line">
-    <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+    <img :src="item.image" :alt="item.name" />
     <span>[[ item.name ]]</span>
     <span>[[ item.price ]]</span>
     <template-foreach data-each="bonus in item.bonuses">
       <div class="cart-bonus-row">
-        <img src="[[ bonus.image ]]" alt="[[ bonus.name ]]" />
+        <img :src="bonus.image" :alt="bonus.name" />
         <span>[[ bonus.name ]]</span>
         <span>FREE <s>[[ bonus.retail_price ]]</s></span>
       </div>
@@ -137,7 +137,7 @@ Each course has: `id`, `title`, `slug`, `description`, `cover`, `instructor_name
 ```html
 <template-foreach data-each="course in item.courses">
   <div class="cart-course-row">
-    <img src="[[ course.cover ]]" alt="[[ course.title ]]" />
+    <img :src="course.cover" :alt="course.title" />
     <span>[[ course.title ]]</span>
   </div>
 </template-foreach>
@@ -167,7 +167,7 @@ The cart plugin handles **−**, **+**, and **Remove** automatically via data at
 | **`data-cart-qty-minus`** | Button | Decrease quantity by 1 |
 | **`data-cart-qty-plus`** | Button | Increase quantity by 1 |
 | **`data-cart-qty-remove`** | Button/link | Remove line (sets qty to 0) |
-| **`data-code="[[ item.code ]]"`** | Same element | Links the button to the product |
+| **`:data-code="item.code"`** | Same element | Links the button to the product |
 | **`data-disable-when-one`** | Minus button (optional) | Disables the button when `item.quantity` is 1 (prevents accidentally removing the last unit) |
 
 On checkout pages the minus button is always disabled at quantity 1, regardless of `data-disable-when-one`.

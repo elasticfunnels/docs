@@ -223,7 +223,7 @@ Each order returned by `getOrders()` or `getOrder()` contains:
       price: 97.00,
       quantity: 1,
       currency_code: "USD",
-      is_bonus: false
+      is_bonus: false   // true on a free bonus line the order shipped (with its own quantity)
     }
   ],
 
@@ -299,6 +299,10 @@ The key pattern:
 Tracking numbers are auto-linked to [17track.net](https://17track.net) when no carrier URL is provided. The carrier is auto-detected from the number pattern (USPS, UPS, FedEx, DHL, UniUni). You do not need to map carriers yourself.
 </Tip>
 
+<Note>
+**`image_url` when the product has no image** is a 1 px `data:image/svg+xml` placeholder, not an empty string. A template that appends `?width=400` for resizing breaks that placeholder. Give every product (bonuses included) an image in the catalog, or check that `image_url` starts with `http` before adding parameters.
+</Note>
+
 ## `getSessionOrders()` — Current Session Orders
 {/* SCREENSHOT: `getSessionOrders()` — Current Session Orders · members area screen · desktop */}
 
@@ -329,6 +333,24 @@ By default it returns **all** orders from the current session. Pass an optional 
 </div>
 @endforeach
 ```
+
+<Warning>
+**Session orders hold the products that were charged, not the free bonus lines.** A thank-you page cannot list "free gifts in this order" from `getSessionOrders()` alone (`getPurchasedProducts()` reads the same session orders, so its `included_bonuses` is empty there too). Read the order's bonus lines with `getOrder(order.order_number)` (lines with `is_bonus`) once the order is indexed, usually within a minute. On the very first load, show the bonuses the ordered product carries in the catalog. Avoid `getBonusProducts()` for this: it lists every bonus the customer has ever received, across all orders.
+
+```html
+@set(orders = getSessionOrders())
+@foreach(order in orders)
+@set(full = getOrder(order.order_number))
+@if(full and full.products)
+@foreach(line in full.products)
+@if(line.is_bonus)
+<li>{{ line.name }} @if(line.quantity gt 1)x {{ line.quantity }}@endif <b>Free</b></li>
+@endif
+@endforeach
+@endif
+@endforeach
+```
+</Warning>
 
 <Tip>
 Prefer `getSessionOrders()` over `getOrders('newest', 1)` on thank-you pages. `getOrders()` reads from the search index, so a customer with an existing purchase history could see a previous order — or miss a just-accepted upsell — until the new conversions are indexed. `getSessionOrders()` reads from the current session, so it shows exactly what was just purchased, complete and immediately.

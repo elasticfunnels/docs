@@ -28,7 +28,7 @@ Do **not** use `cartItems[0]` in the single-product block. Use **`checkout.produ
 ```html
 <template-if data-condition="is_single_product">
   <div class="order-summary-single">
-    <img src="[[ checkout.product_image ]]" alt="[[ checkout.product_title ]]" />
+    <img :src="checkout.product_image" :alt="checkout.product_title" />
     <h2>[[ checkout.product_title ]]</h2>
     <span>[[ checkout.product_price ]]</span>
     <span>[[ checkout.retail_price ]]</span>
@@ -37,7 +37,7 @@ Do **not** use `cartItems[0]` in the single-product block. Use **`checkout.produ
 <template-else-if data-condition="is_cart">
   <template-foreach data-each="item in cartItems">
     <div class="order-summary-line">
-      <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+      <img :src="item.image" :alt="item.name" />
       <span>[[ item.name ]]</span>
       <span>[[ item.total ]]</span>
     </div>
@@ -185,7 +185,7 @@ Use code values in options:
 <select name="shipping_country" data-template-value="checkout.customer.shipping_country">
   <option value="">Select Country</option>
   <template-foreach data-each="opt in checkout.countries">
-    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+    <option :value="opt.value">[[ opt.label ]]</option>
   </template-foreach>
 </select>
 ```
@@ -232,8 +232,43 @@ The **entire billing info section** can be wrapped in **`<template-if data-condi
 | **`checkout.selectedBumpLines`** | Selected bumps (each: **`code`**, **`name`**, **`price`**, **`price_raw`**). |
 
 - Display **`[[ bump.price ]]`** and **`[[ line.price ]]`** as-is (already formatted).
-- **Checkbox pattern:** Use **`data-bump-code`**, **`data-bump-checkbox`**, **`data-bump-toggle`** and **`name="bump"`**, **`value="[[ bump.code ]]"`** so the bump plugin can toggle and style. See [Cart](/frontend-template-engine/cart#order-bumps) for the full offer vs added pattern.
+- **Checkbox pattern:** Use **`data-bump-code`**, **`data-bump-checkbox`**, **`data-bump-toggle`** and **`name="bump"`**, **`:value="bump.code"`** so the bump plugin can toggle and style. See [Cart](/frontend-template-engine/cart#order-bumps) for the full offer vs added pattern.
 - **Button + @click pattern:** Alternatively, use **`<button @click="bump.added = true">…</button>`** for “Add to order” and **`<button @click="bump.added = false">…</button>`** for “Remove”. Mutating **`bump.added`** triggers re-render. Both checkbox + **data-bump-*** and button + **@click** are valid.
+
+
+---
+
+## Free gifts (bonuses)
+
+When the product being bought has bonuses in its catalog **Bonuses** tab (with a bonus rule), the checkout scope carries them. After a [package switch](/checkouts/package-selector) the lists are rebuilt for the new product.
+
+| Scope | Purpose |
+|-------|--------|
+| **`checkout.bonus_options`** | Every bonus offered with the current product. Each: **`code`**, **`name`**, **`image`**, **`quantity`**, **`retail_price`** (formatted, `''` when none), **`retail_price_raw`**, **`selected`**, **`locked`** (the rule gives all of them, nothing to pick), **`giftable`**, **`main_code`**. |
+| **`checkout.bonus_rule`** | The rule for the main product: **`main_code`**, **`min`**, **`max`**, **`mode`** (`pick` or `all`), **`label`**. **`checkout.bonus_rules`** has one per main product in cart mode. |
+| **`checkout.bonus_selected`** | Codes currently selected. |
+| **`checkout.bonus_can_add`** | `true` while the buyer may pick another one. |
+| **`checkout.bonus_value`** / **`bonus_value_raw`** | Total retail value of the selected bonuses (retail price × quantity). |
+| **`checkout.gift_shipping`** | "Send to a friend" state: **`allowed`**, **`available`**, **`enabled`**, **`mode`**, **`price`**, **`recipient`**. |
+
+List the included gifts in the order summary:
+
+```html
+<template-foreach data-each="gift in checkout.bonus_options" data-frontend-template="true">
+  <div class="summary-line">
+    <img ef-src="gift.image" :alt="gift.name" width="40" height="40">
+    <span ef-text="gift.name"></span>
+    <template-if data-condition="gift.quantity > 1" data-frontend-template="true"><span>x [[ gift.quantity ]]</span></template-if>
+    <b>Free</b>
+  </div>
+</template-foreach>
+```
+
+For a "pick N of these" offer, give each tile **`:data-bonus-code="gift.code"`**: a click toggles it, and the tile gets `data-selected` / `data-locked`. JavaScript: `window.ef.checkout.bonuses.get()`, `.select(code)`, `.deselect(code)`, `.toggle(code)`, `.set([codes])`. Events: `checkout:bonusesChanged`, `checkout:bonusRejected` (`max_reached`, `not_offered`). The server re-checks every pick on submit.
+
+<Note>
+Bonuses are not bumps. Never fake a gift as a $0 order bump, and never type the gift list into the page: the catalog is the one place the offer per package is set, and the order records the bonus lines it shipped (`is_bonus` lines in [order details](/members-area/order-details)).
+</Note>
 
 ---
 

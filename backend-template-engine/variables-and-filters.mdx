@@ -64,18 +64,27 @@ Use **`t()`** and **`| t`** in templates for the same resolution order (brand fi
 
 ### `default` — fallback when value is empty
 
-If the value is empty (null, undefined, or empty string), the filter returns the argument instead.
-
-```html
-{{ article.date_short | default:article.published_at | default:article.created_at }}
-```
-
-Chain multiple fallbacks — the first non-empty value wins.
+If the value is empty (null, undefined, or empty string), the filter returns the argument instead. The argument is always **literal text**: quote it.
 
 ```html
 {{ article.author_name | default:'Author' }}
 {{ article.reading_time | default:'5' }} min read
 ```
+
+<Warning>
+The argument is not looked up as a variable. `{{ brand.support_email | default:var.support_email }}` prints the text `var.support_email` when the brand has no support e-mail. To fall back to another variable, pick the value first with `@set` and `@if`:
+
+```html
+@set(support = 'help@example.com')
+@if(var.support_email)
+@set(support = var.support_email)
+@endif
+@if(brand.support_email)
+@set(support = brand.support_email)
+@endif
+<a href="mailto:{{ support }}">{{ support }}</a>
+```
+</Warning>
 
 ### `default_if_none` — fallback only for null/undefined
 
@@ -374,8 +383,16 @@ Serialize any value to a JSON string. Safe: uses `JSON.stringify`, no code is ex
 **Date with fallbacks:**
 
 ```html
-<span>{{ article.date_short | default:article.published_at | default:article.created_at }}</span>
+@if(article.date_short)
+<span>{{ article.date_short }}</span>
+@elseif(article.published_at)
+<span>{{ article.published_at }}</span>
+@else
+<span>{{ article.created_at }}</span>
+@endif
 ```
+
+(`default:` takes literal text only, so a fallback to another field is an `@if` chain.)
 
 **Avatar initial when no image:**
 

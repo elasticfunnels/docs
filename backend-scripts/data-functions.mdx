@@ -227,6 +227,8 @@ These APIs return **filtered** data only. Full provider API responses and intern
 
 Fetch the current customer's bonus products — digital downloads and extras they received as part of a purchase. Returns a deduplicated list of bonus items from all the customer's orders.
 
+For the gifts of one order (a thank-you page, an order card), read that order's lines with `getOrder(code)` and keep the ones with `is_bonus`; see [Showing order details](/members-area/order-details).
+
 ```javascript
 var bonuses = getBonusProducts();
 

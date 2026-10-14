@@ -35,7 +35,7 @@ If **"Is checkout page" is off** and the page's backend script sets no product, 
 3. **Link at least one product** so the page can resolve something to sell - from `?p=<code>`, a cart, or a backend script.
 
 <Warning>
-**"Is checkout page" is an app-only page setting.** It is stored on the page and toggled in the dashboard. It is **not** settable from the `ef` CLI, and `ef pages create` does **not** set it - a page pushed with the CLI still needs the toggle flipped in the app, *or* a `setVariable("checkout_product", …)` in its backend script, before checkout runs. Quiz pages that take payment must have this flag on **as well as** their quiz flag; the two are independent.
+**"Is checkout page" is a page setting, not part of the page HTML.** Toggle it in the dashboard (Page List, Edit Page) or from the `ef` CLI with `ef pages settings <slug> --checkout-page` (`--no-checkout-page` turns it off). `ef pages create` does **not** set it, so a page created with the CLI needs that command, the toggle, *or* a `setVariable("checkout_product", …)` in its backend script before checkout runs. To make it the funnel's checkout, also run `ef funnels settings <funnel> --checkout-page <slug>`. Quiz pages that take payment must have this flag on **as well as** their quiz flag; the two are independent.
 </Warning>
 
 ---
@@ -146,6 +146,8 @@ The buyer-filled cart lives in browser storage, so it survives a scroll but not 
 
 Whichever of the two the page sets, the resolved codes are pinned to the session against that page's id while it renders. On submit the runtime charges the pin, not the posted fields - so an edited form, a stale tab, or a hand-crafted POST cannot swap the product out from under a page that already showed a price. Pages that use `?p=` or a buyer-filled cart pin nothing and behave exactly as they always have.
 
+A page that lets the buyer switch between packages (1, 3 or 6 bottles) on top of `checkout_product` also sets `checkout_packages` to the codes its selector offers; a posted code from that list is the buyer's choice and is charged. See [Package selector](/checkouts/package-selector).
+
 <Info>
 Bumps are unaffected and stack on top of any of these. Configure them as in Step 7 - from page config or the **Set Checkout Bumps** node - and the buyer's selections are added to the pinned product or bundle at submit.
 </Info>
@@ -198,7 +200,7 @@ Both branches must be marked `data-frontend-template="true"` (see Step 6 below).
       <div class="dt-co-prod-row">
         <div class="dt-co-prod-img-wrap">
           <template-if data-condition="item.image" data-frontend-template="true">
-            <img ef-src="item.image" alt="[[ item.name ]]" />
+            <img ef-src="item.image" :alt="item.name" />
           </template-if>
           <template-else data-frontend-template="true">
             <span class="dt-co-prod-img-ph"><!-- placeholder icon --></span>
@@ -208,12 +210,12 @@ Both branches must be marked `data-frontend-template="true"` (see Step 6 below).
         <div class="dt-co-prod-info">
           <p class="dt-co-prod-name"><span ef-text="item.name">Product</span></p>
           <div class="dt-co-qty-ctrl">
-            <button type="button" data-cart-qty-minus data-code="[[ item.code ]]" data-disable-when-one aria-label="Decrease">&minus;</button>
+            <button type="button" data-cart-qty-minus :data-code="item.code" data-disable-when-one aria-label="Decrease">&minus;</button>
             <span ef-text="item.quantity">1</span>
-            <button type="button" data-cart-qty-plus data-code="[[ item.code ]]" aria-label="Increase">+</button>
+            <button type="button" data-cart-qty-plus :data-code="item.code" aria-label="Increase">+</button>
           </div>
           <template-if data-condition="cartItems.length > 1" data-frontend-template="true">
-            <button type="button" data-cart-qty-remove data-code="[[ item.code ]]" class="dt-co-prod-remove">Remove</button>
+            <button type="button" data-cart-qty-remove :data-code="item.code" class="dt-co-prod-remove">Remove</button>
           </template-if>
         </div>
         <div class="dt-co-prod-price">
@@ -669,9 +671,10 @@ Two ways to print scope values, used throughout the examples above:
 | `ef-text="expr"` | Set an element's text | `<span ef-text="checkout.product_title">Product</span>` |
 | `ef-src="expr"` | Set an `<img>` `src` | `<img ef-src="checkout.product_image" />` |
 | `ef-alt="expr"` | Set an `<img>` `alt` | `<img ef-alt="checkout.product_title" />` |
-| `[[ expr ]]` | Interpolate inside text/attributes | `alt="[[ item.name ]]"`, `data-code="[[ item.code ]]"` |
+| `[[ expr ]]` | Interpolate inside text | `Qty: [[ item.quantity ]]` |
+| `:attr="expr"` | Bind any attribute | `:alt="item.name"`, `:data-code="item.code"`, `:class="open ? 'is-open' : ''"` |
 
-Use `[[ … ]]` where you need a value **inside** an attribute or mixed with other text (`data-code="[[ item.code ]]"`); use `ef-text` / `ef-src` / `ef-alt` for a whole element's text or image. `formatPrice(raw)` formats a raw number as currency.
+Use `[[ … ]]` for a value mixed into text and `:attr="…"` for an attribute (`:data-code="item.code"`): a `[[ ]]` inside an attribute makes the server hide the element before it until the engine runs ([Syntax](/frontend-template-engine/syntax#attribute-bindings-attr)). Use `ef-text` / `ef-src` / `ef-alt` for a whole element's text or image. `formatPrice(raw)` formats a raw number as currency.
 
 `<template-foreach>` also drives select dropdowns for country/state, each option `{ value, label }`:
 
@@ -679,7 +682,7 @@ Use `[[ … ]]` where you need a value **inside** an attribute or mixed with oth
 <select name="shipping_state" data-template-value="checkout.customer.shipping_state">
   <option value="">Select State</option>
   <template-foreach data-each="opt in checkout.usStates">
-    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+    <option :value="opt.value">[[ opt.label ]]</option>
   </template-foreach>
 </select>
 ```
@@ -711,6 +714,7 @@ For a wallet-first layout, add a `<checkout-wallet force="true" wallets="applePa
 - [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) — wallet setup
 - [Shopify Checkout](/merchants/shopify-checkout) — where `is_cart` carts come from
 - [Buy links](/products/buy-links) — building the `?p=` link
+- [Package selector](/checkouts/package-selector) - switch packages in place (`data-ef-package`, `checkout_packages`)
 - [Backend scripts: actions](/backend-scripts/actions) - `setVariable` and the rest of the `<script scope="backend">` surface used in Step 1b
 - [Set Checkout Bumps node](/funnels/page-events-nodes#set-checkout-bumps) and [Split testing](/funnels/split-testing) — configuring / A/B-testing bumps
 - [Checkout redirect behavior](/funnels/checkout-redirect-behavior) — post-checkout routing

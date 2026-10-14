@@ -43,6 +43,7 @@
             "pages": [
               "funnels/create-funnel",
               "guides/how-to-design-a-checkout-page",
+              "checkouts/package-selector",
               "checkouts/checkout-functionality-reference",
               "funnels/checkout-redirect-behavior",
               "funnels/trigger-pages",
