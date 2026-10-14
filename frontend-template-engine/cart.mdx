@@ -81,6 +81,9 @@ Each element in `item.bonuses` has:
 | **`retail_price`** | Retail value (formatted) — useful for "valued at" display |
 | **`original_price`** | Same as `retail_price` |
 | **`currency`** | Currency code |
+| **`quantity`** | How many of this bonus ship with the product (from the product's bonus settings), the same number the order records on its bonus line |
+
+The list has one entry per bonus product; a package that includes two of the same gift lists it once with `quantity: 2`. The order keeps that quantity on its `is_bonus` lines ([order details](/members-area/order-details)), and the checkout's `checkout.bonus_options` carries it too.
 
 Example:
 
@@ -93,7 +96,7 @@ Example:
     <template-foreach data-each="bonus in item.bonuses">
       <div class="cart-bonus">
         <img :src="bonus.image" :alt="bonus.name" />
-        <span>[[ bonus.name ]]</span>
+        <span>[[ bonus.quantity ]] x [[ bonus.name ]]</span>
         <span>FREE (valued at [[ bonus.retail_price ]])</span>
       </div>
     </template-foreach>
@@ -196,7 +199,8 @@ For **scope** (**`checkout.bump_products`**, **`checkout.selectedBumpLines`**) a
 
 - Use **`cartItems`** and **`[[ item.* ]]`**; **`item.price`** and **`item.total`** are already formatted.
 - **`item.is_subscription`** / **`item.subscription`** — billing cadence; also on `checkout` scope for single-product pages.
-- **`item.bonuses`** — free bonus products linked to the item; always an array.
+- **`item.bonuses`**: free bonus products linked to the item, each with its `quantity`; always an array.
+- **`efCart.tax`** / **`efCart.total_with_tax`**: tax from the checkout's tax calculation (an IP-country estimate until there is an address, `efCart.tax_estimated`); see [Cart](/pages/cart#cart-level-variables).
 - **`item.courses`** — courses linked to the product; always an array.
 - Use **data-cart-qty-minus/plus/remove** and **data-code** for qty and remove.
 - Bumps: use **data-bump-*** attributes; scope and patterns are in [Checkout](/frontend-template-engine/checkout).

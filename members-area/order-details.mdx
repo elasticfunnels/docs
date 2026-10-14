@@ -217,6 +217,13 @@ Each order returned by `getOrders()` or `getOrder()` contains:
   customer_name: "John Doe",
   customer_email: "john@example.com",
 
+  // Money (numbers in the order currency): subtotal - discount + shipping + tax = total
+  subtotal: 104.85,                // Products before the discount
+  discount: 10.00,                 // Coupon discount
+  shipping: 4.95,
+  tax: 8.20,
+  total: 108.00,                   // What was charged
+
   // Products array
   products: [
     {
@@ -316,6 +323,8 @@ Tracking numbers are auto-linked to [17track.net](https://17track.net) when no c
 The order list is served from the **session itself** — every charge (the main order, order bumps, and each one-click upsell/downsell) is recorded the instant it is processed. That means `getSessionOrders()` returns the **complete** set of orders on the very first page load, including upsells accepted seconds earlier. No indexing wait and no page refresh are required.
 
 By default it returns **all** orders from the current session. Pass an optional `limit` to cap the count.
+
+Each order has the same fields as `getOrders()`, including `subtotal`, `discount`, `shipping`, `tax` and `total`, so a thank-you page can print the breakdown and a total that matches the card charge. Every line of the checkout is there on the first load: the main product, each order bump, every cart line of a cart checkout, and each one-click upsell or downsell (a downsell accepted on an upsell page included), with the same-session charges combined into one order.
 
 ### Parameters (`getSessionOrders`)
 

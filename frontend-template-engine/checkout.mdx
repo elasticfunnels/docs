@@ -257,6 +257,8 @@ The **entire billing info section** can be wrapped in **`<template-if data-condi
 - Display **`[[ bump.price ]]`** and **`[[ line.price ]]`** as-is (already formatted).
 - **Checkbox pattern:** Use **`data-bump-code`**, **`data-bump-checkbox`**, **`data-bump-toggle`** and **`name="bump"`**, **`:value="bump.code"`** so the bump plugin can toggle and style. See [Cart](/frontend-template-engine/cart#order-bumps) for the full offer vs added pattern.
 - **Button + @click pattern:** Alternatively, use **`<button @click="bump.added = true">…</button>`** for “Add to order” and **`<button @click="bump.added = false">…</button>`** for “Remove”. Mutating **`bump.added`** triggers re-render. Both checkbox + **data-bump-*** and button + **@click** are valid.
+- **Pre-selecting bumps from a link:** `?selected_bumps=CODE1,CODE2` on the checkout URL sets **`bump.added`** to `true` for those codes when the page loads, so engine-rendered bump cards show ticked and the totals include them (the built-in checkboxes are ticked too). The checkout keeps the parameter in the URL as the shopper ticks and unticks, so a reload keeps the choice. A cart or product page can hand a choice to the checkout this way. The `?bumps=` offer list on its own does not tick engine cards.
+- **Cart mode:** a cart line whose code is also an offered bump counts as a cart line in `checkout.subtotal` and `checkout.total` (and is taxed once) while that bump is not ticked.
 
 ---
 
