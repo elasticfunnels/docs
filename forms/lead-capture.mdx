@@ -56,3 +56,13 @@ Capture leads by creating a custom collection for storing user data, then embedd
 - Use clear, descriptive field labels
 - Provide value before asking for information
 - Test form submission thoroughly 
+## Collections from the `ef` CLI
+
+```bash
+ef collections list                         # every collection with its code and entry count
+ef collections create "Newsletter" --field Email:email:required
+ef collections entries <code>               # check a form is storing
+ef collections delete <code>                # asks first; --force in scripts
+```
+
+Deleting a collection removes its entries too, and any form, component or backend script that still names its code stops storing. Search the brand's pages, components and scripts for the code before you delete it.
