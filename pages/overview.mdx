@@ -171,6 +171,27 @@ Use dynamic variables to personalize your pages:
 - **Mobile optimization** - Ensure pages work on all devices
 - **Loading speed** - Monitor and improve page load times
 
+### Custom 404 page
+
+Give a page the URL `404` and it becomes your brand's not-found page. Any address on your domain that has no page shows it instead of the ElasticFunnels "page not found" screen, so a mistyped or retired link still lands on your branding with a way back to your offer.
+
+**In the app:** create a page as usual (Pages, then Create Page), set its URL to `404` and publish it. The Pages list marks it with a **Not-found page** badge.
+
+**With the `ef` CLI:**
+
+```bash
+ef pages create 404      # creates pages/404.ef
+ef push pages/404.ef     # publishes it
+```
+
+How it behaves:
+
+- The page answers with HTTP status **404**, both for unknown addresses and when someone opens `/404` directly, so search engines never treat a missing URL as a real page. It is also marked `noindex` and never listed in your sitemap.
+- It renders like any other page: templates, components and template variables all work.
+- It records no page view and loads no tracking scripts or pixels, so bots probing random URLs do not show up in your analytics or your usage.
+- Only a **published** `404` page is used. Without one, or while it is a draft or offline, visitors see the standard ElasticFunnels 404 page.
+- API endpoints, webhooks, checkout system addresses (such as the post-purchase `/thank-you` fallback), files like images or scripts, and page previews are never affected.
+
 ## Advanced Features
 
 ### Dynamic Content
