@@ -170,16 +170,13 @@ Legacy unstructured key/value pairs for ad-hoc product metadata (e.g. a download
 
 ### Variants Tab
 
-Define product variants (e.g. Color, Size) with individual pricing.
-
-1. **Select variant options** — Check which brand-level variant options apply to this product (managed under Settings → Variant Options)
-2. **Add variants** — Each row shows one field per selected option plus Code and Price
+Sell one product in several versions (Color, Size). In **1. What the buyer chooses** add each option and its values; in **2. Variants, one per combination** click **Create all combinations**, set a price for all if needed, and **Fill empty codes**. Each variant is **Own price** (its own code, price and SKU) or **Sells another product** (an existing product, such as a 3-bottle pack). The full guide, the page picker and the checkout setup are in [Product Variants](/products/variants).
 
 ---
 
 ## Template Reference
 
-All product data is available in ElasticFunnels templates via data functions and filters. Functions are called with `{% set x = FunctionName(args) %}` or inline. Filters are applied with `{{ value | filterName:arg }}`.
+All product data is available in ElasticFunnels templates via data functions and filters. Functions are called with `@set(x = FunctionName(args))` or inline (`{{ FunctionName(args).field }}`). Filters are applied with `{{ value | filterName:arg }}`.
 
 ---
 
@@ -259,8 +256,8 @@ Each item in `product_files`, `digital_files`, and `bonus_files`:
 Loads a single product by its **code** for the current brand. Also pre-loads structured attribute values so the `attr` and `attrLabel` filters work immediately on the returned object.
 
 ```
-{% set product = getProduct('PROD-001') %}
-{{ product.title }} — {{ product.price | formatPrice:product.currency }}
+@set(product = getProduct('PROD-001'))
+{{ product.title }}: {{ product.price | currency:product.currency }}
 ```
 
 **Returns:** `ProductObject | null`
@@ -280,10 +277,10 @@ Returns the brand's products, with optional filters. Products with **Show in fro
 | `show_in_frontend` | `boolean \| string` | Defaults to `true`. Pass `'any'` for everything, `false` for hidden products only |
 
 ```
-{% set upsells = getProducts({ classification: 'upsell' }) %}
-{% for p in upsells %}
-  <div>{{ p.title }} — {{ p.price | formatPrice:p.currency }}</div>
-{% endfor %}
+@set(upsells = getProducts({ classification: 'upsell' }))
+@foreach(p in upsells)
+  <div>{{ p.title }}: {{ p.price | currency:p.currency }}</div>
+@endforeach
 ```
 
 **Returns:** `ProductObject[]`
@@ -294,10 +291,10 @@ Returns the brand's products, with optional filters. Products with **Show in fro
 Returns every product for the brand without filters. Fastest when you need to iterate all products and filter in the template.
 
 ```
-{% set all = getAllProducts() %}
-{% for p in all %}{% if p.status == 'active' %}
+@set(all = getAllProducts())
+@foreach(p in all)@if(p.status eq 'active')
   {{ p.title }}
-{% endif %}{% endfor %}
+@endif@endforeach
 ```
 
 **Returns:** `ProductObject[]`
@@ -317,12 +314,12 @@ Returns product categories. By default returns a full tree ordered by position, 
 Each item: `{ id, name, position, parent_id, depth? }`
 
 ```
-{% set cats = getProductCategories({ top_level: true }) %}
-{% for cat in cats %}
+@set(cats = getProductCategories({ top_level: true }))
+@foreach(cat in cats)
   <h3>{{ cat.name }}</h3>
-  {% set subs = getProductCategories({ parent_id: cat.id }) %}
-  {% for sub in subs %}<span>{{ sub.name }}</span>{% endfor %}
-{% endfor %}
+  @set(subs = getProductCategories({ parent_id: cat.id }))
+  @foreach(sub in subs)<span>{{ sub.name }}</span>@endforeach
+@endforeach
 ```
 
 **Returns:** `CategoryObject[]`
@@ -333,10 +330,10 @@ Each item: `{ id, name, position, parent_id, depth? }`
 Flattens all downloadable files attached to a product into a single deduplicated array. Useful for rendering download lists on digital product pages.
 
 ```
-{% set files = productDownloads(product) %}
-{% for f in files %}
+@set(files = productDownloads(product))
+@foreach(f in files)
   <a href="{{ f.url }}">{{ f.title or f.extension | upper }} — {{ f.kind }}</a>
-{% endfor %}
+@endforeach
 ```
 
 Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`
@@ -349,10 +346,10 @@ Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary,
 Returns a structured savings breakdown comparing `retail_price` to `price`. Returns `null` if there is no saving.
 
 ```
-{% set savings = productSavings(product) %}
-{% if savings and savings.amount > 0 %}
+@set(savings = productSavings(product))
+@if(savings and savings.amount > 0)
   You save {{ savings.amountFormatted }} ({{ savings.percent }}% off)
-{% endif %}
+@endif
 ```
 
 **Returns:** `{ amount: number, percent: number, amountFormatted: string, percentFormatted: string } | null`
@@ -363,9 +360,9 @@ Returns a structured savings breakdown comparing `retail_price` to `price`. Retu
 Generates a human-readable billing summary string for a subscription product (e.g. `"7-day free trial · Every 1 month"`).
 
 ```
-{% if product.is_subscription %}
+@if(product.is_subscription)
   <p>{{ subscriptionSummary(product) }}</p>
-{% endif %}
+@endif
 ```
 
 **Returns:** `string`
@@ -391,12 +388,12 @@ Each item: `{ id, name, slug, type, applies_to, options, filterable, visible_on_
 Returns all attribute values for a product as a `{ slug: value }` map.
 
 ```
-{% set defs = getProductAttributes({ visible: true }) %}
-{% set vals = getProductAttributeValues(product) %}
-{% for attr in defs %}
+@set(defs = getProductAttributes({ visible: true }))
+@set(vals = getProductAttributeValues(product))
+@foreach(attr in defs)
   <dt>{{ attr.name }}</dt>
   <dd>{{ vals[attr.slug] }}</dd>
-{% endfor %}
+@endforeach
 ```
 
 **Returns:** `Record<string, string | number | boolean>`
@@ -489,7 +486,7 @@ Looks up the merchant-specific product identifier from `merchant_product_ids` (c
 Returns the value of a structured attribute by its slug. Only works on products loaded via `getProduct` (which pre-loads attribute values).
 
 ```
-{% set product = getProduct('MY-PRODUCT') %}
+@set(product = getProduct('MY-PRODUCT'))
 {{ product | attr:'material' }}
 {# → "Organic Cotton" #}
 ```
@@ -512,20 +509,20 @@ Returns the human-readable **label** (name) of a structured attribute definition
 `product.gallery` is a `string[]` — an array of CDN image URLs. It is always an array (never `null` or a JSON string). `product.has_gallery` is `true` when the array has at least one entry.
 
 ```html
-{% if product.has_gallery %}
+@if(product.has_gallery)
 <div class="product-gallery">
-  {% for url in product.gallery %}
+  @foreach(url in product.gallery)
   <img src="{{ url }}" alt="{{ product.title }}" />
-  {% endfor %}
+  @endforeach
 </div>
-{% endif %}
+@endif
 ```
 
 Show the primary image with gallery fallback:
 
 ```html
-{% set mainImage = product.image or (product.gallery[0] if product.has_gallery) %}
-{% if mainImage %}
+@set(mainImage = product.image or (product.gallery[0] if product.has_gallery))
+@if(mainImage)
 <img src="{{ mainImage }}" alt="{{ product.title }}" />
-{% endif %}
+@endif
 ```

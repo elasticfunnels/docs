@@ -146,6 +146,12 @@ With `checkout_packages` set, a posted code from that list is charged, `?p=` nam
 
 ---
 
+## Packs with a color or size
+
+When each pack has variants (an insole in 5 colors and 11 sizes, sold as 1, 2, 3 or 5 pairs), give every option the **variant code** of that pack in the buyer's color and size, so a switch changes the pack and keeps the choice. Build the rows in a backend script from the variant in `?p=`; the full example is in [Product Variants](/products/variants#checkout-pack-selector-that-keeps-the-color-and-size). Selling an own-price variant by its code ships with the sellable variants update.
+
+---
+
 ## Order bumps
 
 Bumps the page offers stay offered, and ticked bumps stay ticked, across a switch. One exception: a bump whose product code is the package the buyer just picked is taken out of `checkout.bump_products` (it would sell the same product twice) and comes back when the buyer picks another package.

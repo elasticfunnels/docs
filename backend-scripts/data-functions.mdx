@@ -625,16 +625,19 @@ array, ordered by position, plus `product_fields` (the option axes) and `has_var
 ```javascript
 var product = getProduct('sleep-gummies');
 
-@foreach(v in product.variants)
-  {{ v.title }}          // "3 Bottles"  - joined option values
-  {{ v.code }}           // "sleep-gummies-3" - resolved through the linked product
-  {{ v.price }}          // 177
-  {{ v.retail_price }}   // 297
-  {{ v.per_unit_price }} // 59  - price / units, precomputed
-  {{ v.on_sale }}        // true when retail_price > price
-  {{ v.is_default }}     // exactly one variant is true
-@endforeach
+for (var i = 0; i < product.variants.length; i++) {
+  var v = product.variants[i];
+  // v.title          "3 Bottles", the option values joined with " / "
+  // v.code           "sleep-gummies-3", what the cart and buy links take
+  // v.price          177
+  // v.retail_price   297
+  // v.per_unit_price 59, price / units
+  // v.on_sale        true when retail_price > price
+  // v.is_default     exactly one variant is true
+}
 ```
+
+In a page template the same fields read as `{{ v.title }}`, `{{ v.price | currency:product.currency }}` inside `@foreach(v in product.variants) ... @endforeach`.
 
 | Field | Notes |
 |---|---|
@@ -648,9 +651,11 @@ var product = getProduct('sleep-gummies');
 | `is_default` | Exactly one variant per product is `true`. |
 
 <Note>
-Commercial fields resolve through the linked product (see
-[Product Variants](/products/variants)), so `price`, `sku` and `image` are already the
-values you should show — no second lookup needed.
+`price`, `retail_price`, `sku` and `image` are the values to show: the variant's own value,
+else the linked product's, else the product's (see [Product Variants](/products/variants)).
+`getProduct()` also accepts an own-price variant's code: it returns the product with that
+variant's price on top, `parent_code` and `variant` (`{ id, code, title, label, option_values }`).
+The product's fallback and variant codes ship with the sellable variants update.
 </Note>
 
 ### `getProducts(filters?)`
