@@ -80,22 +80,22 @@ Attributes with `applies_to = variant` are managed in the Variants tab, not the 
 ### List Definitions
 
 ```
-{% set attrs = getProductAttributes() %}
-{% for attr in attrs %}
+@set(attrs = getProductAttributes())
+@foreach(attr in attrs)
   {{ attr.slug }}: {{ attr.name }} ({{ attr.type }})
-{% endfor %}
+@endforeach
 ```
 
 Filter by scope or visibility:
 
 ```
-{% set visibleAttrs = getProductAttributes({ visible: true, applies_to: 'product' }) %}
+@set(visibleAttrs = getProductAttributes({ visible: true, applies_to: 'product' }))
 ```
 
 ### Get Product Values
 
 ```
-{% set vals = getProductAttributeValues(product) %}
+@set(vals = getProductAttributeValues(product))
 {{ vals.material }}
 {{ vals.scent }}
 ```
@@ -105,23 +105,23 @@ Filter by scope or visibility:
 When a product is loaded via `getProduct()`, attribute values and definitions are pre-loaded:
 
 ```
-{{ product | attr:'material' }}        — value by slug
-{{ product | attrLabel:'material' }}   — display label by slug
+{{ product | attr:'material' }}        {{-- value by slug --}}
+{{ product | attrLabel:'material' }}   {{-- display label by slug --}}
 ```
 
 ### Full Display Example
 
 ```
-{% set attrDefs = getProductAttributes({ visible: true }) %}
-{% set attrVals = getProductAttributeValues(product) %}
+@set(attrDefs = getProductAttributes({ visible: true }))
+@set(attrVals = getProductAttributeValues(product))
 <dl>
-{% for def in attrDefs %}
-  {% set val = attrVals[def.slug] %}
-  {% if val %}
+@foreach(def in attrDefs)
+  @set(val = attrVals[def.slug])
+  @if(val)
     <dt>{{ def.name }}</dt>
     <dd>{{ val }}</dd>
-  {% endif %}
-{% endfor %}
+  @endif
+@endforeach
 </dl>
 ```
 
