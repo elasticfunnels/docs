@@ -1,0 +1,29 @@
+{
+  "out": "images/pages/page-settings-version.png",
+  "alt": "Page Settings opened on version 2 of a page: a banner naming the primary page with an Open primary page settings button, an editable Version URL, and the domain, index page and checkout flag locked",
+  "_note": "Needs the demo page lp-b (5984) to have one version (see pages-page-settings-general.json). Opens the primary, then switches to the second version in the Versions list.",
+  "capture": {
+    "path": "/{brand}/pages/5984/builder",
+    "viewport": { "width": 1440, "height": 1000 },
+    "waitFor": "[data-testid=builder-rail-settings]",
+    "actions": [
+      { "wait": 2500 },
+      { "click": "[data-testid=builder-rail-settings]" },
+      { "waitFor": "[data-testid=page-settings-versions]" },
+      { "click": "[data-testid=page-settings-versions] button:nth-of-type(2)" },
+      { "waitFor": "[data-testid=page-settings-version-banner]" },
+      { "wait": 1200 }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "[data-testid=page-settings-version-banner]", "title": "Version banner", "text": "Which page this version belongs to", "side": "left" },
+    { "selector": "[data-testid=page-settings-open-primary]", "title": "Open primary", "text": "Edit the shared settings there" },
+    { "selector": "[data-testid=page-settings-field-variant-slug]", "title": "Version URL", "text": "Opens this version directly" },
+    { "selector": "[data-testid=page-settings-field-domain-id]", "title": "Locked", "text": "Set on the primary page" },
+    { "selector": "[data-testid=page-settings-field-is-checkout-page]", "title": "Is checkout page", "text": "Shows the primary's value" }
+  ]
+}

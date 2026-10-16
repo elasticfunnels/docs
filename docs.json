@@ -90,6 +90,7 @@
               "pages/overview",
               "pages/rendering-pipeline",
               "pages/create-landing-page",
+              "pages/page-settings",
               "pages/wildcard-routes",
               "pages/seo",
               "pages/privacy-consent",
