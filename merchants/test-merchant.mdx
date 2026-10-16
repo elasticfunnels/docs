@@ -35,6 +35,10 @@ Enter any future expiry date (for example `12/30`) and any CVC.
 
 The other numbers from Stripe's test card list work too and give the same result as on Stripe (for example `5555 5555 5555 4444` is an approved Mastercard). Any other card number is refused before anything is recorded, and an expiry date in the past is refused.
 
+## The checkout card form
+
+A checkout using the Test merchant shows plain card fields (card number, expiry, CVC) instead of the Stripe or NMI card element, because there is no gateway to load it from. Everything around the card is the same as with a real processor: when the page has no ZIP field of its own, the card panel adds the same **Country** and **ZIP / postal code** fields it shows with NMI and Stripe, so a page tests the way it will run in production. A course or download checkout needs no shipping fields; see [Digital products](/checkouts/checkout-functionality-reference#digital-products-courses-downloads-memberships).
+
 ## What a test order does
 
 A test order made through the Test merchant runs the same steps as a paid order, so you can check the whole funnel:

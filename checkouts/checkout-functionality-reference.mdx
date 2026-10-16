@@ -73,16 +73,21 @@ Where a name is missing, the server backfills it: personal ← shipping ← bill
 
 - `email` (required), `phone` (optional)
 - `shipping_address`, `shipping_address2` (optional)
-- `shipping_country` (required, 2-letter, uppercased), `shipping_city`, `shipping_state`, `shipping_zip`
+- `shipping_country` (2-letter, uppercased; required for physical products, see below), `shipping_city`, `shipping_state`, `shipping_zip`
 
 <Note>
-Client-side validation requires any of these that are **present on the page**; server-side, only `email`, `shipping_country` and the shipping name pair are strictly required — address, city, state and ZIP are accepted empty. `shipping_country` defaults to `US` when left blank.
+Client-side validation requires any of these that are **present on the page**. Server-side, `email` and a name (the shipping name pair, filled from the personal or cardholder name when missing) are always required. Which country is required depends on what the cart sells:
+
+- **Any physical product** in the cart (main product, bump or cart line): `shipping_country` is required. Address, city, state and ZIP are accepted empty.
+- **Only digital or service products** (courses, downloads, memberships): `shipping_country` and the shipping address are never required; `billing_country` is. See [Digital products](#digital-products-courses-downloads-memberships).
+
+There is no default country: a missing one is refused with a 400 that names the field (`Shipping country is required.` or `Billing country is required.`). When "same as billing" is on (the default), whichever country the page sends is copied to the other one.
 </Note>
 
 **Billing** (when shown; if empty, shipping values are used)
 
 - `billing_first_name`, `billing_last_name` — never client-side required
-- `billing_address`, `billing_address2`, `billing_country`, `billing_city`, `billing_state`, `billing_zip` — validated client-side only when a billing field is visible; all optional server-side
+- `billing_address`, `billing_address2`, `billing_country`, `billing_city`, `billing_state`, `billing_zip`: validated client-side only when a billing field is visible; optional server-side, except `billing_country` on a cart with no physical product
 
 **Toggle**
 
@@ -91,6 +96,30 @@ Client-side validation requires any of these that are **present on the page**; s
 **Errors**
 
 - Use `data-checkout-error="<field_name>"` matching the input `name` for inline validation messages.
+- When the server refuses a field that has no input (or no error element) on the page, its message is shown in the checkout's error area instead, so the buyer always sees which field is wrong and why.
+
+### Digital products (courses, downloads, memberships)
+
+A product ships only when its **Type** is **Physical** (a product with no type counts as physical). A cart where every product is **Digital** or **Service** ships nothing, so its checkout page needs no shipping fields at all:
+
+- the page collects `email` and the card;
+- the card panel adds its own Country and ZIP fields when the page has no ZIP field (see [Smart field detection](#smart-field-detection)), which gives the order its `billing_country`;
+- the server requires `billing_country` (plus whatever the gateway needs for the card) and never `shipping_country` or a shipping address;
+- the wallet (Apple Pay, Google Pay) does not ask for a shipping address, on Stripe and on NMI.
+
+A minimal working digital checkout:
+
+```html
+<input type="email" name="email" data-template-value="checkout.customer.email" required>
+<div data-checkout-error="email"></div>
+
+<checkout-cc-panel data-accepted-cards="visa,mastercard,amex,discover"></checkout-cc-panel>
+
+<div data-checkout-message class="checkout-message"></div>
+<button type="button" data-checkout-submit>Get instant access</button>
+```
+
+The card panel renders the cardholder name, the card fields, and the Country and ZIP fields. Set the product's **Type** to **Digital** in **Products**; a cart that mixes a course with a physical product still asks for the shipping country.
 
 ---
 
@@ -415,7 +444,7 @@ Because the tab layout requires that no `#applePay` element already exists, addi
 The card panel automatically detects which checkout fields are present on the page and fills in any gaps:
 
 - **Cardholder name:** If `first_name` **or** `last_name` is missing from the page, a "Cardholder Name" field appears inside the card panel. Note this checks only that pair — `shipping_first_name` / `shipping_last_name` do not satisfy it.
-- **Billing block:** If neither `billing_zip` nor `shipping_zip` is on the page, the card panel renders a billing block containing a **Country** select and a **ZIP / postal code** input. It never adds a name or street-address field. Which of the two appear is controlled by `checkout_settings.billing_fields` (section 4.3).
+- **Billing block:** If neither `billing_zip` nor `shipping_zip` is on the page, the card panel renders a billing block containing a **Country** select and a **ZIP / postal code** input, each with its own error message. It never adds a name or street-address field. This holds for every card gateway: Stripe, NMI, Authorize.Net, the plain card form of the [Test merchant](/merchants/test-merchant) and a live merchant's `?test=` mode. Which of the two appear is controlled by `checkout_settings.billing_fields` (section 4.3).
 - **Auto-copy:** When billing fields are inside the card panel and no shipping fields exist on the page, billing values are automatically copied to shipping during submission (and vice versa).
 
 This means a minimal checkout page with only email and the payment panel still collects enough billing information for AVS.
@@ -423,7 +452,7 @@ This means a minimal checkout page with only email and the payment panel still c
 ### Wallet contact field auto-detection
 
 <Note>
-NMI / Collect.js only. On **Stripe**, the payment request is always created with `requestPayerName`, `requestPayerEmail` and `requestShipping` enabled and no phone request, regardless of which fields are on the page.
+The table is the NMI / Collect.js behavior. On **Stripe**, the payment request always asks for the payer's name and email and never the phone; it asks for a shipping address only when the page has `shipping_address` or `shipping_country`. The billing country comes from the card's billing details.
 </Note>
 
 | Page has | Wallet requests |
@@ -635,6 +664,8 @@ The server always takes the customer details from the main order in the session;
 | Too many captchas | Increase `captcha_requests` or `window_ms`; check shared IP / VPN concentration |
 | Hard blocks too aggressive | Increase `hard_block_requests` or `window_ms`; review `block_duration_ms` |
 | A 100% coupon order fails | The cart has a subscription (refused on purpose, see 8.1); otherwise check the coupon is active and covers the product |
+| Digital checkout refused with "Shipping country is required." | A product in the cart (often a bump) has **Type** Physical or no type. Set every product that ships nothing to Digital or Service |
+| "Billing country is required." on a page with no address fields | The page has its own ZIP field, so the card panel hides its Country select; add a `billing_country` select, or remove the ZIP field |
 | Upsell after a free order asks for shipping again | The checkout page was opened without `ups=yes`, or the session lost the main order (different browser or domain) |
 
 ---
