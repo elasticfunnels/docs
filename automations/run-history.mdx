@@ -80,6 +80,15 @@ Credentials such as API keys and tokens are removed from the error before it is 
 above, Klaviyo answered 401, which points at the API key on the Klaviyo integration: fix the key under
 **Apps** → **Integrations**, and the next run uses it.
 
+### Failure emails
+
+When a step fails, the brand owner gets an email with the automation's name, the step, the error and the
+time. For a brand that belongs to an organization, its admins get it too. The **Open this run** button in
+the email opens the Events page with that run's drawer already open.
+
+You get at most one email per automation per day (UTC), for the first failed step that day. Any later
+failures that day appear only on the Events page, so check there once you have fixed the cause.
+
 ### Input and output
 
 Click **Show input and output** on a step to see the data the step received and what it returned.
