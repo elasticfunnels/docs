@@ -33,3 +33,33 @@ If nothing there needed changing, say so in the commit message ("agent rules che
 - Facts come from the code or `.ef-docs/documentation for pitch decks etc/FEATURES_MASTER.md` in the
   app repo; never describe a feature that is not live as if it were.
 - Brand name is ElasticFunnels, one word.
+
+# Screenshots are required
+
+Owner rule (2026-10-16): every page that describes a screen shows that screen, as a real annotated
+screenshot of the live UI on the demo brand (899, Northwind Supplements). Never a mockup, never a
+hand-drawn copy of the UI, never a real customer's brand.
+
+- **A `{/* SCREENSHOT: ... */}` placeholder is a to-do, not a finished page.** A page that still has
+  one is not done; replace it with the image when you touch the page.
+- **Make every image with `tools/shots/`** (README there): one JSON spec per image, captured with
+  Playwright at 2x and rendered as the annotated composite into `images/<section>/<name>.png`. Keep
+  the spec in the repo so the shot can be re-taken after the UI changes.
+- **The style, so every page looks the same:**
+  - UI screens: the capture in a rounded frame with a thin dark border, on a large rounded
+    light-grey panel (`#F5F6FA`). Each element you talk about gets a rounded outline and a dot,
+    and a thin black leader line runs to a white callout box beside the shot. A "Click to enlarge"
+    pill sits bottom right.
+  - URLs and parameters (postbacks, buy links, tracking links): the URL in monospace with each part
+    on its own pastel highlight, a dot and a leader line down to a callout under each part.
+  - Callout copy is short: a bold title of 1 to 3 words (the label the user sees in the app when
+    there is one) and one plain line of at most about 8 words on what it does.
+  - Three to six callouts per image. More than that is two images.
+- **Embed with a plain `<img>`**: `<img src="/images/emails/overview-list.png" alt="..." />`.
+  Mintlify zooms images on click by default, which is what the pill promises; do not add
+  `noZoom`, and do not wrap the image in `<Frame>` (the composite already has its frame). Write
+  real alt text that says what the image shows.
+- **Examples use a generic product.** The example product is **Acme Sleep Gummies**
+  (codes `sleep-gummies`, `sleep-gummies-1/3/6`), the example brand **Acme Health**, example
+  domains `example.com`. Never a real customer product or brand (Menosoothe, Herpafend, Glucotil
+  and the like), not in prose, code, JSON or alt text.
