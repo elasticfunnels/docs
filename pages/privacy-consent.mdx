@@ -178,6 +178,16 @@ on checkout pages** to add an unticked box above the order button. Its text is
 under **Banner text** as **Checkout email opt-in box text**, per language. A
 checkout page that already has its own `allow_emails` box keeps it.
 
+### What the answer means for email campaigns
+
+Email campaigns go to everyone in the audience unless they said no. A buyer said no
+when the checkout showed the opt-in box and they left it unticked. Everyone else is
+included, also buyers with no answer on record: sales from networks such as BuyGoods
+or ClickBank, and orders from checkouts without the box. People who unsubscribed,
+bounced or marked an email as spam are always left out.
+
+The campaign's audience panel shows the count as **Left out: said no to emails**.
+
 ---
 
 ## SMS and email opt-in boxes on checkout and upsell pages
@@ -199,10 +209,12 @@ code editor, write the checkbox yourself:
 | `name="allow_sms"` | The buyer agreed to SMS marketing |
 | `name="allow_emails"` | The buyer agreed to email marketing |
 
-A ticked box is stored on that order as a flag (`allow_sms` or `allow_emails`). An unticked box stores
-nothing. On an **upsell page**, the box is read when the buyer clicks the accept link (`[UPSELL=...]`),
-for one-click and redirect upsells alike, and stored on the upsell order. A buyer who declines the
-upsell is not recorded either way.
+A ticked box is stored on that order as a flag (`allow_sms` or `allow_emails`). On a **checkout
+page**, a box the buyer saw and left unticked is stored as a "no" (the same flag set to `0`); a page
+without the box stores nothing. On an **upsell page**, the box is read when the buyer clicks the accept
+link (`[UPSELL=...]`), for one-click and redirect upsells alike, and a ticked box is stored on the
+upsell order; an unticked one stores nothing there. A buyer who declines the upsell is not recorded
+either way.
 
 <Note>
 The flag records **that** the buyer ticked the box, not the words next to it. If you send SMS in the
