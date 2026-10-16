@@ -10,7 +10,7 @@ An order confirmation only reaches a customer when all three of these are in pla
 
 1. **A sender.** SMTP credentials on the brand, or an email integration on the merchant that is
    connected and not paused.
-2. **A template.** The email itself, from **Emails → Templates**. Your brand has a **Default**
+2. **A template.** The email itself, from the template list (**Settings → Apps → Emails**). Your brand has a **Default**
    template for each standard event.
 3. **A merchant whose payments run through ElasticFunnels.** NMI, Stripe, PayPal, Klarna and
    Authorize.Net checkouts send order emails. BuyGoods, ClickBank, Digistore24, JVZoo and Shopify
@@ -22,7 +22,7 @@ Instead a **Choose a sending account for ... emails** task appears in your Brand
 per email type, and closes by itself once that email can be sent again.
 
 <Tip>
-The **Status** column in **Emails → Templates** shows, for each template, whether it is sending and
+The **Status** column in the template list (**Settings → Apps → Emails**) shows, for each template, whether it is sending and
 for which merchants. Check it after any change here.
 </Tip>
 
@@ -107,7 +107,7 @@ locked out.
 ## Step 2: create the templates
 {/* SCREENSHOT: Emails list · brand templates with names and subjects · desktop */}
 
-Open **Emails → Templates** in the sidebar. Tabs filter the templates by type (Orders, Subscriptions,
+Open **Settings → Apps → Emails** in the sidebar. Tabs filter the templates by type (Orders, Subscriptions,
 Members and login, Courses, Custom). Your brand has a **Default** template for each standard
 event, and you can create your own. See [Emails](/emails/overview) for the list,
 [Building an email](/emails/builder) for the builder and
@@ -167,7 +167,7 @@ For each email, ElasticFunnels checks these in order and sends the first templat
 2. **Settings** → **Subscriptions**, which holds brand-wide picks for the same events
    (not for the Pre-Renewal Reminder).
 3. The brand's **Default** template for that event, marked with a **Default** badge in
-   **Emails → Templates**.
+   the template list (**Settings → Apps → Emails**).
 
 So to change the copy for every merchant at once, edit the Default template. To give one merchant
 different copy, duplicate the Default, edit the copy, and pick it on that merchant.
