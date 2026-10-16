@@ -31,6 +31,32 @@ A drag-and-drop editor that lets you design emails visually. Ideal for non-techn
 - Style elements with a visual properties panel
 - Preview desktop and mobile layouts side by side
 - Insert template variables from the Variables panel
+- Click **Save** in the top bar to store your changes
+
+#### Adding sections
+
+A **+** marker sits between the sections of the email, and above the first and below the last.
+Move the pointer near one and it opens into an **Add section here** line. Click it to pick what to
+insert at that spot: Text, Image, Button, Two columns, Divider, Spacer, Social links, Logo, Footer
+or Custom HTML. The markers only show in the editor and are never part of the saved email.
+
+#### Email blocks
+
+The **Email elements** group in the blocks panel holds blocks built from tables, so they show the same
+in every mail client: Button, Two columns, Spacer, Social links, Logo and Footer.
+The Footer block carries your postal address and the unsubscribe link.
+
+Blocks that only work on web pages (frontend template engine blocks, Include Component, Extends
+Layout, Block and Backend Script) are hidden in the email builder. The backend If/Else, Foreach and
+Set blocks are still there.
+
+#### Your own HTML
+
+- Drag the **HTML Block** into the email (or pick **Custom HTML** from an **Add section here**
+  line) to paste markup of your own. The canvas shows it rendered, as it will look in the inbox.
+  Click it to edit the code.
+- To change the markup of any element, right-click it and choose **Edit HTML**, or select it and
+  press `Cmd+E` / `Ctrl+E`.
 
 ### Code Editor (Monaco)
 
@@ -40,6 +66,17 @@ A full HTML code editor for users who prefer writing markup directly. The code e
 - Auto-completion and error detection
 - Save with `Cmd+S` / `Ctrl+S`
 - Switch to the Visual Builder at any time
+
+## Campaign emails
+
+A new campaign opens on a ready-made layout: your brand name, a headline, a short text, a button
+and a footer with your postal address and the unsubscribe link. Edit it in place instead of
+starting from an empty page. On the campaign's **Content** step, **Replace content** lets you start
+over from **A template**, **An earlier campaign** or **The default layout**.
+
+Click **Edit design** to open the layout in the Visual Builder, or **Edit HTML** to open it in the
+Code Editor. When the builder was opened from a campaign, the top bar also shows **Continue to settings**:
+it saves the email and takes you to the campaign's **Settings** step.
 
 ## Versions
 
