@@ -29,6 +29,14 @@
             ]
           },
           {
+            "group": "Account & Security",
+            "pages": [
+              "account/two-factor-authentication",
+              "account/passkeys",
+              "account/cli-and-api-keys"
+            ]
+          },
+          {
             "group": "Analytics & Metrics",
             "pages": [
               "analytics/custom-dashboards",
