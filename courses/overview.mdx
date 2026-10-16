@@ -1,155 +1,158 @@
 ---
 title: 'Courses'
-description: 'Create structured courses with modules, lessons, and progress tracking — gated by customer enrollment from purchase'
+description: 'Create a course, add lessons, choose what unlocks it, preview it as a student and publish it. Buyers are enrolled when they pay.'
 ---
 
-Courses let you deliver structured learning content (video, audio, or text lessons) to customers who have purchased access. Each course is organized into **modules** with **lessons** (contents). Enrollment is tied to a product purchase — when a customer buys the linked product, they are automatically enrolled.
+A course is a set of **modules** (a week, a chapter) that hold **lessons**. You sell it with the
+products, checkouts and funnels you already use: link a product to the course, and everyone who
+buys that product is enrolled as soon as the payment goes through.
 
-## How courses work
-{/* SCREENSHOT: How courses work · relevant screen or example output · desktop */}
+Open **Courses** in the sidebar to see your courses, filter drafts and create a new one.
 
-```mermaid
-flowchart LR
-    A[Customer buys product] --> B[Enrollment created automatically]
-    B --> C[is_assigned = true on that course]
-    C --> D[Customer accesses course content]
-    D --> E[Progress tracked per lesson]
-```
+## Create a course
+{/* SCREENSHOT: New course · the "Where will students take this course?" choice above the name and summary fields · desktop */}
 
-1. You create a course in the ElasticFunnels dashboard with modules and lessons.
-2. You link a **product** to that course — purchasing the product grants enrollment.
-3. On your course pages, `getCourseForCustomer(slug)` returns `is_assigned: true` for enrolled customers and `false` for everyone else.
-4. You gate content in the template: show the full course to enrolled customers, show an "Get access" CTA to others.
+Click **New course**. The first question is **Where will students take this course?**
 
-## Setting up a course
-{/* SCREENSHOT: Setting up a course · relevant screen or example output · desktop */}
+| Choice | What you get |
+|---|---|
+| **ElasticFunnels course pages** | A course library, a course page and a lesson player on your domain, ready to use. You can change the design later. See [Course pages](/courses/student-pages). |
+| **My own pages or app** | No course pages are created. Your members area, your own pages or your app read the course with the course functions, and the course screen shows where it is used and the code to paste. See [Courses on your own pages](/courses/own-pages). |
 
-### 1. Create the course
+Then give the course a name and a short summary of what students will learn. Instructor,
+category and a cover image are optional. A project with no domain yet starts on your own pages;
+add a domain to use the course pages.
 
-In the dashboard, go to **Courses** and create a new course. Add:
+You can switch between the two later in the course's **Settings**. Students, lessons and access
+stay as they are when you switch.
 
-- **Title**, **slug**, **description**, **cover image**, **instructor name**
-- **Category** (optional — used for filtering on the course list page)
-- **Modules** — each with a title and one or more **lessons**
-- **Lessons** — each has a title, type (`video`, `audio`, or `text`), and a content URL or embed
+## The setup checklist
+{/* SCREENSHOT: Course Overview · "Get your course ready" checklist with five steps · desktop */}
 
-### 2. Link a product to the course
+A new course opens on its **Overview**, with a checklist called **Get your course ready**:
 
-In the course settings, select the **product** that grants access. When a customer purchases this product, an enrollment record is created automatically.
+<Steps>
+  <Step title="Describe the course">
+    A name and a short summary are what students see first.
+  </Step>
+  <Step title="Add lessons">
+    Group lessons into modules on the **Curriculum** tab. See [Lessons](#lessons) below.
+  </Step>
+  <Step title="Choose what unlocks it">
+    Link the products that enrol their buyers, or make the course free. See [Access](#access).
+  </Step>
+  <Step title="Preview as a student, or use it in your pages">
+    On course pages, **Preview as student** opens the course the way an enrolled student sees it,
+    drafts included. On your own pages, this step shows the code to paste.
+  </Step>
+  <Step title="Publish">
+    Students can open the course once it is published.
+  </Step>
+</Steps>
 
-You can link multiple products to the same course (e.g. a bundle and a standalone SKU both grant access to the same course).
+**Preview as student** signs you in as a preview student of your own account through a one-time
+link that is valid for 15 minutes. No welcome email is sent, and the preview shows on the
+**Students** tab with a **Preview** badge.
 
-### 3. Create your course pages
+## Lessons
+{/* SCREENSHOT: Curriculum tab · outline on the left, lesson editor with Featured media and the lesson body · desktop */}
 
-You need at minimum two pages:
+On the **Curriculum** tab, the outline lists modules and their lessons. Drag to reorder them, and
+select a module or lesson to edit it next to the outline.
 
-| Page | Purpose |
-|------|---------|
-| **Course list** | Show all available courses with enrollment status (assigned vs. not) |
-| **Course detail** | Show a single course — full content if enrolled, "Get access" CTA if not |
+A lesson has:
 
-See [Courses — Template Reference](/courses/template) for complete backend script and template examples.
+- **Featured media** (optional): a **Video** (a YouTube, Vimeo, Loom or Bunny link, an uploaded
+  video file, or an embed code) or an **Audio** file or link with a cover image. Choose **None**
+  for a written lesson, such as a short essay, a step guide or a file pack.
+- **Lesson**: the body. Add images, numbered steps, a key details box, videos and embeds
+  (YouTube, Vimeo, Loom, Wistia, Bunny Stream, Miro) anywhere in the text.
+- **Files**: downloads under the lesson, such as worksheets, transcripts and templates.
+- **Key takeaways**: one line per thing to remember or do.
+- **Comments**: follow the course setting, or turn them on or off for this lesson.
 
-## Enrollment and `is_assigned`
-{/* SCREENSHOT: Enrollment and `is_assigned` · relevant screen or example output · desktop */}
+## Access
+{/* SCREENSHOT: What unlocks this course · product list with Paid / Free choice · desktop */}
 
-Enrollment is created automatically by `BrandCourseEnrollment` when a purchase conversion is recorded for a product that is linked to a course.
+Click **Link a product** (or **Change** under **Unlocked by**) to choose what unlocks the course:
 
-The `is_assigned` flag is resolved per-customer when you call `getCourseForCustomer({ slug })` or `getCourses({ assignedOnly: false })`. It is `true` if the currently logged-in customer has an enrollment record for the course.
+- **Paid**: only buyers of a linked product and students you add get in. A purchase of a linked
+  product enrols the buyer, including when the product is bought as an upsell.
+- **Free**: any signed-in visitor can enrol in the published course. Linked products still enrol
+  their buyers.
 
-`started` is `true` when the enrollment has any progress (at least one lesson completed or in progress).
+You can link several products to one course, for example a bundle and a standalone product. The
+same list is on each product, on its **Courses** tab.
+
+Access follows the money:
+
+| Event | What happens to course access |
+|---|---|
+| Refund or chargeback | Access to the courses that sale unlocked ends right away. |
+| Subscription cancelled | Access stays until the paid period ends (the default). |
+| Subscription resumed | Access comes back. |
+
+The subscription rule is a project setting with three choices: keep course access until the paid
+period ends, end course access right away, or keep course access. It sits in the project's course
+settings at `/{brand}/settings?tab=courses`, under **When a subscription is cancelled**. Refunds and
+chargebacks always end access, whatever this setting says.
+
+## Students
+{/* SCREENSHOT: Students tab · list with progress, status and source · desktop */}
+
+The **Students** tab lists everyone with access, with search and paging. Each student shows their
+progress, when they enrolled and their status: **Active**, **Revoked** (with the reason: refunded,
+chargeback, subscription cancelled or revoked by an admin) or **Expired**.
+
+- **Add student** gives someone access without a purchase, for example a partner or a past
+  customer. They get the course welcome email with a sign-in link. Adding a revoked or expired
+  student again reopens their access.
+- **Revoke access** stops a student's access and keeps them on the list. **Restore access** gives
+  it back.
+- **Remove from course** deletes the student and their progress.
+
+Open a student to see their progress, how they got access (purchase, upsell, added by your team,
+import or free enrollment), the order, and private notes that only your team sees.
+
+## Student emails
+{/* SCREENSHOT: Settings → Student emails · welcome email picker with Edit, Send test to me and Duplicate for this course · desktop */}
+
+Every new student gets one welcome email. In the course's **Settings → Student emails**:
+
+- **Welcome email** lists the course templates of your project: the two built-in ones (Course
+  Enrollment and Course Magic Link) and their copies. Pick one, then **Edit** it, **Send test to
+  me**, or **Duplicate for this course** to give this course its own copy.
+- **Emails a student can get** lists the welcome and sign-in link email, the sign-in code and the
+  reply to a comment, with the template each one uses.
+
+Students sign in to courses the same way customers sign in to your members area (**Members area,
+Login method**). With email only or magic link, the welcome email carries the student's sign-in
+link. With a code or an order ID, it links to the sign-in page. See [Course emails](/emails/course-emails).
 
 <Note>
-Customers are automatically logged in after checkout, so a customer who just purchased will have `is_assigned: true` the moment they land on the course page — no extra login step needed.
+The welcome email goes to new enrollments only. Students enrolled more than 7 days ago are not
+emailed again.
 </Note>
 
-## Progress tracking
-{/* SCREENSHOT: Progress tracking · relevant screen or example output · desktop */}
+## Delete a course
 
-Progress is tracked server-side per customer, per lesson. All course functions that resolve enrollment (`getCourseForCustomer`, `getCourses`, `getCoursesForCustomer`) include the customer's progress:
-
-- `completed_content_ids` — array of completed lesson IDs
-- `progress_percent` — 0–100
-- `is_completed` — `true` when the course reaches 100%
-- `current_unfinished_lesson` — object with module/lesson ids, titles, and resume URL when in progress
-- `resume_url` — direct resume link when available
-
-The front-end marks lessons complete by calling the progress API (`POST /api/course/courses/:courseId/lessons/:contentId/complete`).
-
-For dashboards and aggregate views, two additional functions are available:
-
-- `getCompletedLessonsCount(opts?)` — returns the total number of completed lessons (optionally filtered by course slug)
-- `getCourseProgress(opts?)` — returns a structured summary with per-course and overall lesson counts
-
-See [Template Reference](/courses/template) for full API signatures and examples.
-
-## Course object structure
-{/* SCREENSHOT: Course object structure · relevant screen or example output · desktop */}
-
-All course functions return objects with this shape:
-
-```javascript
-{
-  id: 42,
-  title: "12-Week Fat Loss Blueprint",
-  slug: "fat-loss-blueprint",
-  description: "A step-by-step 12-week program combining nutrition, cardio, and strength training.",
-  instructor_name: "Coach Sarah Mills",
-  cover: "https://cdn.example.com/courses/fat-loss-cover.jpg",   // hero/cover image
-  logo: "https://cdn.example.com/courses/fat-loss-logo.png",     // small logo
-  image_url: "https://cdn.example.com/courses/fat-loss-card.jpg", // card thumbnail
-
-  category_slug: "weight-loss",
-  category_name: "Weight Loss",
-
-  module_count: 4,
-  lesson_count: 24,
-  estimated_minutes: 120,
-
-  // Enrollment fields (present when the customer has an enrollment):
-  is_assigned: true,               // customer is enrolled
-  started: false,                  // enrollment has progress
-  completed_content_ids: [101, 105, 108],  // IDs of completed lessons
-  progress_percent: 31,            // 0–100
-
-  // Only on detail call (getCourseForCustomer, getCourseBySlug):
-  modules: [
-    {
-      id: 10,
-      title: "Week 1 — Foundation",
-      order: 1,
-      contents: [
-        {
-          id: 101,
-          title: "Introduction",
-          type: "video",            // 'video' | 'audio' | 'text'
-          content_url: "https://...",
-          content_embed: "<iframe ...>",  // if embed URL
-          description: "...",
-          materials: [...],           // downloadable files
-          key_takeaways: [...]
-        }
-      ]
-    }
-  ],
-  total_lesson_count: 24,
-}
-```
+**Delete course** (in the course's menu on the list) asks you to confirm. Students lose access and
+the course leaves your list; their enrollments stay on record as revoked. If the course has its
+own pages (see [Customize for this course](/courses/student-pages#customize-for-this-course)), the
+dialog offers **Also delete this course's custom pages**. Your shared course design is not touched.
 
 ## Related
-{/* SCREENSHOT: Related · relevant screen or example output · desktop */}
-
 <CardGroup cols={2}>
-  <Card title="Template Reference" icon="code" href="/courses/template">
-    Backend functions, course list, course detail, and access gating examples
+  <Card title="Course pages" icon="book-open" href="/courses/student-pages">
+    The course library, course page and lesson player on your domain
   </Card>
-  <Card title="Members Area" icon="users" href="/members-area/overview">
-    Auth wrapper pattern — protecting pages and reusing login logic
+  <Card title="Courses on your own pages" icon="code" href="/courses/own-pages">
+    Show a course inside your members area or app
   </Card>
-  <Card title="Backend Scripts" icon="terminal" href="/backend-scripts/overview">
-    How backend scripts work on .ef pages
+  <Card title="Template reference" icon="brackets-curly" href="/courses/template">
+    Every course function and the progress API
   </Card>
-  <Card title="Backend Data Functions" icon="database" href="/backend-scripts/data-functions">
-    Full reference for all data functions including getCourses
+  <Card title="Course emails" icon="envelope" href="/emails/course-emails">
+    Welcome, sign-in and comment emails
   </Card>
 </CardGroup>

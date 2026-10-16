@@ -34,9 +34,12 @@ the first hit:
 
 A pattern matches only when **both** of these hold:
 
-- Its **static prefix** — everything before the first `{` — is exactly the URL
+- Its **static prefix** (everything before the first `{`) is exactly the URL
   prefix being tested.
-- Its **number of placeholders** equals the number of segments left over.
+- The rest of the slug has as many segments as the URL has left over, and they
+  match one by one: a `{name}` segment takes any value, a literal segment must
+  be equal. When several patterns match, the one with the most literal segments
+  wins.
 
 A page whose slug has no braces is never wildcard-matched. A plain page at
 `app` will not catch `/app/anything`; only `app/{slug}` will.
@@ -79,17 +82,17 @@ at the prefix, create a separate page with the slug `app/guided-courses` or
 
 ## Rules and limits
 
-**Placeholders must all be trailing.** The static prefix stops at the first
-`{`, so any literal segment written *after* a placeholder is ignored when
-matching:
+**Literal segments can sit between placeholders.** After the static prefix,
+each segment is compared in turn, so a slug like
+`course/{course}/module/{module}/lesson/{lesson}` answers
+`/course/sleep-reset/module/3/lesson/12`:
 
-| Slug | Behaves as | Matches | Does **not** match |
-|------|------------|---------|--------------------|
-| `blog/{slug}` | prefix `blog`, 1 param | `/blog/hello` | `/blog/2024/hello` |
-| `blog/{cat}/posts/{id}` | prefix `blog`, 2 params | `/blog/tech/5` | `/blog/tech/posts/5` |
+| Slug | Matches | Does **not** match |
+|------|---------|--------------------|
+| `blog/{slug}` | `/blog/hello` | `/blog/2024/hello` |
+| `blog/{cat}/posts/{id}` | `/blog/tech/posts/5` | `/blog/tech/5`, `/blog/tech/articles/5` |
 
-To keep a literal segment in the middle, put it in the fixed part instead:
-`blog/tech/posts/{id}`.
+A placeholder must fill a whole segment: `blog/post-{id}` is not supported.
 
 **A slug cannot start with a placeholder.** Matching always tests at least one
 literal leading segment, so a slug like `{hl}/about` never matches any URL.

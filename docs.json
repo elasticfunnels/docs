@@ -115,6 +115,8 @@
                 "group": "Courses",
                 "pages": [
                   "courses/overview",
+                  "courses/student-pages",
+                  "courses/own-pages",
                   "courses/template"
                 ]
               }

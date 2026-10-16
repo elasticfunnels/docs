@@ -1,0 +1,80 @@
+---
+title: 'Course pages'
+description: 'The course library, course page and lesson player that ElasticFunnels sets up on your domain, the Courses page folder, and how to give one course its own design.'
+---
+
+A course created with **ElasticFunnels course pages** runs on three pages that ElasticFunnels
+creates for your project the first time it needs them:
+
+| Page | What students see |
+|---|---|
+| **Course library** | Every course, with the ones the student is enrolled in |
+| **Course page** | One course, its modules and lessons |
+| **Lesson player** | One lesson: its video or audio, the written lesson, files, takeaways and comments |
+
+They are ordinary pages, filed in a page folder called **Courses** so they stay out of the way in
+your Pages list. Edit them in the page editor like any other page. These three pages are your
+**default course design**: every course without a design of its own uses them.
+
+If a course says **Course pages are not set up yet**, click **Set up course pages** in its
+**Settings → Student pages**. It takes a second.
+
+## Where students open the course
+{/* SCREENSHOT: Course Overview · "Where students find it" card with the course link and Copy link · desktop */}
+
+The course **Overview** shows **Where students find it**: the course's address on your domain,
+with **Copy link**. A published course opens there for enrolled students, and the welcome email
+links to it. A draft opens only for you, with **Preview as student**.
+
+The address is the project's course domain and path, then the course's slug, for example
+`https://yourdomain.com/course/sleep-reset`. Lessons open under it at
+`/course/sleep-reset/module/{module}/lesson/{lesson}`. Change the domain and the course slug in
+the course's **Settings** under **Course address**.
+
+## Customize for this course
+{/* SCREENSHOT: Settings → Student pages · "Using your default course design" with Customize for this course and the three pages · desktop */}
+
+Open the course's **Settings → Student pages**. A course on the default design shows **Using your
+default course design** and the three shared pages, each with **Edit page**.
+
+<Warning>
+Editing a shared page changes it for every course that uses the default design.
+</Warning>
+
+To give one course its own look, click **Customize for this course**. ElasticFunnels copies the
+course page and the lesson player into a new page folder named **Course: &lt;course title&gt;**,
+points this course at the copies and opens the editor in a new tab. Changes to the copies affect
+only this course. The course library stays shared.
+
+- **Reset to default** puts the course back on the shared design. The copies stay in their
+  folder, so you can switch back later.
+- Renaming the course renames its folder too.
+- If a copy is deleted or taken offline, the course screen shows a warning and students see the
+  default design instead of an error.
+- Deleting the course offers **Also delete this course's custom pages**, which removes the pages
+  in its own folder. The shared pages are never deleted with a course.
+
+## Lesson content on your pages
+
+The lesson editor writes plain HTML that the lesson player styles. If you build your own lesson
+page, these are the blocks it can contain:
+
+| Block | Markup |
+|---|---|
+| Key details box | `div.ocp-callout` with a `p.ocp-callout-t` title |
+| Numbered steps | `ol.ocp-steps > li` |
+| Embed (YouTube, Vimeo, Loom, Wistia, Bunny Stream, Miro) | `div.crs-embed > iframe` |
+| Uploaded video | `video.crs-video` |
+
+The default lesson player includes styles for all four. A course on [your own
+pages](/courses/own-pages) gets the same styles as a snippet to copy.
+
+## Related
+<CardGroup cols={2}>
+  <Card title="Courses" icon="graduation-cap" href="/courses/overview">
+    Create a course, lessons, access and students
+  </Card>
+  <Card title="Template reference" icon="brackets-curly" href="/courses/template">
+    The course functions the pages use
+  </Card>
+</CardGroup>

@@ -3,27 +3,28 @@ title: "Emails Not Sending"
 description: "A checklist for when a customer did not receive an order, refund, shipping, or renewal email."
 ---
 
-## Start with the send log
-{/* SCREENSHOT: Email Send Logs · list of sends with recipient, subject, source and status · desktop */}
+## Start with the email log
+{/* SCREENSHOT: Email Logs · list of sends with status, recipient, source and template · desktop */}
 
-Open **Email Send Logs** at `/{brand}/emails/smtp-logs`. It records every email sent through
-your brand's SMTP configuration, with the recipient, the subject, the template used, the
-source that triggered it, and whether it was delivered or failed.
+Open **Settings → Logs → Email Logs**. It lists every email sent for your brand, over your
+brand's SMTP and through an email integration such as Mailgun or SendGrid, with the status,
+the recipient, the subject, the source that triggered it, the template code and the channel
+(SMTP or the integration's name). The old address, `/{brand}/emails/smtp-logs`, redirects
+there.
 
-Filter by **Source** to see one type at a time. `Purchase` and `Refund` are the order jobs,
-`Members Login` is the members area, `SMTP Test` is the button on the Emailing tab.
+Use the **Sent** / **Failed** tabs, the channel and source filters, the date range and the
+search box (recipient, subject or template) to narrow the list. `Purchase` and `Refund` are
+the order jobs, `Members login` is the members area, `Course enrollment` is a course welcome
+email, and `SMTP test` is the test button on the Emailing tab. Click a row to open its details:
+the delivery error, the message ID, the metadata and a link to the template. The log keeps who,
+when and how an email went out, not its body or headers.
 
 Two different answers, two different problems:
 
-- **The send is listed and failed.** Your credentials or your provider are the issue. Go to
-  [Sender problems](#sender-problems).
+- **The send is listed and failed.** Your credentials or your provider are the issue. The
+  delivery error on the row says which. Go to [Sender problems](#sender-problems).
 - **The send is not listed at all.** Nothing was ever attempted. Go to
   [The email was never triggered](#the-email-was-never-triggered).
-
-<Note>
-The log covers the SMTP path. Merchants sending through a Mailgun or SendGrid integration
-instead of brand SMTP write to a separate log and will not appear here.
-</Note>
 
 ---
 
@@ -150,7 +151,7 @@ in **Settings** under your brand variables and they appear on the next send.
 ## Nothing at all is sending, for any brand
 
 Order emails are queued. If the email queue worker is stopped, every send waits in the queue
-and nothing surfaces in the interface. The send log stays empty because no attempt is ever
+and nothing surfaces in the interface. The email log stays empty because no attempt is ever
 made. If several brands go quiet at the same moment, this is the first thing to check with
 your administrator.
 

@@ -3,7 +3,7 @@ title: 'Courses — Template Reference'
 description: 'Backend functions and template patterns for course list pages, course detail pages, and access gating'
 ---
 
-This page covers all backend functions for courses and shows how to use them in `.ef` page templates. See [Courses — Overview](/courses/overview) for setup and enrollment.
+This page covers all backend functions for courses and shows how to use them in `.ef` page templates. See [Courses](/courses/overview) for setup and enrollment.
 
 ---
 
@@ -11,6 +11,14 @@ This page covers all backend functions for courses and shows how to use them in 
 {/* SCREENSHOT: Backend functions · relevant screen or example output · desktop */}
 
 All functions are available in `<script scope="backend">` blocks and in `.ef` files.
+
+<Note>
+**Who gets full lessons.** Every function answers for the signed-in customer. A student with
+active access to a course gets its lessons in full. Anyone else gets the outline: titles, ids,
+type and order, with `locked: true` on each lesson. A draft course is hidden from listings and
+from visitors who are not enrolled in it (an enrolled student and a preview still see it). See
+[Courses on your own pages](/courses/own-pages).
+</Note>
 
 ### `getCourses(opts?)`
 
@@ -93,11 +101,22 @@ Returns `null` if no course with that slug exists.
 
 ### `getCourseBySlug(slug)`
 
-Returns a single course **without** enrollment check. `is_assigned` and `started` will not be set. Use when you only need course metadata and don't need to gate content.
+Returns a single course by slug. Use it for course metadata and the outline, for example on a sales or teaser page. A visitor without access gets the outline (lessons with `locked: true`); a student with access gets the full lessons. A draft course returns `null` for anyone not enrolled in it.
 
 ```javascript
 var course = getCourseBySlug('tinnitus-recovery');
 ```
+
+### `getCourseLessons(opts)`
+
+Returns every lesson of a course in order (module order, then lesson order) as one flat list. Useful for an app-style lesson list without the course portal.
+
+```javascript
+var lessons = getCourseLessons({ slug: 'tinnitus-recovery' });
+// lessons[i].title, .module_title, .position (0-based), .duration, .completed, .locked
+```
+
+A student with active access also gets each lesson's content, files and takeaways; everyone else gets the outline. A draft course returns `[]` unless the student is enrolled in it.
 
 ### `getCourseLesson(opts)`
 

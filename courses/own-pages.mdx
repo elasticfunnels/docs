@@ -1,0 +1,76 @@
+---
+title: 'Courses on your own pages'
+description: 'Show a course inside your own members area or app: where it is used, where students sign in, and the code to read it.'
+---
+
+Choose **My own pages or app** when you create a course (or switch to it in the course's
+**Settings**) when the course should live inside a members area or app you built yourself.
+ElasticFunnels then creates no course pages. It keeps the course, its lessons, who has access,
+progress and the student emails, and your pages read the course with the
+[course functions](/courses/template).
+
+Access works exactly as on course pages: buyers of a linked product are enrolled when they pay,
+refunds and chargebacks end access, and you can add or revoke students. See
+[Access](/courses/overview#access).
+
+## Where this shows
+{/* SCREENSHOT: Settings → Your pages · Where this shows list and the snippets · desktop */}
+
+The course's **Settings → Your pages** lists every page of your project that reads this course:
+pages that name it (by slug or id) and pages that list all courses. When no page reads it yet, use
+one of the snippets below.
+
+## Where students sign in
+
+**Where students sign in** is the page students start from, such as `/members/library`, or a full
+URL on one of your domains. Leave it empty to use your members area landing page. The welcome
+email links there, and the course **Overview** shows it under **Where students find it**.
+
+Students sign in the way your members area is set up (**Members area, Login method**). With email
+only or magic link, the welcome email carries a sign-in link.
+
+## Snippets
+
+The same panel has copy-ready code with this course's slug and ids already filled in:
+
+| Snippet | Function |
+|---|---|
+| Courses of the signed-in customer | `getCoursesForCustomer()` |
+| This course with modules, lessons and progress | `getCourseForCustomer({ slug })` |
+| Outline without an enrollment check | `getCourseBySlug(slug)` |
+| Every lesson in order, flat | `getCourseLessons({ slug })` |
+| One lesson, with previous and next | `getCourseLesson({ course, module, lesson })` |
+| Progress counts | `getCourseProgress({ course })`, `getCompletedLessonsCount({ course })` |
+| Styles for lesson blocks | the CSS for the key details box, numbered steps, embeds and videos |
+| Mark a lesson complete from the browser | a `fetch` POST to `/api/courses/{course}/modules/{module}/lessons/{lesson}/complete` under your course path (the snippet has the full URL) |
+
+**Sample result** shows what `getCourseForCustomer` returns for this course, for a student who
+finished the first lesson, so you can see the field names before you write the page.
+
+```html
+<script scope="backend">
+  var course = getCourseForCustomer({ slug: 'sleep-reset' });
+  // course.is_assigned, course.progress_percent, course.modules[].contents[]
+</script>
+```
+
+## What visitors who are not enrolled get
+
+The functions answer for the signed-in customer:
+
+- A student with active access gets every lesson in full: the media, the written lesson, files
+  and takeaways.
+- Anyone else gets the **outline**: course and lesson titles, ids, type and order, with
+  `locked: true` on each lesson. Use it for a teaser or a sales page.
+- A **draft** course is hidden from everyone except students enrolled in it and a preview, so
+  `getCourseBySlug` returns `null` and `getCourseLessons` returns `[]` for anyone else.
+
+## Related
+<CardGroup cols={2}>
+  <Card title="Template reference" icon="brackets-curly" href="/courses/template">
+    Every course function, with examples
+  </Card>
+  <Card title="Members area" icon="users" href="/members-area/overview">
+    Login methods and protecting pages
+  </Card>
+</CardGroup>
