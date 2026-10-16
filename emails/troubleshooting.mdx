@@ -49,10 +49,12 @@ never resolve into a confirmation email.
 
 <Step title="Is a sender configured?">
 **Settings** → **Emailing** needs SMTP credentials, or the merchant needs an **Email
-Integration**. With neither, the job fails on every attempt.
+Integration** that is connected and not paused. With neither, the email is skipped.
+ElasticFunnels does not send order or subscription emails from its own servers instead.
 
-Check **Brand Actions** on your dashboard. Missing templates and missing integrations raise
-a task there for purchase and subscription emails.
+Check **Brand Actions** on your dashboard. A missing sender raises one task per email type,
+for example **Choose a sending account for order confirmation emails**. It closes by itself
+once that email can be sent again. A paused or disabled integration counts as no sender.
 </Step>
 
 <Step title="For shipping emails, did fulfillment actually report shipped?">
@@ -67,11 +69,10 @@ ElasticFunnels. Other gateways have no subscription section on the Email tab.
 </Step>
 </Steps>
 
-<Warning>
-**Shipping and cancellation emails fail quietly.** Purchase and subscription emails raise a
-Brand Action when they cannot send. Order Shipped and Order Cancelled do not. If those two
-slots are empty, there is no warning anywhere in the app. Check them by eye.
-</Warning>
+<Note>
+Purchase, refund, shipping, cancellation and subscription emails all raise a Brand Action
+when they cannot send: one for a missing template on the merchant, one for a missing sender.
+</Note>
 
 ---
 
