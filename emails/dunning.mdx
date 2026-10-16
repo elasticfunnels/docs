@@ -20,7 +20,7 @@ When a subscription payment fails, ElasticFunnels automatically retries based on
 | 3 | 3 days later | Renewal Failed (orange — more urgent) |
 | 4 | 5 days later | Renewal Failed (orange) |
 | 5 | 7 days later | Renewal Failed (red — final warning) |
-| Final | 10 days later | Dunning Final Notice |
+| Final | 10 days later | None (Dunning Final Notice is not sent yet) |
 
 After the final notice, if payment is still unsuccessful, the subscription is automatically canceled and the [Subscription Canceled](/emails/subscription-emails#subscription-canceled) email is sent.
 
@@ -56,7 +56,8 @@ The `renewal-failed` template uses the `subscription.retry_count` variable to es
 ## Dunning final notice
 {/* SCREENSHOT: Dunning final notice · email editor or template settings · desktop */}
 
-The `dunning-final` template is sent as a last resort before cancellation. It features:
+The `dunning-final` template is meant as a last notice before cancellation, but no event sends it
+yet, and new brands do not get it. Brands that already have it can edit it. It features:
 
 - A red "Final Notice" banner
 - Bold "Pending Cancellation" status
