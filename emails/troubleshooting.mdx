@@ -36,12 +36,15 @@ Two different answers, two different problems:
 Work down this list in order. The first miss is almost always the answer.
 
 <Steps>
-<Step title="Is the slot filled on the right merchant?">
-Merchant → **Email** tab. A row showing **Not set** sends nothing, ever.
+<Step title="Does Apps → Emails say the template is sending?">
+Open **Apps → Emails** and find the template for that event. Its **Status** says **Sending**,
+**Partly sending** or **Not sending**, and names the merchants it is or is not sent for, with the
+reason. A merchant whose checkout sends its own receipt (BuyGoods, ClickBank, Digistore24, JVZoo,
+Shopify) never gets order emails from ElasticFunnels.
 
-This is the most common cause by a wide margin. Templates belong to the brand, but the
-choice of which one to send belongs to each merchant. Adding a merchant, or switching an
-offer to a different merchant, leaves you with a fresh set of empty slots.
+Then check the merchant's **Email** tab. A filled slot wins; a slot showing **Not set** uses the
+brand's pick under **Settings** → **Subscriptions**, then the brand's **Default** template for
+that event. The Pre-Renewal Reminder sends only when its slot is filled.
 </Step>
 
 <Step title="Does the order have a customer email?">
@@ -52,10 +55,12 @@ never resolve into a confirmation email.
 
 <Step title="Is a sender configured?">
 **Settings** → **Emailing** needs SMTP credentials, or the merchant needs an **Email
-Integration**. With neither, the job fails on every attempt.
+Integration** that is connected and not paused. With neither, the email is skipped.
+ElasticFunnels does not send order or subscription emails from its own servers instead.
 
-Check **Brand Actions** on your dashboard. Missing templates and missing integrations raise
-a task there for purchase and subscription emails.
+Check **Brand Actions** on your dashboard. A missing sender raises one task per email type,
+for example **Choose a sending account for order confirmation emails**. It closes by itself
+once that email can be sent again. A paused or disabled integration counts as no sender.
 </Step>
 
 <Step title="For shipping emails, did fulfillment actually report shipped?">
@@ -70,11 +75,10 @@ ElasticFunnels. Other gateways have no subscription section on the Email tab.
 </Step>
 </Steps>
 
-<Warning>
-**Shipping and cancellation emails fail quietly.** Purchase and subscription emails raise a
-Brand Action when they cannot send. Order Shipped and Order Cancelled do not. If those two
-slots are empty, there is no warning anywhere in the app. Check them by eye.
-</Warning>
+<Note>
+Purchase, refund, shipping, cancellation and subscription emails all raise a Brand Action
+when they cannot send: one for a missing template on the merchant, one for a missing sender.
+</Note>
 
 ---
 
@@ -103,36 +107,6 @@ on real volume. A brand can be Verified and still land in spam.
 These are current behaviours worth knowing before you spend an hour debugging.
 
 <AccordionGroup>
-<Accordion title="I edited a copy of the purchase template, but the old one still sends">
-Purchase and refund emails prefer your brand's built-in system template over whatever is
-selected in the merchant dropdown. Duplicating a system template produces an ordinary copy,
-so selecting that copy on the merchant has no effect while the system template still exists.
-
-Edit the system template directly. It is marked with a **Locked** badge in the Emails list.
-Its content and design are fully editable, it just cannot be deleted.
-
-This applies to purchase and refund only. Shipped and cancelled always use the merchant
-dropdown.
-</Accordion>
-
-<Accordion title="Resending an email from a conversion says the merchant has no email integration">
-The manual resend action requires a merchant **Email Integration**, even when the brand is
-sending fine over SMTP. Automatic sends are unaffected. To resend on an SMTP-only brand, add
-an email integration to the merchant.
-</Accordion>
-
-<Accordion title="Send test inside the email builder does nothing on an SMTP-only brand">
-The **Send test** button on a template needs a Mailgun, SendGrid, or Mailrelay integration.
-It does not use brand SMTP. The **Send test** button on **Settings** → **Emailing** does use
-SMTP, so use that one to confirm the sender, and a real test order to confirm the template.
-</Accordion>
-
-<Accordion title="Pre-renewal reminders never arrive on an SMTP-only brand">
-The pre-renewal job checks for a merchant **Email Integration** specifically, so brand SMTP
-alone is not enough for that one email. Other subscription emails work over SMTP normally.
-Add an email integration to the merchant if you need pre-renewal reminders.
-</Accordion>
-
 <Accordion title="A template renders with blank fields">
 Each template is written for one scope. A subscription template dropped into the Shipped slot
 renders with empty subscription values and no error, because the shipping context carries no

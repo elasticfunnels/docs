@@ -1,0 +1,167 @@
+---
+title: "Building an email"
+description: "Design an email in the visual builder: add sections, use email blocks, paste your own HTML, insert variables, check it on mobile, send yourself a test and save."
+---
+
+Every email template opens in one of two editors. The **Visual Builder** is a drag-and-drop canvas
+made for email: its blocks are built from tables, so they look the same in Gmail, Outlook and Apple
+Mail. The **Code Editor** is a plain HTML editor for people who would rather write the markup. You
+choose one when you [create the template](/emails/overview#create-a-template), and both are in
+each row's menu in **Apps → Emails**.
+
+Click a template's name in the list to open it. The editor opens in a new browser tab, so the list
+stays where you left it.
+
+## The parts of the builder
+
+- **The canvas** in the middle is the email itself. Click any text to type in it, click an image or
+  a button to select it.
+- **The left bar** holds the blocks panel, layers, your files, fonts, brand colors and the
+  **Email Variables** panel.
+- **The style panel** on the right changes the selected element: colors, spacing, font size,
+  alignment, the link of a button.
+- **The top bar** has the desktop, tablet and mobile view buttons, undo and redo, and **Save**.
+  The gear button opens the template settings: name, subject, preview text, sender and
+  [versions](/emails/overview#versions).
+
+## Add a section
+
+A small **+** marker sits between the sections of the email, and above the first and below the
+last. Move the pointer near one and it opens into an **Add section here** line.
+
+<Steps>
+<Step title="Click Add section here">
+Pick the gap where the new section should go and click the line (or the **+**).
+</Step>
+<Step title="Choose a block">
+A picker opens with **Text**, **Image**, **Button**, **Two columns**, **Divider**, **Spacer**,
+**Social links**, **Logo**, **Footer** and **Custom HTML**. Click one and it is inserted at that
+spot.
+</Step>
+<Step title="Edit it in place">
+The new section is selected. Type over the sample text, change the image, set the button link in
+the style panel.
+</Step>
+</Steps>
+
+The markers only exist in the editor. They are never saved into the email and never reach an inbox.
+
+You can also drag blocks from the blocks panel onto the canvas. The **Email elements** group holds
+the same blocks as the picker.
+
+## The email blocks
+
+| Block | What it is |
+|---|---|
+| **Text** | A heading and a paragraph. |
+| **Image** | A full-width image. Replace it with one from your files or a URL. |
+| **Button** | A link styled as a button, built from a table so it shows in every mail client. |
+| **Two columns** | Two blocks of text side by side. |
+| **Divider** | A line between two parts of the email. |
+| **Spacer** | Empty space between sections. |
+| **Social links** | Links to your social profiles. Change each link to your own pages. |
+| **Logo** | Your logo, centered. |
+| **Footer** | Your brand name, your postal address and the unsubscribe link. Use it in campaigns. |
+| **Custom HTML** | Markup you paste yourself. See [Your own HTML](#your-own-html). |
+
+Blocks that only work on web pages, such as frontend template engine blocks, Include Component,
+Extends Layout, Block and Backend Script, are not offered in the email builder. The backend
+**If/Else**, **Foreach** and **Set** blocks are there, for [conditional content](#conditional-content).
+
+## Your own HTML
+
+There are two ways to bring in markup of your own:
+
+- **Custom HTML block.** Pick **Custom HTML** from an **Add section here** line, or drag the
+  **HTML Block** onto the canvas, then click it and paste your code. The canvas shows the result
+  rendered, as it will look in the inbox. Scripts do not run in email, in the builder or in any
+  mail client.
+- **Edit HTML on any element.** Right-click an element and choose **Edit HTML**, or select it and
+  press `Ctrl+E` (`Cmd+E` on a Mac). Change the markup and the element is redrawn with your
+  change.
+
+For a whole email written by hand, use the Code Editor instead: create the template with **Code
+Editor** as its editor, or open an existing template with **Code** from its row menu. It has syntax
+highlighting and a **Format code** button, and `Ctrl+S` / `Cmd+S` saves.
+
+## Variables
+
+Variables put the customer's details into the email when it is sent: `{{ purchase.customer_first_name }}`
+becomes "Jane". Which variables a template can use depends on its type (the **Variable scope** in the
+template settings): a Purchase template has the order, a Renewal reminder has the subscription.
+
+Click the **Email Variables** button in the left bar to see the list for this template. Click a
+variable to copy it, then paste it into the text. Pin the panel to keep it open while you write.
+If the panel says no variables are available, set a **Variable scope** in the template settings
+first.
+
+Variables work in the subject and preview text too. The full list is on
+[Template Variables](/emails/template-variables).
+
+## Conditional content
+
+Show a section only when the data is there, with `@if`:
+
+```html
+@if(purchase.tracking_url)
+<a href="{{ purchase.tracking_url }}">Track your package</a>
+@endif
+```
+
+Repeat a block for each product in the order with `@each`:
+
+```html
+@each(product in products)
+<p>{{ product.name }}: {{ product.total }}</p>
+@endeach
+```
+
+Put these in a Custom HTML block, or use the **If/Else** and **Foreach** blocks from the blocks
+panel.
+
+## Check it before it goes out
+
+- **Mobile.** Use the desktop, tablet and mobile buttons in the top bar to see the email at each
+  width. Most email is read on a phone.
+- **A real inbox.** Save, go back to **Apps → Emails**, open the template's row menu and click
+  **Send test**. Type the address to send it to. The test goes out through your brand SMTP, or
+  through one of your email integrations when the brand has no SMTP, so it also shows whether your
+  sender works.
+- **What was sent.** Every send, tests included, is listed in **Settings → Logs → Email logs**,
+  with the template version it used.
+
+## Save
+
+Click **Save** in the top bar. Saving changes to the subject, sender or content creates a new
+version of the template, and the old one stays readable under **Versions**. See
+[Versions](/emails/overview#versions).
+
+Changes reach customers from the next email that is sent. Emails already sent are not changed.
+
+## Emails that belong to a campaign
+
+When [campaigns](/emails/overview#transactional-emails-and-campaigns) are on for your brand, each
+campaign has its own email, edited in the same builder.
+
+- **A new campaign starts on a default layout**: your brand name, a headline, a short text, a
+  button and a footer with your postal address and the unsubscribe link. Edit it in place instead
+  of starting from an empty page.
+- On the campaign's **Content** step, **Edit design** opens the email in the Visual Builder and
+  **Edit HTML** opens it in the Code Editor. **Replace content** starts over from **A template**,
+  **An earlier campaign** or **The default layout**. Replacing changes only this campaign; your
+  templates stay as they are.
+- In the builder, **Continue to settings** next to **Save** saves the email and takes you to the
+  campaign's **Settings** step, where you set the sender, the subject and your postal address.
+  **Back to campaign** returns to the Content step.
+- The subject field in **Settings** has buttons to insert **First name**, **Full name** and
+  **Brand name**.
+- Keep the unsubscribe link and your postal address in the email. If either is missing when the
+  campaign is sent, ElasticFunnels adds a short footer with them.
+- On the **Review and send** step, **Send test** sends the email to you first, with your name in
+  place of the recipient's.
+
+## Related docs
+
+- [Emails](/emails/overview): template types, which templates are in use, who sends your email
+- [Template Variables](/emails/template-variables): every variable by type
+- [Sending Setup](/emails/sending-setup): connect a sender and pick templates on a merchant

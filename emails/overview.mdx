@@ -1,132 +1,189 @@
 ---
-title: "Email Templates"
-description: "Create, customize, and send branded transactional emails from ElasticFunnels."
+title: "Emails"
+description: "What the Emails area holds: the templates for order, subscription, login and course emails, which of them actually go out, and which account sends them."
 ---
 
-## What are email templates?
-{/* SCREENSHOT: What are email templates? · email editor or template settings · desktop */}
+Every email your brand sends to a customer starts from a template in **Apps → Emails**: the order
+confirmation after a purchase, a renewal receipt, a members area login code, a course welcome
+email. This page explains what you see there. To design an email, see
+[Building an email](/emails/builder).
 
-Email templates are the transactional emails your brand sends to customers — order confirmations, shipping notifications, renewal reminders, and more. ElasticFunnels provides **system templates** for every transaction type and lets you create **custom templates** to match your brand.
+## The template list
 
-## System vs custom templates
-{/* SCREENSHOT: System vs custom templates · email editor or template settings · desktop */}
+Open **Apps → Emails**. Each row is one template:
 
-| Type | Description | Editable? |
+| Column | What it tells you |
+|---|---|
+| **Template** | The name. Click it to open the editor in a new browser tab. A **Default** badge marks the template the brand sends for that event when a merchant has no template of its own picked. |
+| **Type** | Which event the template is for (Purchase, Renewal reminder, Login code and so on) and whether it is edited in the **Builder** or in **Code**. |
+| **Status** | **Sending**, **Partly sending** or **Not sending**, with the reason. See [Is a template in use?](#is-a-template-in-use) |
+| **Last sent** | When it last went out. Hover it to see how many were sent in the last 30 days. |
+| **Subject** | The subject line, with merge tags shown as small chips (`first name`, `order id`). |
+| **Used by** | The merchants, courses, campaigns or automations that send it. **Not picked by any merchant** means nothing points at it. |
+
+The tabs above the list filter it: **All**, **Orders**, **Subscriptions**, **Members and login**,
+**Courses** and **Custom**. **Custom** holds every template that is not a built-in event default,
+including the ones made for a campaign or an automation. Search and sort (recently updated, last
+sent, name, newest) sit next to the tabs.
+
+The **...** menu at the top right links to the three places that decide how email leaves your
+brand:
+
+- **Send logs**: every email that went out, in **Settings → Logs → Email logs**.
+- **Sending settings**: your SMTP server and the default sender name and address, in
+  **Settings → Emailing**.
+- **Email integrations**: Mailgun, SendGrid, Mailrelay and other providers, in
+  **Apps → Integrations**.
+
+## Template types
+
+The type of a template (its **Variable scope** in the template settings) decides two things: which
+event sends it, and which [variables](/emails/template-variables) it can use.
+
+| Tab | Types | Sent when |
 |---|---|---|
-| **System** | Auto-created when you enable a merchant or subscription feature. Covers all standard transaction types (purchase, refund, shipped, etc.) | Content and design only — cannot be deleted |
-| **Custom** | Templates you create from scratch for specific use cases | Fully editable and deletable |
+| Orders | Purchase, Refund, Shipped, Cancelled, Refund request | An order is paid, refunded, shipped or cancelled, or a customer asks for a refund. See [Order Emails](/emails/order-emails). |
+| Subscriptions | Renewal reminder, Renewal confirmed, Renewal failed, Subscription paused, Subscription canceled, Card expiring, Final dunning | Something happens to a subscription, or a renewal is a few days away. See [Subscription Emails](/emails/subscription-emails). |
+| Members and login | Login code, Login link | A customer asks to sign in to your members area. See [Login Emails](/emails/login-emails). |
+| Courses | Course enrollment, Course login link, Course comment | A student is enrolled, asks for a sign-in link, or gets a reply to a lesson comment. See [Course Emails](/emails/course-emails). |
+| Custom | From automation, General | An automation step or a campaign sends it. A General template has no event of its own. |
 
-System templates are marked with a **Locked** badge in the email list.
+Your brand has a **Default** template for the standard events. You can edit a default, and you can
+duplicate it to make a variant (a different receipt for one merchant, for example), but you cannot
+delete it.
 
-## Two ways to edit
-{/* SCREENSHOT: Two ways to edit · email editor or template settings · desktop */}
+## Is a template in use?
 
-After creating or opening an email template, you can choose between two editors:
+The **Status** column answers the question "does a customer ever get this?" with the same rules
+the sending jobs use:
 
-### Visual Builder (GrapesJS)
+| Status | Meaning |
+|---|---|
+| **Sending** | It goes out for every merchant, course, campaign or automation that uses it. |
+| **Partly sending** | It goes out for some of them and not for others. |
+| **Not sending** | Nothing sends it today. |
 
-A drag-and-drop editor that lets you design emails visually. Ideal for non-technical users who want to build responsive emails without writing HTML.
+The reason is printed next to the status, for example "Sends for NMI, Stripe" or "Not sent for
+BuyGoods, ClickBank: their checkout emails its own receipt". When there are several, hover the
+**+N more** label to read all of them.
 
-- Drag blocks like text, images, buttons, and dividers
-- Style elements with a visual properties panel
-- Preview desktop and mobile layouts side by side
-- Insert template variables from the Variables panel
-- Click **Save** in the top bar to store your changes
+The usual reasons a template is not sending:
 
-#### Adding sections
+- **The merchant's checkout sends its own receipt.** ElasticFunnels sends order and subscription
+  emails for payments that run through your own gateways (NMI, Stripe, PayPal, Klarna,
+  Authorize.Net). BuyGoods, ClickBank, Digistore24, JVZoo and Shopify email their own receipts,
+  so no order email is sent for those merchants.
+- **Another template is picked.** A merchant with its own template selected sends that one
+  instead of the default, and the row names it.
+- **There is no sending account** for that merchant. See [Who sends your email](#who-sends-your-email).
+- **Shipped** emails need a fulfillment or order sync integration on the merchant, because that is
+  what marks an order as shipped.
+- **Renewal reminders** go out only for merchants that have a renewal reminder template picked on
+  their **Email** tab.
+- **Login emails** follow the members area login mode, and use your template only when the brand
+  has its own SMTP server. Without one, ElasticFunnels sends its standard login email.
+- **Campaign and automation templates** count as sending while the campaign is going out or the
+  automation is on.
 
-A **+** marker sits between the sections of the email, and above the first and below the last.
-Move the pointer near one and it opens into an **Add section here** line. Click it to pick what to
-insert at that spot: Text, Image, Button, Two columns, Divider, Spacer, Social links, Logo, Footer
-or Custom HTML. The markers only show in the editor and are never part of the saved email.
+Switch on **Sending only** to hide every template that nothing sends.
 
-#### Email blocks
+## Transactional emails and campaigns
 
-The **Email elements** group in the blocks panel holds blocks built from tables, so they show the same
-in every mail client: Button, Two columns, Spacer, Social links, Logo and Footer.
-The Footer block carries your postal address and the unsubscribe link.
+**Transactional emails** are the ones a customer triggers: a receipt, a shipping notice, a login
+code. Each goes to one person because of something that person did, and it is sent whether or
+not they agreed to marketing email. Almost everything in the template list is transactional.
 
-Blocks that only work on web pages (frontend template engine blocks, Include Component, Extends
-Layout, Block and Backend Script) are hidden in the email builder. The backend If/Else, Foreach and
-Set blocks are still there.
+**Campaigns** are newsletters and promotions you send to many people at once: all customers, one
+of your audiences, a form collection or a list of addresses you paste. Campaigns are switched on
+brand by brand. When they are on for your brand, a **Campaigns** tab shows next to **Templates**
+at the top of the Emails page.
 
-#### Your own HTML
+A campaign goes to everyone in its audience except people who said no to email (they saw the
+email opt-in box at checkout and left it unticked), unsubscribed, bounced or marked an earlier
+email as spam. Sales from networks such as BuyGoods or ClickBank, and orders from checkouts
+without the box, are included. See [Privacy & consent](/pages/privacy-consent#checkout-email-opt-in)
+for how the box is recorded. You are responsible for having permission to email the people you
+send campaigns to.
 
-- Drag the **HTML Block** into the email (or pick **Custom HTML** from an **Add section here**
-  line) to paste markup of your own. The canvas shows it rendered, as it will look in the inbox.
-  Click it to edit the code.
-- To change the markup of any element, right-click it and choose **Edit HTML**, or select it and
-  press `Cmd+E` / `Ctrl+E`.
+A new campaign starts on a ready-made layout instead of an empty page. How to edit it is on
+[Building an email](/emails/builder#emails-that-belong-to-a-campaign).
 
-### Code Editor (Monaco)
+## Who sends your email
 
-A full HTML code editor for users who prefer writing markup directly. The code editor gives you complete control over the email HTML.
+ElasticFunnels sends your email through an account you own: your SMTP server
+(**Settings → Emailing**) or an email integration such as Mailgun, SendGrid or Mailrelay. Each
+kind of email has one rule for which account sends it:
 
-- Syntax highlighting for HTML/CSS
-- Auto-completion and error detection
-- Save with `Cmd+S` / `Ctrl+S`
-- Switch to the Visual Builder at any time
+| Email | Sent through | If no account can send it |
+|---|---|---|
+| Order and subscription emails | Your brand SMTP. Without SMTP, the email integration picked on the merchant (**Merchant → Email → Email Integration**). | Not sent. A **Choose a sending account for ... emails** task appears in your Brand Actions, one per email type, and closes by itself once that email can go out again. |
+| Members area login codes and links | Your brand SMTP. | ElasticFunnels sends its standard login email under your brand name, so customers are never locked out. |
+| Course welcome email | Your brand SMTP, or the course's email integration. | ElasticFunnels sends it under your brand name. |
+| Campaigns | The account you choose in the campaign's **Settings** step. | The campaign cannot be sent until you pick one. |
 
-## Campaign emails
+A paused or disabled integration never sends anything, so it counts as no account. The full setup
+is on [Sending Setup](/emails/sending-setup).
 
-A new campaign opens on a ready-made layout: your brand name, a headline, a short text, a button
-and a footer with your postal address and the unsubscribe link. Edit it in place instead of
-starting from an empty page. On the campaign's **Content** step, **Replace content** lets you start
-over from **A template**, **An earlier campaign** or **The default layout**.
+## Create a template
 
-Click **Edit design** to open the layout in the Visual Builder, or **Edit HTML** to open it in the
-Code Editor. When the builder was opened from a campaign, the top bar also shows **Continue to settings**:
-it saves the email and takes you to the campaign's **Settings** step.
+<Steps>
+<Step title="Click Create email">
+In **Apps → Emails**, click **Create email**.
+</Step>
+<Step title="Fill in the basics">
+Give it a **Name** (only you see it), a **Subject** and an optional **Preview text**, the line most
+inboxes show after the subject. **From name**, **From email** and **Reply-to** apply when the email
+goes through an email integration. When your brand sends over SMTP, the sender set in
+**Settings → Emailing** is used instead.
+</Step>
+<Step title="Pick the type">
+**Variable scope** sets the type, and with it the variables you can use. Leave it on **General** for
+an email that no event sends on its own.
+</Step>
+<Step title="Pick the editor">
+**Visual Builder** to design the email by dragging blocks, or **Code Editor** to write the HTML
+yourself.
+</Step>
+<Step title="Save, then design it">
+Click **Save**, then click the template's name in the list. The editor opens in a new tab. See
+[Building an email](/emails/builder).
+</Step>
+</Steps>
+
+To make a template send for orders or subscriptions, pick it on the merchant's **Email** tab. See
+[Sending Setup](/emails/sending-setup#step-3-wire-the-templates-to-the-merchant).
+
+## Row actions
+
+The menu at the end of each row has:
+
+- **Builder** or **Code**: open the editor in a new tab.
+- **Name, subject and sender**: the template settings, with its [versions](#versions).
+- **Send test**: sends the template to an address you type.
+- **Duplicate**: a copy you can change freely. Duplicate a default to try different copy without
+  touching the one that sends.
+- **Delete**: removes a template you made. Merchants that had picked it fall back to the brand
+  default. Defaults cannot be deleted.
 
 ## Versions
 
-Every time you save a template with a changed subject, preview text, sender, reply-to address or
-content, the previous content is kept as a version you can read but not edit, and the template
-moves to the next version number. Saving without changing any of those (renaming the template,
-adding a builder comment) does not make a new version.
+When you save a template with a changed subject, preview text, sender, reply-to address or
+content, the previous content is kept as a read-only version and the template moves to the next
+version number. Renaming the template does not make a new version.
 
-To see them, open the template's settings (the edit dialog) and look under **Versions**. Click
-**View** on a version to read its subject, sender and body. There is no restore button: to go back
-to an older version, copy what you need from it into the template and save.
+Open **Name, subject and sender** and look under **Versions**. Click **View** on a version to read
+its subject, sender and body. There is no restore button: to go back, copy what you need from the
+old version into the template and save.
 
-Each send records the template and the version it used, so the [email log](/emails/troubleshooting#start-with-the-email-log)
-can show exactly what went out. A campaign keeps the version it had when it started sending:
-editing the template while the campaign is going out changes later sends of the template, not the
+Each send records the template and the version it used, so the
+[email log](/emails/troubleshooting#start-with-the-email-log) shows exactly which copy went out,
+for example `Receipt · version 3`, with **Show what was sent**. A campaign keeps the version it
+had when it started sending: editing the template while it goes out changes later sends, not the
 rest of that campaign.
 
-## Template variables
-{/* SCREENSHOT: Template variables · email editor or template settings · desktop */}
-
-Every email template has access to **variables** — dynamic data that gets replaced when the email is sent. For example, `{{ purchase.customer_first_name }}` is replaced with the customer's actual first name.
-
-Variables are organized by **scope** (purchase, subscription, brand, etc.). See the [Template Variables](/emails/template-variables) reference for the complete list.
-
-## Conditional content
-{/* SCREENSHOT: Conditional content · email editor or template settings · desktop */}
-
-Use `@if` / `@endif` directives to show or hide sections based on available data:
-
-```html
-@if(purchase.tracking_url)
-<a href="{{ purchase.tracking_url }}">Track Your Package</a>
-@endif
-```
-
-Use `@each` / `@endeach` to loop over collections like products:
-
-```html
-@each(product in products)
-<p>{{ product.name }} — ${{ product.total }}</p>
-@endeach
-```
-
 ## Related docs
-{/* SCREENSHOT: Related docs · email editor or template settings · desktop */}
 
-- [Sending Setup](/emails/sending-setup) - Connect a sender and wire templates to a merchant
-- [Template Variables](/emails/template-variables) — Complete variable reference
-- [Order Emails](/emails/order-emails) — Purchase, refund, shipped, cancelled
-- [Subscription Emails](/emails/subscription-emails) — Renewals, paused, canceled, dunning
-- [Course Emails](/emails/course-emails) — Enrollment, magic links, comments
-- [Login Emails](/emails/login-emails) — Verification codes and magic links
-- [Emails Not Sending](/emails/troubleshooting) - Checklist when a customer got nothing
+- [Building an email](/emails/builder): blocks, HTML, variables, test sends
+- [Sending Setup](/emails/sending-setup): connect a sender and pick templates on a merchant
+- [Template Variables](/emails/template-variables): every merge tag
+- [Emails Not Sending](/emails/troubleshooting): what to check when a customer got nothing

@@ -49,6 +49,17 @@ If the funnel has any trigger rules, the **Trigger Rules** tab shows an **orange
 
 The system always tries rule-based funnels first; if none match, it uses the single default for that domain. You can also force a specific funnel with the URL: `?f=[funnel code]`.
 
+## Test which funnel runs
+
+To check a setup before you send traffic, click **Which funnel runs?** at the top of the
+**Funnels** list. Enter a real URL on your domain (with its query string, to test query
+parameter rules) and, if you want, a **Country code**, a **Region / State** and an
+**Affiliate ID**, then click **Run test**.
+
+The test asks the same page runtime that serves your visitors, so the answer is the funnel a
+live visitor with those details would get, and **Why** explains the match. **No funnel would run for this URL** means no rule matched and the
+domain has no default funnel. The test works on every domain connected to your brand.
+
 ## Tips
 {/* SCREENSHOT: Tips · funnel builder, page events, or published flow · desktop */}
 

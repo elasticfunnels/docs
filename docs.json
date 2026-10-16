@@ -157,6 +157,7 @@
           {
             "group": "Integrations",
             "pages": [
+              "integrations/integration-health",
               {
                 "group": "Ad Platforms",
                 "pages": [
@@ -247,6 +248,7 @@
             "group": "Emails",
             "pages": [
               "emails/overview",
+              "emails/builder",
               "emails/sending-setup",
               "emails/template-variables",
               "emails/order-emails",
