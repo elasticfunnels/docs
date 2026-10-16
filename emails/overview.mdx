@@ -41,6 +41,22 @@ A full HTML code editor for users who prefer writing markup directly. The code e
 - Save with `Cmd+S` / `Ctrl+S`
 - Switch to the Visual Builder at any time
 
+## Versions
+
+Every time you save a template with a changed subject, preview text, sender, reply-to address or
+content, the previous content is kept as a version you can read but not edit, and the template
+moves to the next version number. Saving without changing any of those (renaming the template,
+adding a builder comment) does not make a new version.
+
+To see them, open the template's settings (the edit dialog) and look under **Versions**. Click
+**View** on a version to read its subject, sender and body. There is no restore button: to go back
+to an older version, copy what you need from it into the template and save.
+
+Each send records the template and the version it used, so the [email log](/emails/troubleshooting#start-with-the-email-log)
+can show exactly what went out. A campaign keeps the version it had when it started sending:
+editing the template while the campaign is going out changes later sends of the template, not the
+rest of that campaign.
+
 ## Template variables
 {/* SCREENSHOT: Template variables · email editor or template settings · desktop */}
 

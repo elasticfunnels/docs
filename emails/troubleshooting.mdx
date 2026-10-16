@@ -16,8 +16,11 @@ Use the **Sent** / **Failed** tabs, the channel and source filters, the date ran
 search box (recipient, subject or template) to narrow the list. `Purchase` and `Refund` are
 the order jobs, `Members login` is the members area, `Course enrollment` is a course welcome
 email, and `SMTP test` is the test button on the Emailing tab. Click a row to open its details:
-the delivery error, the message ID, the metadata and a link to the template. The log keeps who,
-when and how an email went out, not its body or headers.
+the delivery error, the message ID, the metadata and a link to the template with the version
+that was sent, for example `receipt · version 3`. **Show what was sent** opens that version's
+subject and body as they were written in the template, with the merge tags not filled in. The
+log does not keep the copy each recipient got (their name in the subject, for example) or the
+headers. Sends from before template versions existed show no version.
 
 Two different answers, two different problems:
 
