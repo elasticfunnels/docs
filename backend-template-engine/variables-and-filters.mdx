@@ -23,6 +23,15 @@ Values are resolved from the current context (e.g. page data, article, posts, fe
 
 Paths can use dot notation and array indexing. If a value is missing, it usually renders as empty unless you use the **`default`** filter.
 
+An output can also be a short condition: a ternary (`cond ? 'yes' : 'no'`), `and` / `or` (or `&&` / `||`), comparisons, and
+`!` or `not` to negate a value.
+
+| Example | Renders |
+|---------|---------|
+| `{{ lesson.done ? 'Done' : 'Open' }}` | `Done` for a finished lesson |
+| `{{ lesson.current and !lesson.done ? ' is-active' : '' }}` | ` is-active` on the open lesson until it is finished |
+| `{{ not cart.items ? 'Your cart is empty' : '' }}` | The message when there are no items |
+
 ---
 
 ## Filters
