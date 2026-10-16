@@ -1,0 +1,71 @@
+---
+title: 'Integration activity, errors and presets'
+description: 'See when each integration last did something, why it last failed, and turn a new integration on with a ready-made automation.'
+---
+
+## What each integration does
+
+Integrations work in one of three ways, and the Activity tab of each connection tells you which:
+
+| Kind | What it means | Examples |
+|------|---------------|----------|
+| Runs on its own | Acts every time its events happen. No automation needed. | Call centers, fulfillment, Shopify order sync, Meta Conversions API and other ad-platform postbacks, tax, chargeback alerts |
+| Waits to be used | Does nothing until an automation, a merchant, an email campaign or a page uses it. | Klaviyo, Mailchimp, HubSpot, Twilio, Google Sheets, Mailgun, SendGrid |
+| Syncs data in | Reads data on a schedule. | Ad spend from Google Ads and Meta Ads, Google Analytics |
+
+Some integrations do two of these. Meta Ads, for example, sends conversions and also imports ad spend.
+
+## Last event and last error
+
+Under each connection on **Apps → Integrations** you see:
+
+- **Last event 3 min ago**: the last time the integration sent something (an email, a call center lead, a conversion postback, an automation step, a sync).
+- **Never used**: it is connected but has not sent anything yet. For an integration that waits to be used, this usually means no automation, merchant or campaign uses it.
+- **Last error 2h ago: the reason**, in red, when its most recent attempt failed. Click it to open the log that holds that integration's records under **Settings → Logs** (call center, fulfillment, order sync, external postbacks or email logs).
+
+Affiliate network postbacks (BuyGoods, ClickBank, JVZoo) are received, not sent, so they never show "Never used".
+
+Error text is stored without email addresses, phone numbers or keys, and is cut to 500 characters.
+
+## The Activity tab
+
+Open a connection and choose **Activity** to see:
+
+- last event, last success and last error
+- events and errors in the last 24 hours, and the success rate
+- the most recent error and its reason
+- a list of recent outcomes. It is a sample: at most one success and one error per minute are listed, while the 24-hour counts include every event.
+
+## Alerts
+
+ElasticFunnels adds an item to your **Actions** list when:
+
+- an active integration **keeps failing**: 10 or more errors, and more than half of its attempts, in the last 24 hours. The item closes itself once the integration works again.
+- an integration that runs on its own **has gone quiet**: no event for 7 days while your other integrations are active. Checked once a day. The item closes itself on the integration's next event.
+
+You get one item per integration, not one per error. If you dismiss it, it is not raised again for 7 days.
+
+## Presets: make a new integration do something
+
+Every integration that waits to be used comes with ready-made automations. When you connect one, ElasticFunnels opens its **Presets** tab and asks whether you want it to do something. Pick a preset and click **Create**, or click **Skip for now**.
+
+You can come back any time: open the connection and choose **Presets**. The tab lists the presets and the automations that already use this integration, with whether each is on or off.
+
+When you create a preset you can leave **Turn it on now** unchecked. The automation is then created switched off, so you can review it in the builder before it runs.
+
+Examples:
+
+| Integration | Presets |
+|-------------|---------|
+| Klaviyo, Mailchimp, AWeber, ActiveCampaign, Brevo, GetResponse, Kit, Maropost, Ontraport | Add new customers, buyers or form entries as contacts |
+| HubSpot, Keap, Agile CRM, Close, Pipedrive | Create or update a contact for new customers, buyers or form entries |
+| SendGrid, Mailgun, Mailrelay | Welcome email to new customers, thank-you email after a purchase, email for each form entry |
+| DeBounce, ZeroBounce | Check the email address of new customers or form entries |
+| Twilio | Text buyers after a purchase |
+| Google Sheets | Add each order, or each form entry, as a row in a sheet |
+
+Every step stays editable in the automation builder.
+
+## Paused integrations
+
+A paused integration sends nothing, including email. Order and subscription emails that would go through a paused email integration are not sent (brands that send through their own SMTP settings are not affected), and course welcome emails fall back to the ElasticFunnels mailer. Resume the integration to send again.
