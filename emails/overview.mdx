@@ -16,7 +16,41 @@ Email templates are the transactional emails your brand sends to customers — o
 | **System** | Auto-created when you enable a merchant or subscription feature. Covers all standard transaction types (purchase, refund, shipped, etc.) | Content and design only — cannot be deleted |
 | **Custom** | Templates you create from scratch for specific use cases | Fully editable and deletable |
 
-System templates are marked with a **Locked** badge in the email list.
+System templates are marked with a **Default** badge in the email list.
+
+## Find a template
+
+Go to **Apps → Emails → Templates**. The tabs at the top filter the list: **All**, **Orders**, **Subscriptions**, **Members and login**, **Courses** and **Custom**. **Custom** holds every template that is not a built-in event default, such as the templates you made for a campaign or an automation. A copy of a built-in template shows under its event tab and under Custom.
+
+Clicking a template name, or **Builder** or **Code** in the row menu, opens the editor in a new browser tab, so the list stays where you left it.
+
+## Is a template actually sending?
+
+Each row shows whether the template goes out to customers today:
+
+| Status | Meaning |
+|---|---|
+| **Sending** | The template is sent for every merchant, course, campaign or automation that uses it. |
+| **Partly sending** | It is sent for some of them and not for others. The row says which. |
+| **Not sending** | Nothing sends it right now. The row says why. |
+
+The reasons under the status name the merchants, courses, campaigns or automations involved, for example "Sends for NMI, Stripe" or "Not sent for BuyGoods, ClickBank: their checkout emails its own receipt". Click **Show more** to see every reason.
+
+Common reasons a template is not sent:
+
+- **Network checkouts.** ElasticFunnels sends order and subscription emails only for payments that go through your own gateways (NMI, Stripe, PayPal, Klarna, Authorize.Net). BuyGoods, ClickBank, Digistore24, JVZoo and Shopify send their own receipts, so ElasticFunnels sends none for those merchants.
+- **No sending account.** Add SMTP in **Settings → Emailing**, or pick an email integration on the merchant. See [Sending Setup](/emails/sending-setup).
+- **Another template is picked.** When a merchant or course has its own template selected, that one is sent instead of the default, and the row says so.
+- **Shipped emails** need a fulfillment or order sync integration on the merchant, since that is what marks an order as shipped.
+- **Pre-renewal reminders** need a pre-renewal template and an email integration on the merchant. SMTP alone is skipped for these reminders.
+- **Members login emails** follow the members login mode, and are sent from your own SMTP. Without SMTP, ElasticFunnels sends its standard login email instead of your template.
+- **Campaign and automation templates** send while their campaign is going out or their automation is active.
+
+Turn on **Sending only** to hide the templates nothing sends.
+
+### Last sent
+
+Next to the status, each row shows when the template was last sent and how many times in the last 30 days, or "No sends in the last 12 months". The numbers come from the same log as **Settings → Logs → Email logs**, where you can see each email.
 
 ## Two ways to edit
 {/* SCREENSHOT: Two ways to edit · email editor or template settings · desktop */}
