@@ -4,16 +4,21 @@ description: "A checklist for when a customer did not receive an order, refund, 
 ---
 
 ## Start with the email log
-{/* SCREENSHOT: Emails → Logs · list of sends with status, recipient, source and template · desktop */}
+{/* SCREENSHOT: Settings → Logs → Email Logs · list of sends with status, recipient, template, channel and source · desktop (take after the release ships) */}
 
-Open **Emails → Logs** in the sidebar. It lists every email sent for your brand, over your
-brand's SMTP and through an email integration such as Mailgun or SendGrid, with the status,
-the recipient, the subject, the source that triggered it, the template code and the channel
-(SMTP or the integration's name). The older addresses, `/{brand}/emails/smtp-logs` and
-Settings → Logs → Email Logs, redirect there.
+Open **Settings → Logs** and pick **Email Logs**. It lists every email sent for your brand, over
+your brand's SMTP and through an email integration such as Mailgun or SendGrid: the status, the
+subject and recipient, the template, the channel (SMTP or the integration's name) and the source
+that triggered it, and when it was sent. The older addresses, `/{brand}/emails/logs` and
+`/{brand}/emails/smtp-logs`, open this tab with their filters kept.
 
-Use the **Sent** / **Failed** tabs, the channel and source filters, the date range and the
-search box (recipient, subject or template) to narrow the list. `Purchase` and `Refund` are
+You can also land here already filtered: **Open send logs** in a template's row menu or in the
+email builder's info panel shows that template's sends, **Open send logs** on a campaign report
+shows that campaign's, and **Open logs** on an email integration shows that integration's.
+
+Use the **All** / **Sent** / **Failed** tabs, the template, channel, source, integration and
+campaign filters, the date range and the search box to narrow the list, and the reload button
+next to the date range to fetch new sends. `Purchase` and `Refund` are
 the order jobs, `Members login` is the members area, `Course enrollment` is a course welcome
 email, and `SMTP test` is the test button on the Emailing tab. Click a row to open its details:
 the delivery error, the message ID, the metadata and a link to the template with the version
