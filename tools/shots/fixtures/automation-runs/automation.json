@@ -1,0 +1,6 @@
+{
+ "id": 21,
+ "title": "Post-purchase VIP tag for $90+ orders",
+ "postback_code": "azgir0nofbwrhgft",
+ "trigger_node_type": "triggers_on_new_purchase"
+}

@@ -1,0 +1,40 @@
+{
+ "data": [
+  {
+   "id": "Bm6Qx1TjRz8WkF4nHv2D",
+   "event_code": "K7WD3QZ9MB2XT6LE",
+   "status": "received",
+   "outcome": {
+    "result": "failed",
+    "steps": 4,
+    "failed": 1,
+    "skipped": 0
+   },
+   "input_payload": {
+    "trigger": {
+     "order_id": "NW-104880",
+     "public_order_id": "EF-104880",
+     "customer_email": "jordan.lee@example.com",
+     "customer_first_name": "Jordan",
+     "customer_last_name": "Lee",
+     "total": 129.0,
+     "currency_code": "USD",
+     "product_codes": [
+      "nw-sleep-3",
+      "nw-sleep-bump"
+     ],
+     "status": "approved"
+    }
+   },
+   "output_payload": null,
+   "revision_id": null,
+   "created_at": "2026-10-16T12:18:04Z"
+  }
+ ],
+ "current_page": 1,
+ "per_page": 25,
+ "total": 1,
+ "last_page": 1,
+ "from": 1,
+ "to": 1
+}

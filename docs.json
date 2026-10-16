@@ -228,6 +228,12 @@
             ]
           },
           {
+            "group": "Automations",
+            "pages": [
+              "automations/run-history"
+            ]
+          },
+          {
             "group": "Members Area",
             "pages": [
               "members-area/overview",

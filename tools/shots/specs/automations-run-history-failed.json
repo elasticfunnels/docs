@@ -1,0 +1,73 @@
+{
+  "out": "images/automations/run-history-failed.png",
+  "alt": "A failed run in the side drawer: the summary, the steps on a timeline and the failed step's error",
+  "capture": {
+    "path": "/{brand}/automations/21/events",
+    "viewport": {
+      "width": 1440,
+      "height": 860
+    },
+    "waitFor": "text=K7WD3QZ9MB2XT6LE",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/automations/21/logs\\?event_id=Bm6Qx1TjRz8WkF4nHv2D",
+        "file": "tools/shots/fixtures/automation-runs/logs-failed.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/21/events",
+        "file": "tools/shots/fixtures/automation-runs/events.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/21$",
+        "file": "tools/shots/fixtures/automation-runs/automation.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "text=K7WD3QZ9MB2XT6LE"
+      },
+      {
+        "waitFor": "[data-testid=automation-event-steps]"
+      }
+    ],
+    "crop": {
+      "x": 768,
+      "y": 0,
+      "width": 672,
+      "height": 830
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid=automation-event-drawer] dl",
+      "title": "Summary",
+      "text": "Result, received time, revision, event ID",
+      "side": "left"
+    },
+    {
+      "selector": "text=3 done, 1 failed",
+      "title": "Step counts",
+      "text": "Done, failed, skipped and not run",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid=automation-event-steps] > li:nth-child(4) span:has(> time)",
+      "title": "Duration and time",
+      "text": "How long the step took, and when",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid=automation-event-steps] > li:nth-child(4) pre",
+      "title": "Error",
+      "text": "What the provider said, credentials removed",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=automation-event-steps] > li:nth-child(4) button",
+      "title": "Show input and output",
+      "text": "What the step sent and got back",
+      "side": "left"
+    }
+  ],
+  "calloutWidth": 230
+}

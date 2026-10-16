@@ -1,0 +1,65 @@
+{
+  "out": "images/automations/list-run-counts.png",
+  "alt": "The Automations list with Total runs, Success and Failed counts for the current billing period, and the Events link",
+  "capture": {
+    "path": "/{brand}/automations",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "text=148",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/automations/summary-by-automation",
+        "file": "tools/shots/fixtures/automation-runs/summary-by-automation.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations(\\?|$)",
+        "file": "tools/shots/fixtures/automation-runs/automations-list.json"
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 0,
+      "width": 1183,
+      "height": 345
+    }
+  },
+  "maxWidth": 900,
+  "calloutWidth": 230,
+  "annotations": [
+    {
+      "box": [
+        698,
+        196,
+        84,
+        84
+      ],
+      "title": "Total runs",
+      "text": "Triggers in the current billing period",
+      "side": "left"
+    },
+    {
+      "box": [
+        808,
+        198,
+        142,
+        36
+      ],
+      "title": "Success and Failed",
+      "text": "Steps that ran in the same period",
+      "side": "right"
+    },
+    {
+      "box": [
+        966,
+        244,
+        200,
+        40
+      ],
+      "title": "Events",
+      "text": "Opens this automation's run history",
+      "side": "right"
+    }
+  ]
+}

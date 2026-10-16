@@ -1,0 +1,112 @@
+{
+ "data": [
+  {
+   "id": "log1",
+   "event_code": "Bm6Qx1TjRz8WkF4nHv2D",
+   "node_code": "trigger",
+   "node_type": "triggers_on_new_purchase",
+   "status": "success",
+   "message": null,
+   "previous_node": null,
+   "input_payload": {
+    "trigger": {
+     "order_id": "NW-104880",
+     "public_order_id": "EF-104880",
+     "customer_email": "jordan.lee@example.com",
+     "customer_first_name": "Jordan",
+     "customer_last_name": "Lee",
+     "total": 129.0,
+     "currency_code": "USD",
+     "product_codes": [
+      "nw-sleep-3",
+      "nw-sleep-bump"
+     ],
+     "status": "approved"
+    }
+   },
+   "output_payload": {
+    "received": true
+   },
+   "errors": null,
+   "revision_id": null,
+   "created_at": "2026-10-16T12:18:04Z",
+   "finished_at": "2026-10-16T12:18:04.210Z"
+  },
+  {
+   "id": "log2",
+   "event_code": "Bm6Qx1TjRz8WkF4nHv2D",
+   "node_code": "nwwait00002",
+   "node_type": "control_general_wait_for",
+   "status": "success",
+   "message": null,
+   "previous_node": null,
+   "input_payload": {
+    "minutes": 60
+   },
+   "output_payload": {
+    "resume_at": "2026-10-16T13:18:05Z"
+   },
+   "errors": null,
+   "revision_id": null,
+   "created_at": "2026-10-16T12:18:05Z",
+   "finished_at": "2026-10-16T12:18:05.140Z"
+  },
+  {
+   "id": "log3",
+   "event_code": "Bm6Qx1TjRz8WkF4nHv2D",
+   "node_code": "nwcond00003",
+   "node_type": "control_general_continue_if",
+   "status": "success",
+   "message": null,
+   "previous_node": null,
+   "input_payload": {
+    "data": 129.0,
+    "condition": "is_greater_than",
+    "condition_value": "90"
+   },
+   "output_payload": {
+    "continue": true,
+    "conditionResult": true
+   },
+   "errors": null,
+   "revision_id": null,
+   "created_at": "2026-10-16T13:18:06Z",
+   "finished_at": "2026-10-16T13:18:06.090Z"
+  },
+  {
+   "id": "log4",
+   "event_code": "Bm6Qx1TjRz8WkF4nHv2D",
+   "node_code": "nwklav00004",
+   "node_type": "mailing_klaviyo_create_or_update_profile",
+   "status": "failed",
+   "message": "Klaviyo rejected the request (401 Unauthorized)",
+   "previous_node": null,
+   "input_payload": {
+    "integration_id": 31,
+    "email": "jordan.lee@example.com",
+    "first_name": "Jordan",
+    "last_name": "Lee",
+    "tags": "vip-90-day"
+   },
+   "output_payload": null,
+   "errors": {
+    "status": 401,
+    "errors": [
+     {
+      "code": "not_authenticated",
+      "detail": "Incorrect authentication credentials."
+     }
+    ]
+   },
+   "revision_id": null,
+   "created_at": "2026-10-16T13:18:07Z",
+   "finished_at": "2026-10-16T13:18:09.420Z"
+  }
+ ],
+ "current_page": 1,
+ "per_page": 100,
+ "total": 4,
+ "last_page": 1,
+ "from": 1,
+ "to": 4
+}

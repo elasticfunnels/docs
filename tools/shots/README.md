@@ -28,6 +28,11 @@ Needs Node 18+ and Playwright. Nothing to install in this repo: it uses
 - **Read-only.** Every POST, PUT, PATCH or DELETE to the app is answered with an empty 204 and logged
   as `blocked`, so a click can open a panel but never save, delete or send. If a screen needs a POST to
   read data (a search endpoint), allow that URL with `"allowPost": ["/api/.../search"]`.
+- **No demo data for the screen?** Answer its endpoints with fictional JSON:
+  `"fixtures": [{ "url": "/api/brands/{brand}/automations/21/events", "file": "tools/shots/fixtures/automation-runs/events.json" }]`.
+  `url` is a regex tested against the request's path and query; the first match wins, so put the narrow
+  one first. It is the real component with fixture data, never a mockup: keep the numbers plausible and
+  every name generic.
 - A spec whose path contains `{brand}` refuses to capture if the app lands on any other brand.
 - Raw captures and the measured element boxes go to `tools/shots/raw/` (gitignored), so the
   composite can be re-rendered without the app.

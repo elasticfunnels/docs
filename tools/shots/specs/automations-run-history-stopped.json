@@ -1,0 +1,70 @@
+{
+  "out": "images/automations/run-history-stopped.png",
+  "alt": "A run that a Continue If condition stopped: the note on the condition step, its output, and the step marked Not run",
+  "capture": {
+    "path": "/{brand}/automations/21/events",
+    "viewport": {
+      "width": 1440,
+      "height": 860
+    },
+    "waitFor": "text=R2TF8KM4QZ6WB9XC",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/automations/21/logs\\?event_id=Pc9Vh4MsKw2LxN7bTq5G",
+        "file": "tools/shots/fixtures/automation-runs/logs-stopped.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/21/events",
+        "file": "tools/shots/fixtures/automation-runs/events.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/21$",
+        "file": "tools/shots/fixtures/automation-runs/automation.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "text=R2TF8KM4QZ6WB9XC"
+      },
+      {
+        "waitFor": "[data-testid=automation-event-steps]"
+      },
+      {
+        "click": "[data-testid=automation-event-steps] > li:nth-child(3) button"
+      }
+    ],
+    "crop": {
+      "x": 768,
+      "y": 0,
+      "width": 672,
+      "height": 860
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=so the run stopped here",
+      "title": "Stopped here",
+      "text": "The condition was not met",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid=automation-event-steps] > li:nth-child(3) .grid > div:nth-child(2) pre",
+      "title": "Output",
+      "text": "What the step returned",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=automation-event-steps] > li:nth-child(4)",
+      "title": "Not run",
+      "text": "A step this run did not reach",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=automation-event-drawer] section > button",
+      "title": "Trigger payload",
+      "text": "What the trigger received, collapsed",
+      "side": "right"
+    }
+  ],
+  "calloutWidth": 230
+}
