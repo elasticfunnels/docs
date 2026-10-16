@@ -5,21 +5,22 @@ description: 'Learn how to authenticate your API requests'
 
 ## Overview
 
-The ElasticFunnels API uses **API keys** for authentication. Each API key is tied to a specific user and project (brand), inheriting all the permissions of that user for that project.
+The ElasticFunnels API uses **API keys** for authentication. Each key belongs to your user account and reaches only the projects (brands) you picked when you created it, as read-only or read and write. It can never do more than your own account can in those projects.
 
 <Warning>
   Keep your API keys secure! Never share them publicly or commit them to version control. Treat them like passwords.
 </Warning>
 
-## Generating an API Key
+## Creating an API Key
 
-1. Navigate to your project dashboard
-2. Go to **Settings** → **API**
-3. Click **Generate API Key**
-4. Copy and securely store your API key
+1. In your project, go to **Settings → API**
+2. Click **Create API key**
+3. Name the key, pick its **Projects** and its **Access** (read and write, or read-only)
+4. Click **Create API key** and confirm it's you with your passkey, authenticator code or a recovery code
+5. Copy the key from the **Copy your new key** window. It is shown only once
 
 <Note>
-  You can regenerate your API key at any time, but this will immediately invalidate the old key. Make sure to update any integrations using the old key.
+  Creating or regenerating a key needs [two-factor authentication](/account/two-factor-authentication) on your account and a confirmation in the last 10 minutes. Keys are created from a signed-in browser session only, and an API key can't create another key. Step-by-step help: [Connect the ef CLI and create API keys](/account/cli-and-api-keys#create-an-api-key).
 </Note>
 
 ## Using Your API Key
@@ -111,12 +112,15 @@ If you don't include the `EF-Access-Key` header, you'll be redirected to the log
 
 API keys are:
 - **User-specific**: Each key is tied to your user account
-- **Project-specific**: Each key is tied to a specific project (brand)
-- **Permission-aware**: Your API requests have the same permissions as your user role (Owner, Admin, Editor, etc.)
+- **Project-scoped**: Each key reaches only the projects you picked (one, several, or all projects you can access)
+- **Read-only or read and write**: chosen when you create the key
+- **Permission-aware**: Within those projects, requests never go beyond your own role (Owner, Admin, Editor, etc.)
+
+Scoped keys never reach organization settings, organization billing or team management. An older **Full access (legacy)** key can do everything your account can do in every project. You can swap it for a scoped key with **Convert to scoped key** on the API page.
 
 ### Example Permission Scenarios
 
-**Owner/Admin**: Full access to all endpoints including team management, billing, and settings
+**Owner/Admin**: Access to the project's content, analytics and settings endpoints
 
 **Editor**: Access to content management endpoints (pages, products, funnels) but not billing or team management
 
@@ -143,9 +147,9 @@ API keys are:
 
 If your API key is compromised or you need to revoke access:
 
-1. Go to **Settings** → **API**
-2. Click **Regenerate API Key**
-3. Confirm the action
+1. Go to **Settings → API**
+2. Click **Revoke** on the key (it stops working at once), then create a new one. For a legacy full-access key, click **Regenerate** instead
+3. Confirm it's you when asked
 4. Update all integrations with the new key
 
 <Warning>

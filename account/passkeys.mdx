@@ -1,0 +1,75 @@
+---
+title: "Passkeys"
+description: "Sign in and confirm sensitive actions with your fingerprint, face or device PIN instead of a code."
+---
+
+A passkey lets you sign in with Touch ID, Face ID, Windows Hello, your device PIN or your phone. It counts as [two-factor authentication](/account/two-factor-authentication) on its own, and it can't be phished: it only works on app.elasticfunnels.io.
+
+Every passkey check asks your device to verify you (fingerprint, face or PIN). A security key that only needs a tap, with no PIN, is not accepted.
+
+## Add a passkey
+{/* SCREENSHOT: Account settings, Two factor pane · Passkeys list with the Name field and Add a passkey button · desktop */}
+
+<Steps>
+  <Step title="Open the two-factor settings">
+    Open **Account settings** from your account menu and choose **Two factor**. Passkeys are at the top.
+  </Step>
+  <Step title="Name it (optional)">
+    Type a name you'll recognise later, such as `MacBook` or `iPhone`. Leave it empty and it's called **Passkey**.
+  </Step>
+  <Step title="Create it">
+    Click **Add a passkey** and follow your browser's prompt. When it's saved, the passkey shows in the list.
+  </Step>
+  <Step title="Save your recovery codes if you see them">
+    If this is your first second factor, ElasticFunnels shows 10 recovery codes once. Save them before you leave the screen. See [Recovery codes](/account/two-factor-authentication#recovery-codes).
+  </Step>
+</Steps>
+
+Before the passkey is added, the app may ask you to confirm it's you:
+
+- **Your first second factor:** no check if you signed in within the last 15 minutes. Otherwise you confirm with your password, or with a code sent to your email if your account has no password.
+- **You already have a passkey or authenticator app:** you confirm with one of them, unless you did so in the last 10 minutes.
+
+You can have up to 10 passkeys. Each row shows when it was added and last used. Passkeys saved in iCloud Keychain, Google Password Manager or a password manager show **synced across devices**, and work on your other devices signed in to the same account.
+
+When two-factor setup is required at sign-in or before an action, the setup window also offers **Use a passkey instead** of the authenticator app.
+
+## Sign in with a passkey
+{/* SCREENSHOT: Sign-in page · Sign in with a passkey button under the password form · desktop */}
+
+- **Without typing your email:** click **Sign in with a passkey** on the sign-in page and pick your passkey. The passkey tells us which account it belongs to. The **Remember me** checkbox applies here too.
+- **As the second step after your password:** the screen offers **Use a passkey** first. If you cancel the prompt, you can enter your authenticator code instead.
+
+**Sign in with a passkey** only appears in browsers that support passkeys.
+
+## Confirm sensitive actions with a passkey
+
+Creating an API key and connecting the ef CLI need a fresh confirmation. If your account has a passkey, the window offers **Confirm with passkey** first, with the authenticator code (or a recovery code, for passkey-only accounts) as the fallback. One confirmation covers the next 10 minutes. See [Connect the ef CLI and create API keys](/account/cli-and-api-keys).
+
+## Remove a passkey
+
+Click **Remove** next to the passkey and confirm. Removing one needs a fresh confirmation with your passkey, authenticator code or a recovery code.
+
+If two-factor is required for your account and this is your only second factor, you can't remove it until you add an authenticator app or another passkey.
+
+Removing a passkey here does not delete it from your device or password manager. Delete it there too if you no longer need it.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="I cancelled the passkey prompt">
+    Nothing happens and nothing is counted as a failed try. Click the passkey button again, or use the authenticator code or a recovery code instead.
+  </Accordion>
+  <Accordion title="&quot;That passkey could not be verified. Try again.&quot;">
+    Your device answered, but not with a passkey this account accepts. Common causes: you picked a passkey saved for a different ElasticFunnels account, or your device skipped the fingerprint, face or PIN check. Try again and choose the passkey listed under **Account settings → Two factor**.
+  </Accordion>
+  <Accordion title="&quot;Too many attempts. Try again in 15 minutes.&quot;">
+    Too many failed passkey checks in a short time. When you are confirming an API key or CLI connection, failed passkey checks and wrong codes share one limit of 5 tries, so switching to a code does not get you more. Wait 15 minutes.
+  </Accordion>
+  <Accordion title="&quot;This browser does not support passkeys.&quot;">
+    Update your browser, or use a recent version of Chrome, Safari, Edge or Firefox. You can still sign in with your authenticator code or a recovery code, and add the passkey later from a browser that supports it.
+  </Accordion>
+  <Accordion title="&quot;This account has no passkey.&quot;">
+    The passkey was removed from your account, or you are signed in to a different account. Use your authenticator code or a recovery code, then add a new passkey.
+  </Accordion>
+</AccordionGroup>

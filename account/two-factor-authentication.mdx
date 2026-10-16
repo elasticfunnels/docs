@@ -1,0 +1,118 @@
+---
+title: "Two-factor authentication"
+description: "Turn on an authenticator app, save your recovery codes, sign in with a second factor, and get back in if you lose your phone."
+---
+
+Two-factor authentication (2FA) asks for a second proof after your password: a 6-digit code from an authenticator app, or a [passkey](/account/passkeys). Your account holds your funnels, customer data and payment connections, so ElasticFunnels is making 2FA required for every account.
+
+## What needs it
+
+| Action | What you need |
+|---|---|
+| Signing in with your password (or Google, Facebook, LinkedIn) | Your second factor, every time |
+| Connecting a payment gateway, adding a domain, inviting a team member, publishing a checkout page | 2FA turned on for your account |
+| Creating or regenerating an API key, connecting the ef CLI | 2FA turned on, and a fresh confirmation in the last 10 minutes. See [Connect the ef CLI and create API keys](/account/cli-and-api-keys) |
+
+API keys and CLI connections you already have keep working. The checks above apply when you create new ones.
+
+## When it becomes required
+
+While 2FA is not yet required for you, the app shows a reminder with the date it applies to your account. **Remind me later** hides it for a few days. In the last three days a banner stays at the top of the app and the reminder comes back daily.
+
+From that date, you set up 2FA before you reach the dashboard. If you start an action that needs 2FA before then (adding a domain, for example), the app opens the setup in place and finishes your action once you are done.
+
+## Turn on 2FA with an authenticator app
+{/* SCREENSHOT: Account settings, Two factor pane · QR code, secret key and 6-digit code field during setup · desktop */}
+
+You need an authenticator app on your phone, such as Google Authenticator, Authy or 1Password.
+
+<Steps>
+  <Step title="Open the two-factor settings">
+    Open **Account settings** from your account menu and choose **Two factor**.
+  </Step>
+  <Step title="Start the setup">
+    Click **Enable two-factor authentication**. If you signed in more than 15 minutes ago, the app first asks you to confirm it's you with your password (or a code sent to your email, if your account has no password).
+  </Step>
+  <Step title="Scan the QR code">
+    Scan the QR code with your authenticator app. If you can't scan it, type the key shown under **Secret (manual entry)** into the app instead.
+  </Step>
+  <Step title="Enter the code">
+    Type the 6-digit code the app shows and click **Confirm and enable**.
+  </Step>
+  <Step title="Save your recovery codes">
+    ElasticFunnels shows your 10 recovery codes once. Copy or download them before you leave the screen. See the next section.
+  </Step>
+</Steps>
+
+<Tip>
+You can use a passkey (Touch ID, Face ID, Windows Hello or your phone) as your second factor instead of an authenticator app, or alongside it. See [Passkeys](/account/passkeys).
+</Tip>
+
+## Recovery codes
+{/* SCREENSHOT: Recovery codes list with Copy and Download buttons, right after turning on 2FA · desktop */}
+
+Recovery codes are your way back in when your phone is not with you. You get 10 of them when you turn on 2FA or add your first passkey. They look like `ab3k9-x2mpq`.
+
+- Each code works **once**: at sign-in, or wherever the app asks you to confirm it's you.
+- Store them away from your phone: a password manager, or a printed copy somewhere safe.
+- We email you every time one is used, with the IP address it came from. If that wasn't you, reset your password and create new codes straight away.
+
+**Account settings → Two factor → Recovery codes** shows how many you have left. At 3 or fewer the count turns red.
+
+### Create a new set
+
+Enter a code from your authenticator app under **Recovery codes** and click **Create new codes**. The new set appears once, and every old code stops working.
+
+<Note>
+Creating a new set needs an authenticator code. If you use only passkeys, you get a new set when you add a passkey after using up all your codes.
+</Note>
+
+## Signing in with 2FA
+{/* SCREENSHOT: Sign-in second step · authenticator code boxes and the Other ways to sign in link · desktop */}
+
+After your password, ElasticFunnels asks for your second factor:
+
+- **If you have a passkey**, the screen offers **Use a passkey** first. Cancel the passkey prompt and you get the authenticator code field instead.
+- **Authenticator app:** type the 6-digit code and click **Verify**.
+- **Other ways to sign in** lists everything your account can use: a passkey, the authenticator app, a recovery code, or **Contact support**.
+
+You can also skip the password entirely with **Sign in with a passkey** on the sign-in page.
+
+## If you lose your phone
+
+<Steps>
+  <Step title="Sign in with a recovery code">
+    On the second step of sign-in, open **Other ways to sign in**, choose **Recovery code**, type one of your saved codes and click **Sign in with this code**.
+  </Step>
+  <Step title="Add a passkey so you have a working factor">
+    In **Account settings → Two factor**, add a passkey on the computer you are using. See [Passkeys](/account/passkeys).
+  </Step>
+  <Step title="Ask support to reset your authenticator app">
+    While 2FA is on, the authenticator can't be swapped to a new phone from the settings. Email [support@elasticfunnels.io](mailto:support@elasticfunnels.io) and we reset it after confirming it's you.
+  </Step>
+</Steps>
+
+**Lost your phone and your recovery codes?** Use **Contact support** under **Other ways to sign in**. It opens an email to support@elasticfunnels.io. When we reset your 2FA, we remove the authenticator app and recovery codes from your account, sign out every session and email you. At your next sign-in you set up 2FA again.
+
+## Turning 2FA off
+
+In **Account settings → Two factor**, click **Disable two-factor authentication**, then enter your current 2FA code and your password.
+
+You can't turn it off when your organization requires 2FA, or once the date it became required for your account has passed.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="&quot;That code is not right&quot; or the code never works">
+    Authenticator codes depend on your phone's clock. Turn on automatic date and time on your phone and try a fresh code. Each code changes every 30 seconds.
+  </Accordion>
+  <Accordion title="&quot;Too many incorrect codes. Please sign in again.&quot;">
+    Five wrong codes within 15 minutes at sign-in end that attempt. Start again from your email and password.
+  </Accordion>
+  <Accordion title="&quot;Too many attempts. Try again in 15 minutes.&quot;">
+    Shown when you confirm it's you for an API key or CLI connection and five tries failed within 15 minutes. Wrong codes and failed passkey checks count toward the same limit. Wait 15 minutes, then try again.
+  </Accordion>
+  <Accordion title="&quot;Setup session expired. Please start again.&quot;">
+    The QR code you scanned belongs to a setup that timed out. Click **Enable two-factor authentication** again and scan the new QR code. Delete the old entry from your authenticator app so you don't mix them up.
+  </Accordion>
+</AccordionGroup>
