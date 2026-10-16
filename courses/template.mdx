@@ -133,6 +133,20 @@ var lessonSeed = getCourseLesson({
 var lessonSeedLegacy = getCourseLesson('tinnitus-recovery', 12, 77);
 ```
 
+Leave out an argument (or pass an empty value) and it is read from the page's URL: on a page with the slug `course/{course}/module/{module}/lesson/{lesson}`, `getCourseLesson()` finds the lesson the visitor opened. In a template, the URL segments are also on `request.route_params` (`request.route_params.course`, `.module`, `.lesson`).
+
+### `getOrderCourses()`
+
+Returns the courses the visitor's latest order in this session gives access to, as a list of `{ title, url }`. Use it on your own thank-you page to send a course buyer straight to the course. It returns `[]` when the session has no order or the order unlocks no course.
+
+```html
+@foreach(getOrderCourses() as c)
+  <a href="{{ c.url }}">Start {{ c.title }}</a>
+@endforeach
+```
+
+The link opens the course page: your course domain and path when you set one in the course settings, otherwise `/course/{slug}` on the domain the buyer is on. A buyer who is not signed in yet is asked to sign in first. When a project has no thank-you page, the built-in one shows the same links.
+
 ### `getCompletedLessonsCount(opts?)`
 
 Returns the total number of completed lessons across all enrolled courses, or for a specific course when a slug is provided.
