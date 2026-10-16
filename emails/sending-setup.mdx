@@ -89,6 +89,14 @@ tab → **Email Integration** lists your Mailgun, SendGrid, and Mailrelay integr
 is ignored for order emails. Use the merchant integration when a single brand sells through
 merchants that need to mail from different providers.
 
+A paused or disabled integration sends nothing. If it is the only sender a merchant has, its
+order and subscription emails are skipped and a Brand Action asks you to choose a sending
+account. ElasticFunnels never sends those emails from its own servers in its place.
+
+Members area login codes and links, and the course welcome email, are the exception: when
+the brand has no SMTP, ElasticFunnels sends them under your brand name so customers are not
+locked out.
+
 ---
 
 ## Step 2: create the templates
