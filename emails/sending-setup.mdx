@@ -8,18 +8,23 @@ description: "Connect a sender, wire templates to a merchant, and send a test be
 
 An order confirmation only reaches a customer when all three of these are in place:
 
-1. **A sender.** SMTP credentials on the brand, or an email integration on the merchant.
-2. **A template.** The email itself, from **Emails** in your brand dashboard.
-3. **That template selected on the merchant.** Merchant → **Email** tab → **Order Emails**.
+1. **A sender.** SMTP credentials on the brand, or an email integration on the merchant that is
+   connected and not paused.
+2. **A template.** The email itself, from **Apps → Emails**. Your brand has a **Default**
+   template for each standard event.
+3. **A merchant whose payments run through ElasticFunnels.** NMI, Stripe, PayPal, Klarna and
+   Authorize.Net checkouts send order emails. BuyGoods, ClickBank, Digistore24, JVZoo and Shopify
+   email their own receipts, so ElasticFunnels sends none for them.
 
-Miss any one of them and nothing sends. There is no built-in fallback email, and for
-shipping and cancellation notices there is no warning either. The order goes through, the
-customer is charged, and the inbox stays empty.
+Without a sender, the order goes through, the customer is charged, and no email is sent.
+ElasticFunnels does not send order or subscription emails from its own servers in its place.
+Instead a **Choose a sending account for ... emails** task appears in your Brand Actions, one
+per email type, and closes by itself once that email can be sent again.
 
-<Warning>
-ElasticFunnels never sends a generic default on your behalf. If the slot is empty, the
-customer gets no email at all.
-</Warning>
+<Tip>
+The **Status** column in **Apps → Emails** shows, for each template, whether it is sending and
+for which merchants. Check it after any change here.
+</Tip>
 
 ---
 
@@ -102,10 +107,10 @@ locked out.
 ## Step 2: create the templates
 {/* SCREENSHOT: Emails list · brand templates with names and subjects · desktop */}
 
-Open **Apps → Emails** in the sidebar. Templates are grouped by type (Orders, Subscriptions,
-Members and login, Courses, Automations, General). Every brand ships with system templates for the
-standard transaction types, and you can create your own. See
-[Email Templates](/emails/overview) for the builder and
+Open **Apps → Emails** in the sidebar. Tabs filter the templates by type (Orders, Subscriptions,
+Members and login, Courses, Custom). Your brand has a **Default** template for each standard
+event, and you can create your own. See [Emails](/emails/overview) for the list,
+[Building an email](/emails/builder) for the builder and
 [Template Variables](/emails/template-variables) for the merge tags.
 
 The fastest route is Step 3: the merchant screen can create a pre-built template and select
@@ -145,7 +150,8 @@ Visible for NMI and Stripe merchants:
 | Subscription Canceled | A subscription is canceled |
 
 Each row has a **Create template** button that seeds a ready-made template for that type and
-selects it immediately. A row showing **Not set** sends nothing.
+selects it immediately. A row showing **Not set** uses the brand's template for that event (see
+below). The Pre-Renewal Reminder is the exception: with **Not set**, no reminder is sent.
 
 <Tip>
 The usual setup is all four order slots filled on the merchant, with a custom purchase
@@ -155,17 +161,16 @@ builder.
 
 ### Which template actually gets used
 
-There are two places a subscription template can be chosen, and they are checked in order:
+For each email, ElasticFunnels checks these in order and sends the first template it finds:
 
 1. The merchant's **Email** tab. This wins.
-2. **Settings** → **Subscriptions**, which holds brand-wide defaults for the same events.
-3. The brand's built-in system template for that event.
+2. **Settings** → **Subscriptions**, which holds brand-wide picks for the same events
+   (not for the Pre-Renewal Reminder).
+3. The brand's **Default** template for that event, marked with a **Default** badge in
+   **Apps → Emails**.
 
-Order emails are simpler. Set them on the merchant. The brand defaults under
-**Settings** → **Subscriptions** are not a reliable fallback for shipping and cancellation
-notices, and purchase and refund prefer the brand's locked system template over anything
-picked in a dropdown. If you want different purchase copy, edit the locked template rather
-than duplicating it.
+So to change the copy for every merchant at once, edit the Default template. To give one merchant
+different copy, duplicate the Default, edit the copy, and pick it on that merchant.
 
 ---
 

@@ -248,6 +248,7 @@
             "group": "Emails",
             "pages": [
               "emails/overview",
+              "emails/builder",
               "emails/sending-setup",
               "emails/template-variables",
               "emails/order-emails",
