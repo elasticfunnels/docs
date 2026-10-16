@@ -1,0 +1,60 @@
+---
+title: 'Test merchant (sandbox)'
+description: 'Run a whole funnel end to end with test card numbers: checkout, bumps, upsells, course access, order emails and subscription renewals, with no payment gateway and no money moving.'
+---
+
+The **Test (sandbox)** merchant is a merchant with no credentials that never charges anyone. Use it to try a funnel from the first page to the thank-you page before you connect a real payment processor: the checkout, order bumps, one-click upsells and downsells, course access, order emails, automations, subscription renewals and refunds all work.
+
+Every order it takes is a **test order**. You pay with test card numbers, and only test card numbers: a real card is refused.
+
+## Create a Test merchant
+
+1. Go to **Settings** → **Merchants** → **Create Merchant**.
+2. In **Gateway**, pick **Test (sandbox)** and give it a name.
+3. Click **Create & Configure**.
+4. Pick the **Checkout Page** your funnel uses and click **Save**.
+
+There are no keys to enter. The yellow box on the merchant shows the test cards and what runs for a test order.
+
+Then make it the merchant of the domain or funnel you are testing (**Settings** → **Domains**, or the funnel's merchant setting), the same way you would pick Stripe or NMI.
+
+<Warning>
+Use the Test merchant only on domains and funnels you are testing. Anyone who reaches a checkout that uses it can finish the order with a test card and get what it sells for free, including course access. Switch the domain or funnel to your real merchant before you send traffic.
+</Warning>
+
+## Test cards
+
+Enter any future expiry date (for example `12/30`) and any CVC.
+
+| Card number | Result |
+|---|---|
+| `4242 4242 4242 4242` | Approved |
+| `4000 0000 0000 0002` | Declined: "Your card was declined." |
+| `4000 0000 0000 9995` | Declined: insufficient funds |
+| `4000 0000 0000 0069` | Declined: expired card |
+
+The other numbers from Stripe's test card list work too and give the same result as on Stripe (for example `5555 5555 5555 4444` is an approved Mastercard). Any other card number is refused before anything is recorded, and an expiry date in the past is refused.
+
+## What a test order does
+
+A test order made through the Test merchant runs the same steps as a paid order, so you can check the whole funnel:
+
+- the thank-you page, the order bump and the order total;
+- one-click upsells and downsells, charged to the test card saved at checkout;
+- course access for the products bought, and the welcome and order emails;
+- automations that start on a purchase;
+- subscriptions: the renewal charges the saved test card on its date, and the renewal emails go out;
+- refunds and voids from the order page.
+
+Some steps never run for it, because nothing was paid:
+
+- it is left out of revenue, analytics and reports, like any test order;
+- nothing is sent to a fulfillment provider;
+- no affiliate postback, no ad platform conversion (Meta, Google Ads, TikTok and the others) and no tracker postback;
+- no sale is sent to a call center, no stock is taken and no processing fee is charged.
+
+Your merchant's own [postback URLs](/merchants/postback-urls) still fire, with `"test": true` in the payload.
+
+## Moving to a real processor
+
+When the funnel works, create your real merchant (Stripe, NMI, Authorize.Net or another) and switch the domain or funnel to it. To keep testing on a live merchant afterwards, use its **Test Key**.
