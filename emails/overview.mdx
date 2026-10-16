@@ -3,14 +3,14 @@ title: "Emails"
 description: "What the Emails area holds: the templates for order, subscription, login and course emails, which of them actually go out, and which account sends them."
 ---
 
-Every email your brand sends to a customer starts from a template in **Apps → Emails**: the order
+Every email your brand sends to a customer starts from a template in **Emails → Templates**: the order
 confirmation after a purchase, a renewal receipt, a members area login code, a course welcome
 email. This page explains what you see there. To design an email, see
 [Building an email](/emails/builder).
 
 ## The template list
 
-Open **Apps → Emails**. Each row is one template:
+Open **Emails → Templates**. Each row is one template:
 
 | Column | What it tells you |
 |---|---|
@@ -26,10 +26,10 @@ The tabs above the list filter it: **All**, **Orders**, **Subscriptions**, **Mem
 including the ones made for a campaign or an automation. Search and sort (recently updated, last
 sent, name, newest) sit next to the tabs.
 
-The **...** menu at the top right links to the three places that decide how email leaves your
-brand:
+**Emails** has its own entry in the sidebar, with **Templates**, **Campaigns** and **Logs** (every
+email that went out) beside it. The **...** menu at the top right of Templates links to the
+places that decide how email leaves your brand:
 
-- **Send logs**: every email that went out, in **Settings → Logs → Email logs**.
 - **Sending settings**: your SMTP server and the default sender name and address, in
   **Settings → Emailing**.
 - **Email integrations**: Mailgun, SendGrid, Mailrelay and other providers, in
@@ -85,7 +85,8 @@ The usual reasons a template is not sending:
 - **Campaign and automation templates** count as sending while the campaign is going out or the
   automation is on.
 
-Switch on **Sending only** to hide every template that nothing sends.
+Set **Show** to **In use** to hide every template that nothing sends today. **All** lists every
+template.
 
 ## Transactional emails and campaigns
 
@@ -128,7 +129,7 @@ is on [Sending Setup](/emails/sending-setup).
 
 <Steps>
 <Step title="Click Create email">
-In **Apps → Emails**, click **Create email**.
+In **Emails → Templates**, click **Create email**.
 </Step>
 <Step title="Fill in the basics">
 Give it a **Name** (only you see it), a **Subject** and an optional **Preview text**, the line most
