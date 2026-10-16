@@ -77,7 +77,7 @@ The setup is the same for every provider:
 
 <Steps>
   <Step title="Find the provider">
-    Go to **Integrations** → **Email Marketing** (or **Validation**), find the provider, click **Activate**.
+    Go to **Apps → Integrations**, click **New integration**, and pick the provider under **Email Marketing** (or **Utilities** for validation).
   </Step>
   <Step title="Authenticate">
     Paste an API key, OAuth your account, or fill in SMTP credentials depending on the provider.
@@ -89,6 +89,18 @@ The setup is the same for every provider:
     Open any **Automation** and drop the new actions (e.g. `Klaviyo: Subscribe Profile`) into the workflow. Map ElasticFunnels variables (email, first name, custom fields) to the provider's fields.
   </Step>
 </Steps>
+
+## The integration page
+
+Mailgun and SendGrid open on a page with the settings in cards and a column beside them:
+
+- **Header**: the connection's name (click it to rename, then **Save**), its status, when it last sent and its last error. **Test connection** (SendGrid) checks the saved API key. The **⋯** menu opens the email logs or deletes the integration.
+- **Connection**: the API key and, for Mailgun, the sending domain. A saved key is never shown again: it reads **Saved** with a **Replace** button. Leave it as it is to keep the stored key.
+- **Default sender**: the from address, from name and reply-to used when an email template has none. **How the sender is chosen** explains the order.
+- **Delivery stats**: the webhook that brings opens, clicks and bounces back.
+- **How to set it up** (beside the cards, or under them on a phone): the steps with links to the provider.
+
+The **Activity** tab shows recent sends and failures, **Presets** offers ready-made automations, and **Used by** lists the automations and merchants that send through this account.
 
 ## Built-in vs external
 {/* SCREENSHOT: Built-in vs external · architecture · desktop */}
