@@ -30,7 +30,7 @@ An output can also be a short condition: a ternary (`cond ? 'yes' : 'no'`), `and
 |---------|---------|
 | `{{ lesson.done ? 'Done' : 'Open' }}` | `Done` for a finished lesson |
 | `{{ lesson.current and !lesson.done ? ' is-active' : '' }}` | ` is-active` on the open lesson until it is finished |
-| `{{ not cart.items ? 'Your cart is empty' : '' }}` | The message when there are no items |
+| `{{ not customer.email ? 'Sign in to see your orders' : '' }}` | The message for a visitor who is not signed in |
 
 ---
 
