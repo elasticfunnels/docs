@@ -157,6 +157,7 @@
           {
             "group": "Integrations",
             "pages": [
+              "integrations/integration-health",
               {
                 "group": "Ad Platforms",
                 "pages": [
