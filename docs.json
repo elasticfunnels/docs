@@ -31,6 +31,7 @@
           {
             "group": "Analytics & Metrics",
             "pages": [
+              "analytics/custom-dashboards",
               "analytics/split-test",
               "analytics/conversions",
               "analytics/ad-spend-metrics",
