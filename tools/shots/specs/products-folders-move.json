@@ -1,0 +1,24 @@
+{
+  "out": "images/products/folders-move.png",
+  "alt": "The Move to folder dialog opened from the bulk bar with one product selected",
+  "capture": {
+    "path": "/{brand}/products?tab=products",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid=\"list.row\"]",
+    "actions": [
+      { "click": "tr[data-testid=\"list.row\"] input[type=checkbox]" },
+      { "wait": 400 },
+      { "click": "[data-testid=\"products.list.bulk.move-to-folder\"]" },
+      { "waitFor": "[data-testid=\"products.move-to-folder.submit\"]" },
+      { "wait": 400 }
+    ],
+    "crop": { "x": 480, "y": 20, "width": 480, "height": 290 },
+    "hide": [".toast"]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "[data-testid=\"products.move-to-folder\"] [data-testid=\"field.folder-id\"]", "title": "Folder", "text": "Pick a folder, or No folder to take products out", "side": "right" },
+    { "selector": "[data-testid=\"products.move-to-folder.submit\"]", "title": "Move", "text": "Files every selected product", "side": "right" }
+  ]
+}
