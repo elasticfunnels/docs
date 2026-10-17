@@ -167,6 +167,7 @@
           {
             "group": "Integrations",
             "pages": [
+              "integrations/connect",
               "integrations/integration-health",
               {
                 "group": "Ad Platforms",
@@ -230,6 +231,7 @@
           {
             "group": "Automations",
             "pages": [
+              "automations/variables",
               "automations/run-history"
             ]
           },

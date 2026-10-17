@@ -1,0 +1,49 @@
+{
+  "out": "images/integrations/connect-add-ad-account.png",
+  "alt": "Ad Campaigns: Add ad account opens a window listing only the ad platforms, with Google Ads marked Connected and an Add another link",
+  "capture": {
+    "path": "/{brand}/analytics/campaigns",
+    "viewport": {
+      "width": 900,
+      "height": 1000
+    },
+    "waitFor": "[data-testid='integrations.campaigns.add-ad-account']",
+    "actions": [
+      {
+        "click": "[data-testid='integrations.campaigns.add-ad-account']"
+      },
+      {
+        "waitFor": "[data-testid='integrations.connect.picker'] [data-testid=integration-card]",
+        "wait": 1000
+      }
+    ],
+    "hide": [
+      ".ant-message",
+      ".toast",
+      ".Vue-Toastification__container"
+    ],
+    "crop": ".integration-catalog-modal .ant-modal-content"
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": ".integration-catalog-modal .ant-modal-content input",
+      "title": "Search",
+      "text": "By name or what it does",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=integration-card][data-integration=meta_ads]",
+      "title": "Ad platforms only",
+      "text": "What this screen can use",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=integration-card][data-integration=google_ads] >> text=Add another",
+      "title": "Add another",
+      "text": "Next to one already connected",
+      "side": "right"
+    }
+  ]
+}

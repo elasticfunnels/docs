@@ -1,0 +1,16 @@
+{
+  "out": "images/automations/variables-untested-step.png",
+  "alt": "A Continue If step's variable picker listing the Valid, Validation Result and Message fields of a DeBounce Validate Email step that has never been tested",
+  "_source": "elasticfunnels repo flow _dev/flows/step-defaults step 8, recorded at 2x on demo brand 899 with the fictional builder fixture tools/shots/fixtures/automation-step-defaults/builder.json, cropped to CSS x 600, y 122, 840 x 700",
+  "image": "tools/shots/source/automations-variables-untested-step.png",
+  "imageSize": { "w": 840, "h": 700 },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [37, 401, 218, 63], "title": "Validate Email", "text": "A step you have not tested yet", "side": "left" },
+    { "box": [37, 561, 233, 92], "title": "Continue If", "text": "The step that reads its result", "side": "left" },
+    { "box": [444, 178, 319, 39], "title": "Data", "text": "Click to open the variable picker", "side": "right" },
+    { "box": [449, 358, 325, 36], "title": "Validate Email", "text": "That step's fields, before any test", "side": "right" },
+    { "box": [450, 395, 324, 36], "title": "Valid", "text": "Example value until you test", "side": "right" }
+  ]
+}
