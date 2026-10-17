@@ -9,6 +9,7 @@ from the app on the demo brand with Playwright, rendered as the annotated compos
 node tools/shots/shoot.cjs                      # every spec
 node tools/shots/shoot.cjs emails               # specs whose file name contains "emails"
 node tools/shots/shoot.cjs --compose-only       # re-render from tools/shots/raw/ (no app needed)
+node tools/shots/shoot.test.cjs                 # regression: the access key never follows a cross-origin redirect
 node tools/shots/shoot.cjs --capture-only       # capture only
 ```
 

@@ -51,6 +51,36 @@ const fill = (s, ctx) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k === "brand
 
 const SETTLE_CSS = `*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}`;
 
+// Route handler for a capture context. The access key goes only to the app's own origin, and it is never
+// carried across a redirect: Playwright applies route.continue() header overrides to every redirect the request
+// initiates, cross-origin included, so the app request is fetched with maxRedirects 0.
+function appRoute(origin, { accessKey, fixtures = [], allowPost = [] }) {
+  return async (route) => {
+    const req = route.request();
+    const u = new URL(req.url());
+    if (u.origin !== origin) return route.continue();
+    const fx = req.method() === "GET" && fixtures.find((f) => f.re.test(u.pathname + u.search));
+    if (fx) return route.fulfill({ status: 200, contentType: "application/json", body: fx.body });
+    if (req.method() !== "GET" && req.method() !== "HEAD" && !allowPost.some((r) => r.test(req.url()))) {
+      console.warn(`  blocked ${req.method()} ${req.url().replace(origin, "")}`);
+      return route.fulfill({ status: 204, body: "" });
+    }
+    // Same-origin redirects are followed here with the key (the browser does not route a fulfilled redirect's
+    // target again); the first redirect that leaves the origin goes back to the browser without the key.
+    let url = req.url();
+    let response;
+    for (let hop = 0; hop <= 10; hop++) {
+      response = await route.fetch({ url, headers: { ...req.headers(), "ef-access-key": accessKey }, maxRedirects: 0 });
+      const loc = response.status() >= 300 && response.status() < 400 && response.headers()["location"];
+      if (!loc) break;
+      const next = new URL(loc, url);
+      if (next.origin !== origin) break;
+      url = next.href;
+    }
+    return route.fulfill({ response });
+  };
+}
+
 // ---- capture ------------------------------------------------------------------------------------------
 async function capture(browser, spec, ctx) {
   const app = (process.env.EF_APP || "").replace(/\/$/, "");
@@ -64,18 +94,7 @@ async function capture(browser, spec, ctx) {
   const allowPost = (c.allowPost || []).map((r) => new RegExp(r));
   // Fixtures: a GET whose path+query matches answers with fictional JSON, for screens the demo seed has no data for.
   const fixtures = (c.fixtures || []).map((f) => ({ re: new RegExp(fill(f.url, ctx)), body: fs.readFileSync(path.resolve(ROOT, f.file), "utf8") }));
-  await context.route("**/*", (route) => {
-    const req = route.request();
-    if (new URL(req.url()).origin !== origin) return route.continue();
-    const u = new URL(req.url());
-    const fx = req.method() === "GET" && fixtures.find((f) => f.re.test(u.pathname + u.search));
-    if (fx) return route.fulfill({ status: 200, contentType: "application/json", body: fx.body });
-    if (req.method() !== "GET" && req.method() !== "HEAD" && !allowPost.some((r) => r.test(req.url()))) {
-      console.warn(`  blocked ${req.method()} ${req.url().replace(origin, "")}`);
-      return route.fulfill({ status: 204, body: "" });
-    }
-    return route.continue({ headers: { ...req.headers(), "ef-access-key": ctx.access_key } });
-  });
+  await context.route("**/*", appRoute(origin, { accessKey: ctx.access_key, fixtures, allowPost }));
   const page = await context.newPage();
   const url = app + fill(c.path, ctx);
   await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
@@ -156,7 +175,7 @@ async function compose(browser, spec) {
   console.log(`    <img src="/${spec.out}" alt="${(spec.alt || "").replace(/"/g, "&quot;")}" />`);
 }
 
-(async () => {
+if (require.main === module) (async () => {
   const specs = fs.readdirSync(SPECS).filter((f) => f.endsWith(".json")).sort()
     .map((f) => ({ name: f.replace(/\.json$/, ""), ...JSON.parse(fs.readFileSync(path.join(SPECS, f), "utf8")) }))
     .filter((s) => !filter || s.name.includes(filter));
@@ -176,3 +195,5 @@ async function compose(browser, spec) {
   await browser.close();
   process.exit(failed ? 1 : 0);
 })().catch((e) => { console.error(e.message); process.exit(1); });
+
+module.exports = { appRoute };
