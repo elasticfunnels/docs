@@ -11,7 +11,7 @@ under **Email**.
 The step does not hold a copy of the email. It sends the template as it is when the step runs,
 so a change you save in the email builder reaches the next email the automation sends.
 
-<img src="/images/automations/send-email-step.png" alt="The Send email step's options: Sending account, Email template with Edit email in builder, To, and the optional Subject, From email, From name and Reply-to email" />
+<img src="/images/automations/send-email-step.png" alt="The Send email step's options: Sending account, Email template with Edit email in builder, To, and the optional Subject, From email and From name showing the template's values in grey" />
 
 ## The fields
 
@@ -20,8 +20,8 @@ so a change you save in the email builder reaches the next email the automation 
 | **Sending account** | The account that sends it. The list shows each active account as provider, name and its default from address, for example `Postmark: Acme receipts (orders@example.com)`. Paused accounts are not listed. |
 | **Email template** | Required. The saved email the step sends. **Create new email** makes a template and opens it in the builder. **Edit email in builder** opens the picked one in a new tab. |
 | **To** | Required. An address, or a variable such as the customer's email from the trigger. |
-| **Subject** | Optional. Leave it empty to use the template's subject. Type one to use it instead. Variables work here. |
-| **From email**, **From name**, **Reply-to email** | Optional, under the extra fields. Leave them empty to use the template's values, and the account's default sender when the template has none. |
+| **Subject** | Optional. While it is empty, the field shows the template's subject in grey, and that is what is sent. Type one to use it instead. Variables work here. |
+| **From email**, **From name**, **Reply-to email** | Optional, under the extra fields. An empty field shows the template's value in grey and sends it. When the template has none, the account's default sender is used. |
 
 ## Variables in the template
 
