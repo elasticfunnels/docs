@@ -47,7 +47,7 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/automations?q=welcome&
       "status": "active",
       "trigger_node_type": "form_submission",
       "entry_node": "start",
-      "postback_code": "abc-123",
+      "postback_code": "9f2c4e7a1b3d5f60a8c2e4b6d8f0a1c3",
       "collection_code": "lead-capture",
       "created_at": "2024-12-01T10:00:00.000000Z",
       "updated_at": "2024-12-10T15:00:00.000000Z"
@@ -92,7 +92,7 @@ GET /api/brands/{brand}/automations/{automation}
 {
   "id": 12,
   "title": "Welcome Email Sequence",
-  "postback_code": "abc-123",
+  "postback_code": "9f2c4e7a1b3d5f60a8c2e4b6d8f0a1c3",
   "trigger_node_type": "form_submission"
 }
 ```
@@ -163,10 +163,6 @@ PUT /api/brands/{brand}/automations/{automation}
 
 <ParamField body="entry_node" type="string">
   Entry node code
-</ParamField>
-
-<ParamField body="postback_code" type="string">
-  Custom postback code (max 255)
 </ParamField>
 
 <ParamField body="collection_code" type="string">
@@ -456,7 +452,9 @@ Returns available event types that have fired for this automation.
 ## Notes
 
 <Info>
-  - `postback_code` is the unique trigger code used in postback URLs (`/webhooks/{code}`)
+  - `postback_code` is the trigger code used in postback URLs (`/webhooks/{code}`). ElasticFunnels generates it (32 hex characters); it cannot be set or changed through the API
+  - Paused (`inactive`) and `draft` automations accept postbacks but run nothing
+  - Publishing is refused when a flow loops back on itself, has a Wait For longer than 90 days, or has more than 500 steps
   - Builder configs are deployed to S3 on publish — **draft saves do not activate** the automation
   - Stats are read from Elasticsearch and may have a short indexing delay
   - The `copy` endpoint copies across brands; `clone` copies within the same brand
