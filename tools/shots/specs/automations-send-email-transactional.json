@@ -1,0 +1,64 @@
+{
+  "out": "images/automations/send-email-transactional.png",
+  "alt": "The Send email step with the Transactional switch turned on, under To, with its help text: use it for mail the person needs, like access details or receipts",
+  "capture": {
+    "path": "/{brand}/automations/21/builder",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='automations.builder.canvas-area']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/automations/21(/builder)?(\\?|$)",
+        "file": "tools/shots/fixtures/automation-send-email/builder.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/sending-accounts",
+        "file": "tools/shots/fixtures/automation-send-email/sending-accounts.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/emails/all",
+        "file": "tools/shots/fixtures/automation-send-email/templates.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": ".vue-flow__node[data-id='nwmail00005']",
+        "wait": 1200
+      },
+      {
+        "waitFor": "[data-testid='automations.field.purpose']"
+      },
+      {
+        "click": "[data-testid='automations.field.purpose']",
+        "wait": 500
+      }
+    ],
+    "crop": {
+      "x": 1032,
+      "y": 125,
+      "width": 398,
+      "height": 680
+    },
+    "hide": [
+      ".toast"
+    ]
+  },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid='automations.field.email-id']",
+      "title": "Email template",
+      "text": "The saved email it sends",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='automations.field.purpose']",
+      "title": "Transactional",
+      "text": "On: receipts and access, no unsubscribe",
+      "side": "left"
+    }
+  ]
+}

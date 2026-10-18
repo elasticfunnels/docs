@@ -40,7 +40,7 @@
             "group": "Analytics & Metrics",
             "pages": [
               "analytics/custom-dashboards",
-              "analytics/audience-destinations",
+              "analytics/audience-actions",
               "analytics/split-test",
               "analytics/conversions",
               "analytics/ad-spend-metrics",
@@ -436,6 +436,10 @@
     "dark": "/logo/light.svg"
   },
   "redirects": [
+    {
+      "source": "/analytics/audience-destinations",
+      "destination": "/analytics/audience-actions"
+    },
     {
       "source": "/wildcard-routes",
       "destination": "/pages/wildcard-routes"

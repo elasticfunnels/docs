@@ -1,0 +1,91 @@
+{
+  "out": "images/audiences/actions-send-email.png",
+  "alt": "The Send an email window: the automation it creates, the Bump thank-you template picked, Send it when They enter, holdout, cooldown and Also send it to the 412 people already in this audience",
+  "capture": {
+    "path": "/{brand}/analytics/segments/8",
+    "viewport": {
+      "width": 1440,
+      "height": 1400
+    },
+    "waitFor": "[data-testid='segments.activations.row']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/activations/destinations$",
+        "file": "tools/shots/fixtures/audiences/actions-destinations.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/activations$",
+        "file": "tools/shots/fixtures/audiences/actions.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/export/columns",
+        "file": "tools/shots/fixtures/audiences/export-columns.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/emails/all",
+        "file": "tools/shots/fixtures/audiences/email-templates.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='segments.activations.add']",
+        "wait": 900
+      },
+      {
+        "click": "[data-testid='segments.activations.preset.email']",
+        "wait": 300
+      },
+      {
+        "click": "[data-testid='segments.activations.continue']",
+        "wait": 900
+      },
+      {
+        "wait": 1200
+      },
+      {
+        "select": "[data-testid='segments.activations.email-template']",
+        "value": "3101"
+      },
+      {
+        "click": "[data-testid='segments.activations.backfill']",
+        "wait": 300
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='segments.activations.email-intro']",
+      "title": "The automation",
+      "text": "Named after the audience and template",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='segments.activations.email-template']",
+      "title": "Email template",
+      "text": "One of your saved emails",
+      "side": "left"
+    },
+    {
+      "selector": "fieldset:has([data-testid='segments.activations.email-when-enter'])",
+      "title": "Send it when",
+      "text": "They enter, or they leave",
+      "side": "right"
+    },
+    {
+      "selector": "label:has([data-testid='segments.activations.backfill'])",
+      "title": "People already in it",
+      "text": "Up to 500 per refresh",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='segments.activations.save']",
+      "title": "Create and turn on",
+      "text": "The automation starts at once",
+      "side": "right"
+    }
+  ]
+}
