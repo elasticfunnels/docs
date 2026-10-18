@@ -1,0 +1,61 @@
+{
+  "out": "images/audiences/destinations-list.png",
+  "alt": "The Destinations section of an audience: a webhook and a Klaviyo list marked Integration paused, each with Edit, Sync now, Pause and its send counts",
+  "capture": {
+    "path": "/{brand}/analytics/segments/8",
+    "viewport": {
+      "width": 1440,
+      "height": 1800
+    },
+    "waitFor": "[data-testid='segments.activations.row']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/activations/destinations",
+        "file": "tools/shots/fixtures/audiences/destinations.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/activations$",
+        "file": "tools/shots/fixtures/audiences/activations.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/export/columns",
+        "file": "tools/shots/fixtures/audiences/export-columns.json"
+      }
+    ],
+    "actions": [
+      {
+        "scroll": "[data-testid='segments.activations.add']"
+      }
+    ],
+    "crop": "section:has([data-testid='segments.activations.add'])",
+    "cropPad": 12
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='segments.activations.add']",
+      "title": "Add destination",
+      "text": "A list, tag, webhook or automation",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='segments.activations.row'] >> nth=0 >> div.flex-shrink-0",
+      "title": "Edit",
+      "text": "Change it after saving, or pause it",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='segments.activations.row'] >> nth=1 >> div.flex-wrap.items-center",
+      "title": "Integration paused",
+      "text": "Sends wait until you resume it",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='segments.activations.row'] >> nth=0 >> dl",
+      "title": "Counts",
+      "text": "Sent, held out, no consent, failed, pending",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

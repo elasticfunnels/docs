@@ -1,0 +1,17 @@
+{
+  "columns": [
+    { "key": "email", "computed": false },
+    { "key": "first_name", "computed": false },
+    { "key": "last_name", "computed": false },
+    { "key": "phone", "computed": false },
+    { "key": "orders", "computed": false },
+    { "key": "usual_gap_days", "computed": false },
+    { "key": "days_since_last_order", "computed": false },
+    { "key": "overdue_ratio", "computed": false },
+    { "key": "total_revenue", "computed": false },
+    { "key": "first_purchase_at", "computed": false },
+    { "key": "last_purchase_at", "computed": false },
+    { "key": "country_code", "computed": false },
+    { "key": "bump_product", "computed": true }
+  ]
+}

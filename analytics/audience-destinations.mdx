@@ -1,0 +1,213 @@
+---
+title: 'Audience Destinations'
+description: 'Send the people who enter or leave an audience to Klaviyo, ActiveCampaign, Mailchimp, a signed webhook or an automation'
+---
+
+A destination keeps another tool in step with one of your audiences. When someone enters the audience, they are
+added to a list or tag, sent to your webhook, or run through an automation. When they leave, they can be taken off
+again or sent as a second event. Syncs run after each audience refresh, in batches.
+
+Destinations work on **customer audiences** (people identified by email). An audience that identifies anonymous
+visitors cannot be sent anywhere, and a live audience is matched on the page as people browse, so it has no members
+to send.
+
+<img src="/images/audiences/destinations-list.png" alt="The Destinations section of an audience: a webhook and a Klaviyo list marked Integration paused, each with Edit, Sync now, Pause and its send counts" />
+
+## Where to find it
+
+Open **Reports → Audiences**, pick an audience, and scroll to **Destinations** on its **Overview** tab. Each
+destination shows where it sends, when it sends, its holdout and cooldown, the last sync, and its counts:
+
+| Count | Meaning |
+|---|---|
+| **In audience** | People in the audience now |
+| **Sent** | People this destination has sent |
+| **Held out** | People in the holdout group, recorded and never sent |
+| **No consent** | People your consent settings refused |
+| **Failed** | Sends that still failed after 5 attempts |
+| **Pending** | People waiting for a later refresh (over the per-run cap, paused integration, or a retry) |
+
+Each row has **Edit**, **Sync now**, **Pause** / **Resume** and **Delete**. Deleting a destination leaves
+people already sent where they are. An audience can have up to 20 destinations.
+
+## Add a destination
+
+Click **Add destination** and choose where to send:
+
+| Destination | What happens when someone enters | When someone leaves |
+|---|---|---|
+| **Klaviyo list** | Added to the list | Removed from the list |
+| **ActiveCampaign tag** | Tagged | Tag removed |
+| **ActiveCampaign list** | Subscribed to the list (people who left the checkout opt-in unticked are skipped) | Unsubscribed from the list |
+| **Mailchimp audience** | Added to the audience, with an optional tag | The tag is removed (leaving never unsubscribes anyone, so a tag is needed to take people off) |
+| **Webhook** | `audience.entered` is POSTed to your URL | `audience.left` is POSTed to your URL |
+| **Automation** | An automation that starts with **On Entered Audience** runs once per person | An automation that starts with **On Left Audience** runs once per person |
+
+The picker lists the Klaviyo, ActiveCampaign and Mailchimp integrations installed on the brand. A tool you have not
+connected is named under the picker with an **Open Integrations** link. An automation is offered when its trigger is
+set to this audience; automations run for up to 500 people per refresh, and the rest follow at the next one.
+
+Then set:
+
+- **When**: **They enter**, **They leave**, or both.
+- **Only when they left because**: limit leave events to **Bought**, **Refunded or charged back**, **Aged out** or
+  **Audience edited**. Leave all unticked for every reason.
+- **Holdout**: a share of people (0 to 50%) that is never sent. Each person's group stays the same, so you can
+  compare the held-out people with the rest and see the real lift.
+- **Cooldown**: someone who re-enters within this many days (0 to 30, default 7) is not sent again.
+- **Subscribe people who opted in** (Klaviyo and Mailchimp): subscribes everyone except people who left the email
+  opt-in unticked at checkout. Without it, people are added without a marketing subscription.
+- **Also sync the people already in this audience**: off by default, so only people who enter from now on are
+  sent.
+
+When **Save** is disabled, the line next to it says what is missing, for example "Enter the webhook URL" or
+"The URL must start with https://".
+
+### Paused integrations
+
+A paused integration still appears in the picker, marked **(paused)**, and its destinations show an
+**Integration paused** badge. You can save a destination on it, but nothing is sent while it is paused: people
+wait as **Pending** and are sent once you resume the integration under **Integrations**.
+
+## Edit a destination
+
+Click **Edit** on a destination to change it after saving: the list or tag, the webhook URL and fields, when it
+sends, the leave reasons, holdout, cooldown and subscribe option. The destination itself (Klaviyo, a webhook,
+an automation) and an ActiveCampaign tag/list choice cannot be changed; to send somewhere else, add another
+destination.
+
+<img src="/images/audiences/destination-webhook-edit.png" alt="The Edit destination window for a webhook: the URL, Pick columns with the audience's columns ticked, Replace the signing secret, when to send, holdout and cooldown" />
+
+## Who is never sent
+
+Every person who enters goes through the same checks, whatever the destination:
+
+1. **Consent**: your brand's consent settings. Email destinations follow the same rule as email campaigns:
+   everyone is sent except people who left the checkout opt-in box unticked. Refusals are counted under
+   **No consent**.
+2. **Email suppression list**: people on the brand's suppression list (unsubscribed, bounced or complained) are
+   never added to a list, sent to a webhook, or run through an automation. They are counted, not sent.
+3. **No email**: a person with no known email address is skipped.
+
+Removals (people leaving) do not need consent.
+
+## Webhooks
+
+A webhook destination POSTs JSON to your URL. The URL must use HTTPS and point to a public address.
+
+### Signing secret
+
+When you save a new webhook, its signing secret is shown once. Copy it then; it is not shown again.
+
+To change it, open **Edit**, tick **Replace the signing secret** and save. The old secret stops working at once,
+and the new one is shown once. Update your receiver right after.
+
+### Headers
+
+| Header | Value |
+|---|---|
+| `X-EF-Event` | `audience.entered` or `audience.left` |
+| `X-EF-Delivery` | The body's `delivery_id` |
+| `X-EF-Timestamp` | Unix time in seconds when the request was signed |
+| `X-EF-Signature` | `sha256=` followed by the hex HMAC-SHA256 of `<timestamp>.<raw body>`, keyed with the signing secret |
+
+Verify the signature on the raw body before you parse it, and reject a timestamp more than 5 minutes old:
+
+```js
+import crypto from 'node:crypto';
+
+function verify(rawBody, headers, secret) {
+  const ts = headers['x-ef-timestamp'];
+  if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false;
+  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(`${ts}.${rawBody}`).digest('hex');
+  const given = String(headers['x-ef-signature'] || '');
+  return given.length === expected.length && crypto.timingSafeEqual(Buffer.from(given), Buffer.from(expected));
+}
+```
+
+### Body
+
+Each request carries up to 500 people. Larger batches are split into several requests.
+
+```json
+{
+  "event": "audience.entered",
+  "audience": { "id": 8, "name": "Took the order bump" },
+  "activation_id": 41,
+  "run_id": 412,
+  "delivery_id": "3f1c9a7e-52b4-5d0e-9a61-0c4e2b7d8f13",
+  "sent_at": "2026-10-18T10:15:02Z",
+  "people": [
+    {
+      "email_hash": "9b74c9897bac770ffc029102a200c5de",
+      "email": "jane@example.com",
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "phone": "+15555550123",
+      "reason": ""
+    }
+  ]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `event` | `audience.entered` or `audience.left` |
+| `audience` | The audience's id and name |
+| `activation_id` | The destination's id |
+| `run_id` | The audience refresh that produced this change |
+| `delivery_id` | The id of this POST (see [Duplicates and retries](#duplicates-and-retries)) |
+| `sent_at` | When the request was sent, UTC |
+| `people[].email_hash` | A stable id for the person, present in every shape |
+| `people[].reason` | Why they left: `bought`, `refunded`, `aged_out` or `definition_changed`. Empty when they enter |
+
+### Fields for each person
+
+Under **Fields for each person** you choose the shape of each entry in `people`:
+
+- **Standard fields** (the default): `email_hash`, `email`, `first_name`, `last_name`, `phone` and `reason`, as in
+  the example above.
+- **Pick columns, as in the CSV export**: `email_hash` and `reason`, plus exactly the columns you tick. The list is
+  the same one the audience's CSV export offers, including the audience's own computed columns (for example which
+  order bump each buyer took).
+
+With picked columns, a person looks like this:
+
+```json
+{
+  "email_hash": "9b74c9897bac770ffc029102a200c5de",
+  "reason": "",
+  "email": "jane@example.com",
+  "first_name": "Jane",
+  "orders": 2,
+  "total_revenue": 232,
+  "last_purchase_at": "2026-10-17 09:27:00",
+  "bump_product": ["Sleep Gummies, add a 30-day jar"]
+}
+```
+
+A column that has no value for a person is sent as `null`. If you later edit the audience so a picked column no
+longer exists, saving the destination asks you to pick the columns again.
+
+### Duplicates and retries
+
+A `429`, a `5xx` or a dropped connection is retried, and a send that still fails is tried again at later refreshes,
+up to 5 attempts in all. When a batch is retried, every request in it is sent again, including ones your receiver
+already accepted.
+
+`delivery_id` is built from the destination, the refresh, the event and the people in the request, so a retried
+request carries the same `delivery_id` (also in `X-EF-Delivery`) and any other request gets a new one. To ignore
+duplicates:
+
+1. Store each `delivery_id` you have processed.
+2. When a request arrives with a `delivery_id` you already have, answer `200` and do nothing else.
+3. Answer `2xx` only after you have stored the people. Any other status counts as a failed send.
+
+If your receiver also writes per person, key it on `email_hash` plus `event`, so the same person entering twice in
+a row is still one record.
+
+## Related
+
+- [CRM overview](/crm/overview)
+- [Email marketing integrations](/integrations/email-marketing)
+- [Automation run history](/automations/run-history)

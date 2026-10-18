@@ -1,0 +1,29 @@
+{
+  "out": "images/audiences/destination-webhook-edit.png",
+  "alt": "The Edit destination window for a webhook: the URL, Pick columns with the audience's columns ticked, Replace the signing secret, when to send, holdout and cooldown",
+  "capture": {
+    "path": "/{brand}/analytics/segments/8",
+    "viewport": { "width": 1440, "height": 1900 },
+    "waitFor": "[data-testid='segments.activations.row']",
+    "fixtures": [
+      { "url": "^/api/brands/{brand}/analytics/segments/8/activations/destinations", "file": "tools/shots/fixtures/audiences/destinations.json" },
+      { "url": "^/api/brands/{brand}/analytics/segments/8/activations$", "file": "tools/shots/fixtures/audiences/activations.json" },
+      { "url": "^/api/brands/{brand}/analytics/segments/8/export/columns", "file": "tools/shots/fixtures/audiences/export-columns.json" }
+    ],
+    "actions": [
+      { "click": "[data-testid='segments.activations.edit'] >> nth=0", "wait": 1200 },
+      { "waitFor": "[data-testid='segments.activations.rotate-secret']" }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "annotations": [
+    { "selector": "[data-testid='segments.activations.url']", "title": "Webhook URL", "text": "Must start with https://", "side": "right" },
+    { "selector": "label:has([data-testid='segments.activations.fields-custom'])", "title": "Pick columns", "text": "The same list as the CSV export", "side": "right" },
+    { "selector": "label:has([data-testid='segments.activations.rotate-secret'])", "title": "Replace the signing secret", "text": "New secret shown once on save", "side": "right" },
+    { "selector": "[data-testid='segments.activations.holdout']", "title": "Holdout", "text": "Share never sent, to measure lift", "side": "left" },
+    { "selector": "[data-testid='segments.activations.save']", "title": "Save", "text": "Says what is missing when disabled", "side": "right" }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

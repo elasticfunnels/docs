@@ -40,6 +40,7 @@
             "group": "Analytics & Metrics",
             "pages": [
               "analytics/custom-dashboards",
+              "analytics/audience-destinations",
               "analytics/split-test",
               "analytics/conversions",
               "analytics/ad-spend-metrics",

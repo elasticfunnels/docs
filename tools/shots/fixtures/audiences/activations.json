@@ -1,0 +1,51 @@
+{
+  "segment_id": 8,
+  "contactable": true,
+  "member_count": 1284,
+  "activations": [
+    {
+      "id": 41,
+      "type": "webhook",
+      "integration_id": null,
+      "integration_name": null,
+      "integration_status": null,
+      "automation_title": null,
+      "automation_status": null,
+      "config": { "url": "https://hooks.example.com/ef/audiences", "columns": ["email", "first_name", "orders", "total_revenue", "last_purchase_at", "bump_product"] },
+      "has_secret": true,
+      "on_enter": true,
+      "on_leave": true,
+      "leave_reasons": ["refunded"],
+      "holdout_percent": 10,
+      "cooldown_days": 7,
+      "status": "active",
+      "started_at": "2026-10-02T09:00:00+00:00",
+      "last_synced_run_id": 412,
+      "last_synced_at": "2026-10-18T10:15:00+00:00",
+      "last_run": {},
+      "summary": { "qualified": 1284, "sent": 1093, "in_destination": 1071, "held_out": 128, "treatment": 1156, "skipped_consent": 41, "suppressed": 9, "no_contact": 4, "failed": 0, "pending": 22 }
+    },
+    {
+      "id": 42,
+      "type": "klaviyo_list",
+      "integration_id": 77,
+      "integration_name": "Northwind Klaviyo",
+      "integration_status": "paused",
+      "automation_title": null,
+      "automation_status": null,
+      "config": { "list_id": "WxR4tq", "subscribe": true },
+      "has_secret": false,
+      "on_enter": true,
+      "on_leave": true,
+      "leave_reasons": [],
+      "holdout_percent": 0,
+      "cooldown_days": 7,
+      "status": "active",
+      "started_at": "2026-10-05T09:00:00+00:00",
+      "last_synced_run_id": 398,
+      "last_synced_at": "2026-10-16T14:40:00+00:00",
+      "last_run": {},
+      "summary": { "qualified": 1284, "sent": 1012, "in_destination": 1003, "held_out": 0, "treatment": 1284, "skipped_consent": 41, "suppressed": 9, "no_contact": 4, "failed": 0, "pending": 218 }
+    }
+  ]
+}
