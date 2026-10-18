@@ -1,26 +1,41 @@
 ---
 title: "Send Email Step"
-description: "Send an email from an automation through any of your sending accounts: SMTP, Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid or Mailrelay."
+description: "Send one of your saved email templates from an automation, through any of your sending accounts: SMTP, Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid or Mailrelay."
 ---
 
-**Send email** sends one email from an automation through a sending account you pick. It works
-with every kind of account your brand has, so one step covers SMTP, Amazon SES, Postmark, Brevo,
-Resend, Mailgun, SendGrid and Mailrelay. Find it in the step list under **Email**.
+**Send email** sends one of your saved email templates from an automation, through a sending
+account you pick. It works with every kind of account your brand has, so one step covers SMTP,
+Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid and Mailrelay. Find it in the step list
+under **Email**.
 
-<img src="/images/automations/send-email-step.png" alt="The Send email step's options: Sending account, Email template, To, Subject, Body with variables, and the optional From email with its verification notice" />
+The step does not hold a copy of the email. It sends the template as it is when the step runs,
+so a change you save in the email builder reaches the next email the automation sends.
+
+<img src="/images/automations/send-email-step.png" alt="The Send email step's options: Sending account, Email template with Edit email in builder, To, and the optional Subject, From email, From name and Reply-to email" />
 
 ## The fields
 
 | Field | What it does |
 |---|---|
 | **Sending account** | The account that sends it. The list shows each active account as provider, name and its default from address, for example `Postmark: Acme receipts (orders@example.com)`. Paused accounts are not listed. |
-| **Email template** | Optional. Picking a saved email copies its subject, body, from address, from name and reply-to into the step. You can still change them in the step. **Create new email** makes a template, and **Edit email in builder** opens the picked one in a new tab. |
+| **Email template** | Required. The saved email the step sends. **Create new email** makes a template and opens it in the builder. **Edit email in builder** opens the picked one in a new tab. |
 | **To** | Required. An address, or a variable such as the customer's email from the trigger. |
-| **Subject** | Required. Variables work here. |
-| **Body (HTML)** | The email itself. Variables from earlier steps work here. **Expand** gives you a bigger editor. |
-| **From email**, **From name**, **Reply-to email** | Optional, under the extra fields. Leave **From email** empty to send as the account's default sender. |
+| **Subject** | Optional. Leave it empty to use the template's subject. Type one to use it instead. Variables work here. |
+| **From email**, **From name**, **Reply-to email** | Optional, under the extra fields. Leave them empty to use the template's values, and the account's default sender when the template has none. |
 
-Variables are picked the same way as in any other step. See [Variables](/automations/variables).
+## Variables in the template
+
+Write variables in the email builder the same way as in any other email, for example
+`{{ purchase.customer_first_name }}`. When the step runs, they are filled with the data of that
+run: the trigger's data and the output of the steps before it. The variable picker in a step
+inserts the same values in the form `{trigger.customer_first_name}`, and both forms work in the
+template.
+
+A value that came from a visitor, such as a name typed into a form, is shown as text. It can't
+add links, images or other markup to the email.
+
+A variable with no value in that run prints nothing. See [Variables](/automations/variables) for
+what each trigger provides.
 
 ## Which account sends it
 
@@ -36,28 +51,41 @@ fails instead of sending through another account.
 
 ## Which sender it uses
 
-A **From email** typed in the step wins over the account's default sender. It has to be an
-address the provider accepts: on a domain or sender you verified with that provider, or the
-provider refuses the email. The notice above the field says the same.
+The from address is chosen in this order:
 
-With **From email** empty, the account's **Default From Email** is used. The full rule is on
+1. the **From email** typed in the step,
+2. the template's from address,
+3. the account's **Default From Email**.
+
+A from address set in the step or in the template has to be one the provider accepts: on a
+domain or sender you verified with that provider, or the provider refuses the email. The notice
+in the step says the same. The full rule is on
 [How the sender is chosen](/emails/sending-accounts#how-the-sender-is-chosen).
 
-Picking an email template fills **From email** with the template's from address. Clear the field
-if you want the account's default sender instead.
+## Steps made before templates were required
+
+Before October 18, 2026, picking a template copied its subject and body into the step. Those
+steps keep sending the body saved in them, and the step shows a notice about it. Pick an email
+template in the step to send the template instead.
 
 ## When it fails
 
-If the provider refuses the email (an unverified from address, a revoked key) or no account can
-send it, the step fails and the provider's reply is shown on the run. See
-[Run history](/automations/run-history).
+The step fails, and the reason is shown on the run, when:
+
+- the template was deleted,
+- the template has no subject and the step sets none,
+- the provider refuses the email (an unverified from address, a revoked key),
+- no account can send it.
+
+See [Run history](/automations/run-history).
 
 ## The older per-provider steps
 
 The **Mailgun**, **SendGrid** and **Mailrelay** send steps are still in the step list and keep
-working in the automations that use them. They only send through their own provider. Use
-**Send email** for Amazon SES, Postmark, Brevo, Resend or your SMTP server, or when you want to
-switch providers later by changing one field.
+working in the automations that use them. They only send through their own provider, and they
+keep a copy of the template made when you picked it. Use **Send email** for Amazon SES,
+Postmark, Brevo, Resend or your SMTP server, when you want template changes to reach the
+automation, or when you want to switch providers later by changing one field.
 
 ## Related docs
 
