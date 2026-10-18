@@ -376,6 +376,10 @@ Triggers wait for something to happen, then continue down their single output.
 | When scrolled to | `when_scrolled_to` | `value` (pixels from top), `percent` (% of page) | Either threshold can fire it |
 | Video: On Pause | `video_pause` | — | pass-through |
 | Video: On Goal Reached | `video_watched_seconds` | `value` (seconds watched), `percent` (% watched) | pass-through |
+| On Audience Match | `on_segment_match` | `Live audience` (a live audience of the brand) | Continues when the visitor enters that live audience, on this page or a later page in the same session; runs once per page |
+
+To follow up after the visit instead (an email, a CRM update, a webhook), use the **On Matched Live Audience**
+automation trigger: see [When a customer matches a live audience](/analytics/audience-actions#when-a-customer-matches-a-live-audience).
 
 ### On Exited Page
 

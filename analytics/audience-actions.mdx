@@ -9,7 +9,8 @@ webhook, or run them through an automation. Actions run after each audience refr
 
 Actions work on **customer audiences** (people identified by email). An audience that identifies anonymous
 visitors cannot be sent anywhere, and a live audience is matched on the page as people browse, so it has no members
-to send.
+to send. To email or follow up with known customers who match a live audience, use the
+[On Matched Live Audience](#when-a-customer-matches-a-live-audience) automation trigger instead.
 
 <img src="/images/audiences/actions-list.png" alt="The When people enter or leave section of an audience: two email automations showing Who gets it and their holdout with Edit in automation, one marked Automation off, a Klaviyo list sync and a webhook with their cooldown, each with its kind, its buttons and its counts" />
 
@@ -144,8 +145,9 @@ wait as **Pending** and are sent once you resume the integration under **Integra
 ## Who gets it
 
 Audience emails and automations have a **Who gets it** setting, so nobody gets the same email over and over. Set it
-on the **On Entered Audience** or **On Left Audience** trigger in the builder, or in the **Send an email** window
-when you create one. The audience page shows it on the automation's row, read only, with **Edit in automation**.
+on the **On Entered Audience**, **On Left Audience** or **On Matched Live Audience** trigger in the builder, or in
+the **Send an email** window when you create one. The audience page shows it on the automation's row, read only,
+with **Edit in automation**.
 
 <img src="/images/automations/audience-trigger-who-gets-it.png" alt="The On Entered Audience trigger: the audience, Who gets it set to Every time, at most once per N days with 14 days, Holdout 10% and the note that explains both choices" />
 
@@ -171,12 +173,59 @@ What else to know:
   suppression list (unsubscribed, bounced, complained) or because there is no email address for them is not counted
   as sent. If that changes and they enter again, they can still get it. A send that failed does not use up their
   turn either.
+- **On Matched Live Audience** follows the same two choices, counted per person per automation, on top of its
+  once per visit limit. It has no holdout.
 - **Holdout** is 0 to 50%. Each person's group stays the same, so you can compare the held-out people with the rest
   and see the real lift.
 - **Changing the setting** applies when you publish the automation. It does not resend to people who already got
   it.
 - **Automations made before October 18, 2026** kept the way they already worked: **Every time, at most once per N
   days**, with the cooldown they had (at least 1 day). Open the trigger to switch one to **First time only**.
+
+## When a customer matches a live audience
+
+A live audience is matched on your pages while people browse (for example, came back to the pricing page twice in
+an hour). The **On Matched Live Audience** automation trigger starts an automation when a known customer matches one.
+Use it to send an email, update a CRM or call a webhook after the visit, with no page events to wire.
+
+<img src="/images/automations/live-audience-trigger.png" alt="The On Matched Live Audience trigger: the live audience Came back to pricing twice, Who gets it set to Every time, at most once per N days with 14 days, and the note that explains when it runs" />
+
+1. Open **Automations**, create an automation and pick the **On Matched Live Audience** trigger (in the
+   **Audiences** group).
+2. Under **Live audience**, pick the audience. Only live audiences are listed; saved audiences use
+   **On Entered Audience** and **On Left Audience**.
+3. Under **Who gets it**, pick **First time only** (the default) or **Every time, at most once per N days** and
+   enter the days (1 to 90). See [Who gets it](#who-gets-it).
+4. Add the steps, for example a [Send email](/automations/send-email) step, and publish the automation.
+
+When it runs:
+
+- **Only known customers.** It runs when the visit already carries the email of one of your customers, for example
+  someone who bought and came back. Anonymous visitors never start it.
+- **At most once per visit**, per automation, and then only as often as **Who gets it** allows for that person.
+- **A visit that matched before the customer was known does not start it later.** If someone matches the audience
+  first and buys afterwards on the same visit, that match does not run the automation.
+- **Leads who filled in a form but never bought** are not customers, so they do not start it.
+- **Up to 120 matches a minute per brand.** Matches over that in the same minute are dropped, not queued.
+
+The steps can use these fields from the trigger: `customer_email`, `customer_first_name`, `customer_last_name`,
+`customer_name`, `customer_phone`, `customer_address`, `customer_city`, `customer_state`, `customer_zip`,
+`customer_country`, `email_hash`, `audience_id`, `audience_name`, `audience_kind` (`live`), `audience_change`
+(`matched`), `page_url` (the page where they matched) and `matched_at`. The audience fields have the same names as on
+**On Entered Audience**, so one email template works for both.
+
+A **Send email** step is a marketing email by default: consent, the email suppression list and the unsubscribe link
+are checked when the email is sent, as on every automation. See
+[Send email: Marketing and Transactional](/automations/send-email#marketing-and-transactional).
+
+### On the page, or after the visit?
+
+| You want to | Use |
+|---|---|
+| React on the page while they browse: show a popup or a section, add a tag, redirect | The **On Audience Match** [page event](/funnels/page-events-nodes#triggers-browser). It works for anonymous visitors too |
+| Follow up after the visit: an email, a CRM update, a webhook | The **On Matched Live Audience** automation trigger. It runs for known customers only |
+
+You can use both on the same live audience.
 
 ## Edit an action
 

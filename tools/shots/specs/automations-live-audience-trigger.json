@@ -1,0 +1,76 @@
+{
+  "out": "images/automations/live-audience-trigger.png",
+  "alt": "The On Matched Live Audience trigger: the live audience Came back to pricing twice, Who gets it set to Every time, at most once per N days with 14 days, and the note that explains when it runs",
+  "capture": {
+    "path": "/{brand}/automations/22/builder",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='automations.builder.canvas-area']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/automations/22(/builder)?(\\?|$)",
+        "file": "tools/shots/fixtures/automation-live-audience-trigger/builder.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/audience-activations/live-audiences",
+        "file": "tools/shots/fixtures/automation-live-audience-trigger/live-audiences.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/sending-accounts",
+        "file": "tools/shots/fixtures/automation-send-email/sending-accounts.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/emails/all",
+        "file": "tools/shots/fixtures/automation-send-email/templates.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": ".vue-flow__node[data-id='trigger']",
+        "wait": 1200
+      },
+      {
+        "waitFor": "[data-testid='automations.field.reentry-help']"
+      }
+    ],
+    "crop": {
+      "x": 1032,
+      "y": 125,
+      "width": 398,
+      "height": 520
+    },
+    "hide": [
+      ".toast"
+    ]
+  },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid='automations.field.segment-id']",
+      "title": "Live audience",
+      "text": "Only live audiences are listed",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='automations.field.reentry']",
+      "title": "Who gets it",
+      "text": "First time only, or every time",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='automations.field.cooldown-days']",
+      "title": "N days",
+      "text": "1 to 90, required for every time",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='automations.field.reentry-help']",
+      "title": "When it runs",
+      "text": "Known customers only, once per visit",
+      "side": "left"
+    }
+  ]
+}
