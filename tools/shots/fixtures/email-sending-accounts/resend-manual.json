@@ -1,0 +1,42 @@
+{
+ "id": 9104,
+ "name": "Acme Resend",
+ "integration": "resend",
+ "status": "active",
+ "pausable": false,
+ "pausable_group": null,
+ "config": {
+  "api_key": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+  "from_email": "hello@example.com",
+  "from_name": "Acme Health",
+  "reply_to": "",
+  "webhook_status": "manual",
+  "webhook_url": "https://app.elasticfunnels.io/webhooks/email/resend/acme-health/9104"
+ },
+ "last_sync_at": null,
+ "sync_status": "pending",
+ "sync_error": null,
+ "sync_stats": null,
+ "behaviour": {
+  "acts": [],
+  "used_by": [
+   "merchants",
+   "campaigns"
+  ],
+  "sync": false,
+  "inbound": false,
+  "log": "email-logs",
+  "classes": [
+   "B"
+  ]
+ },
+ "health": {
+  "last_event_at": null,
+  "last_success_at": null,
+  "last_error_at": null,
+  "last_error": null,
+  "events_24h": 0,
+  "errors_24h": 0
+ },
+ "linked_merchants": []
+}

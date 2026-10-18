@@ -1,0 +1,74 @@
+{
+  "out": "images/automations/send-email-step.png",
+  "alt": "The Send email step's options: Sending account, Email template, To, Subject, Body with variables, and the optional From email with its verification notice",
+  "_source": "elasticfunnels repo flow _dev/flows/automation-send-email step 6, recorded at 2x (1440x1300) on demo brand 899 with the fictional builder fixture and sending accounts in that flow, cropped to CSS x 890, y 125, 550 x 980",
+  "image": "tools/shots/source/automations-send-email-step.png",
+  "imageSize": {
+    "w": 550,
+    "h": 980
+  },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        154,
+        175,
+        285,
+        40
+      ],
+      "title": "Sending account",
+      "text": "Which account sends it"
+    },
+    {
+      "box": [
+        154,
+        250,
+        332,
+        40
+      ],
+      "title": "Email template",
+      "text": "Optional: copies a saved email in"
+    },
+    {
+      "box": [
+        154,
+        385,
+        328,
+        40
+      ],
+      "title": "To",
+      "text": "An address or a variable"
+    },
+    {
+      "box": [
+        154,
+        460,
+        320,
+        40
+      ],
+      "title": "Subject",
+      "text": "Variables work here"
+    },
+    {
+      "box": [
+        154,
+        510,
+        375,
+        150
+      ],
+      "title": "Body (HTML)",
+      "text": "The email, with variables"
+    },
+    {
+      "box": [
+        154,
+        671,
+        375,
+        140
+      ],
+      "title": "From email",
+      "text": "Optional; must be verified"
+    }
+  ]
+}

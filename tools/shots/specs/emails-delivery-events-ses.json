@@ -1,0 +1,49 @@
+{
+  "out": "images/emails/delivery-events-ses.png",
+  "alt": "A saved Amazon SES sending account waiting for Amazon SNS: the webhook URL with a Copy button, the three setup steps, and a warning that no configuration set is entered",
+  "capture": {
+    "path": "/{brand}/integrations/amazon_ses/9102",
+    "viewport": {
+      "width": 1440,
+      "height": 1500
+    },
+    "waitFor": "[data-testid='integrations.amazon-ses.events-guide']",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/integrations/9102$",
+        "file": "tools/shots/fixtures/email-sending-accounts/ses-awaiting.json"
+      }
+    ],
+    "crop": {
+      "x": 276,
+      "y": 662,
+      "width": 756,
+      "height": 390
+    }
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='integrations.amazon-ses.events-status']",
+      "title": "Waiting for SNS",
+      "text": "Turns on once SNS confirms"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.webhook-url']",
+      "title": "Webhook URL",
+      "text": "The HTTPS endpoint for your SNS topic",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.events-guide']",
+      "title": "Three steps",
+      "text": "Topic, subscription, event destination"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.events-needs-set']",
+      "title": "Configuration set",
+      "text": "Required: SES only reports with one"
+    }
+  ]
+}

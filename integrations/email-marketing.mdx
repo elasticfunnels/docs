@@ -34,7 +34,7 @@ ElasticFunnels ships its own email engine for broadcasts and automations, but yo
 | **GetResponse** | API key | Create / update contact, add to campaign (list), manage tags |
 | **Kit (ConvertKit)** | API key (v4) | Create / update subscriber, manage tags, enroll in form / sequence |
 | **AWeber** | OAuth 2.0 | Create / update contact (dynamic list selection), manage tags |
-| **Brevo** (Sendinblue) | API key | Create / update contact, check existence, manage tags, SMS |
+| **Brevo** (Sendinblue) | API key | Create / update contact, check existence, manage tags, SMS. The same key also sends order emails and campaigns |
 | **Maropost** | API key + account | Send transactional via `emails/deliver.json`, sync contacts |
 
 <Tip>
@@ -48,10 +48,17 @@ These providers send one-off emails — order receipts, dunning notices, passwor
 
 | Provider | Method | What you control |
 |----------|--------|------------------|
+| **Amazon SES** | SES v2 API, IAM access key | Region, configuration set, default sender, delivery events through Amazon SNS |
+| **Postmark** | Server API token | Transactional and broadcast streams, default sender, delivery events added on save |
+| **Brevo** | API key | Default sender, delivery events added on save |
+| **Resend** | API key | Default sender, delivery events added on save with a full access key |
 | **SendGrid** | REST API v3 | Sender identity, stats, bounces, suppression management |
 | **Mailgun** | REST API v3 | Sender, mailing lists, bounce / complaint tracking, opens & clicks |
 | **Generic SMTP** (labelled "Mailrelay") | Any SMTP relay | Host, port, username, password — works with Gmail, Outlook, Postmark, Amazon SES, etc. |
 | **Maropost** | Marketing Cloud REST API | Transactional sends via campaign ID |
+
+Setup for Amazon SES, Postmark, Brevo and Resend is on [Email Sending Accounts](/emails/sending-accounts),
+and their opens, clicks and bounces on [Delivery events](/emails/delivery-events).
 
 <Info>
 The integration shown as **Mailrelay** in the UI is a general-purpose SMTP integration despite the name — point it at any SMTP server you already operate.
@@ -92,12 +99,12 @@ The setup is the same for every provider:
 
 ## The integration page
 
-Mailgun and SendGrid open on a page with the settings in cards and a column beside them:
+Mailgun, SendGrid, Amazon SES, Postmark, Brevo and Resend open on a page with the settings in cards and a column beside them:
 
-- **Header**: the connection's name (click it to rename, then **Save**), its status, when it last sent and its last error. **Test connection** (SendGrid) checks the saved API key. The **⋯** menu opens the email logs or deletes the integration.
-- **Connection**: the API key and, for Mailgun, the sending domain. A saved key is never shown again: it reads **Saved** with a **Replace** button. Leave it as it is to keep the stored key.
-- **Default sender**: the from address, from name and reply-to used when an email template has none. **How the sender is chosen** explains the order.
-- **Delivery stats**: the webhook that brings opens, clicks and bounces back.
+- **Header**: the connection's name (click it to rename, then **Save**), its status, when it last sent and its last error. **Test connection** (SendGrid, Amazon SES, Postmark, Brevo, Resend) checks the saved key. The **⋯** menu opens the email logs or deletes the integration.
+- **Connection**: the API key and, for Mailgun, the sending domain (the access key and region for Amazon SES, the server token and streams for Postmark). A saved key is never shown again: it reads **Saved** with a **Replace** button. Leave it as it is to keep the stored key.
+- **Default sender**: the from address, from name and reply-to for email sent through this account. **How the sender is chosen** explains the order, also written out on [Email Sending Accounts](/emails/sending-accounts#how-the-sender-is-chosen).
+- **Delivery stats** (Mailgun, SendGrid) or **Delivery events** (Amazon SES, Postmark, Brevo, Resend): the webhook that brings opens, clicks and bounces back. See [Delivery events](/emails/delivery-events).
 - **How to set it up** (beside the cards, or under them on a phone): the steps with links to the provider.
 
 The **Activity** tab shows recent sends and failures, **Presets** offers ready-made automations, and **Used by** lists the automations and merchants that send through this account.
@@ -109,7 +116,7 @@ ElasticFunnels can replace these tools for many teams. Use the table below to de
 
 | Need | Use built-in EF | Use external integration |
 |------|-----------------|--------------------------|
-| Order, dunning, course, login emails | EF Emails (recommended) | SendGrid / Mailgun if you already pay for deliverability |
+| Order, dunning, course, login emails | EF Emails (recommended) | Amazon SES, Postmark, Brevo, Resend, SendGrid or Mailgun if you already pay for deliverability |
 | Marketing broadcasts to your list | EF Emails (campaigns + segments) | Klaviyo / ActiveCampaign / Mailchimp if your team lives there |
 | Behavior-based sequences | EF Automations | ActiveCampaign / Klaviyo automations |
 | Validation at form-capture | — | Debounce or ZeroBounce |

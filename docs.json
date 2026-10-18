@@ -232,6 +232,7 @@
             "group": "Automations",
             "pages": [
               "automations/variables",
+              "automations/send-email",
               "automations/run-history"
             ]
           },
@@ -268,6 +269,8 @@
               "emails/overview",
               "emails/builder",
               "emails/sending-setup",
+              "emails/sending-accounts",
+              "emails/delivery-events",
               "emails/template-variables",
               "emails/order-emails",
               "emails/subscription-emails",

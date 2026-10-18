@@ -1,0 +1,50 @@
+{
+  "out": "images/emails/sending-account-postmark.png",
+  "alt": "A saved Postmark sending account: the server API token, the transactional and broadcast streams, and Delivery events turned on",
+  "capture": {
+    "path": "/{brand}/integrations/postmark/9101",
+    "viewport": {
+      "width": 1440,
+      "height": 1500
+    },
+    "waitFor": "[data-testid='integrations.postmark.events-status']",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/integrations/9101$",
+        "file": "tools/shots/fixtures/email-sending-accounts/postmark-registered.json"
+      }
+    ],
+    "crop": {
+      "x": 276,
+      "y": 236,
+      "width": 760,
+      "height": 560
+    }
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='integrations.postmark.server-token-replace'] >> xpath=..",
+      "title": "Server API token",
+      "text": "From the server's API Tokens tab"
+    },
+    {
+      "selector": "[data-testid='integrations.postmark.message-stream']",
+      "title": "Transactional stream",
+      "text": "Order and subscription emails",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.postmark.broadcast-stream']",
+      "title": "Broadcast stream",
+      "text": "Campaigns go out here"
+    },
+    {
+      "selector": "[data-testid='integrations.postmark.events-status']",
+      "title": "Delivery events",
+      "text": "Added for you when you save",
+      "side": "left"
+    }
+  ]
+}

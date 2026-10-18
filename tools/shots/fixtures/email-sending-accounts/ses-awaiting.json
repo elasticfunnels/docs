@@ -1,0 +1,45 @@
+{
+ "id": 9102,
+ "name": "Acme SES",
+ "integration": "amazon_ses",
+ "status": "active",
+ "pausable": false,
+ "pausable_group": null,
+ "config": {
+  "access_key_id": "AKIAEXAMPLEONLY",
+  "secret_key": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+  "region": "us-east-1",
+  "configuration_set": "",
+  "from_email": "news@example.com",
+  "from_name": "Acme Health",
+  "reply_to": "support@example.com",
+  "webhook_status": "awaiting_subscription",
+  "webhook_url": "https://app.elasticfunnels.io/webhooks/email/amazon_ses/acme-health/9102"
+ },
+ "last_sync_at": null,
+ "sync_status": "pending",
+ "sync_error": null,
+ "sync_stats": null,
+ "behaviour": {
+  "acts": [],
+  "used_by": [
+   "merchants",
+   "campaigns"
+  ],
+  "sync": false,
+  "inbound": false,
+  "log": "email-logs",
+  "classes": [
+   "B"
+  ]
+ },
+ "health": {
+  "last_event_at": null,
+  "last_success_at": null,
+  "last_error_at": null,
+  "last_error": null,
+  "events_24h": 0,
+  "errors_24h": 0
+ },
+ "linked_merchants": []
+}

@@ -87,8 +87,9 @@ for every template. Change the sender in one place and every transactional email
 ### Alternative: a per-merchant email integration
 
 Instead of brand SMTP, a merchant can carry its own sending service. Merchant → **Email**
-tab → **Email Integration** lists your Mailgun, SendGrid, and Mailrelay integrations from
-**Integrations**.
+tab → **Email Integration** lists your Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid
+and Mailrelay integrations from **Integrations**. How to connect each one is on
+[Email Sending Accounts](/emails/sending-accounts).
 
 **Brand SMTP takes priority.** If the brand has SMTP configured, the merchant integration
 is ignored for order emails. Use the merchant integration when a single brand sells through
@@ -217,4 +218,5 @@ a promotional blast should not put order confirmations at risk.
 - [Subscription Emails](/emails/subscription-emails) - Renewals, paused, canceled, dunning
 - [Emails Not Sending](/emails/troubleshooting) - Checklist when a customer got nothing
 - [Template Variables](/emails/template-variables) - Complete merge tag reference
+- [Email Sending Accounts](/emails/sending-accounts) - Amazon SES, Postmark, Brevo, Resend and the sender rule
 - [Email Marketing Integrations](/integrations/email-marketing) - Mailgun, SendGrid, generic SMTP

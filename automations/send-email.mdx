@@ -1,0 +1,66 @@
+---
+title: "Send Email Step"
+description: "Send an email from an automation through any of your sending accounts: SMTP, Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid or Mailrelay."
+---
+
+**Send email** sends one email from an automation through a sending account you pick. It works
+with every kind of account your brand has, so one step covers SMTP, Amazon SES, Postmark, Brevo,
+Resend, Mailgun, SendGrid and Mailrelay. Find it in the step list under **Email**.
+
+<img src="/images/automations/send-email-step.png" alt="The Send email step's options: Sending account, Email template, To, Subject, Body with variables, and the optional From email with its verification notice" />
+
+## The fields
+
+| Field | What it does |
+|---|---|
+| **Sending account** | The account that sends it. The list shows each active account as provider, name and its default from address, for example `Postmark: Acme receipts (orders@example.com)`. Paused accounts are not listed. |
+| **Email template** | Optional. Picking a saved email copies its subject, body, from address, from name and reply-to into the step. You can still change them in the step. **Create new email** makes a template, and **Edit email in builder** opens the picked one in a new tab. |
+| **To** | Required. An address, or a variable such as the customer's email from the trigger. |
+| **Subject** | Required. Variables work here. |
+| **Body (HTML)** | The email itself. Variables from earlier steps work here. **Expand** gives you a bigger editor. |
+| **From email**, **From name**, **Reply-to email** | Optional, under the extra fields. Leave **From email** empty to send as the account's default sender. |
+
+Variables are picked the same way as in any other step. See [Variables](/automations/variables).
+
+## Which account sends it
+
+With **Sending account** picked, that account sends the email. Leave it empty and the step uses:
+
+1. your brand SMTP server, when the brand has one,
+2. otherwise your brand's email sending account, when it has exactly one.
+
+With no SMTP and several sending accounts, pick one in the step, or the email is not sent.
+
+An account must belong to the brand and be active. A paused account is refused, and the step
+fails instead of sending through another account.
+
+## Which sender it uses
+
+A **From email** typed in the step wins over the account's default sender. It has to be an
+address the provider accepts: on a domain or sender you verified with that provider, or the
+provider refuses the email. The notice above the field says the same.
+
+With **From email** empty, the account's **Default From Email** is used. The full rule is on
+[How the sender is chosen](/emails/sending-accounts#how-the-sender-is-chosen).
+
+Picking an email template fills **From email** with the template's from address. Clear the field
+if you want the account's default sender instead.
+
+## When it fails
+
+If the provider refuses the email (an unverified from address, a revoked key) or no account can
+send it, the step fails and the provider's reply is shown on the run. See
+[Run history](/automations/run-history).
+
+## The older per-provider steps
+
+The **Mailgun**, **SendGrid** and **Mailrelay** send steps are still in the step list and keep
+working in the automations that use them. They only send through their own provider. Use
+**Send email** for Amazon SES, Postmark, Brevo, Resend or your SMTP server, or when you want to
+switch providers later by changing one field.
+
+## Related docs
+
+- [Email Sending Accounts](/emails/sending-accounts): connect SES, Postmark, Brevo and Resend
+- [Variables](/automations/variables): insert values from earlier steps
+- [Run history](/automations/run-history): see what each run sent and why a step failed
