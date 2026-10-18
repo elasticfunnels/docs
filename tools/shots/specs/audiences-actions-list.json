@@ -1,6 +1,6 @@
 {
   "out": "images/audiences/actions-list.png",
-  "alt": "The When people enter or leave section of an audience: an email automation, an automation marked Automation off, a Klaviyo list sync and a webhook, each with its kind, its buttons and its counts",
+  "alt": "The When people enter or leave section of an audience: two email automations showing Who gets it and their holdout with Edit in automation, one marked Automation off, a Klaviyo list sync and a webhook with their cooldown, each with its kind, its buttons and its counts",
   "capture": {
     "path": "/{brand}/analytics/segments/8",
     "viewport": {
@@ -52,7 +52,13 @@
     {
       "selector": "[data-testid='segments.activations.row'] >> nth=0 >> div.flex-shrink-0",
       "title": "Open automation",
-      "text": "Then Edit, Sync now, Pause",
+      "text": "Then Sync now, Pause",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='segments.activations.row'] >> nth=0 >> [data-testid='segments.activations.row-policy']",
+      "title": "Who gets it",
+      "text": "Set on the trigger, shown here",
       "side": "right"
     },
     {
@@ -66,6 +72,12 @@
       "title": "Counts",
       "text": "Sent, held out, no consent, failed, pending",
       "side": "left"
+    },
+    {
+      "selector": "[data-testid='segments.activations.row'] >> nth=2 >> p:has-text('Cooldown')",
+      "title": "Cooldown",
+      "text": "Syncs and webhooks only",
+      "side": "right"
     }
   ]
 }

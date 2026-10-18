@@ -66,7 +66,7 @@ Needs Node 18+ and Playwright. Nothing to install in this repo: it uses
 - `crop`: a selector (that element's box) or `{x, y, width, height}` in viewport CSS px; default the
   whole viewport. Crop to the part of the screen the page talks about: the sidebar is rarely it.
 - `actions`: `click`, `hover`, `scroll` (selector), `waitFor` (selector), `wait` (ms), `select` (a `<select>`
-  selector, with `value`: the option to choose). Playwright
+  selector, with `value`: the option to choose), `fill` (an input selector, with `value`: the text to type). Playwright
   selectors work (`text=Save`, `role=button[name="Save"]`).
 - `annotations[]`: `selector` (measured at capture) or `box: [x, y, w, h]` in CSS px of the cropped
   capture; `title` (1 to 3 words, the label in the app), `text` (one short line), `side` (`right`,

@@ -90,7 +90,8 @@ async function capture(browser, spec, ctx) {
     else if (a.scroll) await page.locator(a.scroll).scrollIntoViewIfNeeded();
     else if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 30000 });
     else if (a.select) await page.selectOption(a.select, String(a.value));
-    if (a.wait || a.click || a.hover || a.select) await page.waitForTimeout(a.wait || 600);
+    else if (a.fill) await page.fill(a.fill, String(a.value));
+    if (a.wait || a.click || a.hover || a.select || a.fill) await page.waitForTimeout(a.wait || 600);
   }
   for (const h of c.hide || []) await page.locator(h).evaluateAll((els) => els.forEach((e) => (e.style.visibility = "hidden")));
   await page.evaluate(() => document.fonts.ready);

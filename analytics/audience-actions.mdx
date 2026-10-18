@@ -11,13 +11,14 @@ Actions work on **customer audiences** (people identified by email). An audience
 visitors cannot be sent anywhere, and a live audience is matched on the page as people browse, so it has no members
 to send.
 
-<img src="/images/audiences/actions-list.png" alt="The When people enter or leave section of an audience: an email automation, an automation marked Automation off, a Klaviyo list sync and a webhook, each with its kind, its buttons and its counts" />
+<img src="/images/audiences/actions-list.png" alt="The When people enter or leave section of an audience: two email automations showing Who gets it and their holdout with Edit in automation, one marked Automation off, a Klaviyo list sync and a webhook with their cooldown, each with its kind, its buttons and its counts" />
 
 ## Where to find it
 
 Open **Reports → Audiences**, pick an audience, and scroll to **When people enter or leave** on its **Overview**
 tab. Each row starts with its kind (**Automation**, **Sync** or **Webhook**) and shows where it sends, when it
-runs, its holdout and cooldown, the last sync, and its counts:
+runs, the last sync, and its counts. An automation row also shows **Who gets it** and its holdout (for example
+`Who gets it: First time only · Holdout 10%`); a sync or webhook row shows its holdout and cooldown.
 
 | Count | Meaning |
 |---|---|
@@ -28,10 +29,11 @@ runs, its holdout and cooldown, the last sync, and its counts:
 | **Failed** | Sends that still failed after 5 attempts |
 | **Pending** | People waiting for a later refresh (over the per-run cap, paused integration, or a retry) |
 
-Each row has **Edit**, **Sync now** and **Pause** / **Resume**. Sync and webhook rows also have **Delete**, which
-leaves people already sent where they are. Automation rows have **Open automation** instead, and show
-**Automation off** while the automation is not turned on: nobody is run through it until you turn it on in the
-builder. An audience can have up to 20 actions.
+Each row has **Sync now** and **Pause** / **Resume**. Sync and webhook rows also have **Edit** and **Delete**
+(deleting leaves people already sent where they are). Automation rows have **Open automation** instead, plus an
+**Edit in automation** link next to **Who gets it**: those settings live on the automation's trigger, so they are
+changed there, not on the audience page. An automation row shows **Automation off** while the automation is not
+turned on: nobody is run through it until you turn it on in the builder. An audience can have up to 20 actions.
 
 ## Add an action
 
@@ -52,13 +54,15 @@ plan's automation limit.
 
 ### Send an email
 
-<img src="/images/audiences/actions-send-email.png" alt="The Send an email window: the automation it creates, the Bump thank-you template picked, Send it when They enter, holdout, cooldown and Also send it to the 412 people already in this audience" />
+<img src="/images/audiences/actions-send-email.png" alt="The Send an email window: the automation it creates, the Bump thank-you template picked, Send it when They enter, Who gets it set to Every time, at most once per 14 days, Holdout 10% and Also send it to the 412 people already in this audience" />
 
 1. Pick an **Email template**. The list holds your saved emails, the same ones the automation **Send email** step
    offers. **New template** opens Emails in a new tab; click **Reload** once it is saved.
 2. Under **Send it when**, pick **They enter** or **They leave**. For **They leave**, you can limit it to some
    reasons under **Only when they left because**.
-3. Set the **Holdout** and **Cooldown** (see [The settings](#the-settings)).
+3. Under **Who gets it**, pick **First time only** (the default) or **Every time, at most once per N days** and
+   enter the days (1 to 90). Set the **Holdout** if you want one. See [Who gets it](#who-gets-it). Both are
+   saved on the automation's trigger; to change them later, open the automation.
 4. To send it to people who are already in the audience too, tick **Also send it to the N people already in this
    audience** (only for **They enter**). Up to 500 of them are sent per refresh, and the rest at the next
    refreshes. Left unticked, only people who enter from now on get it.
@@ -108,17 +112,23 @@ click **Open the builder**. It opens a new automation with the trigger already s
 and publish it; it runs once it is published.
 
 Publishing any automation whose trigger is set to this audience adds it to **When people enter or leave** right
-away. An automation runs for up to 500 people per refresh, once per person, and the rest follow at the next
-refresh.
+away. An automation runs for up to 500 people per refresh, and the rest follow at the next refresh. Who it runs for
+again is set on its trigger: see [Who gets it](#who-gets-it).
 
 ### The settings
+
+These are the settings of a list, tag or webhook action. Automations use [Who gets it](#who-gets-it) instead of a
+cooldown.
 
 - **When**: **They enter**, **They leave**, or both (lists, tags and webhooks).
 - **Only when they left because**: limit leave events to **Bought**, **Refunded or charged back**, **Aged out** or
   **Audience edited**. Leave all unticked for every reason.
 - **Holdout**: a share of people (0 to 50%) that is never sent. Each person's group stays the same, so you can
   compare the held-out people with the rest and see the real lift.
-- **Cooldown**: someone who re-enters within this many days (0 to 30, default 7) is not sent again.
+- **Cooldown** (0 to 30 days, default 7): the same change (added, or removed) is not sent again for a person within
+  this many days of the last time it was sent. A different change always goes out, so someone who is added and then
+  leaves is still removed from the list right away. Lists and webhooks have no "first time only": they follow the
+  audience every time, so the list stays true to it.
 - **Also sync the people already in this audience**: off by default, so only people who enter from now on are
   sent.
 
@@ -131,12 +141,50 @@ A paused integration still appears in the picker, marked **(paused)**, and its r
 **Integration paused** badge. You can save an action on it, but nothing is sent while it is paused: people
 wait as **Pending** and are sent once you resume the integration under **Integrations**.
 
+## Who gets it
+
+Audience emails and automations have a **Who gets it** setting, so nobody gets the same email over and over. Set it
+on the **On Entered Audience** or **On Left Audience** trigger in the builder, or in the **Send an email** window
+when you create one. The audience page shows it on the automation's row, read only, with **Edit in automation**.
+
+<img src="/images/automations/audience-trigger-who-gets-it.png" alt="The On Entered Audience trigger: the audience, Who gets it set to Every time, at most once per N days with 14 days, Holdout 10% and the note that explains both choices" />
+
+| Choice | What happens |
+|---|---|
+| **First time only** | The default for new automations. Each person runs through the automation once, ever. If they leave the audience and come back, they do not get it again |
+| **Every time, at most once per N days** | Each person runs through it again when they come back, but never twice within N days. N is required, from 1 to 90 |
+
+There is no unlimited "every time" for automations: an automation sends email, and someone who drops in and out of
+an audience must not get an email at every refresh.
+
+What else to know:
+
+- **Entering and leaving keep separate counts.** On a **Left Audience** automation, leaving is what counts: someone
+  who already got your "welcome" email on entering can still get the "we miss you" email on leaving, and each
+  follows its own setting.
+- **In and out quickly changes nothing.** Someone who leaves and comes back many times within a few days still gets
+  it at most what the setting allows: once with **First time only**, once per N days with **Every time**.
+- **Held-out people count as having had it.** If someone lands in the **Holdout** group, they never get the email,
+  and they are treated as if they had: they are not picked again next time. Otherwise the held-out group would not
+  stay comparable with the rest.
+- **People who were skipped keep their turn.** Someone skipped for consent, because they are on the email
+  suppression list (unsubscribed, bounced, complained) or because there is no email address for them is not counted
+  as sent. If that changes and they enter again, they can still get it. A send that failed does not use up their
+  turn either.
+- **Holdout** is 0 to 50%. Each person's group stays the same, so you can compare the held-out people with the rest
+  and see the real lift.
+- **Changing the setting** applies when you publish the automation. It does not resend to people who already got
+  it.
+- **Automations made before October 18, 2026** kept the way they already worked: **Every time, at most once per N
+  days**, with the cooldown they had (at least 1 day). Open the trigger to switch one to **First time only**.
+
 ## Edit an action
 
-Click **Edit** on a row to change it after saving: the list or tag, the webhook URL and fields, when it
-sends, the leave reasons, holdout, cooldown and subscribe option. The kind itself (Klaviyo, a webhook,
-an automation) and an ActiveCampaign tag/list choice cannot be changed; to send somewhere else, add another
-action. To change the email or the steps of an automation, click **Open automation**.
+Click **Edit** on a sync or webhook row to change it after saving: the list or tag, the webhook URL and fields,
+when it sends, the leave reasons, holdout, cooldown and subscribe option. The kind itself (Klaviyo, a webhook)
+and an ActiveCampaign tag/list choice cannot be changed; to send somewhere else, add another action. Automation
+rows have no **Edit**: to change the email, the steps, **Who gets it** or the holdout, click **Open automation**
+or **Edit in automation** and change the trigger.
 
 <img src="/images/audiences/destination-webhook-edit.png" alt="The Edit destination window for a webhook: the URL, Pick columns with the audience's columns ticked, Replace the signing secret, when to send, holdout and cooldown" />
 
