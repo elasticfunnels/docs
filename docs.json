@@ -207,7 +207,8 @@
                 "group": "AI & Communications",
                 "pages": [
                   "integrations/ai-providers",
-                  "integrations/twilio"
+                  "integrations/twilio",
+                  "integrations/slicktext"
                 ]
               },
               {
