@@ -95,6 +95,19 @@ To enable it, open your app in the PayPal Developer Dashboard and turn on **Save
 
 ---
 
+## Refunds
+
+Refund a PayPal order from ElasticFunnels the same way as a card order: open the order in **Conversions** and click **Refund**. ElasticFunnels sends the refund to PayPal and the money goes back to the buyer's PayPal account.
+
+- **Full or partial.** Enter any amount up to what is left to refund. You can refund one order several times until the full amount is back with the buyer.
+- **No voids.** PayPal takes the money when the buyer approves, so a PayPal payment cannot be voided, even minutes after the sale. The refund dialog says so, and the order is always refunded.
+- **Pending refunds.** When the original payment was funded by a bank transfer (eCheck), PayPal can accept the refund as pending and finish it later. The order shows as refunded right away.
+- **When PayPal refuses.** The message shows PayPal's reason, for example that the amount is more than what is left to refund. The order is still marked as refunded in ElasticFunnels, so refund the buyer from your PayPal account in that case.
+
+A refund you issue from your PayPal account instead also reaches ElasticFunnels through the webhook and is recorded on the order once.
+
+---
+
 ## Tracking numbers are sent to PayPal
 
 When an order paid through a PayPal merchant gets a tracking number, ElasticFunnels adds it to the PayPal transaction. PayPal uses it to settle "item not received" disputes. The tracking number can come from:
