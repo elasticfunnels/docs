@@ -66,6 +66,14 @@ If a user only has access to one report child, such as **Customers** or **Conver
 
 Billing visibility uses permissions such as `billing.invoices.view` and `billing.cards.view` (not the shorter `billing.invoices` labels).
 
+### Affiliate portal
+
+The organization's affiliate portal has its own group in the role editor, **Affiliate portal**, with one row per part of the portal: Portal settings, Portal affiliates, Payouts and billing, Assets and Commission groups. Give a role only the rows it needs. Someone who handles payouts can get **Payouts and billing** without being able to change the portal's domain or branding, and the portal opens on the tabs their role has.
+
+Organization settings permissions no longer open the portal on their own. When this group was added, roles that could change organization settings were given every portal permission, and roles that could view them were given every view.
+
+To let someone add an internal affiliate on a brand, give their role **Use portal affiliates in brands** as well as **Affiliates** create or update.
+
 ## How to set up a restricted role
 {/* SCREENSHOT: How to set up a restricted role · relevant screen or example output · desktop */}
 
