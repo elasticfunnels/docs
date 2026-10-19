@@ -66,6 +66,16 @@ In **Affiliates → Edit affiliate → Postback URLs** you'll find:
 Affiliate postbacks intentionally do **not** include `shipped`, `abandon`, or
 `failed_payment` — those aren't commission-bearing events.
 
+### Renewal events are opt-in
+
+`subscription_renewal` and `subscription_renewal_failed` are sent only when the
+affiliate has **Send rebills: postbacks and commission** turned on (**Affiliates →
+Edit affiliate**, General information tab). It is off by default: with it off, renewals reach
+none of the affiliate's postbacks (these URLs, the legacy postback URL or the signed
+`rebill` postback) and earn no commission, even when a renewal URL is filled in.
+With it on, each successful renewal earns commission at the affiliate's rates and
+its postbacks go out. Purchases, refunds, chargebacks and cancels are not affected.
+
 ## Request format
 {/* SCREENSHOT: Request format · relevant screen or example output · desktop */}
 
