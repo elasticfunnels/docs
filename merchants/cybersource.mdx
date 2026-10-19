@@ -1,0 +1,127 @@
+---
+title: 'Cybersource'
+description: 'Take card payments on your own checkout with Cybersource: secure card fields, one-click upsells, subscription renewals and refunds from ElasticFunnels.'
+---
+
+<Warning>
+**Beta.** Cybersource is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Cybersource is a **card merchant** for your checkout. The buyer types their card number and security code into secure fields that Cybersource hosts inside your checkout page (Cybersource calls them Microform), so the card never reaches ElasticFunnels. The first payment also saves the card with Cybersource, which is what makes one-click upsells and subscription renewals possible.
+
+---
+
+## Before you start
+
+You need:
+
+1. A **Cybersource merchant account**. To test first, create a free sandbox account at [developer.cybersource.com](https://developer.cybersource.com/hello-world/sandbox.html). A sandbox account is separate from your live account and has its own keys.
+2. **Token Management Service** (TMS) enabled on the account, so cards can be saved for upsells and renewals. It is usually on for sandbox accounts; for a live account, ask your Cybersource account manager.
+3. Access to the **Business Center**: [ebctest.cybersource.com](https://ebctest.cybersource.com) for the sandbox, [ebc.cybersource.com](https://ebc.cybersource.com) for live.
+
+---
+
+## Step 1: create a REST key in the Business Center
+
+ElasticFunnels talks to Cybersource with a REST shared secret key. Make one for each account you connect (one in the sandbox, one in live).
+
+1. Sign in to the Business Center.
+2. Go to **Payment Configuration** → **Key Management**.
+3. Click **Generate Key**, choose **REST - Shared Secret**, and click **Next**.
+4. Copy the **Key** and the **Shared Secret** it shows. Download the key file too.
+
+<Warning>
+The Shared Secret is shown only once. If you lose it, generate a new key and paste the new pair into ElasticFunnels.
+</Warning>
+
+---
+
+## Step 2: add the Cybersource merchant
+
+1. Go to **Merchants** → **Add Merchant** and choose **Cybersource**.
+2. Fill in the fields. Each one has a hint under it that says where to find the value.
+3. Use the **Live Mode** toggle to pick which set of keys is used. With Live Mode off, the **Sandbox** fields are used and no real card is charged.
+4. Pick the checkout page the merchant uses.
+5. Save.
+
+| Field | Where to find it |
+|---|---|
+| **Merchant ID** | The Merchant ID (organization ID) you sign in to the Business Center with. |
+| **REST Key ID** | The **Key** from Step 1. |
+| **REST Shared Secret** | The **Shared Secret** from Step 1. |
+
+Every field has a **Sandbox** twin, so you can keep both sets of keys on one merchant and switch with the toggle. Saving does not test the keys. Place a test order with Live Mode off (see [Test before you go live](#test-before-you-go-live)) to confirm they work.
+
+When you save, ElasticFunnels also sets up Cybersource notifications for your account, so refunds and voids you make in the Business Center reach your reports. See [Refunds and voids](#refunds-and-voids).
+
+---
+
+## Step 3: use it on your checkout
+
+Make Cybersource the merchant of the domain or the funnel, as with any card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+The card form on your checkout page then loads Cybersource's secure fields for the card number and security code, and an expiry field of its own. Nothing changes in your page's code.
+
+<Note>
+The secure fields are tied to your checkout page's address. If a buyer leaves the page open for more than about 15 minutes before paying, the fields reload and the buyer types the card again. This is a Cybersource rule, and no payment is lost.
+</Note>
+
+---
+
+## What the buyer sees
+
+1. The buyer fills in their details and types the card into the secure fields.
+2. They click the button. The payment is approved or declined on the same page.
+3. After an approval they continue to the next step (an upsell or the thank-you page).
+
+A declined card shows a message on the checkout, and the buyer can try another card. A payment that Cybersource holds for fraud review is treated as declined: ElasticFunnels releases the hold at once, so the buyer is never charged for an order that did not go through.
+
+---
+
+## One-click upsells and subscriptions
+
+The first payment saves the buyer's card with Cybersource's Token Management Service. ElasticFunnels keeps only the token, never the card number. With the saved card:
+
+| | How it is charged |
+|---|---|
+| **One-click upsell** | The buyer clicks accept on the upsell page and the saved card is charged. The buyer does not type the card again. |
+| **Subscription renewal** | ElasticFunnels charges the saved card on each billing date, linked to the buyer's first payment, as card networks require for renewals. |
+
+A declined renewal follows your subscription's retry settings.
+
+---
+
+## Refunds and voids
+
+Refund an order from its page in ElasticFunnels, the same way as for any card merchant. You can refund the full amount or part of it. A full refund of a payment that has not settled yet is sent as a void, so the buyer never sees the charge on their statement.
+
+Refunds and voids you make in the Cybersource Business Center are recorded in ElasticFunnels too, through the notifications set up in Step 2.
+
+{/* OWNER: payment and chargeback notifications from Cybersource need message-level encryption, which ElasticFunnels does not support yet, and Cybersource support has to enable them on the account. Until then, chargebacks do not reach reports automatically. Confirm the wording once this is decided. */}
+
+---
+
+## Test before you go live
+
+With **Live Mode** off, payments go to your Cybersource sandbox. Use Cybersource's test cards with any future expiry date and any security code:
+
+| Card | Number |
+|---|---|
+| Visa | 4111 1111 1111 1111 (if the card field refuses it, use 4444 3333 2222 1111) |
+| Mastercard | 5555 5555 5555 4444 |
+| American Express | 3782 822463 10005 |
+
+Test payments show in the sandbox Business Center under **Transaction Management** → **Transactions**.
+
+To place test orders on a live merchant without charging a real card, set a **Test Key** and add `?test=[key]` to the checkout URL. See [Test merchant](/merchants/test-merchant).
+
+---
+
+## Troubleshooting
+
+| What you see | What to check |
+|---|---|
+| Test orders are declined with an authentication error | The REST Key ID and Shared Secret belong together and to this Merchant ID, and you are using the sandbox fields for a sandbox account (Live Mode off). |
+| "Payment form failed to load" on the checkout | The merchant's keys are valid and the checkout page is opened over https on your own domain. |
+| "Your secure card form expired" | The page was open too long. The buyer types the card again; nothing was charged. |
+| Upsells or renewals fail with a token error | Token Management Service is not enabled on the account. Ask Cybersource to enable it. |

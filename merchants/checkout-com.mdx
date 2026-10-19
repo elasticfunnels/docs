@@ -1,0 +1,107 @@
+---
+title: 'Checkout.com'
+description: 'Take card payments on your own checkout with Checkout.com: a secure card form, one-click upsells, subscription renewals, refunds and chargebacks in your reports.'
+---
+
+<Warning>
+**Beta.** Checkout.com is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Checkout.com is a **card merchant** for your checkout. The buyer types their card into a secure card form that Checkout.com loads inside your checkout page (Checkout.com calls it Flow), so the card number never reaches ElasticFunnels. Once the first payment goes through, Checkout.com keeps the card on file, which makes one-click upsells and subscription renewals possible.
+
+<Info>
+You can test without talking to anyone: Checkout.com gives you a free **sandbox** account at [checkout.com/get-test-account](https://www.checkout.com/get-test-account). Live payments need a live Checkout.com account, which their sales team sets up.
+</Info>
+
+---
+
+## Before you start
+
+You need:
+
+1. A Checkout.com account: a **sandbox** account to test, a **live** account to take real payments. Each has its own keys.
+2. A **processing channel**. Checkout.com creates one with your account; you can see it under **Settings** → **Business settings** → **Processing channels**.
+3. A key pair (secret key and public key) created under **Developers** → **Keys**. Give the key access to **payments**, **payment sessions** and **workflows**. ElasticFunnels uses workflows to send refunds and chargebacks back to your reports.
+
+---
+
+## Step 1: add the Checkout.com merchant
+
+1. Go to **Settings** → **Merchants** → **Add Merchant** and choose **Checkout.com**.
+2. Fill in the four fields. Each one has a hint under it that says where to find the value.
+3. Use the **Live Mode** toggle to pick which set of keys is used. With Live Mode off, the **Sandbox** fields are used and nothing is charged.
+4. Save.
+
+| Field | Where to find it |
+|---|---|
+| **API base URL** | **Developers** → **Overview** shows your unique base URL, such as `https://abcd1234.api.checkout.com`. Paste the whole URL or only the part before `.api`. |
+| **Secret key** | **Developers** → **Keys**, when you create a key. It starts with `sk_` (`sk_sbox_` in the sandbox). Copy it right away: Checkout.com shows it only once. |
+| **Public key** | **Developers** → **Keys**, created together with the secret key. It starts with `pk_` (`pk_sbox_` in the sandbox). |
+| **Processing channel ID** | **Settings** → **Business settings** → **Processing channels**, or open your key under **Developers** → **Keys**. It starts with `pc_`. |
+
+The form checks that the keys match the mode: a sandbox key in the live fields (or the other way round) is refused with a message that says which one is wrong.
+
+When you save, ElasticFunnels **creates a workflow in your Checkout.com account** that sends refunds, voids and disputes to ElasticFunnels, signed with a key only your merchant knows. You do not set up any webhook yourself. If you later change the base URL or the processing channel, saving again replaces the workflow.
+
+<Warning>
+The workflow can only be created when the secret key has the **workflows** scope. If no ElasticFunnels workflow appears under **Workflows** in the Checkout.com Dashboard after you save, create a new key with that scope under **Developers** → **Keys**, paste both keys again and save.
+</Warning>
+
+Then assign the merchant to your domain or funnel, as for any card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+---
+
+## What the buyer sees
+
+1. The checkout loads the Checkout.com card form in place of the card fields. The rest of the page (order summary, bumps, totals, customer fields) works the same way.
+2. The buyer fills in their card and clicks your submit button. The card goes straight to Checkout.com, which hands the page a one-time token.
+3. ElasticFunnels charges the token and the buyer moves on to the next step (an upsell or the thank-you page).
+
+A declined card keeps the buyer on the checkout with a message, so they can try another card.
+
+<Note>
+3D Secure is not available with Checkout.com on ElasticFunnels yet. Payments are sent without a 3D Secure challenge. If your Checkout.com account requires 3D Secure for a payment, that payment is declined and the buyer is asked to try again or use another card.
+</Note>
+
+---
+
+## One-click upsells and subscriptions
+
+The first payment saves the buyer's card with Checkout.com. After that:
+
+| | What happens |
+|---|---|
+| **One-click upsell** | The buyer clicks accept on the upsell page and the saved card is charged. They do not type their card again. |
+| **Subscription renewal** | Each renewal charges the saved card, linked to the buyer's first payment so the card network knows the buyer agreed to it. |
+
+When the checkout holds a subscription product, the first payment is marked as the start of a recurring series, so the renewals that follow are accepted as merchant-initiated charges.
+
+---
+
+## Refunds, voids and chargebacks
+
+- **Refund** an order from its page in ElasticFunnels as usual. Full and partial refunds both work once Checkout.com has captured the payment.
+- A payment Checkout.com has **not captured yet** can only be cancelled in full. A full refund on it becomes a void; a partial refund is refused until the payment is captured.
+- A refund or void you make in the **Checkout.com Dashboard** reaches your ElasticFunnels reports through the workflow, so you do not have to repeat it in ElasticFunnels. It is not counted twice.
+- A **dispute** (chargeback) opened at Checkout.com shows on the order as a chargeback.
+
+---
+
+## Testing
+
+1. Leave **Live Mode** off and fill in the sandbox fields.
+2. Pay on your checkout with a Checkout.com test card, such as `4242 4242 4242 4242`, any future expiry date and CVV `100`.
+3. To see a decline, use `4544 2491 6767 3670` (insufficient funds).
+
+See [Test merchant](/merchants/test-merchant) for testing a whole funnel.
+
+---
+
+## Troubleshooting
+
+| What you see | What to check |
+|---|---|
+| The card form does not load on the checkout | The public key and the base URL belong to the same account and mode as the secret key. |
+| "This is not a sandbox key" when saving | Live Mode is off but a live key was pasted. Sandbox keys start with `sk_sbox_` and `pk_sbox_`. |
+| Every payment is declined with "try again or use another card" | Your Checkout.com account may require 3D Secure. Ask Checkout.com support to allow payments without it for your processing channel. |
+| Refunds made in the Checkout.com Dashboard do not show in ElasticFunnels | Save the merchant again so the workflow is recreated, and check that it appears under **Workflows** in the Checkout.com Dashboard. |

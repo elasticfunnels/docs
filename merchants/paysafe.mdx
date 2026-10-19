@@ -1,0 +1,118 @@
+---
+title: 'Paysafe'
+description: 'Take card payments on your own checkout with Paysafe: secure card fields, one-click upsells, subscription renewals and refunds in your reports.'
+---
+
+<Warning>
+**Beta.** Paysafe is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Paysafe is a **card merchant** for your checkout. It uses the Paysafe Payments API and Paysafe.js, the card fields Paysafe hosts inside your checkout page. The buyer types the card into those fields, so the card number never reaches ElasticFunnels. After the first payment the card is saved with Paysafe, which is what makes one-click upsells and subscription renewals work.
+
+---
+
+## Before you start
+
+You need:
+
+1. A **Paysafe merchant account** with card payments, and a login to the **Paysafe Business Portal**.
+2. Two API keys from the Business Portal: the **Secret Key** (used by ElasticFunnels to charge and refund) and the **Single-Use Token** key (used by your checkout page to show the card fields).
+3. For testing, a Paysafe **Test** account. You can request one on developer.paysafe.com (user icon, then **Sign up here**). Its keys only work against Paysafe's test environment.
+
+<Info>
+3-D Secure is not supported yet. If your Paysafe account forces 3-D Secure on every card, ask Paysafe to turn that off for this account before you use it with ElasticFunnels.
+</Info>
+
+---
+
+## Step 1: add the Paysafe merchant
+
+1. Go to **Settings** → **Merchants** → **Add Merchant** and choose **Paysafe**.
+2. Fill in the fields. Each one has a hint under it that says where to find the value.
+3. Use the **Live Mode** toggle to pick which credentials are used. With Live Mode off, the **Sandbox** fields are used and nobody is charged.
+4. Save.
+
+| Field | Where to find it |
+|---|---|
+| **API key username** | Business Portal → **Developer** → **API Keys**. Click **Authenticate Now** under **Secret Key** and copy the Username. |
+| **API key password** | The Password shown next to that Username. |
+| **Single-use token key username** | Same page, in the **Single-Use Token** section. |
+| **Single-use token key password** | The Password of the Single-Use Token key. |
+| **Card account number** | Optional. Needed only when one API key covers several card accounts (for example one per currency). Listed with your merchant accounts in the Business Portal. |
+| **Webhook HMAC key** | Optional. The key of the webhook you add in Step 2. |
+
+Every field has a **Sandbox** twin, so one merchant holds both your Test and your live keys.
+
+{/* OWNER: confirm the Business Portal labels (Developer > API Keys, Single-Use Token, the accounts list) on a real account; Paysafe's docs only describe the Secret Key path. */}
+
+---
+
+## Step 2: add the webhook in the Business Portal
+
+The webhook lets refunds and cancellations you make directly in Paysafe show up in your ElasticFunnels reports. Refunds you start from ElasticFunnels are recorded without it.
+
+Save the merchant, open it again, and copy the **Webhook URL** shown under the credential fields. Add a webhook in the Business Portal that points at that URL.
+
+- Subscribe it to the **refund** and **settlement** events (`REFUND_COMPLETED`, `SETTLEMENT_CANCELLED`).
+- Copy the webhook's **HMAC key** into **Webhook HMAC key** on the merchant.
+
+Once the key is saved, a webhook with a missing or wrong `Signature` header is rejected.
+
+---
+
+## Step 3: use the merchant on your checkout
+
+Pick the Paysafe merchant as the domain's or the funnel's merchant, like any other card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+The card form shows three secure fields: card number, expiry and CVV. Paysafe hosts them, which keeps your checkout out of scope for handling card data (PCI SAQ-A).
+
+---
+
+## What works with Paysafe
+
+| | Supported |
+|---|---|
+| **Card payments** on your checkout | Yes. The payment is captured right away. |
+| **One-click upsells** | Yes, charged to the card saved at checkout. |
+| **Subscriptions** | Yes. Renewals are charged automatically to the saved card. |
+| **Full and partial refunds** | Yes, from the order in ElasticFunnels. |
+| **Voids** | Yes, until Paysafe settles the payment. |
+| **Refunds made in Paysafe** in your reports | Yes, through the webhook from Step 2. |
+| **Chargebacks** in your reports | Not yet. Paysafe does not send chargebacks by webhook. |
+| **Apple Pay and Google Pay** | Not yet. |
+| **3-D Secure** | Not yet. |
+| **Phone and mail orders (MOTO)** | No. |
+| **Test mode** (`?test=` with a test key) | Not available. Use your Test account keys with Live Mode off instead. |
+
+---
+
+## Refunds on the same day
+
+Paysafe settles payments in a daily batch. Until a payment settles, it can only be cancelled as a whole:
+
+- A **full refund** on an unsettled payment cancels the payment instead. The buyer is not charged.
+- A **partial refund** on an unsettled payment is refused with a message. Try again once the payment has settled, usually the next day.
+
+---
+
+## Testing
+
+1. Fill in the **Sandbox** fields with your Test account keys and turn **Live Mode** off.
+2. Open your checkout and pay with a Paysafe test card, for example `4037 1111 1100 0000` with any future expiry date and CVV `111`.
+3. To see a decline, use a product priced at **0.05** (declined) or **0.11** (insufficient funds). Paysafe's test environment picks the result from the amount.
+
+<Warning>
+Turn **Live Mode** on before you send real traffic. With Live Mode off, every payment goes to Paysafe's test environment and nobody is charged.
+</Warning>
+
+---
+
+## Troubleshooting
+
+| What you see | What to check |
+|---|---|
+| The card fields do not appear on the checkout | The Single-Use Token key is missing, or it belongs to the other environment (Test vs live). |
+| Every payment fails with an authentication error | The Secret Key username or password is wrong, or Test keys are used with Live Mode on. |
+| Payments fail with an account error | Your API key covers several card accounts: fill in **Card account number**. |
+| Refunds made in the Business Portal never reach your reports | The webhook from Step 2 is missing, or its HMAC key does not match. |
+| A card is declined although it works elsewhere | The issuer may require 3-D Secure, which is not supported yet. The buyer can use another card. |

@@ -1,0 +1,97 @@
+---
+title: 'Airwallex'
+description: 'Take card payments on your checkout through your Airwallex account, with one-click upsells, subscription renewals, refunds and chargebacks in your reports.'
+---
+
+<Warning>
+**Beta.** Airwallex is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Airwallex is a **card merchant**. The buyer types their card into Airwallex's secure card field on your checkout page, and the card details go straight to Airwallex. ElasticFunnels never receives the card number or the CVC.
+
+Once the first payment goes through, Airwallex keeps the buyer's card on file for your account, so upsells are one click and subscription renewals are charged without the buyer.
+
+---
+
+## Before you start
+
+You need:
+
+1. An **Airwallex** account with card payments turned on. Airwallex reviews your business before live payments are allowed, so start that early.
+2. For testing, a **sandbox** account at [sandbox.airwallex.com](https://www.sandbox.airwallex.com/global/signup). It has its own keys and never moves money.
+
+---
+
+## Step 1: add the Airwallex merchant
+
+1. Go to **Merchants** → **Add Merchant** and choose **Airwallex**.
+2. In the Airwallex web app, open **Developer** → **API keys**. Copy the **Client ID** and the **API key** into the merchant form. If the page shows no API key yet, generate one there; Airwallex shows it only once.
+3. Sandbox and live keys have their own fields. The **Mode** toggle decides which pair is used.
+4. Save.
+
+When you save, ElasticFunnels signs in to Airwallex with the keys. If they are wrong, the form tells you before anything is saved.
+
+**API version** is optional. Leave it empty to use the version your Airwallex account is set to.
+
+---
+
+## Step 2: connect the webhook
+
+Airwallex does not let apps create webhooks for you, so this step is done by hand once per merchant. Without it, payments still work, but refunds and chargebacks you handle inside Airwallex will not show up in your ElasticFunnels reports.
+
+1. Open the saved Airwallex merchant. Copy the **Webhook URL** shown under the credential fields.
+2. In the Airwallex web app, go to **Developer** → **Webhooks** → **Add webhook**. Paste the URL.
+3. Select the events **refund.accepted** and **payment_dispute.requires_response**.
+4. Save the webhook in Airwallex, then copy its **secret** into the **Webhook secret** field of the merchant (or **Sandbox webhook secret** for a sandbox webhook) and save the merchant again.
+
+ElasticFunnels checks the signature on every webhook Airwallex sends and ignores anything older than five minutes, so a copied or replayed request is rejected.
+
+---
+
+## What the buyer sees
+
+1. The buyer fills in the checkout and types their card into the card field.
+2. When they click the button, Airwallex checks the card with the bank. If the bank asks for 3D Secure, the bank's screen opens on top of your checkout.
+3. The payment is captured for the order total and the buyer continues to the next step of the funnel, the same as with any other card merchant.
+
+If the card is declined, the buyer stays on the checkout with the bank's reason and can try another card. The decline is recorded with its reason.
+
+---
+
+## One-click upsells and subscriptions
+
+The first card payment saves a payment consent at Airwallex. ElasticFunnels uses it for:
+
+| | What happens |
+|---|---|
+| **Upsells** after an Airwallex checkout | Charged to the same card in one click, without the buyer entering it again |
+| **Subscription renewals** | Charged automatically on each billing date |
+
+These later charges are made while the buyer is not on the page. If the bank asks for 3D Secure on one of them, Airwallex cannot show it, so the charge is declined and the renewal goes to the normal retry schedule.
+
+---
+
+## Refunds and chargebacks
+
+- **Refund from ElasticFunnels**: open the order and refund it, in full or in part. The refund is sent to Airwallex and recorded on the order.
+- **Refund made in Airwallex**: arrives through the webhook from Step 2 and is added to the order.
+- **Chargebacks**: when Airwallex opens a dispute that needs your response, the webhook records it on the order, so your reports show it. You answer the dispute in Airwallex.
+
+---
+
+## Testing with the Airwallex sandbox
+
+1. Copy the sandbox **Client ID** and **API key** into the sandbox fields, and set **Mode** to **Sandbox**.
+2. Open your checkout and pay with an Airwallex test card, for example `4035 5010 0000 0008` with any future expiry date and any CVC.
+3. Check the payment in the sandbox web app under **Payments**.
+
+Sandbox payments are recorded as **test** orders. Airwallex lists more test cards, including ones that decline, in its [testing guide](https://www.airwallex.com/docs/payments/test-and-go-live/test-your-integration).
+
+You can also place test orders on a live merchant with its test key. See [Test merchant](/merchants/test-merchant).
+
+---
+
+## Limits
+
+- Apple Pay and Google Pay are not offered through Airwallex on the checkout yet. Use [Apple Pay and Google Pay](/merchants/apple-pay-google-pay) on a merchant that supports them.
+- The buyer is always charged in the checkout's currency. Airwallex settles it to your account according to your Airwallex settings.

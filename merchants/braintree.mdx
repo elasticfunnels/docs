@@ -1,0 +1,121 @@
+---
+title: 'Braintree'
+description: 'Take card payments on your checkout through your Braintree account, with one-click upsells, subscription renewals, refunds and chargeback alerts.'
+---
+
+<Warning>
+**Beta.** Braintree is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Braintree can be the **card merchant** of a domain or funnel, the same way Stripe, NMI or Authorize.Net are. The buyer types the card into fields that Braintree serves inside your checkout page, so the card number never passes through ElasticFunnels. Braintree returns a one-time token, and ElasticFunnels charges that.
+
+With a Braintree merchant you get:
+
+- card payments on the checkout, with order bumps,
+- **one-click upsells** charged to the saved card,
+- **subscription renewals** charged automatically, marked as recurring so issuers treat them as the buyer agreed,
+- full and partial **refunds** and voids from the order page,
+- **chargebacks** reported to your dashboard through a Braintree webhook.
+
+<Note>
+PayPal through Braintree, Apple Pay and Google Pay are not part of the Braintree merchant yet. For PayPal, add a separate [PayPal merchant](/merchants/paypal) to the checkout.
+</Note>
+
+---
+
+## Before you start
+
+You need:
+
+1. A **Braintree** account. For testing, a free [Braintree sandbox](https://www.braintreepayments.com/sandbox) works without any approval.
+2. Access to the Braintree **Control Panel** for that account, to copy the keys below.
+
+---
+
+## Step 1: find your keys in Braintree
+
+Open the Braintree Control Panel. Every key is under the **gear icon** at the top right.
+
+| Field in ElasticFunnels | Where it is in Braintree |
+|---|---|
+| **Merchant ID** | Gear icon → **Business**, shown at the top of the page |
+| **Public Key** | Gear icon → **API** → **API Keys** |
+| **Private Key** | Gear icon → **API** → **API Keys**, click **View** next to the key |
+| **Tokenization Key** | Gear icon → **API** → **Tokenization Keys**, click **Generate New Tokenization Key** if the list is empty |
+| **Merchant Account ID** (optional) | Gear icon → **Business** → **Merchant Accounts**. Leave it empty to use the default account |
+
+The tokenization key starts with `sandbox_` on a sandbox account and `production_` on a live one. It is a public key: it lets the checkout page turn a card into a token, and nothing else.
+
+<Tip>
+Each Braintree merchant account settles in one currency. If you sell in more than one currency, create one ElasticFunnels merchant per Braintree merchant account and put its ID in **Merchant Account ID**. A charge in a currency the account does not settle in is voided at once and the buyer sees a payment error.
+</Tip>
+
+---
+
+## Step 2: add the Braintree merchant
+
+1. Go to **Merchants** → **Add Merchant** and choose **Braintree**.
+2. Paste the five values. Sandbox and Live keys have their own fields, and the **Mode** toggle decides which set is used.
+3. Pick the **checkout page** this merchant charges on.
+4. Save.
+
+When you save, ElasticFunnels sends a test call to Braintree with the keys of the selected mode. If Braintree refuses them, the form tells you which field to check and nothing is saved.
+
+Then attach the merchant to a domain or funnel, as for any card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+---
+
+## Step 3: add the webhook in Braintree
+
+Braintree has no way for ElasticFunnels to create the webhook for you, so this step is manual.
+
+1. Open the Braintree merchant in ElasticFunnels again. Below the keys, the form shows your **Webhook URL**. Copy it.
+2. In the Braintree Control Panel, go to gear icon → **API** → **Webhooks** → **Create new webhook**.
+3. Paste the URL and tick **Dispute Opened** and **Transaction Settlement Declined**.
+4. Click **Create Webhook**, then **Check URL** to confirm Braintree reaches it.
+
+With the webhook in place, a chargeback opened on a Braintree payment shows on the order and in your reports, and a bank payment that fails to settle is marked as voided.
+
+<Warning>
+Refunds made inside the Braintree Control Panel do not reach ElasticFunnels, because Braintree sends no webhook for them. Refund from the order page in ElasticFunnels instead, so your reports stay right.
+</Warning>
+
+---
+
+## What the buyer sees
+
+The card panel on your checkout shows three fields (card number, expiry date and security code) served by Braintree. They look like the rest of the form. When the buyer clicks the submit button, the card is checked and turned into a token in the browser, and the order goes through as with any other card merchant.
+
+A declined card keeps the buyer on the checkout with a message to try another card.
+
+---
+
+## One-click upsells and renewals
+
+On the first payment, the card is saved in your Braintree vault. Later charges use that saved card:
+
+- **Upsells** after the checkout are charged in one click, without the buyer typing the card again.
+- **Subscription renewals** are charged on schedule and flagged to Braintree as recurring payments the buyer set up.
+
+Saved cards stay in your own Braintree account. You can see them in the Control Panel under **Vault**.
+
+---
+
+## Refunds and voids
+
+Refund from the order page in ElasticFunnels.
+
+- A payment that has **not settled yet** (usually the same day) can only be cancelled in full. ElasticFunnels voids it, and the buyer is never charged.
+- A **settled** payment can be refunded in full or in part. Partial refunds work only after settlement. Before that, the app asks you to refund the full amount or wait.
+
+---
+
+## Testing with the Braintree sandbox
+
+1. Create a sandbox account and put its keys in the **sandbox** fields.
+2. Set **Mode** to **Sandbox**, or keep Live and use the merchant's test key: see [Test merchant](/merchants/test-merchant).
+3. Pay on your checkout with Braintree's test card `4111 1111 1111 1111`, any future expiry date and any 3-digit code.
+
+To test a decline, use an order total between **2000.00 and 2999.99**: the sandbox declines it with that code (for example 2001.00 is "Insufficient Funds").
+
+Sandbox payments are recorded as **test** orders.
