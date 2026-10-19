@@ -51,9 +51,23 @@ event sends it, and which [variables](/emails/template-variables) it can use.
 | Courses | Course enrollment, Course login link, Course comment | A student is enrolled, asks for a sign-in link, or gets a reply to a lesson comment. See [Course Emails](/emails/course-emails). |
 | Custom | From automation, General | An automation step or a campaign sends it. A General template has no event of its own. |
 
-Your brand has a **Default** template for the standard events. You can edit a default, and you can
-duplicate it to make a variant (a different receipt for one merchant, for example), but you cannot
-delete it.
+Your brand gets a **Default** template for each standard event when it first needs one, not when the
+brand is created:
+
+- **Orders** and **Subscriptions**: when you add the first merchant whose payments run through
+  ElasticFunnels (NMI, Stripe, PayPal, Authorize.Net, Klarna, or a Test merchant). BuyGoods,
+  ClickBank, JVZoo, Digistore24 and Shopify send their own receipts, so they do not add them.
+- **Members and login**: when you set up the members login (the sign-in method, or a page that
+  requires login), or create a course.
+- **Courses**: when you create your first course.
+
+If an email has to go out before its default exists (a shipped email for a network merchant with
+fulfillment, for example), the default is created at that moment and the email is sent. You can
+edit a default, and you can duplicate it to make a variant (a different receipt for one merchant,
+for example), but you cannot delete it.
+
+Card expiring, Final dunning and Refund request have templates, but no event sends them yet. New
+brands do not get them; brands that already have them keep them.
 
 ## Is a template in use?
 

@@ -71,7 +71,8 @@ The `renewal-failed` template uses the `subscription.retry_count` variable to es
 ## Dunning final notice
 {/* SCREENSHOT: Dunning final notice · email editor or template settings · desktop */}
 
-The `dunning-final` template is sent as a last resort before cancellation. It features:
+The `dunning-final` template is meant as a last notice before cancellation, but no event sends it
+yet, and new brands do not get it. Brands that already have it can edit it. It features:
 
 - A red "Final Notice" banner
 - Bold "Pending Cancellation" status
