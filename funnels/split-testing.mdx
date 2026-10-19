@@ -76,7 +76,7 @@ Open **Manage Page Events** for the page. A component split test is always the s
 
 ```mermaid
 flowchart LR
-  E[Loaded] --> CST[Component Split Test<br/>container: headline-test<br/>value: 2]
+  E[On Page Load] --> CST[Component Split Test<br/>container: headline-test<br/>value: 2]
   CST -->|Output 1| W1[Traffic Distribution<br/>50%]
   CST -->|Output 2| W2[Traffic Distribution<br/>50%]
   W1 --> C1[Component<br/>headline-variant-a<br/>baseline]
@@ -138,7 +138,7 @@ Field-by-field detail: [Node Reference → Split testing](/funnels/page-events-n
 
 **Page Events**
 
-1. **Loaded** → **Component Split Test**
+1. **On Page Load** → **Component Split Test**
    - Container: `Headline Test`
    - Total Variants: `2`
    - Name: `Headline — hero`
