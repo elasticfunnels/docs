@@ -1,73 +1,66 @@
 ---
 title: 'Subscription Analytics'
-description: 'Monitor MRR, churn, cohort LTV, and dunning recovery from the subscription analytics dashboard'
+description: 'Track MRR, churn, cohort LTV and dunning recovery with the Subscriptions dashboard preset and cards'
 ---
 
-The subscription analytics dashboard shows recurring revenue, churn, retention, dunning recovery, and customer lifetime value. Navigate to **Reports** → **Subscription Analytics** in the sidebar.
+Subscription analytics live in your dashboards. There is no separate Subscription Analytics page: you build a dashboard from the **Subscriptions** preset, or add the subscription cards to any dashboard you already have.
 
-## Summary Cards
-{/* SCREENSHOT: Summary Cards · subscriptions list, drawer, or settings panel · desktop */}
+## Create the Subscriptions dashboard
+{/* SCREENSHOT: Dashboard → Create dashboard → preset picker with Subscriptions selected · desktop */}
 
-The top of the dashboard shows four key metrics:
+1. Open **Dashboard** and click **Create dashboard**.
+2. Choose **Start from a preset** and pick **Subscriptions**.
+3. Save. The dashboard opens with the KPI tiles and cards described below.
+
+To add a single card to another dashboard, open the dashboard builder and pick it from the **Subscriptions** category.
+
+## KPI tiles
+{/* SCREENSHOT: Subscriptions preset, KPI tile row · desktop */}
 
 <CardGroup cols={2}>
   <Card title="MRR" icon="chart-line">
-    Monthly Recurring Revenue — the total of all active subscription amounts, normalized to a monthly value.
+    Monthly recurring revenue: the amounts of your running subscriptions, each converted to a monthly value from its billing interval.
   </Card>
   <Card title="Active Subscribers" icon="users">
-    The current count of subscriptions with an active status.
+    How many subscriptions are running and have not been canceled.
   </Card>
   <Card title="Churn Rate" icon="arrow-trend-down">
-    The percentage of subscriptions that canceled in the last 30 days relative to the active base.
+    Canceled subscriptions as a share of the active base.
   </Card>
   <Card title="Avg Customer LTV" icon="money-bill-trend-up">
-    Average lifetime revenue per subscriber across all subscription customers.
+    Average revenue per subscription customer over their lifetime.
+  </Card>
+  <Card title="Net Revenue Retention" icon="arrows-rotate">
+    Recurring revenue kept from existing subscribers, counting upgrades and downgrades.
+  </Card>
+  <Card title="Gross Revenue Retention" icon="shield">
+    Recurring revenue kept from existing subscribers, without counting upgrades.
   </Card>
 </CardGroup>
 
-## MRR Trend
-{/* SCREENSHOT: MRR Trend · subscriptions list, drawer, or settings panel · desktop */}
+## Cards
 
-A line chart showing Monthly Recurring Revenue over time. Each data point represents the total subscription revenue for that month. Use this to track growth trends and spot seasonal patterns.
-
-## Churn Trend
-{/* SCREENSHOT: Churn Trend · subscriptions list, drawer, or settings panel · desktop */}
-
-A dual-series chart with two lines:
-
-- **New Subscriptions** — Count of new subscription purchases per month
-- **Cancellations** — Count of subscription cancellations per month
-
-When cancellations consistently exceed new subscriptions, your subscriber base is shrinking.
-
-## Cohort LTV
-{/* SCREENSHOT: Cohort LTV · subscriptions list, drawer, or settings panel · desktop */}
-
-A heatmap table showing cumulative revenue by acquisition month over a 12-month horizon. Each row is a cohort (customers who first subscribed that month), and each column shows their cumulative revenue at month 1, 2, 3, and so on.
+| Card | What it shows |
+|------|---------------|
+| **MRR Trend** | Subscription revenue collected per month, so you can see growth and seasonal dips. |
+| **Churn vs New Subscribers** | New subscriptions and cancellations per month. When cancellations stay above new subscriptions, your base is shrinking. |
+| **Cohort LTV** | Cumulative revenue per acquisition month over 12 months. Each row is the group of customers who first subscribed that month. |
+| **Dunning Recovery** | Subscriptions saved by failed-payment retries, subscriptions lost, and the recovery rate. |
+| **Payment Health** | Renewal fail rate, recovery rate and chargeback ratio. |
+| **Retention Curves** | The share of each cohort still subscribed month by month. |
+| **Decline Reasons** | Why renewal charges were declined. |
+| **Cancel Reasons** | The reasons buyers and agents gave when they canceled, from the members area and the Call Center cancel flow. |
+| **Net Revenue Retention** | NRR over time, showing expansion against contraction. |
+| **Subscription KPIs** | Active subscriptions, MRR, churn rate and average LTV in one card. |
 
 <Tip>
-Cohort analysis reveals retention problems 3–4 months earlier than aggregate churn metrics. If you see a cohort's revenue flatten early compared to others, investigate what changed in your offer or onboarding during that period.
+Cohort LTV shows retention problems earlier than the churn rate does. If one cohort's revenue flattens sooner than the others, look at what changed in your offer or onboarding that month.
 </Tip>
 
-## Dunning Recovery
-{/* SCREENSHOT: Dunning Recovery · subscriptions list, drawer, or settings panel · desktop */}
-
-Recovery metrics for the failed payment retry system:
-
-- **Recovered** — Subscriptions that were in dunning and successfully re-charged
-- **Lost** — Subscriptions that exhausted all retry attempts and were canceled
-- **Recovery Rate** — Recovered ÷ (Recovered + Lost) as a percentage
-
 <Info>
-A recovery rate below 50% usually means your dunning emails need work or your retry timing should be adjusted. See [Subscription Emails & Dunning](/subscriptions/emails-and-dunning) for configuration.
+To tune the failed-payment retries behind Dunning Recovery, see [Subscription Emails & Dunning](/subscriptions/emails-and-dunning).
 </Info>
 
 ## Filters
-{/* SCREENSHOT: Filters · subscriptions list, drawer, or settings panel · desktop */}
 
-All charts and metrics can be filtered by:
-
-- **Date range** — Analyze a specific time period
-- **Merchant** — Focus on a single merchant
-- **Product** — Filter by product code
-- **Show test** — Include or exclude test transactions
+The dashboard's date range applies to every card, and the merchant and product filters narrow the subscription figures to one merchant or product.
