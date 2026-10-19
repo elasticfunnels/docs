@@ -201,6 +201,7 @@
                 "group": "Email & CRM",
                 "pages": [
                   "integrations/email-marketing",
+                  "integrations/maropost",
                   "integrations/crm"
                 ]
               },
