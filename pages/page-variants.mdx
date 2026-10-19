@@ -82,7 +82,7 @@ To split traffic between variants at one URL:
 
 ```mermaid
 flowchart LR
-  E[Loaded] --> ST[Split Test<br/>value: 2]
+  E[On Page Load] --> ST[Split Test<br/>value: 2]
   ST -->|Output 1| W1[Traffic Distribution 50%]
   ST -->|Output 2| W2[Traffic Distribution 50%]
   W1 --> P1[Load Another Page<br/>V1]

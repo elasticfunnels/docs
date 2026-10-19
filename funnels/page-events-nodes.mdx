@@ -63,7 +63,7 @@ The builder enforces four connection rules. If a connection is rejected, one of 
 
 | Node | Type | In / Out | Runs on |
 |------|------|----------|---------|
-| Loaded (entry) | `entry` | 0 / 1 | Server + Browser |
+| On Page Load (entry) | `entry` | 0 / 1 | Server + Browser |
 | Router | `router` | 1 / 1 | Server |
 | Sequence | `sequence` | 1 / 2+ | Server + Browser |
 | Stop Next Events Execution | `stop_execution` | 1 / 0 | Server + Browser |
@@ -133,7 +133,7 @@ The builder enforces four connection rules. If a connection is rejected, one of 
 
 ## Entry & flow control
 
-### Loaded (entry point)
+### On Page Load (entry point)
 
 **Type** `entry` · **0 in / 1 out** · Server + Browser
 
