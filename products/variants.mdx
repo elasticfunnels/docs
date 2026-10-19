@@ -1,174 +1,387 @@
 ---
 title: 'Product Variants'
-description: 'Manage product variants: define variant axes (Color, Size), configure option values, set per-variant pricing, and assign variant attributes'
+description: 'Sell one product in several versions (color, size, pack): set up options, create every combination in one click, choose own price or another product per variant, build a picker on your page and see the choice on the order.'
 ---
 
-Product variants let you sell multiple versions of a product (e.g., different sizes or colors) under a single product record, each with its own price and code.
+A variant is one version of a product that a buyer picks before buying: Black in size M9/W10, or Green in M12/W13. You add the choices once (Color, Size), the app creates one variant per combination, and each variant has a code your pages, cart, checkout and orders understand.
+
+<Warning>
+**What works today and what needs the next release.** Today you can define options and variants, show them on a page (`product.variants`) and sell variants set to **Sells another product**. The new Variants tab described below (options on the product, **Create all combinations**, bulk price, **Fill empty codes**), buying an **Own price** variant by its own code, and the variant on the order (order drawer, export, `variant_label` on thank-you pages) ship with the sellable variants update, which is **not deployed yet**. Until then, sell each choice as a linked product.
+</Warning>
+
+Prices and product details (title, price, retail price, image, units, stock) always come from the product and variant records, never typed into a page. A variant's own value wins; a blank field takes the value from the linked product, and an own-price variant falls back to the product it belongs to.
 
 ---
 
-## How Variants Work
-{/* SCREENSHOT: How Variants Work · product form, builder panel, or checkout example · desktop */}
+## Own price or Sells another product
 
-Variants are built from **Variant Options** — brand-level axis definitions (e.g., "Color", "Size"). On the product, you select which options apply, then define each combination as an individual variant row.
+Every variant row has a **Sells as** choice.
 
----
-
-## Linking a Variant to an Existing Product
-
-A variant normally **points at a product you already have** rather than owning its own
-commercial data. Set **Linked product** on the variant row and everything downstream —
-SKU, inventory, fulfilment, payouts, `merchant_product_ids`, postback matching — keeps
-resolving through that product's code, exactly as it did before.
-
-This is the difference from Shopify, and it is deliberate. In ElasticFunnels the product
-code is the identity the whole system is keyed on, so a variant that owned a separate
-price and SKU would need all of that duplicated. Linking keeps one source of truth:
-
-- **The variant** is presentation — which option values it represents, what order it
-  appears in, which one is selected by default.
-- **The linked product** stays the sellable thing, unchanged.
-
-### Worked example: pack sizes
-
-A supplement sold as 1, 3 and 6-bottle packs, where each pack is already its own product:
-
-| Variant | Option value | Linked product | Resolves to |
+| Sells as | What the buyer gets | Use it when | Code on the order |
 |---|---|---|---|
-| 1 | `Pack size: 1 Bottle` | `sleep-gummies-1` | $69.00 |
-| 2 | `Pack size: 3 Bottles` | `sleep-gummies-3` | $177.00 |
-| 3 | `Pack size: 6 Bottles` | `sleep-gummies-6` | $294.00 |
+| **Own price** | This product, with the variant's own code, price and SKU | The choice is a version of this product: a color, a size, a flavor | The product's code, plus the variant (`variant_code`, `variant_label`) |
+| **Sells another product** | A product you already created, with its code, price and stock | Each choice already exists as its own product, like 1, 3 or 6-bottle packs | The other product's code |
 
-The dashboard product list shows one **Acme Sleep Gummies** row instead of three, the storefront
-renders one page with a picker, and add-to-cart still submits `sleep-gummies-3`.
+Leave **Price** blank on an own-price variant to use the product's price. Fill it only when that version costs more or less.
+
+---
+
+## Set up Color and Size
+
+{/* SCREENSHOT: Product Variants tab · step 1 options with Color and Size values, step 2 table after Create all combinations · desktop 1440px */}
+
+1. Open **Settings → Products**, open the product and go to the **Variants** tab.
+2. Under **1. What the buyer chooses**, click **Add option**. Type the **Option name** (`Color`) and its **Values**: type one and press Enter, or paste a list separated by commas (`Black, Navy, Green, Gray, Red`).
+3. Click **Add option** again for `Size` and paste every size.
+4. Under **2. Variants, one per combination**, click **Create all combinations**. The button shows how many it will make (5 colors x 11 sizes = 55) and skips combinations that already exist.
+5. Optional: type a **Price for all** and click **Apply to own-price variants**. Leave it empty to keep the product's price.
+6. Click **Fill empty codes**. Codes are built from the product code and the values, for example `KNS-3-GREEN-M12W13`. You can edit any of them.
+7. Pick the **Default** variant (selected when the buyer has not chosen yet) and click **Save**.
+
+Saved options under **Settings → Products → Variant options** are shortcuts: they show as buttons next to **Add option** and copy their name and values onto the product.
+
+Each variant code must be unique in your project. Saving refuses a code used by another variant of the product, by any product, or by another product's variant.
+
+---
+
+## Worked example: massage insoles
+
+Kneadstep sells massage insoles in 5 colors and 11 shoe sizes, as 1, 2, 3 or 5-pair packs. The packs stay four products, so pack prices, free gifts and upsells keep working per pack. Each pack has one own-price variant per color and size, with the price left blank so it uses the pack price.
+
+**Products (one per pack)**
+
+| Product code | Title | Price | Retail price | Units |
+|---|---|---|---|---|
+| `KNS-1` | Kneadstep Massage Insoles, 1 pair | $39 | $59 | 1 |
+| `KNS-2` | Kneadstep Massage Insoles, 2 pairs | $69 | $118 | 2 |
+| `KNS-3` | Kneadstep Massage Insoles, 3 pairs | $89 | $177 | 3 |
+| `KNS-5` | Kneadstep Massage Insoles, 5 pairs | $129 | $295 | 5 |
+
+**Options (the same on each pack)**
+
+| Option | Values |
+|---|---|
+| Color | Black, Navy, Green, Gray, Red |
+| Size | M6/W7, M7/W8, M8/W9, M9/W10, M10/W11, M11/W12, M12/W13, M13/W14, M14/W15, M15/W16, M16/W17 |
+
+**Variants (55 per pack, made with Create all combinations)**
+
+| Variant code | Color | Size | Sells as | Price |
+|---|---|---|---|---|
+| `KNS-3-BLACK-M6W7` | Black | M6/W7 | Own price | blank, so $89 from `KNS-3` |
+| `KNS-3-GREEN-M12W13` | Green | M12/W13 | Own price | blank, so $89 |
+| `KNS-3-RED-M16W17` | Red | M16/W17 | Own price | $95 (bigger sizes cost more) |
+
+That is 4 products and 220 variants, made in four clicks of **Create all combinations**. A buyer who picks Green, M12/W13 and the 3-pair pack buys `KNS-3-GREEN-M12W13`: the order line is `KNS-3` with `Color: Green, Size: M12/W13`, and stock is taken from that variant.
 
 <Note>
-Leave **Linked product** empty for a standalone variant that carries its own price, SKU
-and inventory. Mixing both styles on one product is supported — each variant resolves
-independently.
+One order line is one variant. A 3-pair pack with three different sizes is not supported yet: sell it as three lines, or ask the buyer to order one pack per size.
 </Note>
 
-### Field resolution order
+---
 
-For every commercial field the variant's own value wins when set, and the linked
-product fills in the rest:
+## What a page gets
 
+`getProduct(code)` and `getProducts(...)` return the product with:
+
+- `product_fields`: the options in order, each `{ name, options }` (`options` is the list of values).
+- `variants`: one entry per variant, sorted by position, exactly one with `is_default: true`.
+
+| Field | Notes |
+|---|---|
+| `code` | What you add to the cart or put in a buy link. For **Sells another product** it is the other product's code. |
+| `option_values` | `{ "Color": "Green", "Size": "M12/W13" }`, keyed by option name. |
+| `title` | The values joined with ` / `, e.g. `Green / M12/W13`. |
+| `price`, `retail_price`, `image`, `sku`, `units` | The variant's own value, else the linked product's, else the product's. |
+| `per_unit_price` | `price / units`, or `null` without units. |
+| `on_sale` | `true` when `retail_price` is more than `price`. |
+| `linked_product_id`, `linked_product_code` | Set for **Sells another product**, `null` for own price. |
+
+`getProduct('KNS-3-GREEN-M12W13')` (a variant's own code) returns the **pack** with that variant on top: `code` is the variant code, `price`, `image` and `sku` are the variant's, `parent_code` is `KNS-3`, and `variant` holds `{ id, code, title, label, option_values }`.
+
+---
+
+## Product page: color, size and pack picker
+
+A complete page for the insole example. It reads every price and name from the four pack products, lets the buyer pick a color, a size and a pack, then adds that exact variant to the cart or opens the checkout. Without JavaScript it shows one plain list of every pack, color and size that goes straight to checkout.
+
+The backend script at the top starts the page on the variant in the URL (`?v=KNS-3-GREEN-M12W13` or `?p=`), using `resolveVariant(product, code)` when the code belongs to the main product, and the default variant otherwise.
+
+```html
+<script scope="backend">
+  // Start on the variant in the URL: ?v=KNS-3-GREEN-M12W13 (or ?p=), else the default.
+  var main = getProduct('KNS-1');
+  var code = request.query.v || request.query.p || null;
+  var picked = code ? getProduct(code) : null;        // a variant code resolves to its pack
+  var start = picked && picked.variant ? picked.variant : resolveVariant(main, code);
+  setVariable('start_pack', picked && picked.parent_code ? picked.parent_code : main.code);
+  setVariable('start_options', start ? start.option_values : {});
+</script>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+@set(main = getProduct('KNS-1'))
+<title>{{ main.title }}</title>
+<meta name="description" content="Pick a color, a size and a pack.">
+<style>
+  .vp { max-width: 560px; margin: 32px auto; font: 16px/1.5 system-ui, sans-serif; padding: 0 16px; }
+  .vp-group { margin: 0 0 20px; }
+  .vp-label { font-weight: 600; margin: 0 0 8px; }
+  .vp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .vp-chip { border: 1px solid #c9ced6; background: #fff; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+  .vp-chip.is-on { border-color: #1b2a41; box-shadow: 0 0 0 1px #1b2a41; }
+  .vp-dot { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; border: 1px solid #0002; }
+  .vp-dot--black { background: #222; } .vp-dot--navy { background: #1f2f5c; } .vp-dot--gray { background: #8a8f98; }
+  .vp-dot--green { background: #2f8a4c; } .vp-dot--red { background: #c63b2f; }
+  .vp-pack { display: flex; justify-content: space-between; gap: 12px; border: 1px solid #c9ced6; border-radius: 8px; padding: 12px; margin: 0 0 8px; cursor: pointer; }
+  .vp-pack.is-on { border-color: #1b2a41; box-shadow: 0 0 0 1px #1b2a41; }
+  .vp-price { font-size: 22px; font-weight: 700; margin: 8px 0 16px; }
+  .vp-actions { display: flex; gap: 8px; }
+  .vp-btn { flex: 1; text-align: center; padding: 12px; border-radius: 8px; border: 0; background: #1b2a41; color: #fff; font-size: 16px; text-decoration: none; cursor: pointer; }
+  .vp-btn--alt { background: #f2a100; color: #1b1b1b; }
+  .vp-btn:disabled { opacity: .5; cursor: not-allowed; }
+  /* Without JavaScript only the plain form shows; with it, only the picker. */
+  .vp:not(.vp-live) .vp-picker { display: none; }
+  .vp.vp-live .vp-fallback { display: none; }
+</style>
+</head>
+<body>
+{{-- Each pack is its own product (KNS-1, KNS-2, KNS-3, KNS-5) with one variant per Color x Size.
+     Prices, names and images come from those records, never from this page. --}}
+@set(packs = getProducts({ codes: 'KNS-1,KNS-2,KNS-3,KNS-5', show_in_frontend: 'any' }))
+
+<script>
+  window.efScope = window.efScope || {};
+  window.efScope.vp = {
+    pack: {{ start_pack | json }},
+    sel: {{ start_options | json }},
+    currency: {{ main.currency | json }},
+    // Every sellable code: pack, option values and the variant's own record values.
+    variants: [
+      @foreach(pack in packs)
+        @foreach(v in pack.variants)
+          { pack: {{ pack.code | json }}, code: {{ v.code | json }}, options: {{ v.option_values | json }},
+            price: {{ v.price | json }}, name: {{ pack.title | json }}, title: {{ v.title | json }}, isDefault: {{ v.is_default | json }} },
+        @endforeach
+      @endforeach
+    ],
+    set: function (name, value) { this.sel[name] = value; },
+    on: function (name, value) { return this.sel[name] === value ? 'is-on' : ''; },
+    current: function () {
+      var self = this;
+      return this.variants.filter(function (v) {
+        if (v.pack !== self.pack) return false;
+        return Object.keys(self.sel).every(function (k) { return v.options[k] === self.sel[k]; });
+      })[0] || null;
+    },
+    code: function () { var v = this.current(); return v ? v.code : ''; },
+    buyUrl: function () { var c = this.code(); return c ? '/b?p=' + encodeURIComponent(c) : '#'; },
+    priceText: function () {
+      var v = this.current();
+      if (!v || v.price == null) return '';
+      return new Intl.NumberFormat(undefined, { style: 'currency', currency: this.currency }).format(v.price);
+    },
+    add: function () {
+      var v = this.current();
+      if (v) window.ef.addToCart(v.code, { price: v.price, name: v.name + ' - ' + v.title, currency: this.currency });
+    }
+  };
+</script>
+
+<div class="vp" :class="'vp-live'">
+  <h1>{{ main.title }}</h1>
+
+  <div class="vp-picker">
+    @foreach(field in main.product_fields)
+      <div class="vp-group">
+        <p class="vp-label">{{ field.name }}: <span data-ef-text='vp.sel[{{ field.name | json }}]'></span></p>
+        <div class="vp-chips">
+          @foreach(value in field.options)
+            <button type="button" class="vp-chip" data-name="{{ field.name }}" data-value="{{ value }}"
+                    :class='vp.on({{ field.name | json }}, {{ value | json }})'
+                    @click="vp.set($el.dataset.name, $el.dataset.value)">
+              @if(field.name eq 'Color')<span class="vp-dot vp-dot--{{ value | lower }}"></span>@endif{{ value }}
+            </button>
+          @endforeach
+        </div>
+      </div>
+    @endforeach
+
+    <div class="vp-group">
+      <p class="vp-label">Pack</p>
+      @foreach(pack in packs)
+        <label class="vp-pack" :class='vp.pack === {{ pack.code | json }} ? "is-on" : ""'>
+          <span>
+            <input type="radio" name="vp_pack" value="{{ pack.code }}"
+                   :checked='vp.pack === {{ pack.code | json }}' @click="vp.pack = $el.value">
+            {{ pack.title }}
+          </span>
+          <strong>{{ pack.price | currency:pack.currency }}</strong>
+        </label>
+      @endforeach
+    </div>
+
+    <p class="vp-price" data-ef-text="vp.priceText()"></p>
+
+    <div class="vp-actions">
+      <button type="button" class="vp-btn" :disabled="!vp.code()" @click="vp.add()">Add to cart</button>
+      <a class="vp-btn vp-btn--alt" href="/b?p={{ main.code }}" :href="vp.buyUrl()">Buy now</a>
+    </div>
+  </div>
+
+  {{-- No JavaScript: one plain list of every pack, color and size, straight to checkout. --}}
+  <form class="vp-fallback" method="get" action="/b">
+    <label for="vp-p">Pack, color and size</label>
+    <select id="vp-p" name="p">
+      @foreach(pack in packs)
+        <optgroup label="{{ pack.title }}">
+          @foreach(v in pack.variants)
+            <option value="{{ v.code }}">{{ v.title }} - {{ v.price | currency:pack.currency }}</option>
+          @endforeach
+        </optgroup>
+      @endforeach
+    </select>
+    <button type="submit" class="vp-btn">Buy now</button>
+  </form>
+</div>
+
+</body>
+</html>
 ```
-price          variant.price          -> linked product.price
-retail_price   variant.retail_price   -> linked product.retail_price
-sku            variant.sku            -> linked product.sku
-units          variant.units          -> linked product.units
-image          variant.image          -> linked product.image
-code           variant.code           -> linked product.code -> variant id
+
+How the pieces fit:
+
+- `@set(packs = getProducts({ codes: '...', show_in_frontend: 'any' }))` loads the four packs in one call. `show_in_frontend: 'any'` also returns packs you hid from shop listings.
+- The `<script>` puts a compact list of every variant on `window.efScope.vp`; the helpers (`current`, `code`, `buyUrl`, `priceText`, `add`) live on that object, so bindings stay free of `;`.
+- Option buttons pass their name and value through `data-*` attributes and `$el.dataset`. Values are printed into attributes, never `[[ ]]` inside an attribute.
+- **Add to cart** calls `window.ef.addToCart(code, { price, name, currency })` with the variant's record values; the cart re-prices every line from the catalog anyway.
+- **Buy now** is a buy link to `/b?p=<variant code>`.
+
+### Other ways to send the choice
+
+```html
+<!-- A fixed variant, as a buy link (the [BUY=] shortcode works too) -->
+<a href="/b?p=KNS-3-GREEN-M12W13">Buy 3 pairs, Green, M12/W13</a>
+<a href="[BUY=KNS-3-GREEN-M12W13]">Buy 3 pairs, Green, M12/W13</a>
+
+<!-- A fixed variant, as an add-to-cart button -->
+<button data-ef-add-to-cart data-product-code="KNS-3-GREEN-M12W13">Add to cart</button>
 ```
 
 ---
 
-## Default Variant
+## Checkout: pack selector that keeps the color and size
 
-Every product with variants has exactly **one** default — the variant used when no
-selection is made. If you do not flag one, the lowest **Position** wins. This guarantees
-a product can always be added to a cart without an explicit choice.
+The product page sends the buyer to `/b?p=KNS-3-GREEN-M12W13`. On the checkout, a [package selector](/checkouts/package-selector) lets them switch between 1, 2, 3 and 5 pairs. Each row must sell the **same color and size** in another pack, so the rows are built from the variant in `?p=`:
+
+```html
+<script scope="backend">
+  // The color and size come from the variant in ?p= (sent by the product page).
+  // Every pack row below sells that same color and size, so switching packs keeps them.
+  var chosen = getProduct(request.query.p || 'KNS-1');
+  var start = chosen && chosen.variant ? chosen.variant : resolveVariant(chosen, null);
+  var want = start ? start.option_values : {};
+  var packCodes = ['KNS-1', 'KNS-2', 'KNS-3', 'KNS-5'];
+  var rows = [];
+  for (var i = 0; i < packCodes.length; i++) {
+    var pack = getProduct(packCodes[i]);
+    if (!pack || !pack.variants) continue;
+    for (var j = 0; j < pack.variants.length; j++) {
+      var v = pack.variants[j];
+      if (v.option_values.Color === want.Color && v.option_values.Size === want.Size) {
+        rows.push({
+          code: v.code,
+          name: pack.title + ' - ' + v.title,
+          price: v.price,
+          retail_price: v.retail_price,
+          image: v.image || '',
+          currency: pack.currency
+        });
+      }
+    }
+  }
+  setVariable('pack_rows', rows);
+  setVariable('picked_color', want.Color || '');
+  setVariable('picked_size', want.Size || '');
+</script>
+<p class="picked">Color: {{ picked_color }}, Size: {{ picked_size }}</p>
+<div class="packs" data-ef-package-group>
+  @foreach(row in pack_rows)
+    <a class="pack" href="/b?p={{ row.code }}"
+       data-ef-package="{{ row.code }}"
+       data-ef-package-price="{{ row.price }}"
+       data-ef-package-retail-price="{{ row.retail_price }}"
+       data-ef-package-name="{{ row.name }}"
+       data-ef-package-image="{{ row.image }}"
+       data-ef-package-currency="{{ row.currency }}">
+      <span class="pack-name">{{ row.name }}</span>
+      <span class="pack-price">{{ row.price | currency:row.currency }}</span>
+    </a>
+  @endforeach
+</div>
+```
+
+- Each row's `data-ef-package` is a variant code, so a switch keeps Green M12/W13 and changes only the pack. The selector marks the row matching `?p=` on first paint.
+- A `?p=` that is a pack code (`KNS-3`) starts on that pack's default variant; an unknown code renders no rows, so link to the checkout only with real codes.
+- Keep the buy link in each row's `href`: without JavaScript it still opens the checkout for that row.
+- If your checkout names its product in a backend script (`checkout_product`), list the row codes in `checkout_packages` too, see [Package selector](/checkouts/package-selector#pages-that-name-the-product-in-a-backend-script).
 
 ---
 
-## Setting Up Variant Options
-{/* SCREENSHOT: Setting Up Variant Options · product form, builder panel, or checkout example · desktop */}
+## After the purchase: thank-you page, members area, order views
 
-Before adding variants to a product, create the variant option definitions:
+Each order line stores the product (`product_sku` is the pack code, e.g. `KNS-3`) and the variant: `variant_id`, `variant_code`, `variant_sku`, `variant_title` (`Green / M12/W13`), `variant_label` (`Color: Green, Size: M12/W13`) and `variant_options` (`[{ name, value }]`).
 
-1. Go to **Settings → Products → Variant Options**
-2. Create a new option (e.g., `Color` with values: Red, Blue, Green)
-3. Repeat for each dimension (e.g., `Size` with values: S, M, L, XL)
+A thank-you or order summary prints the label under the product name:
+
+```html
+@set(orders = getSessionOrders('newest', 1))
+@if(orders.length gt 0)
+  @foreach(order in orders)
+    <p class="order-no">Order {{ order.order_number }}</p>
+    <ul class="lines">
+      @foreach(line in order.products)
+        <li class="line">
+          <span class="line-name">{{ line.name }}</span>
+          @if(line.variant_label)
+            <span class="line-options">{{ line.variant_label }}</span>
+          @endif
+          <span class="line-qty">x {{ line.quantity }}</span>
+          <span class="line-price">{{ line.price | currency:line.currency_code }}</span>
+        </li>
+      @endforeach
+    </ul>
+  @endforeach
+@else
+  <p>Your order details will appear here.</p>
+@endif
+```
+
+The same `line.variant_label` is available on the lines of `getOrder(...)` and `getOrders()` in the [members area](/members-area/order-details). In the app, the order drawer shows `Kneadstep Massage Insoles, 3 pairs (Color: Green, Size: M12/W13)`, the conversions export adds the label after the product name, and two variants of one product stay two lines.
+
+<Note>
+Right after checkout the thank-you page reads the order from the session; the variant label appears once the order line is indexed, usually within a minute. Fulfilment exports to ShipOffers, Jetpack and Shopify order sync still send the pack's SKU, not the variant's.
+</Note>
 
 ---
 
-## Adding Variants to a Product
-{/* SCREENSHOT: Adding Variants to a Product · product form, builder panel, or checkout example · desktop */}
+## Variant attributes
 
-1. Open the product and go to the **Variants** tab
-2. In **Variant Options**, check the options that apply to this product (e.g., Color and Size)
-3. In **Product Variants**, click **Add Variant** for each combination
-4. For each variant row, fill in:
-   - **Code** — Unique variant identifier
-   - **Price** — Variant-specific price
-   - One field per selected option (e.g., Color, Size)
+Product Attributes with **Applies To** set to `Variant` or `Both` get one input per variant row, managed in the app and through the API (`products/{product}/variants/{variant}/attribute-values`). Page templates cannot read per-variant attribute values yet: the `attr` filter reads the product's attributes only. See [Product Attributes](/products/product-attributes).
 
 ---
 
-## Per-Variant Pricing
-{/* SCREENSHOT: Per-Variant Pricing · product form, builder panel, or checkout example · desktop */}
+## Troubleshooting
 
-Each variant has its own **Price** field. If left blank, the product's base price is used at checkout.
+**The cart drops the code, or the buy link answers 404.** The code is not a product code and not an own-price variant code. Check the spelling in the Variants tab (codes are matched without case), check the variant is **Own price** (a **Sells another product** variant sells the other product's code), and check the sellable variants update is live on your project. A variant of a deleted product is never found.
 
----
+**The price is wrong.** A variant's own **Price** wins over everything; clear it to use the pack price. A **Sells another product** variant uses the other product's price unless you fill **Price** on the row. The checkout always charges the catalog price for the code, whatever the page shows, so fix the record, not the page.
 
-## Variant Option Values (`option_values`)
-{/* SCREENSHOT: Variant Option Values (`option_values`) · product form, builder panel, or checkout example · desktop */}
+**The page starts on the wrong variant.** The **Default** radio picks the variant used when nothing is chosen; exactly one variant is the default (if none is picked, the first row is). A `?v=` or `?p=` code in the URL wins when your page reads it, as in the picker example.
 
-Each variant stores its option selections as `option_values` — a map of option slug to selected value:
+**Saving says a code is already used.** Each own-price variant code must be unique in the project, including product codes. Use **Fill empty codes** on rows with an empty code, or edit the code.
 
-```json
-{
-  "color": "Blue",
-  "size": "M"
-}
-```
+**Create all combinations is greyed out.** Every option needs at least one value. Options without fixed values (older text options) are not combined.
 
-This map is available in the template engine as `variant.option_values`.
-
----
-
-## Variant Attributes
-{/* SCREENSHOT: Variant Attributes · product form, builder panel, or checkout example · desktop */}
-
-Product Attributes with `applies_to = variant` or `applies_to = both` can store values per variant. These appear in each variant row in the Variants tab and are managed independently.
-
-To set up variant-scoped attributes:
-1. Go to **Settings → Products → Product Attributes**
-2. Create or edit an attribute and set **Applies To** to `Variant` or `Both`
-3. Open any product → Variants tab — variant rows will include inputs for these attributes
-
-See [Product Attributes](/products/product-attributes) for full documentation on the attribute system.
-
----
-
-## Template Access
-{/* SCREENSHOT: Template Access · product form, builder panel, or checkout example · desktop */}
-
-Variants are available on the product object:
-
-```
-{{ product.variants }}
-```
-
-Each variant object:
-
-```
-{{ variant.code }}
-{{ variant.price | formatPrice:product.currency }}
-{{ variant.option_values.color }}
-{{ variant.option_values.size }}
-```
-
-### Displaying All Variants
-
-```
-{% for variant in product.variants %}
-  <option value="{{ variant.id }}" data-price="{{ variant.price }}">
-    {{ variant.option_values.color }} / {{ variant.option_values.size }}
-    — {{ variant.price | formatPrice:product.currency }}
-  </option>
-{% endfor %}
-```
-
-### Accessing Variant Attributes
-
-```
-{% set variantAttrDefs = getProductAttributes({ applies_to: 'variant' }) %}
-{% for variant in product.variants %}
-  {% for def in variantAttrDefs %}
-    {{ def.name }}: {{ variant | attr:def.slug }}
-  {% endfor %}
-{% endfor %}
-```
