@@ -1,0 +1,26 @@
+{
+  "out": "images/products/folders-tree.png",
+  "alt": "The Products screen with the folder tree under Products: All products, a folder with two subfolders, and the folder's products on the right",
+  "capture": {
+    "path": "/{brand}/products?tab=products&folder_id=1",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid=\"list.row\"]",
+    "actions": [
+      { "click": "[data-folder-id=\"1\"] [data-testid=\"products.folder-nav.tree.select\"]" },
+      { "wait": 400 },
+      { "hover": "[data-folder-id=\"4\"] [data-testid=\"products.folder-nav.tree.select\"]" },
+      { "wait": 300 }
+    ],
+    "crop": { "x": 257, "y": 60, "width": 1183, "height": 400 },
+    "hide": [".toast"]
+  },
+  "maxWidth": 900,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "[data-testid=\"products.folder-nav.new-button\"]", "title": "New folder", "text": "Adds a folder at the top level", "side": "left" },
+    { "selector": "[data-testid=\"products.folder-nav.all\"]", "title": "All products", "text": "Every product, filed or not", "side": "left" },
+    { "selector": "[data-folder-id=\"2\"] [data-testid=\"products.folder-nav.tree.select\"]", "title": "Subfolders", "text": "Folders nest to any depth", "side": "left" },
+    { "selector": "[data-folder-id=\"4\"] [data-testid=\"products.folder-nav.tree.edit\"]", "title": "Folder actions", "text": "Subfolder, edit, delete on hover", "side": "left" },
+    { "selector": "[data-testid=\"list.tab.bonus\"]", "title": "Tab counts", "text": "All, Main, Bump... count only the open folder", "side": "right" }
+  ]
+}

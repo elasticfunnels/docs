@@ -287,6 +287,7 @@
             "group": "Products & Sales",
             "pages": [
               "products/product-management",
+              "products/product-folders",
               "products/buy-links",
               "products/upsells",
               "products/subscription-upsells",
