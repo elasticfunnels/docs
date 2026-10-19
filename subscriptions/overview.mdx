@@ -70,7 +70,7 @@ Action buttons appear at the bottom of the drawer:
 - **Skip Next Charge** — Move the next scheduled billing forward by one cycle without charging now
 - **Force Bill** — Trigger an immediate charge attempt
 - **Change Date** — Set a new next billing date (opens a date picker)
-- **Reactivate** — Restart a canceled or past-due subscription
+- **Reactivate** — Restart a canceled or past-due subscription. If its next billing date has already passed, the subscription is billed on the reactivation day and the next cycle follows one billing period later. Cycles missed while it was canceled are never charged.
 - **Edit Pricing** — Adjust the recurring charge amount, shipping, and discount for the subscription
 
 <Note>
@@ -107,6 +107,12 @@ Subscription lifecycle events also appear in the main conversions list at **Repo
 - **Renewal Failed** — Failed renewal attempts
 
 Purchase conversions that are subscription renewals display a small purple **Recurring** badge. You can also use the **Subscription Only** checkbox filter to show only subscription-related conversions.
+
+## Rebills and Affiliates
+
+A rebill is credited to the affiliate who referred the original purchase, so it shows in that affiliate's reports. By default a rebill sends **no postback** to the affiliate and earns **no commission**. To pay an affiliate on renewals, open **Affiliates**, edit the affiliate and turn on **Send rebills: postbacks and commission**. From then on each successful renewal earns commission at that affiliate's rates and reaches their postbacks. First sales are not affected by this setting.
+
+Ad platforms (Meta Conversions API, Google Ads, TikTok and the other ad networks) never receive renewals, so a renewal is never reported to them as a new purchase.
 
 ## Automation Triggers
 
