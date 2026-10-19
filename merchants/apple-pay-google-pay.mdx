@@ -59,7 +59,7 @@ For more details, see [Stripe's domain registration guide](https://docs.stripe.c
 No configuration is required.
 
 1. Ensure the domain uses an **NMI** merchant.
-2. Ensure that merchant uses **tokenization** (Collect.js): in the merchant settings, tokenization mode should be **Collect.js** and the **public / tokenization key** should be set.
+2. Ensure that merchant has its **public / tokenization key** set. Live NMI merchants always take cards through Collect.js; direct card entry is only available on a sandbox merchant.
 3. Assign that NMI merchant to your checkout domain under **Settings** → **Domains** → **Edit Domain** → **Merchant**.
 
 Google Pay appears automatically on checkout when the customer is on an **Android device** with a supported browser (Chrome). It does not appear on desktop browsers.
