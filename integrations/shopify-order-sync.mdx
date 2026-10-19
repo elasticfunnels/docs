@@ -234,9 +234,8 @@ If Shopify rejects the order or does not answer, the order is tried again up to 
 
 The order and customer details stay in ElasticFunnels as part of your conversions and customer records; Shopify receives a copy to create the order. The Shopify app answers Shopify's required privacy webhooks:
 
-- **customers/data_request**: customer data export requests
-- **customers/redact**: customer data deletion requests
-- **shop/redact**: shop data deletion after the app is uninstalled
+- **customers/data_request** and **customers/redact**: acknowledged, but they do not export or delete anything in ElasticFunnels. The buyer's orders and customer record stay in your conversions and customers. To export or erase a buyer's data, contact support.
+- **shop/redact**: removes the Shopify integration after the app is uninstalled. Order history already in ElasticFunnels is kept.
 
 If you uninstall the app from Shopify, the integration is disabled and syncing stops. Orders already in Shopify stay there.
 
