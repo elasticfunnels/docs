@@ -1,6 +1,6 @@
 ---
 title: 'JVZoo'
-description: 'Sell your own product on JVZoo with ElasticFunnels pages: the three numbers of a JVZoo buy link, the JVZIPN URL and secret key, product IDs, upsells, the thank-you page and the sales pixel'
+description: 'Sell your own product on JVZoo with ElasticFunnels pages: the funnel, product and button numbers of a JVZoo buy link, the JVZIPN URL and secret key, product IDs, upsells, the thank-you page and the sales pixel'
 ---
 
 This guide connects JVZoo as a merchant, for a vendor selling their own product through JVZoo's checkout. Your pages run on ElasticFunnels; JVZoo takes the payment, runs the upsell sequence and reports each order back over JVZIPN.
@@ -30,16 +30,16 @@ Everything ElasticFunnels needs from JVZoo is in the buy link JVZoo generates fo
 ```
 https://www.jvzoo.com/b/120456/451020/99
                         ^       ^      ^
-                        funnel  product last number
+                        funnel  product button
 ```
 
 | Part | What it is | Where it goes in ElasticFunnels |
 | --- | --- | --- |
 | `120456` | Your JVZoo funnel ID. JVZIPN reports it as `funnel_id`. | **JVZoo Funnel ID** on the merchant |
 | `451020` | The product ID. Each product in the funnel has its own. | **jvzoo Product ID** on the product's Merchants tab |
-| `99` | The last number of the button link | **JVZoo Funnel ID** on the funnel's domain row |
+| `99` | The button ID, the third number | **JVZoo Button ID** on the funnel's domain row |
 
-The numbers above are examples. Two fields in ElasticFunnels carry the label **JVZoo Funnel ID**: the one on the merchant takes the **first** number, the one on the funnel's domain row takes the **last** number. ElasticFunnels builds every buy link as `/b/<merchant value>/<product ID>/<domain row value>`, so with both filled in the links match the ones JVZoo gives you.
+The numbers above are examples. The merchant's **JVZoo Funnel ID** takes the **first** number and the funnel domain row's **JVZoo Button ID** takes the **third**. ElasticFunnels builds every buy link as `/b/<JVZoo Funnel ID>/<product ID>/<JVZoo Button ID>`, so with both filled in the links match the ones JVZoo gives you.
 
 <Warning>
 Your JVZoo **vendor ID** (the account number on your JVZoo profile) is a different number and goes nowhere in this setup. Typed into the merchant's JVZoo Funnel ID, it produces buy links JVZoo does not recognise.
@@ -99,15 +99,15 @@ The same ID builds the buy link and matches incoming JVZIPNs to the product. Wit
 
 Every `[BUY=...]` and `[UPSELL=...]` tag on a page of this domain now builds a JVZoo buy link.
 
-## Step 6: Enter the last number on the funnel's domain row
+## Step 6: Enter the button ID on the funnel's domain row
 
 1. Go to **Funnels**, open the funnel's menu and click **Edit**
-2. Under **Domains**, on the row of your JVZoo domain, type the **last** number of the buy link (`99` above) into **JVZoo Funnel ID**
+2. Under **Domains**, on the row of your JVZoo domain, type the **third** number of the buy link (`99` above) into **JVZoo Button ID**
 3. Save
 
-<img src="/images/merchants/jvzoo-funnel-row.png" alt="A funnel's domain row with the JVZoo Funnel ID field set to 99" />
+<img src="/images/merchants/jvzoo-funnel-row.png" alt="A funnel's domain row with the JVZoo Button ID field set to 99" />
 
-The value lives on the domain row, so one funnel served on two domains can use two different JVZoo buttons. When the field is empty, buy links have two numbers and a trailing slash (`/b/120456/451020/`).
+The value lives on the domain row, so one funnel served on two domains can use two different JVZoo buttons. The field is required on a JVZoo domain when you save the funnel. On an older funnel saved without it, buy links have two numbers and a trailing slash (`/b/120456/451020/`); add the button ID so they match JVZoo's own links.
 
 ## Buy links
 
@@ -120,16 +120,16 @@ Use the standard tag on your sales page:
 With the merchant, the product mapping and the domain row set, it becomes:
 
 ```
-https://www.jvzoo.com/b/120456/451020/99?vtid=<click_code>&aff=<affiliate_id>
+https://www.jvzoo.com/b/120456/451020/99?vtid=<click_code>&aff=<affiliate_id>&aid=<affiliate_id>
 ```
 
 | Part | Source |
 | --- | --- |
 | `120456` | Merchant **JVZoo Funnel ID** |
 | `451020` | The product's **jvzoo Product ID** |
-| `99` | **JVZoo Funnel ID** on the funnel's domain row |
+| `99` | **JVZoo Button ID** on the funnel's domain row |
 | `vtid` | The visitor's ElasticFunnels click code, read back from the JVZIPN to attribute the sale |
-| `aff` | The JVZoo affiliate ID, when the visit came from an affiliate |
+| `aff`, `aid` | The JVZoo affiliate ID, when the visit came from an affiliate. `aid` is the name JVZoo's own link script uses; both carry the same value |
 
 `subid`, `subid2` and `subid3` on the page URL are passed through, and the domain's **Buy Link Parameters** are added to every link.
 
@@ -165,7 +165,9 @@ JVZoo sends the buyer to the thank-you page set on each product in JVZoo. Set it
 
 ## Tracking pixel
 
-To load JVZoo's sales pixel on your pages, add it as a tracking script:
+The quickest way: on the JVZoo merchant's settings, turn on **Create Tracking Pixels** and save. ElasticFunnels adds the JVZoo pixel as a tracking script on all pages, in the footer, once per merchant.
+
+To add it by hand instead:
 
 1. Go to **Pages** → **Tracking Scripts** and click **Create Tracking Script**
 2. Under **Template**, pick **JVZoo**
@@ -183,7 +185,7 @@ Nothing to fill in. The tokens resolve per page:
 | --- | --- |
 | `{jvz_acc_id}` | The merchant's **JVZoo Funnel ID** |
 | `{product_code_first}` | The JVZoo ID of the first buy button on the page |
-| `{jvz_funnel_id}` | **JVZoo Funnel ID** on the funnel's domain row |
+| `{jvz_funnel_id}` | **JVZoo Button ID** on the funnel's domain row |
 | `{product_codes_comma}` | Every product code on the page, comma-separated |
 
 Use **Footer**: an image tag in the head ends the head early in the browser, and any head script after it is moved into the body.
@@ -196,7 +198,7 @@ JVZoo only tells you which affiliate sent a visitor if you turn it on, **per pro
 2. Set **Pass Affiliate ID to Sales Page** to **Yes**
 3. Repeat for every product in the funnel
 
-JVZoo then adds `aid=<affiliate_id>` when it hands the visitor to your page. ElasticFunnels keeps it for the session and puts it on the buy link as `aff`, and the JVZIPN brings the affiliate and commission back with the sale.
+JVZoo then adds `aid=<affiliate_id>` when it hands the visitor to your page. ElasticFunnels keeps it for the session and puts it on the buy link as `aff` and `aid`, and the JVZIPN brings the affiliate and commission back with the sale.
 
 <Warning>
 With this setting off, affiliate traffic arrives with no affiliate ID and those sales cannot be attributed afterwards.
@@ -206,7 +208,7 @@ With this setting off, affiliate traffic arrives with no affiliate ID and those 
 
 <AccordionGroup>
   <Accordion title="Buy links go to the wrong JVZoo page">
-    Compare the link on your page with the one JVZoo gives you under Buy Buttons. The merchant's **JVZoo Funnel ID** must be the first number (not your vendor ID), the product's **jvzoo Product ID** the middle one, and the domain row's **JVZoo Funnel ID** the last one.
+    Compare the link on your page with the one JVZoo gives you under Buy Buttons. The merchant's **JVZoo Funnel ID** must be the first number (not your vendor ID), the product's **jvzoo Product ID** the middle one, and the domain row's **JVZoo Button ID** the third one.
   </Accordion>
   <Accordion title="Upsells never run after the front-end sale">
     Check that the button you copied came from the JVZoo funnel, so the first number is the funnel's ID, and that every upsell product has its JVZoo ID mapped.
