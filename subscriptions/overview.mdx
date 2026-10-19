@@ -90,6 +90,8 @@ The **Edit Pricing** action opens a modal where you can adjust:
 
 Changes take effect on the next billing cycle. The discount amount is calculated automatically based on the type and value.
 
+A new **Amount** you type here is treated as the price before tax: renewals add tax on top of it (see [Tax on renewals](#tax-on-renewals)). Saving the modal without changing the amount keeps how the subscription was taxed before.
+
 ### Bulk Actions
 
 On the **Subscriptions** list, select multiple rows with the checkboxes, then use the bulk action menu:
@@ -113,6 +115,10 @@ Purchase conversions that are subscription renewals display a small purple **Rec
 A rebill is credited to the affiliate who referred the original purchase, so it shows in that affiliate's reports. By default a rebill sends **no postback** to the affiliate and earns **no commission**. To pay an affiliate on renewals, open **Affiliates**, edit the affiliate and turn on **Send rebills: postbacks and commission**. From then on each successful renewal earns commission at that affiliate's rates and reaches their postbacks. First sales are not affected by this setting.
 
 Ad platforms (Meta Conversions API, Google Ads, TikTok and the other ad networks) never receive renewals, so a renewal is never reported to them as a new purchase.
+
+## Tax on Renewals
+
+Each renewal is taxed again when it is charged, with the merchant's current tax settings. The tax is calculated at the ship-to address stored with the subscription (the billing address when there is none), and the renewal charges the price before tax plus that tax. A retention discount applies to the price before tax, and an EU business customer whose first order was reverse-charged keeps the reverse charge. When the merchant's **Collect tax at checkout** switch is off, renewals charge no tax. Details: [Sales tax: subscription renewals](/integrations/tax#subscription-renewals).
 
 ## Automation Triggers
 

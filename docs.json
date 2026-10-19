@@ -259,6 +259,13 @@
             ]
           },
           {
+            "group": "Quizzes",
+            "pages": [
+              "quizzes/build-and-publish",
+              "quizzes/blocks-and-answers"
+            ]
+          },
+          {
             "group": "Subscriptions",
             "pages": [
               "subscriptions/overview",

@@ -148,6 +148,28 @@ Recommended template bindings:
 - Total row: `[[ checkout.total ]]`
 - Conditions: `checkout.bump_total_raw > 0`, `checkout.tax_raw > 0`, `checkout.shipping_raw > 0`
 
+### Tax pending
+
+The checkout limits how often it asks for a tax quote (see [Tax quotes at checkout](/integrations/tax#tax-quotes-at-checkout)). When a quote is refused because of that limit, the checkout keeps showing the last tax it calculated and sets **`checkout.tax_pending`** to `true`. It goes back to `false` with the next quote that succeeds. The final tax is always calculated again when the payment is processed.
+
+Use it to tell the buyer the tax is settled at payment:
+
+```html
+<template-if data-condition="checkout.tax_pending">
+  <p class="tax-note">Final tax is calculated when you pay.</p>
+</template-if>
+```
+
+Scripts can listen for the same state: every `checkout:taxUpdated` event carries `pending` in its `detail`.
+
+```js
+document.addEventListener('checkout:taxUpdated', (e) => {
+  if (e.detail.pending) {
+    // tax shown is the last quote; the final tax is settled at payment
+  }
+});
+```
+
 ---
 
 ## Form fields and validation

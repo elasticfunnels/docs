@@ -8,9 +8,11 @@ description: 'Calculate US sales tax at checkout in real time using TaxJar, Aval
 
 ElasticFunnels calculates sales tax at checkout. For US buyers you can use one of three external services (TaxJar, Avalara AvaTax, TaxCloud) or the built-in rates. EU VAT, UK VAT, Canadian tax and Australian GST always use the built-in rules.
 
+Tax is collected only on merchants where **Collect tax at checkout** is switched on. See [Turn tax on for a merchant](#turn-tax-on-for-a-merchant).
+
 Two places work together:
 
-- **The merchant's Tax configuration tab** (**Merchants** → open a merchant → **Tax configuration**) decides how tax is calculated for orders that merchant processes: which provider, the US states where you collect tax, your origin address, shipping and VAT settings.
+- **The merchant's Tax configuration tab** (**Merchants** → open a merchant → **Tax configuration**) decides whether and how tax is calculated for orders that merchant processes: which provider, the US states where you collect tax, your origin address, shipping and VAT settings.
 - **Integrations** → **Tax** holds your TaxJar, Avalara and TaxCloud credentials for the brand. When a brand integration and the merchant tab both hold a key for the same provider, the integration's key is used.
 
 <Note>
@@ -27,10 +29,11 @@ ElasticFunnels uses the provider to calculate tax only. Orders are not recorded 
 | **TaxCloud** | Free tier for SST member states (member sellers pay nothing) | API Login ID + API Key |
 
 ## The merchant Tax configuration tab
-{/* SCREENSHOT: Merchant Tax configuration tab · provider, nexus states, origin address · desktop */}
+{/* SCREENSHOT: Merchant Tax configuration tab · Collect tax at checkout, provider, nexus states, origin address · desktop */}
 
 | Setting | What it does |
 |---------|--------------|
+| **Collect tax at checkout** | The main switch. When it is off, checkouts on this merchant charge no tax, whatever is set below. See [Turn tax on for a merchant](#turn-tax-on-for-a-merchant). |
 | **Tax provider** | **None (built-in)**, **TaxJar**, **Avalara** or **TaxCloud**. Picks how US tax is calculated for this merchant's orders. |
 | Provider credentials | The fields for the chosen provider (TaxJar API token; Avalara account ID, license key and company code; TaxCloud API ID and key). Leave them empty when the key lives in a brand integration. |
 | **Use TaxJar sandbox** / **Use Avalara sandbox** | Sends the calls to the provider's sandbox. Applies only when the key typed on this tab is used. See [Sandbox mode](#sandbox-mode). |
@@ -39,7 +42,17 @@ ElasticFunnels uses the provider to calculate tax only. Orders are not recorded 
 | **Tax shipping** | Adds tax on the shipping amount. Applies to the built-in rates; a provider decides for itself whether shipping is taxable. |
 | **EU seller country**, **B2B tax exemption**, **Default customer type** | VAT settings for EU and UK buyers. |
 
-Saved provider keys are masked when you open the tab again: you see dots and, for long keys, the last four characters. Saving the tab without touching a masked field keeps the stored key. Type a new key to replace it, or clear the field to remove it. The merchant API returns the same masked values.
+### Turn tax on for a merchant
+
+**New merchants start with Collect tax at checkout off.** Until you switch it on, that merchant's checkouts, upsells and subscription renewals charge no tax at all: no US sales tax from TaxJar, Avalara or TaxCloud, and no built-in EU VAT, UK VAT, Canadian tax or Australian GST.
+
+To collect tax, open the merchant, go to **Tax configuration**, switch on **Collect tax at checkout**, pick the provider and save. The same switch is on the merchant form.
+
+Merchants that existed before this switch was added were turned on for you, so their checkouts keep charging tax as before.
+
+### Saved keys
+
+Provider keys typed on this tab are stored encrypted. Saved provider keys are masked when you open the tab again: you see dots and, for long keys, the last four characters. Saving the tab without touching a masked field keeps the stored key. Type a new key to replace it, or clear the field to remove it. The merchant API returns the same masked values.
 
 ## Nexus: which states are taxed
 
@@ -61,9 +74,34 @@ The same answer is reused for 10 minutes for an identical cart, so a re-submitte
 
 With **None (built-in)**, ElasticFunnels looks up the rate for the buyer's ZIP code from a connected TaxJar or Avalara integration when there is one, then from Avalara's free tax tables, then from a static per-state rate. TaxCloud is not used for these rate lookups.
 
+### Tax-exempt products
+
+A product with **Tax exempt** switched on (product **Pricing** tab) is never taxed. When a provider calculates the cart, the exempt line is sent so the provider taxes it at $0:
+
+| Provider | How the exempt line is sent |
+|----------|-----------------------------|
+| **TaxJar** | With product tax code `99999` (exempt) |
+| **Avalara** | With tax code `NT` (not taxable) |
+| **TaxCloud** | Left out of the cart, because TaxCloud has no exempt code. A cart with only exempt products makes no TaxCloud call. |
+| **None (built-in)** | Not taxed |
+
 ### One-click upsells
 
 Card (NMI, Stripe, Authorize.Net) and PayPal one-click upsells are taxed with the same merchant tax settings and provider as the front sale. Card upsells send the upsell's real shipping amount, so tax on shipping is charged the same way as on the first order.
+
+### Subscription renewals
+
+Every renewal is taxed again when it is charged, with the merchant's current tax settings:
+
+- The tax is calculated at the subscription's **ship-to address**, stored when the subscription was bought. If a subscription has no ship-to address, the billing address is used and the tax report notes it.
+- The renewal charges the price before tax plus the newly calculated tax. If the rate changed since the first order, the renewal charges the new total.
+- A [retention offer](/subscriptions/retention-offers) discount applies to the price before tax, and tax is calculated on the discounted price.
+- An EU business customer whose first order was reverse-charged (valid VAT number) keeps the reverse charge on renewals, even when the VAT check cannot confirm the number again at renewal time.
+- If the provider fails, the renewal still goes through with the built-in estimate, as at checkout (see [When the provider fails](#when-the-provider-fails)).
+
+### Tax quotes at checkout
+
+The checkout asks for a tax quote each time the buyer changes the address. To protect your provider account from abuse, quotes are limited to 40 per checkout session and 150 per IP address in 10 minutes. When a buyer hits the limit, the checkout keeps showing the last tax it calculated, if any. The final tax is always calculated again when the payment is processed, so a limited quote never changes what is charged. Templates can show a note in that case with [`checkout.tax_pending`](/frontend-template-engine/checkout#tax-pending).
 
 The calculated tax flows into Shopify Order Sync (so your accountant sees matching numbers in Shopify), into the ElasticFunnels reports, and into the receipt email.
 
@@ -151,7 +189,7 @@ A paused tax integration is not used at checkout: its key is not sent and it is 
 
 <AccordionGroup>
   <Accordion title="Tax shows as $0 on checkout">
-    The buyer's state is not a nexus state (in your provider, or in the Tax tab checkboxes when the provider is None), the product is marked tax exempt, or the provider failed and the estimate found no nexus. Check the tax report on the conversion record and the integration's **Activity** tab.
+    **Collect tax at checkout** is off on the merchant (new merchants start with it off), the buyer's state is not a nexus state (in your provider, or in the Tax tab checkboxes when the provider is None), the product is marked tax exempt, or the provider failed and the estimate found no nexus. Check the tax report on the conversion record and the integration's **Activity** tab.
   </Accordion>
   <Accordion title="Tax is charged but differs from the provider's dashboard">
     The order may have used the built-in estimate after a provider error. The conversion's tax report says so and shows the error. Fix the error shown on the integration's **Activity** tab or in **Actions**.
