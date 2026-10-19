@@ -50,5 +50,6 @@
       "title": "Save",
       "text": "Runs on all pages by default"
     }
-  ]
+  ],
+  "_todo": "Re-record after app ebf55e3ad is deployed: the JVZoo template's setup instructions now name JVZoo Funnel ID and JVZoo Button ID (the shot still shows the old 'Account ID' text) and gain a Footer line."
 }
