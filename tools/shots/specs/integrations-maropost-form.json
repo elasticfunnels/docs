@@ -1,0 +1,16 @@
+{
+  "out": "images/integrations/maropost-form.png",
+  "alt": "A new Maropost connection: Name, Marketing Cloud account ID, API key, Default transactional campaign ID and the API region picker, with Save at the top right",
+  "_source": "elasticfunnels repo flow _dev/flows/maropost-integration step 4, recorded at 1440x1300 (2x) on demo brand 899, cropped to CSS x 270, y 65, 1150 x 505",
+  "image": "tools/shots/source/integrations-maropost-form.png",
+  "imageSize": { "w": 1150, "h": 505 },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [11, 183, 1126, 50], "title": "Account ID", "text": "The number after /accounts/", "side": "left" },
+    { "box": [11, 249, 1126, 50], "title": "API key", "text": "Checked with Maropost on save", "side": "left" },
+    { "box": [11, 315, 1126, 50], "title": "Campaign ID", "text": "Default for Send Email steps", "side": "right" },
+    { "box": [11, 425, 1126, 50], "title": "API region", "text": "Europe 4000-4999, Canada 5000+", "side": "right" },
+    { "box": [1076, 28, 61, 36], "title": "Save", "text": "Connects the account", "side": "right" }
+  ]
+}

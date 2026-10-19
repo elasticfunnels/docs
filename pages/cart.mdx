@@ -292,7 +292,7 @@ Buttons that add products to the cart use `data-ef-add-to-cart` (or class `.ef-a
 
 When these attributes are present, adding to cart stores the price locally, so `item.price` and `item.total` are available immediately without waiting for the `/api/cart-products` response.
 
-`data-product-code` (and `window.ef.addToCart`) also take a variant's code. A variant set to **Sells another product** adds that product. An **Own price** variant code (`KNS-3-GREEN-M12W13`) adds its product with the variant's price and options, and `/api/cart-products` returns `parent_code` and `variant` (`{ id, title, label, option_values }`) for that line; this ships with the sellable variants update. See [Product Variants](/products/variants).
+`data-product-code` (and `window.ef.addToCart`) also take a variant's code. A variant set to **Sells another product** adds that product. An **Own price** variant code (`KNS-3-GREEN-M12W13`) adds its product with the variant's price and options, and `/api/cart-products` returns `parent_code` and `variant` (`{ id, title, label, option_values }`) for that line. See [Product Variants](/products/variants).
 
 ## Tips
 {/* SCREENSHOT: Tips · page builder, settings panel, or published page · desktop */}

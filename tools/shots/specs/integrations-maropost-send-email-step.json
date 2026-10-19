@@ -1,0 +1,16 @@
+{
+  "out": "images/integrations/maropost-send-email-step.png",
+  "alt": "The Maropost Send Email step: From email, From name, Reply-to email, To email mapped from the trigger, Subject and the HTML and plain-text message",
+  "_source": "elasticfunnels repo flow _dev/flows/maropost-automation-steps step 8, recorded at 1440x1500 (2x) on demo brand 899 with the fictional builder in that flow, cropped to CSS x 1032, y 170, 400 x 750",
+  "image": "tools/shots/source/integrations-maropost-send-email-step.png",
+  "imageSize": { "w": 400, "h": 750 },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [12, 263, 320, 38], "title": "From email", "text": "Empty: the campaign's sender" },
+    { "box": [12, 413, 320, 38], "title": "Reply-to email", "text": "Empty: the campaign's reply-to", "side": "left" },
+    { "box": [12, 488, 375, 38], "title": "To email", "text": "Usually the trigger's email" },
+    { "box": [12, 563, 320, 38], "title": "Subject", "text": "This email's subject line", "side": "left" },
+    { "box": [12, 615, 375, 105], "title": "HTML message", "text": "The body of the email" }
+  ]
+}

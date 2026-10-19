@@ -5,10 +5,6 @@ description: 'Sell one product in several versions (color, size, pack): set up o
 
 A variant is one version of a product that a buyer picks before buying: Black in size M9/W10, or Green in M12/W13. You add the choices once (Color, Size), the app creates one variant per combination, and each variant has a code your pages, cart, checkout and orders understand.
 
-<Warning>
-**What works today and what needs the next release.** Today you can define options and variants, show them on a page (`product.variants`) and sell variants set to **Sells another product**. The new Variants tab described below (options on the product, **Create all combinations**, bulk price, **Fill empty codes**), buying an **Own price** variant by its own code, and the variant on the order (order drawer, export, `variant_label` on thank-you pages) ship with the sellable variants update, which is **not deployed yet**. Until then, sell each choice as a linked product.
-</Warning>
-
 Prices and product details (title, price, retail price, image, units, stock) always come from the product and variant records, never typed into a page. A variant's own value wins; a blank field takes the value from the linked product, and an own-price variant falls back to the product it belongs to.
 
 ---
@@ -28,7 +24,7 @@ Leave **Price** blank on an own-price variant to use the product's price. Fill i
 
 ## Set up Color and Size
 
-{/* SCREENSHOT: Product Variants tab · step 1 options with Color and Size values, step 2 table after Create all combinations · desktop 1440px */}
+<img src="/images/products/variants-tab.png" alt="A product's Variants tab: Color and Size options with their values, Create all combinations (9), Fill empty codes, and the variant rows with Sells as and generated codes" />
 
 1. Open **Settings → Products**, open the product and go to the **Variants** tab.
 2. Under **1. What the buyer chooses**, click **Add option**. Type the **Option name** (`Color`) and its **Values**: type one and press Enter, or paste a list separated by commas (`Black, Navy, Green, Gray, Red`).
@@ -375,7 +371,7 @@ Product Attributes with **Applies To** set to `Variant` or `Both` get one input 
 
 ## Troubleshooting
 
-**The cart drops the code, or the buy link answers 404.** The code is not a product code and not an own-price variant code. Check the spelling in the Variants tab (codes are matched without case), check the variant is **Own price** (a **Sells another product** variant sells the other product's code), and check the sellable variants update is live on your project. A variant of a deleted product is never found.
+**The cart drops the code, or the buy link answers 404.** The code is not a product code and not an own-price variant code. Check the spelling in the Variants tab (codes are matched without case), check the variant is **Own price** (a **Sells another product** variant sells the other product's code). A variant of a deleted product is never found.
 
 **The price is wrong.** A variant's own **Price** wins over everything; clear it to use the pack price. A **Sells another product** variant uses the other product's price unless you fill **Price** on the row. The checkout always charges the catalog price for the code, whatever the page shows, so fix the record, not the page.
 

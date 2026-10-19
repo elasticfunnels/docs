@@ -1,0 +1,58 @@
+{
+  "out": "images/pages/list-title-preview.png",
+  "alt": "The Pages list: a published page's title underlined as a link with the eye icon beside it, and a draft page with a greyed eye and a hover card saying it is not published yet",
+  "_source": "elasticfunnels repo flow _dev/flows/pages-title-preview step 8, recorded at 1440x900 (2x) on demo brand 899, page 2 of the list, cropped to CSS x 257, y 470, 500 x 300",
+  "image": "tools/shots/source/pages-list-title-preview.png",
+  "imageSize": {
+    "w": 500,
+    "h": 300
+  },
+  "maxWidth": 560,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        16,
+        133,
+        224,
+        23
+      ],
+      "title": "Page title",
+      "text": "Opens the builder or code editor",
+      "side": "left"
+    },
+    {
+      "box": [
+        247,
+        137,
+        16,
+        16
+      ],
+      "title": "Preview",
+      "text": "Shows on hover or keyboard focus",
+      "side": "right"
+    },
+    {
+      "box": [
+        195,
+        197,
+        15,
+        15
+      ],
+      "title": "Greyed eye",
+      "text": "Draft and offline pages",
+      "side": "right"
+    },
+    {
+      "box": [
+        192,
+        225,
+        278,
+        61
+      ],
+      "title": "Why",
+      "text": "Publish the page to preview it",
+      "side": "right"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "out": "images/integrations/maropost-contact-step.png",
+  "alt": "The Maropost Create / Update Contact step: the Maropost connection, name, email and phone mapped from the trigger, the Subscribe to lists picker, tags and custom fields",
+  "_source": "elasticfunnels repo flow _dev/flows/maropost-automation-steps step 5, recorded at 1440x1500 (2x) on demo brand 899 with the fictional builder, connection and lists in that flow, cropped to CSS x 1032, y 170, 400 x 777",
+  "image": "tools/shots/source/integrations-maropost-contact-step.png",
+  "imageSize": { "w": 400, "h": 777 },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [12, 68, 328, 38], "title": "Connection", "text": "The Maropost account to use" },
+    { "box": [12, 263, 375, 38], "title": "Mapped fields", "text": "Values from the trigger", "side": "left" },
+    { "box": [12, 563, 285, 38], "title": "Subscribe to lists", "text": "Loaded from your Maropost account" },
+    { "box": [12, 638, 320, 38], "title": "Tags", "text": "Must already exist in Maropost", "side": "left" },
+    { "box": [12, 690, 375, 85], "title": "Custom fields", "text": "name=value, one per line" }
+  ]
+}
