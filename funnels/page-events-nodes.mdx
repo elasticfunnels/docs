@@ -460,7 +460,7 @@ Sends the visitor to any URL. The path ends here.
 
 **Fields:** `value` (target URL), `keep_query_params` (boolean — carry the current query string over; on by default, set it to `false` to drop it).
 
-The target URL supports two placeholder families, in both brace and percent form: `{click_id}` and `{query.<param>}`. A redirect back to the same host as the current request is suppressed so a rule cannot put the page into a loop.
+The target URL supports two placeholder families, in both brace and percent form: `{click_id}` and `{query.<param>}`. A `{query.<param>}` value is URL-encoded, so it always stays one parameter value; write `{query.<param>|raw}` to insert it as sent. A redirect back to the same host as the current request is suppressed so a rule cannot put the page into a loop.
 
 ### Show Popup
 
