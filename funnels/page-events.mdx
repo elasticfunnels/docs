@@ -44,7 +44,7 @@ Every node except **Sequence** follows **one connection per output**. If you nee
 
 ### Entry views
 
-Every flow starts from an **entry node** (the node labelled *Loaded*). A page may have several.
+Every flow starts from an **entry node** (the node labelled *On Page Load*). A page may have several.
 
 Each entry node appears as a **View** in the left rail of the builder. You can name it (pencil icon), reorder the list by dragging, and each view remembers its own camera position on the canvas. The order is saved as `entry_views_order`.
 
@@ -120,7 +120,7 @@ The full list — purpose, fields, inputs/outputs and constraints for every node
 
 <AccordionGroup>
   <Accordion title="Flow control">
-    **Loaded** (entry) · **Router** · **Sequence** · **Stop Next Events Execution**
+    **On Page Load** (entry) · **Router** · **Sequence** · **Stop Next Events Execution**
   </Accordion>
   <Accordion title="Conditions — server">
     **Script Rule** · **Query Parameter Condition** · **Is Customer** · **Has Purchased Any Upsell** · **Referred By Affiliate** · **Is From Country / State / EU / Timezone** · **Is Using VPN/Proxy** · **Is Whitelisted?** · **Has Tag** · **Cloaking.house** · **Product Check** (+ Match Product / Match All)
@@ -155,18 +155,18 @@ Nodes are filtered by permission. If a node is missing from **Add Node**, your r
 
 ```mermaid
 flowchart LR
-  A[Loaded] --> B{Query Parameter Condition<br/>vtID is not empty}
+  A[On Page Load] --> B{Query Parameter Condition<br/>vtID is not empty}
   B -->|Output 1 · true| C[Whitelist visitor]
   B -->|Output 2 · false| D[Compliant content]
 ```
 
-1. **Loaded** → **Query Parameter Condition** (`vtID`, operator `is not empty`)
+1. **On Page Load** → **Query Parameter Condition** (`vtID`, operator `is not empty`)
 2. Output 1 → **Whitelist visitor** (`0` minutes = permanent)
 3. Output 2 → leave empty, or route to compliant content
 
 ### Blocking traffic outside a country
 
-1. **Loaded** → **Is From Country** with `US` selected
+1. **On Page Load** → **Is From Country** with `US` selected
 2. Output 1 (true) → leave empty
 3. Output 2 (false) → **Block Request** with your message
 
@@ -176,7 +176,7 @@ Attach **Block Request** to the specific output of the condition. Dropping it di
 
 ### Merchant by traffic source
 
-1. **Loaded** → **Query Parameter Condition** (`source` `is` `partner1`) → Output 1 → **Set Merchant**
+1. **On Page Load** → **Query Parameter Condition** (`source` `is` `partner1`) → Output 1 → **Set Merchant**
 2. Output 2 → a second **Query Parameter Condition** (`source` `is` `partner2`) → Output 1 → **Set Merchant**
 3. Output 2 → nothing; the domain default applies
 
@@ -190,7 +190,7 @@ Use **Clear Merchant** to explicitly return to the domain default.
 
 ### Swapping content for one affiliate
 
-1. **Loaded** → **Referred By Affiliate** (pick the affiliate)
+1. **On Page Load** → **Referred By Affiliate** (pick the affiliate)
 2. Output 1 → **Dynamic Content** → container `pricing`, component `affiliate-pricing`
 3. Output 2 → nothing; the container's default content renders
 

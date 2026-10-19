@@ -1,0 +1,43 @@
+{
+  "out": "images/integrations/list-remove.png",
+  "alt": "The Integrations list with a row's menu open, showing Activity, Open logs and Remove",
+  "capture": {
+    "path": "/{brand}/integrations",
+    "viewport": {
+      "width": 1100,
+      "height": 900
+    },
+    "waitFor": "[data-testid='apps.integrations.list'] [data-testid='list.row']",
+    "actions": [
+      {
+        "click": "[data-testid='apps.integrations.list'] [data-testid='row-actions-trigger'] >> nth=0"
+      },
+      {
+        "waitFor": "[data-testid='list.row.action.remove']",
+        "wait": 600
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 843,
+      "height": 520
+    }
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='apps.integrations.list'] [data-testid='row-actions-trigger'] >> nth=0",
+      "title": "Row menu",
+      "text": "The ... button on each connection",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='list.row.action.remove']",
+      "title": "Remove",
+      "text": "Asks you to confirm first",
+      "side": "right"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ ElasticFunnels can bill recurring products on schedule. Use the subscription scr
 | Status | Meaning |
 |--------|---------|
 | **Active** | Subscription is being billed on schedule |
-| **Trial** | Customer is in a free trial period before their first charge |
+| **Trial** | Customer is in a free trial period before their first charge. Trial subscriptions are not charged automatically when the trial ends yet; see the note under [Setting Up Subscription Products](#setting-up-subscription-products) |
 | **Paused** | Billing is temporarily stopped; resumes later |
 | **Past Due** | A renewal charge failed; retries are in progress |
 | **Canceled** | Subscription has been terminated |
@@ -128,6 +128,10 @@ To make a product recurring:
 3. Set the **Frequency** and **Frequency Unit** (e.g., every 1 month)
 4. Optionally configure a **Trial Period** (in days) and **First Charge Free**
 
+<Warning>
+A subscription that starts with a trial period stays in **Trial** status, and the renewal runner only charges **Active** subscriptions, so it is never billed when the trial ends. Until this is fixed, sell subscriptions without a trial period (an intro price or stepped pricing works instead).
+</Warning>
+
 #### Subscription tiers (optional)
 
 Products can expose **multiple subscription tiers** with different intervals and prices, for example good / better / best:
@@ -190,18 +194,13 @@ The recurring coupon logic is enforced during billing. The subscription detail d
 
 ## Brand Subscription Settings
 
-Global subscription policies are configured under **Settings** → **Subscriptions**:
+**Settings** → **Subscriptions** holds the brand-wide subscription settings and the default email templates.
 
-| Setting | Description |
-|---------|-------------|
-| **Cancellation Policy** | Immediate, end of period, or admin only |
-| **Grace Period (days)** | Days after failed payment before cancellation |
-| **Max Billing Cycles** | Automatically cancel after N cycles (0 = unlimited) |
-| **Allow Pause** | Let customers pause their subscription |
-| **Allow Skip** | Let customers skip the next charge |
-| **Allow Swap Product** | Let customers switch to a different subscription product |
-| **Allow Change Date** | Let customers change their next billing date |
-| **Customer Self-Service** | Enable the customer-facing subscription management portal |
+<Warning>
+**Cancellation Policy** (Immediate, End of Period, Custom Grace Period) and **Maximum billing cycles** are saved on this page, but billing does not apply them yet. Every cancel takes effect right away, and a subscription keeps renewing past the cycle limit. To stop a subscription after a set number of charges, cancel it from the subscription drawer.
+</Warning>
+
+What buyers can do themselves (pause, skip, resume, cancel) depends on the members area template, not on a setting here. See [Members Area Subscription Management](/members-area/subscription-management).
 
 ### Default Email Templates
 

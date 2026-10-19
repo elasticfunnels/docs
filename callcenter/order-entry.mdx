@@ -8,8 +8,12 @@ The Order Entry page lets call center agents place orders on behalf of customers
 Go to **Call Center** → **Order Entry** in the sidebar.
 
 <Warning>
-Agents need the **Create Orders** permission (included in the Call agent role) to access this page.
+Agents need the **Create Orders** permission (included in the Call agent and Call supervisor roles) to open this page and place orders.
 </Warning>
+
+<Info>
+Phone orders are charged through an **NMI** merchant, in **USD**. Coupons and shipping charges are not applied to phone orders (only gift shipping, when the product's bonus rule offers it). If the brand's call center processor is not NMI, a banner says so when the page opens and the order button stays off.
+</Info>
 
 ## Page Layout
 
@@ -38,7 +42,7 @@ Only brands you have access to and that are enabled in the selected call center 
 9. Tax is calculated automatically based on the customer's address.
 10. If the order should create a subscription, enable the subscription section and choose the interval.
 11. Click the order button to submit.
-12. If upsells are returned, present them before closing the call.
+12. If upsell offers appear under the order, present them before closing the call. Each accepted upsell is charged to the same card.
 13. Choose the final disposition and save the call outcome.
 
 ## Customer Context Drawer
@@ -62,12 +66,19 @@ Each product line shows:
 |-------|-------------|
 | **Product** | Name and code |
 | **Quantity** | Editable quantity field |
-| **Unit Price** | Editable — agents can override the default product price |
+| **Unit Price** | Editable: agents can lower the price for this order |
 | **Subtotal** | Calculated from quantity and unit price |
 
 ### Custom Unit Price
 
-Agents can change the **Unit Price** field to apply a custom price for any product line. The overridden price is used for the subtotal calculation, tax estimation, and the actual charge.
+Agents can change the **Unit Price** field to apply a custom price for a product line. The custom price is used for the subtotal, the tax estimate, and the actual charge.
+
+The price an agent can enter has limits:
+
+- It must be above zero, unless the product's list price is zero (a free product).
+- It cannot be above the product's list price (the price the line starts with). The organization owner and users with the **Manage setup** permission (for example the Call supervisor role) can enter a higher price.
+
+A price outside these limits is refused with a message on the order, and nothing is charged.
 
 <Info>
 Price overrides are only available through Order Entry. Customer-facing checkout pages always use the product's configured price and cannot be manipulated.
@@ -77,8 +88,10 @@ Price overrides are only available through Order Entry. Customer-facing checkout
 
 The payment section supports two paths:
 
-- **Card on File**: shown when the customer profile includes reusable vault tokens; the agent can select which card to use
+- **Card on File**: shown when the customer has cards saved in this brand; the agent picks which card to use, and that card is charged
 - **New Card**: standard card number, expiry, and CVV entry
+
+A saved card can only be charged for the customer it was saved for, in the same brand. If the card does not belong to the customer on the order, the order is refused and nothing is charged.
 
 If a payment fails, the specific error from the gateway is shown above the order button and the card fields are highlighted.
 
@@ -110,3 +123,11 @@ When a phone number or email matches an existing customer:
 On a successful charge, the customer receives the standard purchase confirmation email and the agent's commission is recorded.
 
 If the gateway returns a reusable vault token after the order, Order Entry stores it for the rest of the current flow so upsells and later subscription actions can reuse it.
+
+## Upsells
+
+After a successful order, upsell offers for the brand appear under the order. Click **Add** on an offer the customer accepts:
+
+- The upsell is charged to the card from this call and saved as its **own order**, marked as an upsell. It gets its own confirmation email, fulfillment and affiliate postbacks, and it shows in the session's sales list, where it can be voided like the main order.
+- The agent earns a separate commission for it when the commission rule includes upsells.
+- If the card is declined, the upsell shows as **failed** with the decline reason, and no order is created.

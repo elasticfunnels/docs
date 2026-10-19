@@ -1,0 +1,7 @@
+{
+  "integrations": [ { "id": 9201, "name": "Northwind Klaviyo", "integration": "klaviyo", "paused": false } ],
+  "automations": [
+    { "id": 7702, "title": "Took the order bump: Bump thank-you", "status": "active", "trigger": "entered", "builder_path": "/899/automations/7702/builder" },
+    { "id": 7690, "title": "VIP welcome series", "status": "inactive", "trigger": "entered", "builder_path": "/899/automations/7690/builder" }
+  ]
+}

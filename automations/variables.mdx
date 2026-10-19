@@ -1,0 +1,48 @@
+---
+title: 'Use data from earlier steps'
+description: 'Pick fields from the trigger and from earlier steps with the variable picker, including steps you have not tested yet.'
+---
+
+Every step in an automation can use what the steps before it returned: the buyer's email from the trigger, the
+result of an email check, the ID of the contact a CRM step created. You pick these fields with the variable
+picker in the step's options.
+
+<img src="/images/automations/variables-untested-step.png" alt="A Continue If step's variable picker listing the Valid, Validation Result and Message fields of a DeBounce Validate Email step that has never been tested" />
+
+## Pick a field
+
+1. In the automation builder, click the step you want to set up.
+2. On its **Options tab**, click a field (for example **Data** on a **Continue If** step).
+3. The picker lists each earlier step with its fields and an example value. Type in the search box to filter by
+   name or value.
+4. Click a field to use it.
+
+The field then reads as the field's name and its step, for example **Valid · Validate Email**, with an example
+value next to it. Click it to change it. Behind the label the step stores a variable such as
+`{nwdeb00005.valid}`: the step's code, then the field.
+
+## Steps you have not tested yet
+
+You do not need to test a step before the next one can use its fields. Integration steps come with an example
+of what they return, so the picker lists their fields straight away. In the image, the **Validate Email**
+(DeBounce) step has never been tested and the **Continue If** after it can already check its **Valid** field.
+
+- The example values are made up (`jane.doe@example.com`, `true`). They show the shape of the data only.
+- Once you test a step on its **Test tab**, its real result replaces the example in the picker.
+- A test of a later step sends only real tested data to the provider, never the example values.
+
+Steps with an example output include the email platforms (Klaviyo, Mailchimp, ActiveCampaign, AWeber, Brevo,
+Kit, GetResponse, Maropost), email sending (Mailgun, SendGrid, Mailrelay), CRMs (HubSpot, Keap, Agile CRM,
+Close, Pipedrive, Ontraport), email checks (DeBounce, ZeroBounce), messaging (Twilio, SlickText, Slack, Discord)
+and Google Sheets.
+
+## When a field shows a warning
+
+A field shown in amber with **Not in that step's data** points at a field the step does not return, or at a
+step that is no longer in the automation. Pick the field again from the picker. If the step returns different
+fields for different inputs, test it once so the picker lists the fields it really returned.
+
+## Related
+
+- [Automation run history](/automations/run-history): see what each step received and returned on a real run.
+- [Connect and remove integrations](/integrations/connect): connect an account from a step with **Don't see your account?**

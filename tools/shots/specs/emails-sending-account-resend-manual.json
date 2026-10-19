@@ -1,0 +1,50 @@
+{
+  "out": "images/emails/sending-account-resend-manual.png",
+  "alt": "A Resend account saved with a sending-only API key: the Webhook signing secret field, the note that the key cannot manage webhooks, and the webhook URL to add in Resend",
+  "capture": {
+    "path": "/{brand}/integrations/resend/9104",
+    "viewport": {
+      "width": 1440,
+      "height": 1500
+    },
+    "waitFor": "[data-testid='integrations.resend.webhook-url']",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/integrations/9104$",
+        "file": "tools/shots/fixtures/email-sending-accounts/resend-manual.json"
+      }
+    ],
+    "crop": {
+      "x": 276,
+      "y": 236,
+      "width": 760,
+      "height": 620
+    }
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='integrations.resend.api-key-replace'] >> xpath=..",
+      "title": "API key",
+      "text": "Starts with re_",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.resend.webhook-signing-secret-replace'] >> xpath=..",
+      "title": "Webhook signing secret",
+      "text": "Paste it from Resend, then save"
+    },
+    {
+      "selector": "[data-testid='integrations.resend.events-status']",
+      "title": "Sending-only key",
+      "text": "Add the webhook yourself",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.resend.webhook-url']",
+      "title": "Webhook URL",
+      "text": "The endpoint to add in Resend"
+    }
+  ]
+}

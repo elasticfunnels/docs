@@ -3,14 +3,14 @@ title: "Emails"
 description: "What the Emails area holds: the templates for order, subscription, login and course emails, which of them actually go out, and which account sends them."
 ---
 
-Every email your brand sends to a customer starts from a template in **Apps → Emails**: the order
+Every email your brand sends to a customer starts from a template in **Settings → Apps → Emails**: the order
 confirmation after a purchase, a renewal receipt, a members area login code, a course welcome
 email. This page explains what you see there. To design an email, see
 [Building an email](/emails/builder).
 
 ## The template list
 
-Open **Apps → Emails**. Each row is one template:
+Open **Settings → Apps → Emails**. Each row is one template:
 
 | Column | What it tells you |
 |---|---|
@@ -26,14 +26,17 @@ The tabs above the list filter it: **All**, **Orders**, **Subscriptions**, **Mem
 including the ones made for a campaign or an automation. Search and sort (recently updated, last
 sent, name, newest) sit next to the tabs.
 
-The **...** menu at the top right links to the three places that decide how email leaves your
-brand:
+**Where Emails sits.** For most brands, Emails is under **Settings → Apps → Emails** and opens
+this template list. A brand with email campaigns turned on gets **Emails** as its own entry in the
+main sidebar instead, with **Templates**, **Campaigns**, **Suppression list** and **Campaign
+settings** beside it. Every email that went out is listed in **Settings → Logs → Email Logs**.
+The **...** menu at the top right of the template list links to the
+places that decide how email leaves your brand:
 
-- **Send logs**: every email that went out, in **Settings → Logs → Email logs**.
 - **Sending settings**: your SMTP server and the default sender name and address, in
   **Settings → Emailing**.
-- **Email integrations**: Mailgun, SendGrid, Mailrelay and other providers, in
-  **Apps → Integrations**.
+- **Email integrations**: Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid and Mailrelay,
+  in **Apps → Integrations**. See [Email Sending Accounts](/emails/sending-accounts).
 
 ## Template types
 
@@ -78,8 +81,14 @@ the sending jobs use:
 | **Not sending** | Nothing sends it today. |
 
 The reason is printed next to the status, for example "Sends for NMI, Stripe" or "Not sent for
-BuyGoods, ClickBank: their checkout emails its own receipt". When there are several, hover the
-**+N more** label to read all of them.
+BuyGoods, ClickBank: their checkout emails its own receipt". Hover the reason (or tab to it, or
+tap it on a phone) to open a card that lists every merchant, course, campaign and automation that
+uses the template, one per row: whether it sends there, its name (click it to open it) and why, for
+example "BuyGoods: Not sent: its checkout sends its own receipt". The email builder's info panel
+shows the same list.
+
+To see what a template actually sent, open its row menu and click **Open send logs**. That opens
+**Settings → Logs → Email Logs** filtered to the template.
 
 The usual reasons a template is not sending:
 
@@ -99,7 +108,8 @@ The usual reasons a template is not sending:
 - **Campaign and automation templates** count as sending while the campaign is going out or the
   automation is on.
 
-Switch on **Sending only** to hide every template that nothing sends.
+Set **Show** to **In use** to hide every template that nothing sends today. **All** lists every
+template.
 
 ## Transactional emails and campaigns
 
@@ -125,7 +135,8 @@ A new campaign starts on a ready-made layout instead of an empty page. How to ed
 ## Who sends your email
 
 ElasticFunnels sends your email through an account you own: your SMTP server
-(**Settings → Emailing**) or an email integration such as Mailgun, SendGrid or Mailrelay. Each
+(**Settings → Emailing**) or an email integration: Amazon SES, Postmark, Brevo, Resend, Mailgun,
+SendGrid or Mailrelay ([Email Sending Accounts](/emails/sending-accounts)). Each
 kind of email has one rule for which account sends it:
 
 | Email | Sent through | If no account can send it |
@@ -142,7 +153,7 @@ is on [Sending Setup](/emails/sending-setup).
 
 <Steps>
 <Step title="Click Create email">
-In **Apps → Emails**, click **Create email**.
+In the template list (**Settings → Apps → Emails**), click **Create email**.
 </Step>
 <Step title="Fill in the basics">
 Give it a **Name** (only you see it), a **Subject** and an optional **Preview text**, the line most

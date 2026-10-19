@@ -176,6 +176,12 @@ Sitemap: https://example.com/sitemap.xml
 Each system path is anchored (`$`, `?`, `/`), so a rule like `/b` never blocks
 a content page such as `/blogs`.
 
+`/upsell` and `/decline` are prefixes on purpose, so funnel steps like
+`/upsell-2` and `/decline-offer` stay out of search. A page in your sitemap
+whose slug starts with one of them (say `/upsells-explained`) gets its own
+`Allow: /upsells-explained$` line, so it is still crawled. Other pages under
+those prefixes stay blocked.
+
 **Additional directives** (shown once robots.txt is on) adds your own lines
 verbatim, one directive per line. Don't add a `Sitemap:` line. One is written
 for you.

@@ -1,0 +1,27 @@
+{
+  "out": "images/pages/page-settings-general.png",
+  "alt": "The Page Settings dialog on the General tab, with the tab list on the left, the slug and version URL, the domain, and the Page type section with Is checkout page",
+  "_note": "Needs the demo page lp-b (5984) to have one version, so the Versions list and Version URL show. Create it with Create Variant before shooting and delete it after.",
+  "capture": {
+    "path": "/{brand}/pages/5984/builder",
+    "viewport": { "width": 1440, "height": 1000 },
+    "waitFor": "[data-testid=builder-rail-settings]",
+    "actions": [
+      { "wait": 2500 },
+      { "click": "[data-testid=builder-rail-settings]" },
+      { "waitFor": "[data-testid=page-settings-field-title]" },
+      { "wait": 1200 }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "[data-testid=page-settings-tab][data-tab=seo]", "title": "Tabs", "text": "Same tabs wherever you open it", "side": "left" },
+    { "selector": "[data-testid=page-settings-versions]", "title": "Variants", "text": "Switch versions without closing", "side": "left" },
+    { "selector": "[data-testid=page-settings-field-slug]", "title": "Slug", "text": "The page's main URL" },
+    { "selector": "[data-testid=page-settings-field-domain-id]", "title": "Domain", "text": "Shared by every version" },
+    { "selector": "[data-testid=page-settings-field-is-checkout-page]", "title": "Is checkout page", "text": "Lists it as a checkout page" }
+  ]
+}

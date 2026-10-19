@@ -1,0 +1,544 @@
+{
+ "id": 21,
+ "title": "Post-purchase \u2014 VIP tag for $90+ orders",
+ "config": {
+  "data": [
+   {
+    "node_code": "trigger",
+    "type": "triggers_on_new_purchase",
+    "outputs": 1,
+    "data": {
+     "ef_type": "triggers_on_new_purchase",
+     "node_code": "trigger",
+     "label": "On New Purchase",
+     "label_group": "Webhooks",
+     "category": "Triggers",
+     "values": {},
+     "integration_id": null,
+     "sample_data": {}
+    },
+    "position": {
+     "x": 320,
+     "y": 80
+    }
+   },
+   {
+    "node_code": "nwwait00002",
+    "type": "control_general_wait_for",
+    "outputs": 1,
+    "data": {
+     "ef_type": "control_general_wait_for",
+     "node_code": "nwwait00002",
+     "label": "Wait For",
+     "label_group": "General",
+     "category": "Control",
+     "values": {
+      "minutes": 60
+     },
+     "integration_id": null,
+     "sample_data": {}
+    },
+    "position": {
+     "x": 320,
+     "y": 240
+    }
+   },
+   {
+    "node_code": "nwdeb00005",
+    "type": "validation_debounce_validate_email",
+    "outputs": 1,
+    "data": {
+     "ef_type": "validation_debounce_validate_email",
+     "node_code": "nwdeb00005",
+     "label": "Validate Email",
+     "label_group": "DeBounce",
+     "category": "Validation",
+     "values": {
+      "email": "{trigger.customer_email}"
+     },
+     "integration_id": 47,
+     "sample_data": {}
+    },
+    "position": {
+     "x": 320,
+     "y": 400
+    }
+   },
+   {
+    "node_code": "nwcond00003",
+    "type": "control_general_continue_if",
+    "outputs": 1,
+    "data": {
+     "ef_type": "control_general_continue_if",
+     "node_code": "nwcond00003",
+     "label": "Continue If",
+     "label_group": "General",
+     "category": "Control",
+     "values": {
+      "data": "{nwdeb00005.valid}",
+      "condition": "is_true",
+      "condition_value": ""
+     },
+     "integration_id": null,
+     "sample_data": {}
+    },
+    "position": {
+     "x": 320,
+     "y": 560
+    }
+   },
+   {
+    "node_code": "nwklav00004",
+    "type": "mailing_klaviyo_create_or_update_profile",
+    "outputs": 1,
+    "data": {
+     "ef_type": "mailing_klaviyo_create_or_update_profile",
+     "node_code": "nwklav00004",
+     "label": "Create Or Update Profile",
+     "label_group": "Klaviyo",
+     "category": "Mailing",
+     "values": {
+      "email": "{trigger.email}",
+      "first_name": "{trigger.first_name}",
+      "last_name": "{trigger.last_name}",
+      "tags": "vip-90-day"
+     },
+     "integration_id": 31,
+     "sample_data": {}
+    },
+    "position": {
+     "x": 320,
+     "y": 720
+    }
+   }
+  ]
+ },
+ "builder_config": {
+  "nodes": [
+   {
+    "id": "trigger",
+    "type": "trigger",
+    "position": {
+     "x": 320,
+     "y": 80
+    },
+    "data": {
+     "ef_type": "triggers_on_new_purchase",
+     "node_code": "trigger",
+     "label": "On New Purchase",
+     "label_group": "Webhooks",
+     "category": "Triggers",
+     "values": [],
+     "integration_id": null,
+     "sample_data": {
+      "log_id": "sample",
+      "payload": {
+       "trigger": {
+        "customer_email": "alex@example.com",
+        "customer_name": "Jane Smith",
+        "customer_first_name": "Jane",
+        "customer_last_name": "Smith",
+        "customer_phone": "0987654321",
+        "customer_address": "456 Oak Ave",
+        "customer_city": "Springfield",
+        "customer_country": "United States",
+        "customer_state": "Illinois",
+        "customer_zip": "62701",
+        "billing_address": "456 Oak Ave",
+        "billing_city": "Springfield",
+        "billing_state": "Illinois",
+        "billing_zip": "62701",
+        "billing_country": "United States",
+        "shipping_address": "456 Oak Ave",
+        "shipping_city": "Springfield",
+        "shipping_state": "Illinois",
+        "shipping_zip": "62701",
+        "shipping_country": "United States",
+        "merchant_affiliate_name": "Sample Affiliate",
+        "merchant_affiliate_id": "5678",
+        "aff_id": "5678",
+        "total": 99.99,
+        "subtotal": 79.99,
+        "total_taxes": 7.2,
+        "total_shipping_cost": 12.8,
+        "currency_code": "USD",
+        "cogs": 25,
+        "total_commission": 15.99,
+        "total_merchant_commission": 8,
+        "total_merchant_allowance": 5,
+        "fulfillment_cost": 3.5,
+        "order_id": "ORD-2024-001234",
+        "public_order_id": "EF-001234",
+        "transaction_id": "TXN-ABC123456",
+        "status": "approved",
+        "payment_method": "credit_card",
+        "payment_status": "completed",
+        "last4": "4242",
+        "product_codes": [
+         "MAIN-PRODUCT-001",
+         "UPSELL-001"
+        ],
+        "products": [
+         {
+          "product_id": 1,
+          "name": "Premium Weight Loss Formula",
+          "title": "Premium Weight Loss Formula",
+          "product_sku": "MAIN-PRODUCT-001",
+          "code": "MAIN-PRODUCT-001",
+          "price": 49.99,
+          "quantity": 1,
+          "total": 49.99,
+          "unit_price": 49.99,
+          "product_units": 1,
+          "currency": "USD",
+          "currency_code": "USD",
+          "type": "main",
+          "classification": "main",
+          "is_bonus": false,
+          "image_url": "https://example.com/images/weight-loss-formula.jpg",
+          "description": "Our flagship weight loss supplement with natural ingredients"
+         },
+         {
+          "product_id": 2,
+          "name": "Fat Burner Booster",
+          "title": "Fat Burner Booster",
+          "product_sku": "UPSELL-001",
+          "code": "UPSELL-001",
+          "price": 30,
+          "quantity": 1,
+          "total": 30,
+          "unit_price": 30,
+          "product_units": 1,
+          "currency": "USD",
+          "currency_code": "USD",
+          "type": "upsell",
+          "classification": "upsell",
+          "is_bonus": false,
+          "image_url": "https://example.com/images/fat-burner-booster.jpg",
+          "description": "Accelerate your results with our premium fat burner"
+         }
+        ],
+        "utm_source": "facebook",
+        "utm_medium": "cpc",
+        "utm_campaign": "summer-sale-2024",
+        "utm_term": "weight-loss",
+        "utm_content": "ad-variant-a",
+        "gclid": "Cj0KCQjw...",
+        "fbclid": "IwAR0...",
+        "purchased_at": "2026-10-17T15:59:34-04:00",
+        "created_at": "2026-10-17T15:59:34-04:00"
+       }
+      }
+     }
+    }
+   },
+   {
+    "id": "nwwait00002",
+    "type": "wait",
+    "position": {
+     "x": 320,
+     "y": 240
+    },
+    "data": {
+     "ef_type": "control_general_wait_for",
+     "node_code": "nwwait00002",
+     "label": "Wait For",
+     "label_group": "General",
+     "category": "Control",
+     "values": {
+      "minutes": 60
+     },
+     "integration_id": null,
+     "sample_data": []
+    }
+   },
+   {
+    "id": "nwdeb00005",
+    "type": "action",
+    "position": {
+     "x": 320,
+     "y": 400
+    },
+    "data": {
+     "ef_type": "validation_debounce_validate_email",
+     "node_code": "nwdeb00005",
+     "label": "Validate Email",
+     "label_group": "DeBounce",
+     "category": "Validation",
+     "values": {
+      "email": "{trigger.customer_email}"
+     },
+     "integration_id": 47,
+     "sample_data": {}
+    }
+   },
+   {
+    "id": "nwcond00003",
+    "type": "condition",
+    "position": {
+     "x": 320,
+     "y": 560
+    },
+    "data": {
+     "ef_type": "control_general_continue_if",
+     "node_code": "nwcond00003",
+     "label": "Continue If",
+     "label_group": "General",
+     "category": "Control",
+     "values": {
+      "data": "{nwdeb00005.valid}",
+      "condition": "is_true",
+      "condition_value": ""
+     },
+     "integration_id": null,
+     "sample_data": []
+    }
+   },
+   {
+    "id": "nwklav00004",
+    "type": "action",
+    "position": {
+     "x": 320,
+     "y": 720
+    },
+    "data": {
+     "ef_type": "mailing_klaviyo_create_or_update_profile",
+     "node_code": "nwklav00004",
+     "label": "Create Or Update Profile",
+     "label_group": "Klaviyo",
+     "category": "Mailing",
+     "values": {
+      "email": "{trigger.email}",
+      "first_name": "{trigger.first_name}",
+      "last_name": "{trigger.last_name}",
+      "tags": "vip-90-day"
+     },
+     "integration_id": 31,
+     "sample_data": []
+    }
+   }
+  ],
+  "edges": [
+   {
+    "id": "e_trigger_nwwait00002",
+    "source": "trigger",
+    "target": "nwwait00002",
+    "sourceHandle": null,
+    "targetHandle": null
+   },
+   {
+    "id": "e_nwcond00003_nwklav00004",
+    "source": "nwcond00003",
+    "target": "nwklav00004",
+    "sourceHandle": null,
+    "targetHandle": null
+   },
+   {
+    "id": "e_nwwait00002_nwdeb00005",
+    "source": "nwwait00002",
+    "target": "nwdeb00005",
+    "sourceHandle": null,
+    "targetHandle": null
+   },
+   {
+    "id": "e_nwdeb00005_nwcond00003",
+    "source": "nwdeb00005",
+    "target": "nwcond00003",
+    "sourceHandle": null,
+    "targetHandle": null
+   }
+  ]
+ },
+ "flow": {
+  "nodes": [
+   {
+    "node_code": "trigger",
+    "type": "triggers_on_new_purchase",
+    "data": {
+     "values": [],
+     "integration_id": null,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwwait00002"
+    ]
+   },
+   {
+    "node_code": "nwwait00002",
+    "type": "control_general_wait_for",
+    "data": {
+     "values": {
+      "minutes": 60
+     },
+     "integration_id": null,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwdeb00005"
+    ]
+   },
+   {
+    "node_code": "nwdeb00005",
+    "type": "validation_debounce_validate_email",
+    "data": {
+     "values": {
+      "email": "{trigger.customer_email}"
+     },
+     "integration_id": 47,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwcond00003"
+    ]
+   },
+   {
+    "node_code": "nwcond00003",
+    "type": "control_general_continue_if",
+    "data": {
+     "values": {
+      "data": "{nwdeb00005.valid}",
+      "condition": "is_true",
+      "condition_value": ""
+     },
+     "integration_id": null,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwklav00004"
+    ]
+   },
+   {
+    "node_code": "nwklav00004",
+    "type": "mailing_klaviyo_create_or_update_profile",
+    "data": {
+     "values": {
+      "email": "{trigger.email}",
+      "first_name": "{trigger.first_name}",
+      "last_name": "{trigger.last_name}",
+      "tags": "vip-90-day"
+     },
+     "integration_id": 31,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     null
+    ]
+   }
+  ],
+  "execution_path": [
+   "trigger",
+   "nwwait00002",
+   "nwcond00003",
+   "nwklav00004"
+  ],
+  "node_map": {
+   "trigger": {
+    "node_code": "trigger",
+    "type": "triggers_on_new_purchase",
+    "data": {
+     "values": [],
+     "integration_id": null,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwwait00002"
+    ]
+   },
+   "nwwait00002": {
+    "node_code": "nwwait00002",
+    "type": "control_general_wait_for",
+    "data": {
+     "values": {
+      "minutes": 60
+     },
+     "integration_id": null,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwcond00003"
+    ]
+   },
+   "nwcond00003": {
+    "node_code": "nwcond00003",
+    "type": "control_general_continue_if",
+    "data": {
+     "values": {
+      "data": "{trigger.total}",
+      "condition": "is_greater_than",
+      "condition_value": "90"
+     },
+     "integration_id": null,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     "nwklav00004"
+    ]
+   },
+   "nwklav00004": {
+    "node_code": "nwklav00004",
+    "type": "mailing_klaviyo_create_or_update_profile",
+    "data": {
+     "values": {
+      "email": "{trigger.email}",
+      "first_name": "{trigger.first_name}",
+      "last_name": "{trigger.last_name}",
+      "tags": "vip-90-day"
+     },
+     "integration_id": 31,
+     "url": null
+    },
+    "outputs": 1,
+    "next_codes": [
+     null
+    ]
+   }
+  },
+  "entry_node": "trigger",
+  "metadata": {
+   "total_nodes": 4,
+   "entry_node": "trigger",
+   "exit_nodes": [
+    "nwklav00004"
+   ],
+   "integration_nodes": [
+    {
+     "node_code": "nwklav00004",
+     "type": "mailing_klaviyo_create_or_update_profile",
+     "integration_id": 31
+    }
+   ],
+   "integration_metadata": {
+    "nwklav00004": {
+     "integration_path": "Mailing/Klaviyo",
+     "node_type": "mailing_klaviyo_create_or_update_profile",
+     "integration_id": 31,
+     "task_name": "CreateOrUpdateProfile"
+    }
+   },
+   "trigger_nodes": [
+    {
+     "node_code": "trigger",
+     "type": "triggers_on_new_purchase"
+    }
+   ],
+   "required_functions": [
+    {
+     "node_type": "mailing_klaviyo_create_or_update_profile",
+     "integration_path": "Mailing/Klaviyo",
+     "task_name": "CreateOrUpdateProfile",
+     "s3_key": "tasks/Mailing/Klaviyo/tasks/CreateOrUpdateProfile.js"
+    }
+   ]
+  }
+ },
+ "version": 1,
+ "trigger_node_type": "triggers_on_new_purchase"
+}

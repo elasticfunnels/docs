@@ -1,0 +1,71 @@
+{
+  "out": "images/automations/run-history-list.png",
+  "alt": "The Events page of an automation: each run with its Result pill, step count, revision and received time",
+  "capture": {
+    "path": "/{brand}/automations/21/events",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "text=K7WD3QZ9MB2XT6LE",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/automations/21/events",
+        "file": "tools/shots/fixtures/automation-runs/events.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/automations/21$",
+        "file": "tools/shots/fixtures/automation-runs/automation.json"
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 0,
+      "width": 1183,
+      "height": 720
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Builder",
+      "title": "Builder",
+      "text": "Opens the flow to change it",
+      "side": "right"
+    },
+    {
+      "box": [
+        745,
+        122,
+        416,
+        40
+      ],
+      "title": "Sort and refresh",
+      "text": "Newest or oldest first, refreshed every 10 s",
+      "side": "right"
+    },
+    {
+      "box": [
+        420,
+        236,
+        125,
+        454
+      ],
+      "title": "Result",
+      "text": "Completed, Failed, Step skipped or Received",
+      "side": "left"
+    },
+    {
+      "box": [
+        720,
+        236,
+        150,
+        454
+      ],
+      "title": "Revision",
+      "text": "Which version of the flow ran",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

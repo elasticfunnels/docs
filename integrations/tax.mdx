@@ -1,36 +1,71 @@
 ---
 title: 'Sales Tax Integrations'
-description: 'Calculate sales tax at checkout in real time using TaxJar, Avalara, or TaxCloud.'
+description: 'Calculate US sales tax at checkout in real time using TaxJar, Avalara, or TaxCloud, or the built-in rates.'
 ---
 
 ## Overview
 {/* SCREENSHOT: Overview · tax integrations list · desktop */}
 
-ElasticFunnels can calculate sales tax at checkout using any of three external services. The active integration is queried for every cart that has a shipping or billing state subject to sales tax, and the calculated rate is applied to the order before payment.
+ElasticFunnels calculates sales tax at checkout. For US buyers you can use one of three external services (TaxJar, Avalara AvaTax, TaxCloud) or the built-in rates. EU VAT, UK VAT, Canadian tax and Australian GST always use the built-in rules.
 
-You can configure **multiple** tax integrations per brand. The offer app tries them in the order shown on the integrations list — useful for fallback (e.g. TaxJar primary, Avalara backup).
+Two places work together:
+
+- **The merchant's Tax configuration tab** (**Merchants** → open a merchant → **Tax configuration**) decides how tax is calculated for orders that merchant processes: which provider, the US states where you collect tax, your origin address, shipping and VAT settings.
+- **Integrations** → **Tax** holds your TaxJar, Avalara and TaxCloud credentials for the brand. When a brand integration and the merchant tab both hold a key for the same provider, the integration's key is used.
+
+<Note>
+ElasticFunnels uses the provider to calculate tax only. Orders are not recorded or committed as transactions in TaxJar, Avalara or TaxCloud, so they do not appear in the provider's reports or filings. Keep your own records for filing.
+</Note>
 
 ## Supported providers
 {/* SCREENSHOT: Supported providers · settings · desktop */}
 
 | Provider | Best for | Auth |
 |----------|----------|------|
-| **TaxJar** | US sales tax across all 50 states; SaaS-friendly | API key |
-| **Avalara** | Enterprise; global jurisdictions, exemption handling, certificates | Account ID + License key |
+| **TaxJar** | US sales tax across all 50 states; SaaS-friendly | API token |
+| **Avalara** | Enterprise; global jurisdictions, exemption handling, certificates | Account ID + License key + Company code |
 | **TaxCloud** | Free tier for SST member states (member sellers pay nothing) | API Login ID + API Key |
+
+## The merchant Tax configuration tab
+{/* SCREENSHOT: Merchant Tax configuration tab · provider, nexus states, origin address · desktop */}
+
+| Setting | What it does |
+|---------|--------------|
+| **Tax provider** | **None (built-in)**, **TaxJar**, **Avalara** or **TaxCloud**. Picks how US tax is calculated for this merchant's orders. |
+| Provider credentials | The fields for the chosen provider (TaxJar API token; Avalara account ID, license key and company code; TaxCloud API ID and key). Leave them empty when the key lives in a brand integration. |
+| **Use TaxJar sandbox** / **Use Avalara sandbox** | Sends the calls to the provider's sandbox. Applies only when the key typed on this tab is used. See [Sandbox mode](#sandbox-mode). |
+| **US sales tax nexus** | One checkbox per state (and DC) where you collect US sales tax. Used by the built-in rates. See [Nexus](#nexus-which-states-are-taxed). |
+| **Origin address** | The address you ship from. Sent to TaxJar and Avalara. |
+| **Tax shipping** | Adds tax on the shipping amount. Applies to the built-in rates; a provider decides for itself whether shipping is taxable. |
+| **EU seller country**, **B2B tax exemption**, **Default customer type** | VAT settings for EU and UK buyers. |
+
+Saved provider keys are masked when you open the tab again: you see dots and, for long keys, the last four characters. Saving the tab without touching a masked field keeps the stored key. Type a new key to replace it, or clear the field to remove it. The merchant API returns the same masked values.
+
+## Nexus: which states are taxed
+
+- **Tax provider set to None (built-in):** your nexus checkboxes decide. Buyers in states you have not ticked pay no US sales tax.
+- **A provider selected:** the nexus set up in that provider decides, and the checkboxes are not used for the calculation. With TaxJar, states missing from your TaxJar nexus list are answered with $0 without a calculation call. A TaxJar account with no nexus states but an origin address on the Tax tab is treated as having nexus in the origin state. Avalara and TaxCloud apply the nexus configured in their own dashboards.
+
+If the provider cannot answer, the checkout uses the built-in estimate. That estimate follows the provider's nexus list when it is known (TaxJar), otherwise your checkboxes. Tick your nexus states even when you use a provider, so the estimate taxes the right states.
 
 ## How it works
 {/* SCREENSHOT: How It Works · checkout · desktop */}
 
-1. Customer fills in their billing/shipping address on the checkout step.
-2. Before tax is shown, EF asks the configured tax provider for the rate using:
-   - The customer's destination state, ZIP, and city
-   - The order line items and total
-3. The provider returns the tax amount.
-4. EF adds the tax line to the order total and re-renders the order summary.
-5. When payment succeeds, the tax amount stored on the conversion is exactly what was returned by the provider.
+1. The customer fills in their billing and shipping address on the checkout step.
+2. With a provider selected, ElasticFunnels sends it the cart: the destination address, your origin address, the line items (with each product's tax category and discounts) and the shipping amount.
+3. The provider returns the tax, including any tax on shipping.
+4. ElasticFunnels adds the tax line to the order total and re-renders the order summary.
+5. When payment succeeds, the tax is stored on the conversion with a tax report that names the provider.
 
-The same calculated tax flows into Shopify Order Sync (so your accountant sees matching numbers in Shopify), into the EF reports, and into the receipt email.
+The same answer is reused for 10 minutes for an identical cart, so a re-submitted payment (for example after 3D Secure) does not call the provider twice.
+
+With **None (built-in)**, ElasticFunnels looks up the rate for the buyer's ZIP code from a connected TaxJar or Avalara integration when there is one, then from Avalara's free tax tables, then from a static per-state rate. TaxCloud is not used for these rate lookups.
+
+### One-click upsells
+
+Card (NMI, Stripe, Authorize.Net) and PayPal one-click upsells are taxed with the same merchant tax settings and provider as the front sale. Card upsells send the upsell's real shipping amount, so tax on shipping is charged the same way as on the first order.
+
+The calculated tax flows into Shopify Order Sync (so your accountant sees matching numbers in Shopify), into the ElasticFunnels reports, and into the receipt email.
 
 ## Setup
 {/* SCREENSHOT: Setup · integration form · desktop */}
@@ -41,11 +76,14 @@ The same calculated tax flows into Shopify Order Sync (so your accountant sees m
   <Step title="Get an API token">
     Sign up at [taxjar.com](https://www.taxjar.com). Open **Account** → **TaxJar API** → **API Tokens** and copy your token.
   </Step>
-  <Step title="Activate in EF">
-    Go to **Integrations** → **Tax** → **TaxJar**. Paste the token, save.
+  <Step title="Add the key">
+    Go to **Integrations** → **Tax** → **TaxJar**, paste the token and save. Or paste it on the merchant's **Tax configuration** tab instead.
   </Step>
-  <Step title="(Optional) Set nexus states">
-    TaxJar uses your nexus configuration on its dashboard to decide which orders are taxable. Make sure your nexus list in TaxJar matches the states where you collect tax.
+  <Step title="Select TaxJar on the merchant">
+    On the merchant's **Tax configuration** tab, set **Tax provider** to **TaxJar** and fill in the origin address.
+  </Step>
+  <Step title="Set nexus states in TaxJar">
+    TaxJar decides which states are taxable from the nexus states in your TaxJar account. Keep that list current, and tick the same states on the Tax tab so the fallback estimate matches.
   </Step>
 </Steps>
 
@@ -55,11 +93,14 @@ The same calculated tax flows into Shopify Order Sync (so your accountant sees m
   <Step title="Get account credentials">
     From your Avalara account: **Settings** → **License and API Keys** → copy the **Account ID** and **License Key**.
   </Step>
-  <Step title="Activate in EF">
-    Go to **Integrations** → **Tax** → **Avalara**. Paste both credentials and save. Toggle **Sandbox** during setup if you want to use the sandbox environment.
+  <Step title="Add the credentials">
+    Go to **Integrations** → **Tax** → **Avalara**. Paste both credentials, fill in **Company code** and save. Turn on **Sandbox** while you test against Avalara's sandbox.
   </Step>
-  <Step title="Configure company code">
-    Set the **Company Code** that matches the company entity in your Avalara dashboard. Avalara needs this to apply the right tax profile.
+  <Step title="Company code">
+    Use the company code from your AvaTax account (**Settings** → **Companies**). The integration's company code is used first; if it is empty, the company code on the merchant Tax tab is used, otherwise `DEFAULT`.
+  </Step>
+  <Step title="Select Avalara on the merchant">
+    On the merchant's **Tax configuration** tab, set **Tax provider** to **Avalara** and fill in the origin address. Avalara applies the nexus configured in your AvaTax account.
   </Step>
 </Steps>
 
@@ -72,33 +113,53 @@ The same calculated tax flows into Shopify Order Sync (so your accountant sees m
   <Step title="Get API credentials">
     Open **Websites** → pick your site → **Manage Tax States** to confirm coverage, then copy the **API Login ID** and **API Key**.
   </Step>
-  <Step title="Activate in EF">
-    Go to **Integrations** → **Tax** → **TaxCloud**. Paste both values, save.
+  <Step title="Add the credentials">
+    Go to **Integrations** → **Tax** → **TaxCloud**. Paste both values and save, or enter them on the merchant's **Tax configuration** tab.
+  </Step>
+  <Step title="Select TaxCloud on the merchant">
+    Set **Tax provider** to **TaxCloud** and fill in the origin address. TaxCloud needs an origin address; without one the checkout uses the built-in estimate.
   </Step>
 </Steps>
 
-## Multiple integrations & fallbacks
-{/* SCREENSHOT: Multiple integrations · settings · desktop */}
+## Sandbox mode
 
-If you create more than one tax integration, EF tries them in order until one returns a valid response:
+The sandbox setting follows the key that is sent:
 
-1. First active integration is queried.
-2. If it returns an error or is unavailable, the next is tried.
-3. If all integrations fail, the order falls back to **no tax** (and a warning is logged).
+- **The key comes from a brand integration:** the integration's **Sandbox** setting decides. The merchant tab's sandbox toggle is used only when the integration has no sandbox setting at all.
+- **The key is typed on the merchant Tax tab:** the tab's **Use TaxJar sandbox** or **Use Avalara sandbox** toggle decides.
 
-This is useful for high-availability setups (TaxJar + Avalara as backup) or for switching providers without downtime.
+With neither set, calls go to the provider's production service.
+
+## When the provider fails
+{/* SCREENSHOT: Integration Activity tab · tax provider errors · desktop */}
+
+If the provider returns an error, an empty answer or does not respond, the checkout does not stop. The order is charged the built-in estimate (see [Nexus](#nexus-which-states-are-taxed)), and the order's tax report is marked as a fallback with the provider's error.
+
+Every provider call is reported back to the app:
+
+- **Key from a brand integration:** the outcome shows on that integration's **Activity** tab, and the integration raises a **keeps failing** item in **Actions** under the usual rule (10 or more errors, and more than half of its calls, in 24 hours). See [Integration activity](/integrations/integration-health).
+- **Key typed on the merchant Tax tab:** the same rule raises a critical Action named "*Provider* tax calculation keeps failing for *merchant*", which links to the merchant's Tax tab.
+
+Either item closes itself once the provider answers again.
+
+## Pausing a tax integration
+
+A paused tax integration is not used at checkout: its key is not sent and it is skipped for rate lookups. If the merchant's Tax tab selects that provider and has no key of its own, the checkout uses the built-in estimate. Resume the integration to use it again.
 
 ## Troubleshooting
 {/* SCREENSHOT: Troubleshooting · checkout logs · desktop */}
 
 <AccordionGroup>
   <Accordion title="Tax shows as $0 on checkout">
-    Either the destination address isn't taxable in your nexus configuration, the integration credentials are wrong, or the integration call timed out. Check the checkout's developer log on the conversion record.
+    The buyer's state is not a nexus state (in your provider, or in the Tax tab checkboxes when the provider is None), the product is marked tax exempt, or the provider failed and the estimate found no nexus. Check the tax report on the conversion record and the integration's **Activity** tab.
   </Accordion>
-  <Accordion title="Tax shown in EF doesn't match Shopify after sync">
-    Shopify Order Sync sends the tax amount **exactly as collected** in EF. If Shopify shows a different number, you have Shopify's automatic tax also turned on — turn it off for orders tagged `ElasticFunnel`, or set Shopify to "tax included" so it doesn't recompute.
+  <Accordion title="Tax is charged but differs from the provider's dashboard">
+    The order may have used the built-in estimate after a provider error. The conversion's tax report says so and shows the error. Fix the error shown on the integration's **Activity** tab or in **Actions**.
+  </Accordion>
+  <Accordion title="Tax shown in ElasticFunnels doesn't match Shopify after sync">
+    Shopify Order Sync sends the tax amount **exactly as collected** in ElasticFunnels. If Shopify shows a different number, you have Shopify's automatic tax also turned on. Turn it off for orders tagged `ElasticFunnel`, or set Shopify to "tax included" so it doesn't recompute.
   </Accordion>
   <Accordion title="Avalara returns 'TaxCalculationFailed'">
-    The most common cause is a missing `companyCode`. Check the integration form has the correct company code from your Avalara dashboard.
+    The most common cause is a wrong or missing company code. Check **Company code** on the Avalara integration form (or on the merchant Tax tab) against your AvaTax account.
   </Accordion>
 </AccordionGroup>

@@ -1,0 +1,70 @@
+{
+  "out": "images/audiences/actions-chooser.png",
+  "alt": "The window What should happen when people enter or leave this audience? with four choices: Send an email, Keep a list in step in another tool, Send the changes to a webhook and Start an automation",
+  "capture": {
+    "path": "/{brand}/analytics/segments/8",
+    "viewport": {
+      "width": 1440,
+      "height": 1200
+    },
+    "waitFor": "[data-testid='segments.activations.row']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/activations/destinations$",
+        "file": "tools/shots/fixtures/audiences/actions-destinations.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/activations$",
+        "file": "tools/shots/fixtures/audiences/actions.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/analytics/segments/8/export/columns",
+        "file": "tools/shots/fixtures/audiences/export-columns.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/emails/all",
+        "file": "tools/shots/fixtures/audiences/email-templates.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='segments.activations.add']",
+        "wait": 900
+      },
+      {
+        "click": "[data-testid='segments.activations.preset.email']",
+        "wait": 300
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='segments.activations.preset.email']",
+      "title": "Send an email",
+      "text": "Creates and turns on an automation",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='segments.activations.preset.sync']",
+      "title": "Keep a list in step",
+      "text": "Klaviyo, ActiveCampaign, Mailchimp",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='segments.activations.preset.webhook']",
+      "title": "Webhook",
+      "text": "A signed POST to your URL",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='segments.activations.preset.automation']",
+      "title": "Start an automation",
+      "text": "Ones that listen, or a new one",
+      "side": "left"
+    }
+  ]
+}

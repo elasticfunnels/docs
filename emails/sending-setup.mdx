@@ -10,7 +10,7 @@ An order confirmation only reaches a customer when all three of these are in pla
 
 1. **A sender.** SMTP credentials on the brand, or an email integration on the merchant that is
    connected and not paused.
-2. **A template.** The email itself, from **Apps → Emails**. Your brand has a **Default**
+2. **A template.** The email itself, from the template list (**Settings → Apps → Emails**). Your brand has a **Default**
    template for each standard event.
 3. **A merchant whose payments run through ElasticFunnels.** NMI, Stripe, PayPal, Klarna and
    Authorize.Net checkouts send order emails. BuyGoods, ClickBank, Digistore24, JVZoo and Shopify
@@ -22,7 +22,7 @@ Instead a **Choose a sending account for ... emails** task appears in your Brand
 per email type, and closes by itself once that email can be sent again.
 
 <Tip>
-The **Status** column in **Apps → Emails** shows, for each template, whether it is sending and
+The **Status** column in the template list (**Settings → Apps → Emails**) shows, for each template, whether it is sending and
 for which merchants. Check it after any change here.
 </Tip>
 
@@ -87,8 +87,9 @@ for every template. Change the sender in one place and every transactional email
 ### Alternative: a per-merchant email integration
 
 Instead of brand SMTP, a merchant can carry its own sending service. Merchant → **Email**
-tab → **Email Integration** lists your Mailgun, SendGrid, and Mailrelay integrations from
-**Integrations**.
+tab → **Email Integration** lists your Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid
+and Mailrelay integrations from **Integrations**. How to connect each one is on
+[Email Sending Accounts](/emails/sending-accounts).
 
 **Brand SMTP takes priority.** If the brand has SMTP configured, the merchant integration
 is ignored for order emails. Use the merchant integration when a single brand sells through
@@ -107,7 +108,7 @@ locked out.
 ## Step 2: create the templates
 {/* SCREENSHOT: Emails list · brand templates with names and subjects · desktop */}
 
-Open **Apps → Emails** in the sidebar. Tabs filter the templates by type (Orders, Subscriptions,
+Open **Settings → Apps → Emails** in the sidebar. Tabs filter the templates by type (Orders, Subscriptions,
 Members and login, Courses, Custom). Your brand has a **Default** template for each standard
 event, and you can create your own. See [Emails](/emails/overview) for the list,
 [Building an email](/emails/builder) for the builder and
@@ -167,7 +168,7 @@ For each email, ElasticFunnels checks these in order and sends the first templat
 2. **Settings** → **Subscriptions**, which holds brand-wide picks for the same events
    (not for the Pre-Renewal Reminder).
 3. The brand's **Default** template for that event, marked with a **Default** badge in
-   **Apps → Emails**.
+   the template list (**Settings → Apps → Emails**).
 
 So to change the copy for every merchant at once, edit the Default template. To give one merchant
 different copy, duplicate the Default, edit the copy, and pick it on that merchant.
@@ -217,4 +218,5 @@ a promotional blast should not put order confirmations at risk.
 - [Subscription Emails](/emails/subscription-emails) - Renewals, paused, canceled, dunning
 - [Emails Not Sending](/emails/troubleshooting) - Checklist when a customer got nothing
 - [Template Variables](/emails/template-variables) - Complete merge tag reference
+- [Email Sending Accounts](/emails/sending-accounts) - Amazon SES, Postmark, Brevo, Resend and the sender rule
 - [Email Marketing Integrations](/integrations/email-marketing) - Mailgun, SendGrid, generic SMTP

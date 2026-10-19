@@ -8,7 +8,23 @@ description: "Complete reference for all email template variables available in E
 
 Template variables use double curly braces: `{{ variable.path }}`. When an email is sent, each variable is replaced with the actual value from the transaction.
 
-Variables are grouped by **scope** — each email type has access to different scopes depending on the data available at send time.
+Variables are grouped by **scope**: each email type has access to different scopes depending on the data available at send time.
+
+## Conditions and loops
+
+Show a block only when a value is set with `@if(...)` / `@else` / `@endif`, and repeat a block per order line with `@each(product in products)` / `@endeach` (`@foreach` / `@endforeach` work too):
+
+```html
+@if(purchase.shipping_address)
+<p>Shipping to {{ purchase.shipping_address }}, {{ purchase.shipping_city }}</p>
+@endif
+
+@each(product in products)
+<p>{{ product.name }} x {{ product.quantity }}: ${{ product.total }}</p>
+@endeach
+```
+
+In the visual builder these appear as If, Else and Foreach blocks around the content they control, and variables show as written, for example `{{ purchase.customer_first_name }}`. Values fill in when the email is sent, or when you send a test. An `@elseif` shows as an If block inside the Else block of the one before it.
 
 ## Brand variables (all emails)
 {/* SCREENSHOT: Brand variables (all emails) · email editor or template settings · desktop */}
@@ -62,6 +78,20 @@ Available in: purchase, refund, shipped, cancelled, renewal-success, renewal-fai
 | `purchase.billing_state` | Billing state |
 | `purchase.billing_zip` | Billing postal code |
 | `purchase.billing_country` | Billing country |
+
+### Gift order fields
+
+Orders where the buyer sent bonuses to a friend carry these fields. The default order and shipped emails use them.
+
+| Variable | Example | Description |
+|---|---|---|
+| `purchase.has_gift` | true | The order includes a gift sent to someone else |
+| `purchase.gift_recipient_name` | Sam Lee | Who receives the gift |
+| `purchase.gift_recipient_first_name` | Sam | Recipient first name |
+| `purchase.gift_recipient_city` | Denver | Recipient city |
+| `purchase.gift_recipient_country` | US | Recipient country |
+| `purchase.is_gift` | true | This email is about the gift shipment itself |
+| `purchase.parent_public_order_id` | ORD-1234 | The buyer's order the gift belongs to |
 
 ## Product variables (inside `@each`)
 {/* SCREENSHOT: Product variables (inside `@each`) · email editor or template settings · desktop */}

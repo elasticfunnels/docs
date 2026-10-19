@@ -1,0 +1,9 @@
+{
+  "integrations": [
+    { "id": 77, "name": "Northwind Klaviyo", "integration": "klaviyo", "paused": true },
+    { "id": 78, "name": "Northwind ActiveCampaign", "integration": "activecampaign", "paused": false }
+  ],
+  "automations": [
+    { "id": 21, "title": "Welcome back series", "trigger": "entered" }
+  ]
+}

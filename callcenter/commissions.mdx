@@ -33,13 +33,8 @@ The report shows a filterable table of all commissions.
 
 ### Filters
 
-- **Date range** — Filter by start and end date using the date-from and date-to pickers
-- **Agent** — View a specific agent's commissions
-- **Status** — Show only pending, approved, or paid
-
-<Tip>
-The date range filter defaults to the current month. Use it to pull reports for any custom period — weekly, bi-weekly, or monthly payroll cycles.
-</Tip>
+- **Agent**: view a specific agent's commissions
+- **Status**: show only pending, approved, paid, or clawed back
 
 ### Commission Details
 
@@ -53,7 +48,7 @@ Each entry shows:
 | **Rate** | The commission rate (flat $ or %) |
 | **Amount** | Calculated dollar amount |
 | **Order Total** | The total order value |
-| **Status** | Pending, Approved, or Paid |
+| **Status** | Pending, Approved, Paid, or Clawed back |
 
 ## Approval Workflow
 
@@ -68,14 +63,42 @@ Commissions follow a three-step status flow:
 - **Approve** — Select multiple pending commissions and approve them at once
 - **Mark Paid** — Select approved commissions and mark them as paid in batch
 
+### Nobody approves their own commission
+
+A manager who also takes calls cannot approve or pay their own commissions. When their own rows are part of a selection, EF skips them, approves or pays the rest, and tells them how many were skipped; another manager has to approve those. Only the organization owner can approve their own.
+
+Approvals and payments are recorded in the commission audit log with the person who made them.
+
+### Changing a call's outcome later
+
+Saving a call's outcome again recalculates the commission only while it is still **Pending**. An approved or paid commission keeps its status and amount, and a clawed-back one stays clawed back.
+
+## Refunds and Chargebacks
+
+When a phone sale is refunded, charged back or voided, the agent's commission on it is taken back automatically. It does not matter how the refund reaches EF: issued from Customer Service or the order page, reported by the payment gateway, or sent by the merchant's postback.
+
+| What happened | What happens to the commission |
+|---------------|-------------------------------|
+| Chargeback | The whole commission is taken back and its status becomes **Clawed back** |
+| Void or full refund | The whole commission is taken back and its status becomes **Clawed back** |
+| Partial refund | The same share of the commission is taken back (a $25 refund on a $100 order takes back 25%). The status stays as it was until the whole order is refunded |
+
+- The commission report, the leaderboard and the CSV export count commission after reversals, so a refunded sale stops counting as payable.
+- If the gateway sends the same refund twice, the commission is reversed once.
+- A commission rule's **Clawback on refund** and **Clawback on chargeback** switches and its clawback window still decide whether that rule's commissions are reversed.
+- A refund of a phone sale keeps the agent and call center of the original sale, so it shows against that agent.
+
+<Note>
+If a commission was already **Paid** when the order is refunded, EF records the amount taken back (and shows the commission as **Clawed back** once the whole order is refunded or charged back), but does not deduct it from the agent's next payout for you. Recover it in your payroll.
+</Note>
+
 ## Exporting
 
-Click **Export** to download commission data as a CSV file for payroll processing. The export respects your current filters, so you can export by date range, agent, or status.
+Click **Export** to download commission data as a CSV file for payroll processing. The export respects your current filters, so you can export by agent or status.
 
 Common payroll workflow:
 
 1. Open **Call Center** → **Commissions**
-2. Set the **Date range** for the payroll period
-3. Filter by agent or status if needed
-4. Approve or mark paid in bulk
-5. Export the final CSV
+2. Filter by agent or status if needed
+3. Approve or mark paid in bulk
+4. Export the final CSV

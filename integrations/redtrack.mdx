@@ -30,7 +30,9 @@ The postback URL template can use any of the following macros:
 | `{order_id}` | EF conversion code |
 | `{email}` | Customer email (optional) |
 
-The default URL produced when you click **Insert sample URL** includes `{clickid}`, `{sum}`, `{currency}`, `{type}`, and `{order_id}`. Add custom parameters with the parameter builder if RedTrack expects more fields.
+**Insert sample URL** builds the URL on your **Postback Domain** with `{clickid}`, `{sum}`, `{currency}` and `{type}`. Add `{order_id}` or other parameters with the parameter builder if RedTrack expects more fields.
+
+<img src="/images/integrations/redtrack-postback-url.png" alt="A RedTrack postback URL split into its parts: the postback domain, then clickid, sum, currency and type" />
 
 ## Setup
 {/* SCREENSHOT: Setup · integration settings · desktop */}

@@ -61,12 +61,29 @@ Magic links are single-use. Once clicked, they cannot be used again. If the link
 - Both methods include a notice telling recipients to ignore the email if they didn't request it
 - Links are single-use to prevent sharing or replay attacks
 
+## When your brand has no sending account
+
+Login codes and links always go out, so a customer can sign in even before you set up SMTP or an
+email integration. If your brand cannot send them itself, ElasticFunnels sends a plain version:
+
+- The sender name is your brand's name. The address is an ElasticFunnels no-reply address, so it
+  never looks like it came from a person.
+- Replies go to your brand's support email, if you set one in your brand settings.
+- **Emails** → **Logs** lists it as Sent, with its subject, and the channel reads
+  "ElasticFunnels mailer".
+
+Your own template and From address are used as soon as your brand has SMTP or an email
+integration. See [Sending setup](/emails/sending-setup).
+
+Order and subscription emails work differently: they are never sent by ElasticFunnels. Without a
+sending account they are skipped, and you get a "Choose a sending account" action.
+
 ## Customizing login emails
 {/* SCREENSHOT: Customizing login emails · email editor or template settings · desktop */}
 
 Login templates are configured at the brand level. To customize:
 
-1. Open **Apps → Emails** in the sidebar
+1. Open **Settings → Apps → Emails** in the sidebar
 2. Find "Member Login Verification Code" or "Member Login Magic Link"
 3. Edit in the Visual Builder or Code Editor
 4. Keep the `{{ code }}` or `{{ magic_link_url }}` variables — removing them will break authentication

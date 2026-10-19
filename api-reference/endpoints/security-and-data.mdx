@@ -6,7 +6,7 @@ description: 'API keys, payment metadata, permissions, and analytics data availa
 ## API keys
 
 - Use the `EF-Access-Key` header for programmatic access. Store keys in environment variables or a secrets manager, not in client-side code or public repos.
-- Endpoints under `/api/brands/{brand}/api-key` let you inspect, create, or rotate keys. **Treat any key string in a response as secret** — rotate immediately if it is exposed.
+- Keys are created, regenerated and revoked from **Settings → API** in a signed-in browser session, with a fresh two-factor confirmation. An API key can't create or rotate keys. **Treat any key string as secret**: revoke it and create a new one at once if it is exposed. See [Connect the ef CLI and create API keys](/account/cli-and-api-keys).
 - Rotating a key invalidates the previous key for API access.
 
 ## Billing and payment methods

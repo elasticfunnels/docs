@@ -5,10 +5,14 @@ description: 'Let customers manage their subscriptions and request refunds direc
 
 The Customer Care portal adds two self-service features to the members area:
 
-- **Manage** — Customers can pause, skip, or cancel a subscription (with optional retention offers). The manage page also shows a list of orders eligible for a refund.
-- **Self-refund** — Customers can submit a refund request for eligible orders (one-time purchases or subscription first charges).
+- **Manage**: customers cancel a subscription through an exit survey, and can accept a retention offer instead (a discount, a pause, or a switch to another product, depending on the offers you set). The manage page also lists the orders eligible for a refund.
+- **Self-refund**: customers submit a refund request for eligible orders (one-time purchases or subscription first charges).
 
-Both features are configured per merchant in **Merchant settings → Customer care** and are completely optional.
+Both features are switched on per merchant in **Merchant settings → Customer care** and are optional.
+
+<Note>
+The built-in Manage page has no skip button. If you want buyers to skip, pause or resume on their own, build it into your members area template with the [subscription template functions](/members-area/subscription-management) (`skipSubscription`, `pauseSubscription`, `resumeSubscription`, `cancelSubscription`). Those functions work on every subscription your brand bills (NMI, Stripe, PayPal, Authorize.net) and do not depend on the Customer care toggle.
+</Note>
 
 ---
 
@@ -32,7 +36,7 @@ When a refund request is denied, the error message automatically includes your s
 
 ## Enabling Customer Care
 
-1. Navigate to **Merchants** and open a merchant configured with Stripe or NMI.
+1. Navigate to **Merchants** and open an NMI or Stripe merchant (the **Customer care** tab shows on those two).
 2. Click the **Customer care** tab.
 3. Enable the features you want:
    - **Subscription management** — turns on the Manage page for active subscriptions.

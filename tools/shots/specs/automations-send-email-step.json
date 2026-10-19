@@ -1,0 +1,64 @@
+{
+  "out": "images/automations/send-email-step.png",
+  "alt": "The Send email step's options: Sending account, Email template with Edit email in builder, To, and the optional Subject, From email and From name showing the template's values in grey",
+  "_source": "elasticfunnels repo flow _dev/flows/automation-send-email-template step 11 (optional fields show the template values), recorded at 1440x900 on demo brand 899 with the fictional builder fixture and sending accounts in that flow, cropped to CSS x 1032, y 125, 398 x 765",
+  "image": "tools/shots/source/automations-send-email-step.png",
+  "imageSize": {
+    "w": 398,
+    "h": 765
+  },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        12,
+        175,
+        286,
+        40
+      ],
+      "title": "Sending account",
+      "text": "Which account sends it"
+    },
+    {
+      "box": [
+        12,
+        250,
+        286,
+        90
+      ],
+      "title": "Email template",
+      "text": "The saved email it sends"
+    },
+    {
+      "box": [
+        12,
+        385,
+        328,
+        40
+      ],
+      "title": "To",
+      "text": "An address or a variable"
+    },
+    {
+      "box": [
+        12,
+        538,
+        367,
+        40
+      ],
+      "title": "Subject",
+      "text": "Empty sends the template's"
+    },
+    {
+      "box": [
+        12,
+        613,
+        367,
+        40
+      ],
+      "title": "From email",
+      "text": "Shows the template's; must be verified"
+    }
+  ]
+}

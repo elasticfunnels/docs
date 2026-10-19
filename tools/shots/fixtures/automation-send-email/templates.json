@@ -1,0 +1,1 @@
+[{"id":9201,"name":"Course access","subject":"Your login details, {{ purchase.customer_first_name }}","from_name":"Acme","from_email":"orders@example.com","html":"","css":"","automation_id":21,"variable_scope":"automation-trigger"}]

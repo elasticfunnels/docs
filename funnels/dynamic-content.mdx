@@ -92,7 +92,7 @@ Connect it beneath whatever decides that this variant applies — an entry node 
 
 ```mermaid
 flowchart LR
-  E[Loaded] --> C{Query Parameter Condition<br/>aff_id is 42}
+  E[On Page Load] --> C{Query Parameter Condition<br/>aff_id is 42}
   C -->|Output 1 · true| D[Dynamic Content<br/>container: hero-banner<br/>component: affiliate-42-banner]
   C -->|Output 2 · false| N[ default content renders ]
 ```
@@ -144,7 +144,7 @@ The `name` attribute plays no part in matching at render time; matching is on `i
 
 In Page Events:
 
-1. **Loaded** → **Referred By Affiliate** (select the affiliate)
+1. **On Page Load** → **Referred By Affiliate** (select the affiliate)
 2. Output 1 → **Dynamic Content** → container `Hero Banner`, component `affiliate-42-banner`
 3. Output 2 → nothing; the default banner renders
 
@@ -164,7 +164,7 @@ Each slot needs its own Dynamic Content node. They can hang off the same conditi
 
 ### Country-specific pricing
 
-1. **Loaded** → **Is From Country** with `CA` selected
+1. **On Page Load** → **Is From Country** with `CA` selected
 2. Output 1 → **Dynamic Content** → container `pricing`, component `pricing-cad`
 3. Output 2 → **Is From EU** → Output 1 → **Dynamic Content** → container `pricing`, component `pricing-eur`
 4. Everything else falls through to the container's default content

@@ -1,0 +1,43 @@
+{
+ "id": 9101,
+ "name": "Acme Postmark",
+ "integration": "postmark",
+ "status": "active",
+ "pausable": false,
+ "pausable_group": null,
+ "config": {
+  "server_token": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+  "message_stream": "outbound",
+  "broadcast_stream": "broadcast",
+  "from_email": "orders@example.com",
+  "from_name": "Acme Health",
+  "reply_to": "support@example.com",
+  "webhook_status": "registered"
+ },
+ "last_sync_at": null,
+ "sync_status": "pending",
+ "sync_error": null,
+ "sync_stats": null,
+ "behaviour": {
+  "acts": [],
+  "used_by": [
+   "merchants",
+   "campaigns"
+  ],
+  "sync": false,
+  "inbound": false,
+  "log": "email-logs",
+  "classes": [
+   "B"
+  ]
+ },
+ "health": {
+  "last_event_at": null,
+  "last_success_at": null,
+  "last_error_at": null,
+  "last_error": null,
+  "events_24h": 0,
+  "errors_24h": 0
+ },
+ "linked_merchants": []
+}

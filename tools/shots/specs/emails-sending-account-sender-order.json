@@ -1,0 +1,53 @@
+{
+  "out": "images/emails/sending-account-sender-order.png",
+  "alt": "The Default sender card of a sending account with How the sender is chosen opened, listing the order: the send's own sender, this default, then the template's",
+  "capture": {
+    "path": "/{brand}/integrations/amazon_ses/9102",
+    "viewport": {
+      "width": 1440,
+      "height": 1700
+    },
+    "waitFor": "text=How the sender is chosen",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/integrations/9102$",
+        "file": "tools/shots/fixtures/email-sending-accounts/ses-awaiting.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "text=How the sender is chosen"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": {
+      "x": 276,
+      "y": 1055,
+      "width": 760,
+      "height": 500
+    }
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='integrations.amazon-ses.from-email']",
+      "title": "Default From Email",
+      "text": "Used when the send sets none",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.reply-to']",
+      "title": "Default Reply-To",
+      "text": "Used when the send sets none",
+      "side": "left"
+    },
+    {
+      "selector": "text=How the sender is chosen",
+      "title": "How the sender is chosen",
+      "text": "The order, first match wins"
+    }
+  ]
+}

@@ -131,7 +131,7 @@ In a page you write in code, use the class names directly. A minimal VSL page:
 </script>
 ```
 
-The same fallback without code is a Page Events flow: **Loaded** → **Wait Seconds** (`1500`) → **If Showed CTA** → output 2 → **Show Video CTA**. Tick **Scroll to CTA** on the last node if the page should jump. See [Page Events nodes](/funnels/page-events-nodes).
+The same fallback without code is a Page Events flow: **On Page Load** → **Wait Seconds** (`1500`) → **If Showed CTA** → output 2 → **Show Video CTA**. Tick **Scroll to CTA** on the last node if the page should jump. See [Page Events nodes](/funnels/page-events-nodes).
 
 <Tip>
 A fallback timer reveals the offer the same way the video does, so it is saved for that browser too. Set it later than the pitch timestamp so it only catches visitors whose video never fired.

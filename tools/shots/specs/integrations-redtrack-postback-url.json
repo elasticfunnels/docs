@@ -1,0 +1,13 @@
+{
+  "kind": "url",
+  "out": "images/integrations/redtrack-postback-url.png",
+  "alt": "A RedTrack postback URL split into its parts: your postback domain, then clickid, sum, currency and type",
+  "segments": [
+    { "text": "https://" },
+    { "text": "track.example.com/postback", "title": "Postback domain", "desc": "Your tracking domain in RedTrack" },
+    { "text": "?clickid={clickid}", "title": "Click ID", "desc": "The RedTrack click that gets the credit" },
+    { "text": "&sum={sum}", "title": "Amount", "desc": "Order total in your account currency" },
+    { "text": "&currency={currency}", "title": "Currency", "desc": "ISO code, for example USD" },
+    { "text": "&type={type}", "title": "Event type", "desc": "purchase, refund or chargeback" }
+  ]
+}

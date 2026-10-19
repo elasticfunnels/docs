@@ -1,0 +1,80 @@
+---
+title: 'SlickText Integration'
+description: 'Add customers and leads to your SlickText SMS lists from automations.'
+---
+
+## Overview
+{/* SCREENSHOT: Overview · integration form · desktop */}
+
+The SlickText integration lets your ElasticFunnels automations keep your SlickText contacts and lists up to date. When someone buys, signs up or fills in a form, an automation step can create or update their SlickText contact by mobile number, put them on lists, take them off lists, or look them up to check whether they are subscribed.
+
+SlickText contacts are US and Canadian mobile numbers. A number that is not a 10-digit US or Canadian number (with or without +1) is refused by the step.
+
+## What you get
+{/* SCREENSHOT: Capabilities · automation builder · desktop */}
+
+| Action | What it does |
+|--------|--------------|
+| Create or Update Contact | Finds the contact by mobile number and updates it, or creates it. Saves first and last name, email, birthdate, city, state, ZIP, country and custom fields, can set the opt-in status, and can add the contact to one or more lists |
+| Remove Contact from Lists | Takes the contact off the lists you choose. The contact and its opt-in status stay as they are. If no contact has that number, nothing happens |
+| Find Contact | Looks the contact up by mobile number and returns whether it was found, its contact ID and its opt-in status, for a later **Continue If** step |
+
+The list picker loads the lists from your SlickText brand, so you choose them by name.
+
+There is no "send a text" step. SlickText's API sends campaigns to lists and segments, not single messages, so send texts from SlickText itself (for example a SlickText workflow on the list the contact was added to).
+
+## Setup
+{/* SCREENSHOT: Setup · integration form · desktop */}
+
+<Steps>
+  <Step title="Create an API key in SlickText">
+    Log in to SlickText. Open the menu next to your name (bottom left), go to **Settings** → **API & Webhooks** → **API Keys** and click **Create API Key**. Copy the key right away: SlickText shows it only once.
+  </Step>
+  <Step title="Connect it in ElasticFunnels">
+    Go to **Integrations**, open **SlickText**, give the connection a name and paste the **API key**. Leave **SlickText Brand ID** blank. It is the brand inside your SlickText account, not one of your ElasticFunnels brands, and ElasticFunnels reads it from the key. Fill it only if your SlickText account has more than one brand. Save. The key is checked with SlickText when you save.
+  </Step>
+  <Step title="Use it in automations">
+    Open **Automations**, add a **SlickText: Create or Update Contact** step after your trigger, choose the SlickText connection, and map the trigger's phone field into **Mobile number**. Pick the lists to add the contact to.
+  </Step>
+</Steps>
+
+You can also start from a preset: on the SlickText integration page, the **Presets** tab creates "On New Customer", "On New Purchase" or "On Collection Entry" automations that save the person as a SlickText contact. Before you save the connection, the page already lists these presets with a preview of each one; you can create them once the connection is saved.
+
+## Opt-in status and consent
+{/* SCREENSHOT: Opt-in · automation builder · desktop */}
+
+Only text people who agreed to receive texts from you.
+
+- **Leave as it is** (the default): an existing contact keeps its status, and a new contact starts as **not subscribed**, so SlickText does not text it.
+- **Subscribed**: use it only when the person gave you permission, for example a ticked SMS opt-in box on your checkout.
+- **Ask new contacts to confirm by text (double opt-in)**: SlickText texts the new contact a confirmation request, and they are subscribed once they reply. It applies to new contacts only.
+- A contact who replied STOP (**unsubscribed**) or was **blocked** stays that way. The step still saves their name and other fields, leaves the status alone and reports `opt_in_skipped: true`.
+
+## Custom fields
+{/* SCREENSHOT: Custom fields · automation builder · desktop */}
+
+Create the custom field in SlickText first, then fill it from the step with its **internal name**, one per line:
+
+```
+favorite_product=Gold plan
+```
+
+Values can use variables from earlier steps, the same way as the other fields. A JSON object (`{"favorite_product": "Gold plan"}`) works too. Names that clash with standard contact fields (such as `mobile_number` or `opt_in_status`) are ignored.
+
+## Troubleshooting
+{/* SCREENSHOT: Troubleshooting · automation logs · desktop */}
+
+<AccordionGroup>
+  <Accordion title="Saving the integration says SlickText rejected the API key">
+    The key was deleted or disabled in SlickText, or it was copied incompletely. Create a new key under **Settings** → **API & Webhooks** and paste it again.
+  </Accordion>
+  <Accordion title="The key belongs to a different brand">
+    You filled in a SlickText Brand ID that is not the brand of this key. Clear the SlickText Brand ID field, or use the key created in that brand.
+  </Accordion>
+  <Accordion title="The step fails with a mobile number error">
+    The value is not a US or Canadian mobile number, or the phone field was empty for this person. Add a **Continue If** step before it that checks the phone is not empty.
+  </Accordion>
+  <Accordion title="The contact was saved but is not subscribed">
+    New contacts start as not subscribed unless the step sets **Subscribed** or asks for double opt-in. A contact who opted out is never re-subscribed by an automation.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,157 @@
+---
+title: "Connect the ef CLI and create API keys"
+description: "Approve the ef command-line tool from your browser, create scoped API keys, and confirm it's you with a passkey or authenticator code."
+---
+
+Connecting the `ef` CLI and creating an API key both hand out access that keeps working after you close the browser. Before either one, ElasticFunnels checks that it's really you, even when you are already signed in.
+
+## Before you start
+
+- [Two-factor authentication](/account/two-factor-authentication) must be on for your account: an authenticator app, a [passkey](/account/passkeys), or both. If it's off, the app opens the setup first and continues once you are done.
+- Keys and CLI connections are created from a signed-in browser session only. An existing API key or CLI token can't create new ones.
+
+## The "Confirm it's you" step
+{/* SCREENSHOT: Confirm it's you window · Confirm with passkey button with the Use authenticator code instead link · desktop */}
+
+When you click **Connect** or **Create API key**, a window asks you to confirm it's you. What it offers depends on your account:
+
+| Your account has | The window shows |
+|---|---|
+| A passkey | **Confirm with passkey** first. **Use authenticator code instead** switches to the code field. |
+| A passkey, no authenticator app | **Confirm with passkey** first. **Use a recovery code instead** switches to a recovery code. |
+| An authenticator app only | **Enter your authenticator code**: a 6-digit code from the app, or one of your recovery codes. |
+
+With a passkey, your device asks for your fingerprint, face or PIN. A passkey that skips that check is refused.
+
+One confirmation lasts **10 minutes**. Within that time you can connect more devices or create more keys without being asked again. Signing in with your second factor counts too, so right after sign-in you may not see the window at all.
+
+When you confirm, the action you started (the connection or the new key) goes through on its own. If you click **Cancel** instead, nothing is created and the app shows **Action not saved**.
+
+## Connect the ef CLI
+{/* SCREENSHOT: Connect a device page · Device, Tool, From and Code rows with the Which project? picker and Connect button · desktop */}
+
+The `ef` CLI keeps a project's pages on your computer so you, or an AI tool such as Claude Code or Codex, can edit and publish them. Each computer gets its own connection to one project, which you can disconnect on its own.
+
+<Tip>
+**Settings → AI tools** in your project gives you a ready-made instruction to paste into Claude Code, Codex or a desktop app. It runs the same steps below for you, and the approval page still opens in your browser.
+</Tip>
+
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    npm i -g @elasticfunnels/cli
+    ```
+  </Step>
+  <Step title="Start the connection">
+    In an empty folder for the project, run:
+
+    ```bash
+    ef init
+    ```
+
+    The terminal prints a short code and a link, and opens the link in your browser:
+
+    ```
+      Your code:  WDJB-MJHT
+      Open:       https://app.elasticfunnels.io/cli-auth?code=WDJB-MJHT
+    ```
+
+    The code expires after 10 minutes. If the browser doesn't open, copy the link yourself.
+  </Step>
+  <Step title="Check the request">
+    The **Connect a device** page shows the device name, the tool, the IP address it comes from and the code. Make sure the code matches the one in your terminal. If it doesn't, or you didn't start this, click **Cancel**.
+  </Step>
+  <Step title="Pick the project">
+    Under **Which project?**, choose the project this computer may reach. The device can read and change that project the same way you can, and nothing else.
+  </Step>
+  <Step title="Connect and confirm it's you">
+    Click **Connect**, then confirm with your passkey or code as described above.
+  </Step>
+  <Step title="Go back to the terminal">
+    The page shows **Device connected**. The terminal picks it up by itself and prints `Signed in to <your project>`.
+  </Step>
+</Steps>
+
+### A computer without a browser
+
+For a remote server where you can't open the approval page:
+
+1. In the app, go to **Settings → AI tools**, click **Show advanced options**, and under **Computer without a browser** click **Create a one-time code**. This also asks you to confirm it's you.
+2. Copy the command it shows and run it on the server:
+
+   ```bash
+   ef init --code ABCD-1234
+   ```
+
+The code works once and expires in 10 minutes.
+
+### Reconnect a folder
+
+If a computer was disconnected, or its access expired, commands stop with a message telling you to sign in again. Run this in the project folder:
+
+```bash
+ef login
+```
+
+It goes through the same browser approval and replaces only the stored credential. Your synced files and the project binding stay as they are. Use `ef login --code <code>` on a machine without a browser.
+
+### See or disconnect your devices
+
+Open **Account settings** from your account menu and choose **Connected devices**. Each row shows the device, its project, and when it connected and was last used. Disconnecting a device asks you to confirm it's you, and stops that computer at once without touching your other connections.
+
+## Create an API key
+{/* SCREENSHOT: New API key window · Name, Projects and Access options · desktop */}
+
+API keys are for your own scripts and integrations. Send the key in the `EF-Access-Key` header (see [Authentication](/api-reference/authentication)).
+
+<Steps>
+  <Step title="Open the API settings">
+    In your project, go to **Settings → API** and click **Create API key**.
+  </Step>
+  <Step title="Name it">
+    Give it a name that says where it will be used, such as `reporting server`.
+  </Step>
+  <Step title="Choose the projects">
+    Under **Projects**, pick **Only** this project, **Projects I pick**, or **All projects I can access, now and later**.
+  </Step>
+  <Step title="Choose the access">
+    Under **Access**, pick **Read and write** or **Read-only**.
+  </Step>
+  <Step title="Create and confirm it's you">
+    Click **Create API key**, then confirm with your passkey or code.
+  </Step>
+  <Step title="Copy the key now">
+    The **Copy your new key** window shows the full key once. Store it in a password manager or your integration's settings, then click **I've stored it**. After that the page shows only the first and last characters.
+  </Step>
+</Steps>
+
+Scoped keys never reach organization settings, organization billing or team management, whatever you pick.
+
+**Revoke** stops a key at once and can't be undone.
+
+### Older full-access keys
+
+A key marked **Full access (legacy)** can do everything your account can do, in every project. It keeps working. **Regenerate** gives it a new value and **Convert to scoped key** replaces it with a key limited to the projects and access you pick. Both ask you to confirm it's you, and both stop the old value at once, so update your integrations right after.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="I cancelled the passkey prompt">
+    The window stays open and nothing counts as a failed try. Click **Confirm with passkey** again, or use the link below it to enter your authenticator code or a recovery code.
+  </Accordion>
+  <Accordion title="&quot;Too many attempts. Try again in 15 minutes.&quot;">
+    Five failed tries within 15 minutes, counting wrong codes and failed passkey checks together, lock this step until the 15 minutes are up. A successful confirmation resets the count. Switching between passkey and code does not reset the count. Wait, then start the connection or key again.
+  </Accordion>
+  <Accordion title="My browser doesn't support passkeys">
+    Use **Use authenticator code instead** (or **Use a recovery code instead** on a passkey-only account). To use your passkey, open the link in a recent version of Chrome, Safari, Edge or Firefox.
+  </Accordion>
+  <Accordion title="&quot;This link is no longer valid&quot;">
+    The request expired (after 10 minutes) or was already used. Run `ef init` or `ef login` again for a new code.
+  </Accordion>
+  <Accordion title="The terminal says &quot;Sign-in was declined in the browser&quot;">
+    Someone clicked **Cancel** on the **Connect a device** page. Nothing was connected. Run the command again.
+  </Accordion>
+  <Accordion title="The window says my account is restricted">
+    Some new accounts can't create keys or connect devices until access is granted. Use **Request access** in that window and tell us what you need it for.
+  </Accordion>
+</AccordionGroup>

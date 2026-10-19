@@ -1,0 +1,56 @@
+{
+  "out": "images/emails/sending-account-amazon-ses.png",
+  "alt": "The Amazon SES sending account form: Access key ID, Region, Secret access key and Configuration set, with the setup steps beside it",
+  "capture": {
+    "path": "/{brand}/integrations/amazon_ses/9102",
+    "viewport": {
+      "width": 1440,
+      "height": 1500
+    },
+    "waitFor": "[data-testid='integrations.amazon-ses.access-key-id']",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/integrations/9102$",
+        "file": "tools/shots/fixtures/email-sending-accounts/ses-awaiting.json"
+      }
+    ],
+    "crop": {
+      "x": 276,
+      "y": 236,
+      "width": 1140,
+      "height": 590
+    }
+  },
+  "maxWidth": 900,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid='integrations.amazon-ses.access-key-id']",
+      "title": "Access key ID",
+      "text": "From an IAM user that may send",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.region']",
+      "title": "Region",
+      "text": "Where your SES identities live"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.secret-key-replace'] >> xpath=..",
+      "title": "Secret access key",
+      "text": "Checked on save, never shown again",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='integrations.amazon-ses.configuration-set']",
+      "title": "Configuration set",
+      "text": "Needed for delivery events",
+      "side": "left"
+    },
+    {
+      "selector": "text=How to set it up",
+      "title": "How to set it up",
+      "text": "The AWS steps, with links"
+    }
+  ]
+}

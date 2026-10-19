@@ -432,7 +432,7 @@ Get the complete query string for use in URLs.
 
 <!-- Conditional content based on parameter -->
 <script>
-  const source = '{{ query.source }}';
+  const source = {{ query.source | json | raw }};
   if (source === 'email') {
     // Show email-specific content
   }
@@ -442,7 +442,25 @@ Get the complete query string for use in URLs.
 **Important Notes:**
 - Query parameters are case-sensitive
 - If a parameter doesn't exist, the variable is replaced with an empty string
-- All query parameter values are automatically escaped for security
+- Anyone can put anything in a URL, so query values are escaped by default (see below)
+
+### Escaping and `| raw`
+
+A query value is printed as text. `?name=<b>Ann</b>` shows the tags as characters instead of bold text, and a value cannot close a tag, open a `<script>` or add template code to the page. The same applies to `request.query`, `request.referer` and `request.route_params`.
+
+| Where the value goes | Write | What you get |
+|---|---|---|
+| Page text or an attribute | `{{ query.name }}` | HTML-escaped text |
+| Inside a `<script>` | `{{ query.name \| json \| raw }}` | A quoted JavaScript string |
+| Into a link | `{{ query.name \| url_encode }}` | A URL-encoded value |
+| Unescaped HTML | `{{ query.name \| raw }}` | The value exactly as sent |
+
+The short forms `{query.name}` and `%query.name%` follow the same rule: escaped for the page, for page JavaScript or for a redirect URL depending on where they appear. Add `|raw` to switch it off: `{query.name|raw}`, `%query.name|raw%`.
+
+<Warning>
+`| raw` prints whatever the visitor's link contains. Use it only for a value you check first, for example with `@if(query.layout == 'wide')`, never for free text such as a name or a search term.
+</Warning>
+
 - Unused query parameter variables are cleaned up automatically
 
 ## Request & device context

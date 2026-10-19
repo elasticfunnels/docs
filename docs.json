@@ -29,9 +29,18 @@
             ]
           },
           {
+            "group": "Account & Security",
+            "pages": [
+              "account/two-factor-authentication",
+              "account/passkeys",
+              "account/cli-and-api-keys"
+            ]
+          },
+          {
             "group": "Analytics & Metrics",
             "pages": [
               "analytics/custom-dashboards",
+              "analytics/audience-actions",
               "analytics/split-test",
               "analytics/conversions",
               "analytics/ad-spend-metrics",
@@ -82,6 +91,7 @@
               "pages/overview",
               "pages/rendering-pipeline",
               "pages/create-landing-page",
+              "pages/page-settings",
               "pages/wildcard-routes",
               "pages/seo",
               "pages/privacy-consent",
@@ -128,6 +138,7 @@
               "guides/how-to-set-up-a-new-merchant",
               "merchants/high-risk-and-merchant-accounts",
               "merchants/postback-urls",
+              "merchants/test-merchant",
               {
                 "group": "Payment Processors",
                 "pages": [
@@ -157,6 +168,7 @@
           {
             "group": "Integrations",
             "pages": [
+              "integrations/connect",
               "integrations/integration-health",
               {
                 "group": "Ad Platforms",
@@ -195,7 +207,8 @@
                 "group": "AI & Communications",
                 "pages": [
                   "integrations/ai-providers",
-                  "integrations/twilio"
+                  "integrations/twilio",
+                  "integrations/slicktext"
                 ]
               },
               {
@@ -215,6 +228,14 @@
               },
               "integrations/callcenters",
               "integrations/chargeback-management"
+            ]
+          },
+          {
+            "group": "Automations",
+            "pages": [
+              "automations/variables",
+              "automations/send-email",
+              "automations/run-history"
             ]
           },
           {
@@ -250,6 +271,8 @@
               "emails/overview",
               "emails/builder",
               "emails/sending-setup",
+              "emails/sending-accounts",
+              "emails/delivery-events",
               "emails/template-variables",
               "emails/order-emails",
               "emails/subscription-emails",
@@ -414,6 +437,10 @@
     "dark": "/logo/light.svg"
   },
   "redirects": [
+    {
+      "source": "/analytics/audience-destinations",
+      "destination": "/analytics/audience-actions"
+    },
     {
       "source": "/wildcard-routes",
       "destination": "/pages/wildcard-routes"
