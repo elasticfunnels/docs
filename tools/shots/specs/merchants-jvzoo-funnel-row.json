@@ -1,6 +1,6 @@
 {
   "out": "images/merchants/jvzoo-funnel-row.png",
-  "alt": "A funnel's domain row with the JVZoo Funnel ID field set to 99",
+  "alt": "A funnel's domain row with the JVZoo Button ID field set to 99",
   "_source": "elasticfunnels repo flow _dev/flows/jvzoo-merchant (read-only, recorded 2026-10-19 at 1440x900, scale 2, on demo brand 899 with the fictional JVZoo merchant fixtures in that flow: JVZoo funnel 120456, product 451020, button 99), step 25, cropped to CSS x 448, y 410, 784 x 362",
   "image": "tools/shots/source/merchants-jvzoo-funnel-row.png",
   "imageSize": {
@@ -27,8 +27,8 @@
         720,
         50
       ],
-      "title": "JVZoo Funnel ID",
-      "text": "Last number of the buy link"
+      "title": "JVZoo Button ID",
+      "text": "Third number of the buy link"
     },
     {
       "box": [
@@ -40,5 +40,6 @@
       "title": "Save",
       "text": "Stores the domain row"
     }
-  ]
+  ],
+  "_todo": "Re-record flow jvzoo-merchant step 25 after app ebf55e3ad is deployed: the field is relabelled JVZoo Button ID and has a hint line, so the crop box and annotation boxes need re-measuring before rendering."
 }
