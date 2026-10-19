@@ -3,10 +3,6 @@ title: 'Explodely'
 description: 'Sell your own products through Explodely: payment links, the seller IPN, webhooks, the callback secret, and attribution'
 ---
 
-<Warning>
-**Coming with the next release.** The Explodely merchant is built and tested but not yet available in your account. This page describes how it will work once it ships.
-</Warning>
-
 Explodely is a hosted checkout. Your funnel owns the sales pages, and buyers leave them for an Explodely payment link where Explodely takes the payment and runs its own upsell sequence. ElasticFunnels sends the buyer there with their click code attached, then records the order when Explodely reports it back.
 
 ## What you need
@@ -16,13 +12,13 @@ Explodely is a hosted checkout. Your funnel owns the sales pages, and buyers lea
 - The Explodely **product ID** of each product you sell
 
 ## Step 1: Create the Explodely merchant
-{/* SCREENSHOT: Settings → Merchants → Add Merchant with Explodely selected, callback secret field · desktop */}
+{/* SCREENSHOT: Merchant settings, General information for an Explodely merchant: Account ID, Callback secret, Generate a random secret · desktop */}
 
-1. Go to **Settings** → **Merchants** → **Add Merchant**
-2. Select **Gateway**: Explodely
+1. Go to **Settings** → **Merchants** and click **New merchant**
+2. Select **Gateway**: Explodely, give the merchant a name, and click **Create & Configure**. The merchant's settings open on **General information**.
 3. Enter your Explodely seller username as the **Account ID**
-4. In **Callback secret**, enter a random string of 24 to 128 characters (letters, digits, `-` or `_`). Keep a copy: it goes at the end of every URL you paste into Explodely in Step 3.
-5. Save
+4. In **Callback secret**, enter a random string of 24 to 128 characters (letters, digits, `-` or `_`), or click **Generate a random secret**. Keep a copy: it goes at the end of every URL you paste into Explodely in Step 3.
+5. Click **Save**
 
 Explodely does not sign its IPN or its webhooks, so the callback secret is what proves a postback came from your account. It is stored encrypted and shown masked after you save. A postback with a missing or wrong secret is refused with `401`.
 
