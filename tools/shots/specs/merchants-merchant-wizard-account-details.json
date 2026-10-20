@@ -1,0 +1,38 @@
+{
+  "out": "images/merchants/merchant-wizard-account-details.png",
+  "alt": "The guided setup of a new JVZoo merchant on Account details: the five numbered steps on the left with Merchant done, and the JVZoo Funnel ID field with where to find it",
+  "_source": "Local app (EF_APP=http://127.0.0.1:8027, elasticfunnels 8986e3822) on demo brand 899 with a JVZoo merchant left on Account details (setup_progress = MerchantSetupProgress::start(), id 196 there); to reshoot elsewhere, point capture.path at such a merchant",
+  "capture": {
+    "path": "/{brand}/merchants/196/setup",
+    "viewport": {
+      "width": 1440,
+      "height": 640
+    },
+    "waitFor": "[data-testid='merchants.wizard.panel.credentials']",
+    "actions": [
+      {
+        "wait": 800
+      }
+    ],
+    "crop": "main",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='merchants.wizard.step'][data-tab='credentials']",
+      "title": "Setup steps",
+      "text": "Opening the merchant again resumes at the first open step"
+    },
+    {
+      "selector": "[data-testid='merchants.wizard.credentials.account-id']",
+      "title": "Where to find it",
+      "text": "Each field says where it is in JVZoo"
+    }
+  ]
+}

@@ -93,7 +93,7 @@ The **first** number is the funnel ID, not the last one. The last number (often 
 ## Step 1: Create the JVZoo merchant
 
 1. Go to **Settings** → **Merchants** and click **Create Merchant**
-2. Pick **JVZoo** as the **Gateway**, type a **Name**, and click **Create & Configure**. The merchant's settings open on **General information**.
+2. Pick **JVZoo** as the **Gateway**, type a **Name**, and click **Create & Configure**. A guided setup opens: it asks for the fields below on **Account details**, then the product IDs (Step 2), the JVZIPN URL (Step 4) and a live test (Step 5), and resumes where you left off (**Continue setup** on the merchant's row). In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
 
 <img src="/images/merchants/jvzoo-create.png" alt="The Create a new merchant dialog with JVZoo picked as the Gateway, the name Northwind JVZoo and the Create & Configure button" />
 
@@ -146,10 +146,10 @@ You do not rebuild JVZoo's upsell order in ElasticFunnels. The ElasticFunnels fu
 
 ## Step 4: Paste the JVZIPN URL into every JVZoo product
 
-1. In **Settings** → **Merchants**, click **Postback Setup** on the JVZoo merchant's row (or **Copy Postback URL** in its row menu). Its steps are listed on the left: **Postback URL**, **Set up in JVZoo** and **Test**.
+1. In the guided setup, this is the **Postback URL** step. Later, in **Settings** → **Merchants**, click **Postback Setup** on the JVZoo merchant's row (or **Copy Postback URL** in its row menu). Its steps are listed on the left: **Postback URL**, **Set up in JVZoo** and **Test**.
 2. Copy **Your Postback URL**. It has the form `https://app.elasticfunnels.io/postback/vendor/<code>/jvzoo`, where `<code>` belongs to this merchant.
 
-<img src="/images/merchants/jvzoo-postback-setup-steps.png" alt="The Postback Setup dialog for a JVZoo merchant on Set up in JVZoo: the steps list, the postback URL with Copy and the four steps in JVZoo" />
+<img src="/images/merchants/jvzoo-postback-setup-steps.png" alt="The Postback Setup dialog for a JVZoo merchant on Set up in JVZoo: the steps list, the postback URL with Copy, the five steps in JVZoo and where the JVZIPN secret key is" />
 
 3. In JVZoo, open the product's editor from **Sellers** → **Seller Dashboard** (click the product, then **Edit**) and go to the **Advanced** tab
 

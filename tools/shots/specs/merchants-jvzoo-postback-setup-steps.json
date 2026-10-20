@@ -1,7 +1,7 @@
 {
   "out": "images/merchants/jvzoo-postback-setup-steps.png",
-  "alt": "The Postback Setup dialog for a JVZoo merchant on Set up in JVZoo: the steps list, the postback URL with Copy and the four steps in JVZoo",
-  "_source": "elasticfunnels repo flow _dev/flows/postback-setup-modal (app 47daabe38, read-only, demo brand 899 with fictional merchants, scale 2), step 16, cropped to the dialog; the local origin in the URL is shown as app.elasticfunnels.io",
+  "alt": "The Postback Setup dialog for a JVZoo merchant on Set up in JVZoo: the steps list, the postback URL with Copy, the five steps in JVZoo and where the JVZIPN secret key is",
+  "_source": "elasticfunnels repo flow _dev/flows/postback-setup-modal (app 8986e3822, read-only, demo brand 899 with fictional merchants, scale 2), step 16, cropped to the dialog; the local origin in the URL is shown as app.elasticfunnels.io",
   "image": "tools/shots/source/merchants-jvzoo-postback-setup-steps.png",
   "imageSize": {
     "w": 896,
@@ -12,10 +12,10 @@
   "annotations": [
     {
       "box": [
-        28,
-        85,
-        240,
-        112
+        16,
+        72,
+        212,
+        140
       ],
       "title": "Steps",
       "text": "Postback URL, Set up in JVZoo, Test",
@@ -23,24 +23,35 @@
     },
     {
       "box": [
-        304,
+        244,
         111,
-        572,
+        632,
         40
       ],
       "title": "Postback URL",
-      "text": "Paste as the JVZIPN URL",
+      "text": "Copy, then paste as the JVZIPN URL",
       "side": "right"
     },
     {
       "box": [
-        304,
-        254,
-        572,
-        43
+        244,
+        165,
+        632,
+        240
+      ],
+      "title": "In JVZoo",
+      "text": "Advanced tab of every product",
+      "side": "right"
+    },
+    {
+      "box": [
+        244,
+        418,
+        632,
+        165
       ],
       "title": "Secret key",
-      "text": "Optional, verifies each JVZIPN",
+      "text": "On your JVZoo account, not a product",
       "side": "right"
     },
     {
