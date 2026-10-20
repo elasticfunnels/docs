@@ -82,7 +82,7 @@ Warehousing, inventory, cost breakdown, SKU categorisation, product specificatio
 |---------|--------|
 | **Identity & Structure** | SKU, Barcode, Units per Package, Weight (oz), Dimensions (L/W/H cm) |
 | **Integration** | Fulfillment Integration override, Multiply SKU toggle |
-| **Inventory** | Stock Quantity, Out-of-Stock Policy (continue/deny) |
+| **Inventory** | Stock Quantity (leave it blank to sell without tracking stock), Out-of-Stock Policy (Continue selling / Stop selling) |
 | **Cost Breakdown** | Product Cost, Fulfillment Cost, Packaging Cost, Avg. Shipping, Fuel Surcharge, Auto-calculated COGS |
 | **SKU Categorisation** | SKU Category, SKU Subcategory (for internal reporting) |
 | **Product Specifications** | Repeater: Name / Value / Unit pairs (e.g. Dimensions: 10×5×3 cm) |
@@ -209,8 +209,8 @@ Every product returned by a data function has the following fields:
 | `has_gallery` | `boolean` | `true` when `gallery.length > 0` |
 | `has_description` | `boolean` | `true` when `description` is non-empty |
 | `in_stock` | `boolean` | `true` when `inventory_quantity` is `null` or `> 0` |
-| `inventory_quantity` | `number \| null` | Current stock count; `null` = unlimited |
-| `inventory_policy` | `"continue" \| "deny"` | Behaviour when out of stock |
+| `inventory_quantity` | `number \| null` | Current stock count; `null` = stock not tracked |
+| `inventory_policy` | `"allow" \| "deny"` | Behaviour at zero stock: `allow` = Continue selling, `deny` = Stop selling |
 | `is_subscription` | `boolean` | Whether recurring billing is enabled |
 | `subscription_frequency` | `number \| null` | Billing interval value (e.g. `1`) |
 | `subscription_frequency_unit` | `"day" \| "week" \| "month" \| "year" \| null` | Billing interval unit |
