@@ -1,0 +1,80 @@
+{
+  "out": "images/merchants/explodely-global-ipn.png",
+  "alt": "Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Try IPN Builder and Update",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "image": "tools/shots/source/merchants-explodely-global-ipn.png",
+  "imageSize": {
+    "w": 820,
+    "h": 620
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        188,
+        170,
+        604,
+        48
+      ],
+      "title": "Global IPN",
+      "text": "Expand it under Developers",
+      "side": "left"
+    },
+    {
+      "box": [
+        209,
+        325,
+        272,
+        57
+      ],
+      "title": "IPN URL",
+      "text": "Paste the ElasticFunnels URL",
+      "side": "left"
+    },
+    {
+      "box": [
+        209,
+        415,
+        272,
+        57
+      ],
+      "title": "IPN Type",
+      "text": "Set to POST",
+      "side": "left"
+    },
+    {
+      "box": [
+        500,
+        325,
+        272,
+        57
+      ],
+      "title": "Send IPN",
+      "text": "Set to Yes",
+      "side": "right"
+    },
+    {
+      "box": [
+        653,
+        237,
+        118,
+        32
+      ],
+      "title": "Try IPN Builder",
+      "text": "Sends a sample IPN",
+      "side": "right"
+    },
+    {
+      "box": [
+        699,
+        497,
+        68,
+        32
+      ],
+      "title": "Update",
+      "text": "Saves the IPN settings",
+      "side": "right"
+    }
+  ]
+}

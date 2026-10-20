@@ -1,0 +1,47 @@
+{
+  "out": "images/merchants/explodely-webhook-tab.png",
+  "alt": "Explodely Integrations page on the Webhook tab with the Add Webhook button",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "image": "tools/shots/source/merchants-explodely-webhook-tab.png",
+  "imageSize": {
+    "w": 1300,
+    "h": 418
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        810,
+        3,
+        162,
+        40
+      ],
+      "title": "Seller Hub",
+      "text": "Then Integrations",
+      "side": "right"
+    },
+    {
+      "box": [
+        725,
+        114,
+        80,
+        32
+      ],
+      "title": "Webhook",
+      "text": "The tab for webhooks",
+      "side": "left"
+    },
+    {
+      "box": [
+        577,
+        359,
+        141,
+        40
+      ],
+      "title": "Add Webhook",
+      "text": "Opens the webhook form",
+      "side": "right"
+    }
+  ]
+}

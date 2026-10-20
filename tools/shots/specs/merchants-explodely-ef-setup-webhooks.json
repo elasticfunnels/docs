@@ -1,0 +1,80 @@
+{
+  "out": "images/merchants/explodely-ef-setup-webhooks.png",
+  "alt": "The Postback Setup dialog for Explodely: the IPN settings, the verify step and the Chargeback, Partial and Decline webhook URLs",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "image": "tools/shots/source/merchants-explodely-ef-setup-webhooks.png",
+  "imageSize": {
+    "w": 432,
+    "h": 736
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        24,
+        155,
+        390,
+        34
+      ],
+      "title": "IPN settings",
+      "text": "Send IPN Yes, IPN Type POST",
+      "side": "right"
+    },
+    {
+      "box": [
+        24,
+        195,
+        390,
+        82
+      ],
+      "title": "Verify",
+      "text": "Try IPN Builder, then a test sale",
+      "side": "left"
+    },
+    {
+      "box": [
+        14,
+        320,
+        404,
+        100
+      ],
+      "title": "Webhooks",
+      "text": "Three webhooks, POST, all data points",
+      "side": "right"
+    },
+    {
+      "box": [
+        27,
+        453,
+        378,
+        22
+      ],
+      "title": "Chargeback",
+      "text": "URL for the chargeback webhook",
+      "side": "left"
+    },
+    {
+      "box": [
+        27,
+        502,
+        378,
+        22
+      ],
+      "title": "Partial",
+      "text": "URL for the partial webhook",
+      "side": "right"
+    },
+    {
+      "box": [
+        27,
+        551,
+        378,
+        22
+      ],
+      "title": "Decline",
+      "text": "URL for the decline webhook",
+      "side": "left"
+    }
+  ]
+}

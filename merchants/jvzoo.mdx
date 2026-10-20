@@ -76,6 +76,8 @@ On the merchant's settings:
 
 The merchant shows **Needs Setup** until its first JVZIPN is accepted; it then switches to **Verified**. Sales, rebills, refunds, chargebacks, subscription cancels and reactivations, and abandoned orders all arrive at this one URL.
 
+JVZoo has no button that sends a test notification. Place a test order, or wait for the first real sale: the first JVZIPN that reaches ElasticFunnels marks the merchant verified.
+
 <Note>
 Use the merchant's URL, not the **JVZoo Vendor IPN** integration's. The merchant matches each order to your products, links refunds and chargebacks to the original sale, removes duplicate notifications when **Deduplicate Orders** is on, and records the affiliate. The JVZoo Vendor IPN integration under Integrations is a separate, simpler receiver that stores the product name only. See [JVZoo Vendor IPN](/integrations/jvzoo#jvzoo-vendor-ipn).
 </Note>

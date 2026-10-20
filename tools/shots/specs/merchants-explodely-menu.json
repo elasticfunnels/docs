@@ -1,0 +1,58 @@
+{
+  "out": "images/merchants/explodely-menu.png",
+  "alt": "Explodely Seller Hub menu with Products, Settings and Integrations",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "image": "tools/shots/source/merchants-explodely-menu.png",
+  "imageSize": {
+    "w": 1282,
+    "h": 736
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        445,
+        15,
+        385,
+        92
+      ],
+      "title": "Seller Hub",
+      "text": "Top menu of your seller account",
+      "side": "left"
+    },
+    {
+      "box": [
+        445,
+        190,
+        385,
+        66
+      ],
+      "title": "Products",
+      "text": "Product IDs and payment links",
+      "side": "right"
+    },
+    {
+      "box": [
+        445,
+        575,
+        385,
+        66
+      ],
+      "title": "Settings",
+      "text": "Holds the Global IPN",
+      "side": "right"
+    },
+    {
+      "box": [
+        445,
+        652,
+        385,
+        70
+      ],
+      "title": "Integrations",
+      "text": "Where webhooks are added",
+      "side": "right"
+    }
+  ]
+}

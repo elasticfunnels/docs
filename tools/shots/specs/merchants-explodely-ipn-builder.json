@@ -1,0 +1,47 @@
+{
+  "out": "images/merchants/explodely-ipn-builder.png",
+  "alt": "The Try IPN Builder dialog in Explodely with the IPN URL field, the field chips and Submit",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "image": "tools/shots/source/merchants-explodely-ipn-builder.png",
+  "imageSize": {
+    "w": 960,
+    "h": 316
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        14,
+        73,
+        932,
+        55
+      ],
+      "title": "Enter IPN URL",
+      "text": "The URL with your secret",
+      "side": "left"
+    },
+    {
+      "box": [
+        14,
+        140,
+        890,
+        112
+      ],
+      "title": "Fields",
+      "text": "Tick any, all are fine",
+      "side": "left"
+    },
+    {
+      "box": [
+        416,
+        270,
+        128,
+        34
+      ],
+      "title": "Submit",
+      "text": "Sends the sample to ElasticFunnels",
+      "side": "right"
+    }
+  ]
+}
