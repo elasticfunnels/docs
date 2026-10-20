@@ -129,6 +129,7 @@
                 "icon": "clipboard-list",
                 "pages": [
                   "forms/lead-capture",
+                  "forms/forms-in-code",
                   "forms/thank-you-pages",
                   "forms/export-data"
                 ]
