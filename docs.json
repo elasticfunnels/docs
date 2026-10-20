@@ -616,6 +616,10 @@
   },
   "redirects": [
     {
+      "source": "/products/quickbuy",
+      "destination": "/products/buy-links"
+    },
+    {
       "source": "/analytics/audience-destinations",
       "destination": "/analytics/audience-actions"
     },

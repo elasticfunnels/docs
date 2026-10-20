@@ -21,7 +21,7 @@ If a field is missing or invalid, the form shows the error next to that field an
 
 ## Option 1: no code, add `form=` to the upsell tag
 
-Add a `form` option to an upsell, downsell or QuickBuy link tag:
+Add a `form` option to an upsell or downsell link tag:
 
 ```
 [UPSELL=sleep-gummies-1 form=gift-address]
@@ -103,9 +103,12 @@ window.handleLovedOneGift = function (o) {
 - The recipient's phone, the gift mark and your custom fields are saved as order flags.
 - Fulfillment providers get the recipient's name, address and phone on the label.
 
+Open the order in **Reports** → **Conversions** to see them: its drawer has an **Upsell form** section with the ship-to, the gift mark and each custom field.
+
 ## Limits
 
-- Works with NMI and Stripe merchants (the gateways that charge a stored card for one-click upsells). With other merchants the form shows an error and nothing is charged.
+- Works with NMI, Stripe and the Test merchant (the gateways that charge a stored card for one-click upsells). With other merchants the form shows an error and nothing is charged.
+- If the first order was paid with PayPal, or with Apple Pay on an NMI merchant that does not store the card, a form that asks for an address says the offer cannot be sent to another address and charges nothing. Give those buyers a plain upsell link next to the gift one.
 - Needs an active purchase session, like every one-click upsell. If the session has ended the form says so.
-- Clicking **Confirm** twice charges once.
-- The form needs JavaScript. Without it, the link opens the normal upsell without the form.
+- If the buyer already bought that upsell in this session, the form says so and does not charge again. Clicking **Confirm** twice also charges once.
+- The form needs JavaScript. Without it, a link with `form=gift-address` or `form=address` shows a short "not available" message and charges nothing, so an order never ships to the wrong address. A `form=fields` link works as a plain upsell without the fields.
