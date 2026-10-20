@@ -49,7 +49,7 @@ In **Settings** → **Merchants**, click **Postback Setup** on the Explodely mer
 
 <img src="/images/merchants/explodely-ef-list.png" alt="The Merchants list in ElasticFunnels: an Explodely merchant with its Account ID, the Needs Setup status and the Postback Setup link" />
 
-Postback Setup shows the IPN URL and one webhook URL per event:
+Postback Setup lists its steps on the left: **Postback URL**, **Seller IPN**, **Webhooks** and **Test**. Use **Next** to move through them. Every URL has its own **Copy** button and looks like this:
 
 ```
 https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/YOUR_CALLBACK_SECRET
@@ -57,11 +57,15 @@ https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/YOUR_CAL
 
 Replace `YOUR_CALLBACK_SECRET` with the secret you saved in Step 1, in every URL.
 
-<img src="/images/merchants/explodely-ef-setup-top.png" alt="The Postback Setup dialog for Explodely: the postback URL with Copy, the test connection status and the test instructions" />
+<img src="/images/merchants/explodely-ef-setup-url.png" alt="The Postback Setup dialog for Explodely on its first step: the steps list, the postback URL with Copy, and the callback secret note" />
+
+<video autoPlay muted loop playsInline controls src="/images/merchants/explodely-postback-setup-steps.mp4" style={{ width: '100%', maxWidth: '680px', borderRadius: '12px' }} />
 
 ### Seller IPN
 
-The IPN sends sales, rebills, refunds and rebill cancels.
+The IPN sends sales, rebills, refunds and rebill cancels. The **Seller IPN** step in Postback Setup has the URL and these steps.
+
+<img src="/images/merchants/explodely-ef-setup-ipn.png" alt="The Seller IPN step of Postback Setup for Explodely: the IPN URL with Copy and the five steps in Explodely" />
 
 1. Log in to your Explodely seller account
 2. Open **Seller Hub** → **Settings** and expand **Global IPN** under **Developers**
@@ -91,18 +95,22 @@ Add three webhooks, one per row below. For each one:
 | Partial | `?event=partial` | An abandoned checkout, when no purchase follows within 20 minutes |
 | Decline | `?event=decline` | A failed payment |
 
-<img src="/images/merchants/explodely-ef-setup-webhooks.png" alt="The Postback Setup dialog for Explodely: the IPN settings, the verify step and the Chargeback, Partial and Decline webhook URLs" />
+The **Webhooks** step in Postback Setup has the three URLs, each with its own **Copy**.
+
+<img src="/images/merchants/explodely-ef-setup-webhooks.png" alt="The Webhooks step of Postback Setup for Explodely: where to add them and the Chargeback, Partial and Decline URLs, each with Copy" />
 
 Explodely webhooks carry no event name, which is why each one needs its own `?event=` URL. Do not add webhooks for Sale, Rebill, Refund or Rebill Cancel: the IPN already sends those, and a webhook for them records each one twice.
 
 ## Step 4: Test the connection
 
-1. Leave **Postback Setup** open in ElasticFunnels. It shows **Test postback connection** and waits.
+1. In ElasticFunnels, open the **Test** step of **Postback Setup** and leave it open. It shows **Waiting for a test postback** and checks every 5 seconds for 2 minutes.
 2. In Explodely, go back to **Seller Hub** → **Settings** → **Global IPN** and click **Try IPN Builder**
 3. Paste the IPN URL (with your secret) into **Enter IPN URL**, pick any fields and click **Submit**. Explodely sends a sample IPN to that URL.
-4. The first postback that reaches ElasticFunnels with the right secret marks the merchant verified, even a sample like this one. **Needs Setup** clears from its row.
+4. The first postback that reaches ElasticFunnels with the right secret marks the merchant verified, even a sample like this one. The status next to the dialog's title changes to **Verified** and **Needs Setup** clears from the merchant's row. If nothing arrives in 2 minutes, it shows **No test yet** with **Check again**.
 
 <img src="/images/merchants/explodely-ipn-builder.png" alt="The Try IPN Builder dialog in Explodely with the IPN URL field, the field chips and Submit" />
+
+<img src="/images/merchants/explodely-ef-setup-test.png" alt="The Test step of Postback Setup for Explodely: the waiting status card and how to send a test" />
 
 Then place a real test sale: open one of your payment links with `?testmode=yes` added, complete the order, and check it under **Reports** → **Conversions**.
 

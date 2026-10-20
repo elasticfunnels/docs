@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/apply-failed.png",
+  "alt": "The It did not finish panel with the reason in a red box and the Back to review button",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"apply-failed\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 1039, y 270, 360 x 303",
+  "image": "tools/shots/source/kits-apply-failed.png",
+  "imageSize": {
+    "w": 360,
+    "h": 303
+  },
+  "maxWidth": 560,
+  "calloutWidth": 230,
+  "annotations": [
+    {
+      "box": [
+        17,
+        13,
+        326,
+        23
+      ],
+      "title": "It did not finish",
+      "text": "Nothing was created",
+      "side": "left"
+    },
+    {
+      "box": [
+        17,
+        176,
+        326,
+        54
+      ],
+      "title": "The reason",
+      "text": "What went wrong, in plain words",
+      "side": "left"
+    },
+    {
+      "box": [
+        17,
+        255,
+        326,
+        36
+      ],
+      "title": "Back to review",
+      "text": "Change the choices and apply again",
+      "side": "left"
+    }
+  ]
+}

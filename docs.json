@@ -20,6 +20,17 @@
             ]
           },
           {
+            "group": "Template kits",
+            "pages": [
+              "template-kits/overview",
+              "template-kits/apply-a-kit",
+              "template-kits/after-applying",
+              "template-kits/kit-images",
+              "template-kits/troubleshooting",
+              "template-kits/glossary"
+            ]
+          },
+          {
             "group": "Essentials",
             "pages": [
               "essentials/brand-actions",

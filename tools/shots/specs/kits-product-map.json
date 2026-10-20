@@ -1,0 +1,58 @@
+{
+  "out": "images/template-kits/product-map.png",
+  "alt": "The window Product for Joint Support Formula, 1 extra bottle (downsell): a search box, Create new, and the project's own products that match the search",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"product-map\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 384, y 478, 672 x 444",
+  "image": "tools/shots/source/kits-product-map.png",
+  "imageSize": {
+    "w": 672,
+    "h": 444
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        20,
+        160,
+        632,
+        38
+      ],
+      "title": "Search",
+      "text": "Your products by name or code",
+      "side": "left"
+    },
+    {
+      "box": [
+        21,
+        206,
+        630,
+        53
+      ],
+      "title": "Create new",
+      "text": "Let the kit create it",
+      "side": "left"
+    },
+    {
+      "box": [
+        21,
+        260,
+        630,
+        53
+      ],
+      "title": "Your product",
+      "text": "Links, steps and events use it",
+      "side": "left"
+    },
+    {
+      "box": [
+        587,
+        396,
+        65,
+        36
+      ],
+      "title": "Done",
+      "text": "Back to the review",
+      "side": "right"
+    }
+  ]
+}

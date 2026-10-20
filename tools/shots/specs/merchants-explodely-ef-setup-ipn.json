@@ -1,0 +1,58 @@
+{
+  "out": "images/merchants/explodely-ef-setup-ipn.png",
+  "alt": "The Seller IPN step of Postback Setup for Explodely: the IPN URL with Copy and the five steps in Explodely",
+  "_source": "ElasticFunnels app on prod (app 47daabe38), Postback Setup on an Explodely merchant, captured 2026-10-20 at 1492x812; account details replaced in the page with generic values (Acme Health, Alex Morgan, postback code AbC123xYz) before capture; cropped to the dialog.",
+  "image": "tools/shots/source/merchants-explodely-ef-setup-ipn.png",
+  "imageSize": {
+    "w": 774,
+    "h": 577
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        263,
+        96,
+        494,
+        52
+      ],
+      "title": "IPN URL",
+      "text": "Paste into Global IPN",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        193,
+        494,
+        22
+      ],
+      "title": "Where",
+      "text": "Seller Hub, Settings, Global IPN",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        283,
+        494,
+        36
+      ],
+      "title": "IPN settings",
+      "text": "Send IPN Yes, IPN Type POST",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        328,
+        494,
+        70
+      ],
+      "title": "Verify",
+      "text": "Try IPN Builder, then a test sale",
+      "side": "right"
+    }
+  ]
+}

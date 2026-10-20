@@ -1,0 +1,80 @@
+{
+  "out": "images/template-kits/images-create.png",
+  "alt": "The Create more like this window: a finished version with Use on page and Download, the kit's own image, Your pictures, Your brand name, Aspect ratio, the prompt and the credit estimate",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"images-create\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 336, y 232, 768 x 936",
+  "image": "tools/shots/source/kits-images-create.png",
+  "imageSize": {
+    "w": 768,
+    "h": 936
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        20,
+        296,
+        72,
+        18
+      ],
+      "title": "Use on page",
+      "text": "Puts this version on the kit pages",
+      "side": "left"
+    },
+    {
+      "box": [
+        205,
+        296,
+        173,
+        17
+      ],
+      "title": "Image in the kit",
+      "text": "The original, for comparison",
+      "side": "left"
+    },
+    {
+      "box": [
+        20,
+        381,
+        81,
+        18
+      ],
+      "title": "Your pictures",
+      "text": "Sent with the prompt",
+      "side": "left"
+    },
+    {
+      "box": [
+        20,
+        597,
+        572,
+        38
+      ],
+      "title": "Your brand name",
+      "text": "Replaces the kit brand in the prompt",
+      "side": "left"
+    },
+    {
+      "box": [
+        604,
+        597,
+        144,
+        36
+      ],
+      "title": "Aspect ratio",
+      "text": "Square, portrait or wide",
+      "side": "right"
+    },
+    {
+      "box": [
+        20,
+        897,
+        350,
+        19
+      ],
+      "title": "Estimate",
+      "text": "Credits per image and your balance",
+      "side": "left"
+    }
+  ]
+}

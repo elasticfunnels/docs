@@ -1,0 +1,69 @@
+{
+  "out": "images/template-kits/apply-options.png",
+  "alt": "The Before you apply panel: Folder (optional) with the taken-URL warning and a suggested folder, the Reuse components I already have and Create the products switches, and the Apply kit button",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"apply-options\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 1031, y 560, 376 x 548",
+  "image": "tools/shots/source/kits-apply-options.png",
+  "imageSize": {
+    "w": 376,
+    "h": 548
+  },
+  "maxWidth": 680,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        54,
+        179,
+        296,
+        35
+      ],
+      "title": "Folder (optional)",
+      "text": "joint makes /joint/vsl",
+      "side": "right"
+    },
+    {
+      "box": [
+        114,
+        259,
+        99,
+        18
+      ],
+      "title": "Use a folder",
+      "text": "A free folder, one click",
+      "side": "left"
+    },
+    {
+      "box": [
+        25,
+        310,
+        326,
+        56
+      ],
+      "title": "Reuse components",
+      "text": "Off: a copy next to yours",
+      "side": "left"
+    },
+    {
+      "box": [
+        25,
+        378,
+        326,
+        56
+      ],
+      "title": "Create the products",
+      "text": "Off: pages without products",
+      "side": "left"
+    },
+    {
+      "box": [
+        25,
+        462,
+        326,
+        40
+      ],
+      "title": "Apply kit",
+      "text": "Runs in the background",
+      "side": "left"
+    }
+  ]
+}

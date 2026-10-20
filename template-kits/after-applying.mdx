@@ -1,0 +1,86 @@
+---
+title: 'After applying a kit'
+description: 'Where the kit pages, funnel and products land, and what to check before you publish.'
+---
+
+A kit arrives as drafts. Visitors cannot see any of it until you publish the pages and connect a domain. This page lists where each part lands and the checks to make before you go live.
+
+## Where everything lands
+
+| Part | Where to find it | State after apply |
+|---|---|---|
+| Pages | **Pages** | Draft, no domain, at the URLs shown on the review |
+| Funnel | **Funnels** | A new funnel, with no domain. It is never made your default funnel |
+| Products | **Products** | New products under the names and codes you chose, or the products you linked |
+| Page events | On each page's **Page events** | New event flows that point at the new pages and products |
+| Components | **Pages** > **Components** | New components, or yours where the kit reused them |
+| Variables | Your project variables | New variables only. Variables you had keep their value |
+| Files | Your project's files | Copied in the background right after the apply |
+
+Applying a kit never edits or deletes your existing pages, funnels or products. The one exception is a course portal: when a kit's members pages land on course pages that the project created for you and you never edited, the kit replaces them and keeps the old version as a revision.
+
+## Check the kit before you publish
+
+Work through these steps once for each kit you apply.
+
+### 1. Find the kit pages
+
+1. Open **Pages**.
+2. Find the kit pages at the top of the list. Each one is marked **Draft**, and the **Funnels** column shows the kit's funnel.
+
+<img src="/images/template-kits/after-pages.png" alt="The Pages list after applying a kit: the kit pages at the top, each marked Draft, with the kit funnel in the Funnels column" />
+
+### 2. Open the funnel
+
+1. Open **Funnels** and click the kit's funnel.
+2. Check the path from **Funnel Entry Point** through the entry page, **On Purchase** and the upsells.
+3. Connect a domain to the funnel and publish it when the pages are ready.
+
+<img src="/images/template-kits/after-funnel.png" alt="The funnel builder showing the funnel the kit created: Funnel Entry Point, the entry page group with the product page, On Purchase and the first upsell" />
+
+See [Create a funnel](/funnels/create-funnel) for the funnel builder.
+
+### 3. Check each product's titles
+
+1. Open **Products** and click a product the kit created.
+2. Check **Code** and **Title**. They are the ones you typed on the review.
+3. Change **Checkout Title**. It still holds the kit's wording, and it is the name customers see on the checkout.
+4. Set the price, and the cost of goods if you report on profit.
+5. Click **Save**.
+
+<img src="/images/template-kits/after-product.png" alt="A product the kit created: its Code and Title are the ones typed on the review, and the Checkout Title still holds the kit's wording" />
+
+### 4. Check the stock
+
+Products created by a kit start with **Stock Quantity** set to `0`. The kits in the library also set **Out-of-Stock Policy** to **Stop selling**, so the product shows **Out of Stock** and orders for it are refused.
+
+1. On the same product, scroll to **Inventory**.
+2. If you do not track stock, clear **Stock Quantity** so the box is empty. An empty box means the product sells without tracking stock.
+3. If you do track stock, type the number you have.
+4. Click **Save**.
+5. Repeat for every product and variant the kit created, including free gifts.
+
+<img src="/images/template-kits/after-stock.png" alt="The Inventory section of a product the kit created: Stock Quantity is 0 and the Out-of-Stock Policy is Stop selling" />
+
+<Warning>
+Do this before you send traffic. With `0` and **Stop selling**, a customer can reach the checkout and have the order refused. Place a test order on each checkout once the stock is set.
+</Warning>
+
+### 5. Connect your merchant and fulfillment
+
+Kit products arrive with no merchant product IDs, no fulfillment integration, no category, no shipping profile and no folder. Set the ones you use:
+
+1. On each product, add your merchant's product ID in the merchant tab if your merchant needs one. See [Set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+2. Pick your fulfillment integration and shipping profile if you ship physical goods.
+
+### 6. Check the page events
+
+Open each page's page events. If the apply panel said **Check these before you publish**, a step that chose a merchant or an automation in the kit was cleared, because those belong to the kit's own project. Pick yours in that step.
+
+### 7. Replace the kit's copy and images
+
+The pages still carry the kit's sample product, brand and claims. Edit each page in the editor or the code editor, and replace the images with your own. [Kit images](/template-kits/kit-images) shows how to make your own version of each kit image from its prompt.
+
+### 8. Publish
+
+Publish each page when it is ready, and connect a domain. See [Create a landing page](/pages/create-landing-page) and [Page settings](/pages/page-settings).

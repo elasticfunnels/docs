@@ -107,10 +107,10 @@ You do not rebuild JVZoo's upsell order in ElasticFunnels. The ElasticFunnels fu
 
 ## Step 4: Paste the JVZIPN URL into every JVZoo product
 
-1. In **Settings** → **Merchants**, click **Postback Setup** on the JVZoo merchant's row (or **Copy Postback URL** in its row menu)
+1. In **Settings** → **Merchants**, click **Postback Setup** on the JVZoo merchant's row (or **Copy Postback URL** in its row menu). Its steps are listed on the left: **Postback URL**, **Set up in JVZoo** and **Test**.
 2. Copy **Your Postback URL**. It has the form `https://app.elasticfunnels.io/postback/vendor/<code>/jvzoo`, where `<code>` belongs to this merchant.
 
-<img src="/images/merchants/jvzoo-postback-url.png" alt="The Postback Setup panel of a JVZoo merchant with the postback URL (blurred) and the Copy button" />
+<img src="/images/merchants/jvzoo-postback-setup-steps.png" alt="The Postback Setup dialog for a JVZoo merchant on Set up in JVZoo: the steps list, the postback URL with Copy and the four steps in JVZoo" />
 
 3. In JVZoo, open the product's editor from **Sellers** → **Seller Dashboard** (click the product, then **Edit**) and go to the **Advanced** tab
 
@@ -135,7 +135,7 @@ Use the merchant's URL, not the **JVZoo Vendor IPN** integration's. The merchant
 
 ## Step 5: Test the connection
 
-The merchant shows **Needs Setup** until its first JVZIPN arrives. JVZoo has no button that sends a test notification, so Postback Setup can time out while it waits; that does not mean anything is wrong.
+The merchant shows **Needs Setup** until its first JVZIPN arrives. JVZoo has no button that sends a test notification, so the **Test** step of Postback Setup can time out while it waits; that does not mean anything is wrong.
 
 1. In JVZoo, click the **⋮** menu next to the front-end product and pick **Create a Test Purchase**, then complete the order
 2. The first JVZIPN that reaches ElasticFunnels marks the merchant **Verified**, even after the Postback Setup window has closed. A real sale does the same.
