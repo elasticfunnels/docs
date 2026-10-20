@@ -150,13 +150,31 @@ Each order object contains:
   customer_name: 'John Doe',
   customer_email: 'john@example.com',
   products: [
-    { name: 'Premium Plan', price: 49.99, quantity: 1, image_url: '...', currency_code: 'USD' }
+    { name: 'Premium Plan', price: 49.99, quantity: 1, image_url: '...', currency_code: 'USD',
+      is_gift: false, ship_to: null, gift_fields: {} },
+    // A gift bought with an upsell form ships to someone else:
+    { name: 'Gift bag', price: 19, quantity: 1, image_url: '...', currency_code: 'USD',
+      is_gift: true,
+      ship_to: { name: 'Ann Lee', address: '1 Main St', city: 'Toronto', state: 'ON', zip: 'M5V 2T6', country: 'CA' },
+      gift_fields: { gift_note: 'Happy birthday' } }
   ],
   tracking: [
     { tracking_number: '1Z999AA10123456784', tracking_url: '...', carrier: 'UPS' }
   ]
 }
 ```
+
+Per product line: `is_gift` is `true` for a line bought as a gift through an [upsell form](/products/upsell-forms), `ship_to` is the recipient's address when that line ships somewhere other than the order's address (otherwise `null`), and `gift_fields` holds the custom fields collected with it.
+
+### `canUpsellShipTo()`
+
+Takes no arguments. Returns `true` when this session's first order can pay for an upsell sent to another address (a gift or ship-to [upsell form](/products/upsell-forms)): a card on NMI, Stripe or the Test merchant, Apple Pay on NMI included. Returns `false` for PayPal, other merchants, or no order in the session.
+
+```javascript
+setVariable('show_gift_offer', canUpsellShipTo());
+```
+
+In page HTML, `@if(upsell_form.can_ship_to)` gives the same answer without a script.
 
 ### `getOrder(code)`
 

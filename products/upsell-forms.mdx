@@ -43,6 +43,21 @@ Any input on the page with a `data-ef-upsell-field` attribute is sent along as a
 [UPSELL=sleep-gummies-1 form=gift-address]
 ```
 
+### Example: a gift block with a note and a decline link
+
+Paste this on the upsell page. The button opens the gift form, the note rides along as the `gift_note` field, and the decline link moves the buyer to the next step without charging.
+
+```html
+<div class="gift-offer">
+  <h2>Send a bag to someone you love</h2>
+  <p>Same price, shipped to their door. We'll ask for their address next.</p>
+  <label for="gift-note">Note for the card (optional)</label>
+  <input id="gift-note" data-ef-upsell-field="gift_note" maxlength="200" placeholder="Happy birthday">
+  <a class="btn" href="[UPSELL=sleep-gummies-1 form=gift-address]">Yes, send a gift bag</a>
+</div>
+<a href="[UPSELL_DECLINE]">No thanks, show me my order</a>
+```
+
 ## Option 2: your own form, call `ef.quickBuy`
 
 If the page already has its own gift form, pass what it collected to `ef.quickBuy`. ElasticFunnels validates it, shows the summary with shipping, and charges on confirm.
@@ -79,6 +94,77 @@ The address keys also accept the names most page forms already use: `address1`, 
 
 To get the price with shipping without charging (for example to show it in your own layout), call `ef.quickBuy.quote(code, { ship_to })`.
 
+### Example: your own form, with the error shown and the redirect
+
+```html
+<form id="gift-form">
+  <input name="first_name" placeholder="First name" required>
+  <input name="last_name" placeholder="Last name" required>
+  <input name="address" placeholder="Street address" required>
+  <input name="city" placeholder="City" required>
+  <input name="state" placeholder="State / province">
+  <input name="zip" placeholder="ZIP / postal code" required>
+  <select name="country"><option value="US">United States</option><option value="CA">Canada</option></select>
+  <textarea name="gift_note" maxlength="200" placeholder="Note for the card"></textarea>
+  <button type="submit">Send it as a gift</button>
+  <p id="gift-error" role="alert"></p>
+</form>
+<script>
+document.getElementById('gift-form').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  var f = Object.fromEntries(new FormData(e.target));
+  var note = f.gift_note; delete f.gift_note;
+  var result = await window.ef.quickBuy('sleep-gummies-1', {
+    ship_to: f,
+    gift: true,
+    fields: { gift_note: note }
+  });
+  if (result.success) {
+    window.location.href = result.nextUrl;
+  } else if (result.code !== 'cancelled') {
+    document.getElementById('gift-error').textContent = result.error;
+  }
+});
+</script>
+```
+
+`cancelled` means the buyer closed the summary; nothing was charged and there is nothing to show.
+
+## Show the gift offer only when it can ship
+
+A gift or ship-to upsell needs a main sale that can pay for a parcel to another address. ElasticFunnels already hides a `[UPSELL=CODE form=gift-address]` or `form=address` link (the whole link element) when it can't, and refuses the charge if a page asks anyway. To swap in a different offer for those buyers, wrap the gift block in a template check:
+
+```html
+@if(upsell_form.can_ship_to)
+  <h2>Send a bag to someone you love</h2>
+  <input data-ef-upsell-field="gift_note" maxlength="200" placeholder="Note for the card">
+  <a class="btn" href="[UPSELL=sleep-gummies-1 form=gift-address]">Yes, send a gift bag</a>
+@else
+  <h2>Add a second bag to your order</h2>
+  <a class="btn" href="[UPSELL=sleep-gummies-1]">Yes, add it</a>
+@endif
+<a href="[UPSELL_DECLINE]">No thanks</a>
+```
+
+`upsell_form.can_ship_to` is decided on the server, so the buyer never sees an offer that would fail. In a [backend script](/backend-scripts/data-functions), the same answer is `canUpsellShipTo()`.
+
+If your own form is built in JavaScript, ask the browser instead. `ef.quickBuy.canShipTo()` resolves to `true` or `false`:
+
+```html
+<div id="gift-offer" hidden>
+  <h2>Send a bag to someone you love</h2>
+  <!-- your gift form from Option 2 -->
+</div>
+<div id="plain-offer" hidden>
+  <a class="btn" href="[UPSELL=sleep-gummies-1]">Add a second bag to your order</a>
+</div>
+<script>
+window.ef.quickBuy.canShipTo().then(function (ok) {
+  document.getElementById(ok ? 'gift-offer' : 'plain-offer').hidden = false;
+});
+</script>
+```
+
 ### Example: a page whose gift form calls `handleLovedOneGift`
 
 Some landing pages ship with their own "send one to a loved one" form that calls a function named `handleLovedOneGift` with the package the buyer picked and the address they typed. Map each package to its product code and hand the rest to `ef.quickBuy`:
@@ -105,12 +191,52 @@ window.handleLovedOneGift = function (o) {
 - The recipient's phone, the gift mark and your custom fields are saved as order flags.
 - Fulfillment providers get the recipient's name, address and phone on the label.
 
-Open the order in **Reports** → **Conversions** to see them: its drawer has an **Upsell form** section with the ship-to, the gift mark and each custom field.
+Open the order in **Reports** → **Conversions** to see them: its drawer has an **Upsell form** section with the ship-to, the gift mark, each custom field and a **Main order** link to the order the buyer placed first.
+
+## Gift lines on the thank-you page
+
+On the thank-you page, read the order with [`getSessionOrders()`](/forms/thank-you-pages): it holds the main product and every upsell from this checkout. Each product line (also in [`getOrders()`](/backend-scripts/data-functions#getorderssortby-limit)) says whether it is a gift and where it ships:
+
+| Field | Meaning |
+|-------|---------|
+| `is_gift` | `true` for a line bought with `form=gift-address` or `gift: true` |
+| `ship_to` | `{ name, address, city, state, zip, country }` when the line ships somewhere other than the order's address, otherwise `null` |
+| `gift_fields` | Your custom fields for that line, for example `{ gift_note: 'Happy birthday' }` |
+
+```html
+@set(orders = getSessionOrders('newest', 10))
+@if(orders.length gt 0)
+<ul>
+  @foreach(o in orders)
+  @foreach(item in o.products)
+  <li>{{ item.name }} &times; {{ item.quantity }}, {{ item.price | currency }}
+    @if(item.is_gift)
+    @if(item.ship_to)
+    <br>Gift, ships to {{ item.ship_to.name }}, {{ item.ship_to.city }}, {{ item.ship_to.country }}
+    @else
+    <br>Gift
+    @endif
+    @if(item.gift_fields.gift_note)
+    <br>Note: {{ item.gift_fields.gift_note }}
+    @endif
+    @elseif(item.ship_to)
+    <br>Ships to {{ item.ship_to.name }}, {{ item.ship_to.city }}, {{ item.ship_to.country }}
+    @endif
+  </li>
+  @endforeach
+  @endforeach
+</ul>
+@endif
+```
+
+The gift lines show on the first load of the thank-you page, right after the charge. `country` is the two-letter code (`CA`, `GB`).
 
 ## Limits
 
 - Works with NMI, Stripe and the Test merchant (the gateways that charge a stored card for one-click upsells). With other merchants the form shows an error and nothing is charged.
-- If the first order was paid with PayPal, or with Apple Pay on an NMI merchant that does not store the card, a form that asks for an address says the offer cannot be sent to another address and charges nothing. Give those buyers a plain upsell link next to the gift one.
+- Card buyers on NMI and Stripe can send gifts. Apple Pay buyers on NMI can too: the first sale saves the card, and upsells charge that saved card.
+- If the bank declines that saved Apple Pay card, a plain upsell falls back to the Apple Pay sheet. The sheet can't carry the recipient's address yet, so a gift or ship-to form says the payment was declined and charges nothing. This is rare.
+- PayPal buyers can't send a gift: `upsell_form.can_ship_to` is `false` for them and the gift link is hidden. Wrap the offer in `@if(upsell_form.can_ship_to)` (above) to show them something else.
 - Needs an active purchase session, like every one-click upsell. If the session has ended the form says so.
 - If the buyer already bought that upsell in this session, the form says so and does not charge again. Clicking **Confirm** twice also charges once.
 - The form needs JavaScript. Without it, a link with `form=gift-address` or `form=address` shows a short "not available" message and charges nothing, so an order never ships to the wrong address. A `form=fields` link works as a plain upsell without the fields.
