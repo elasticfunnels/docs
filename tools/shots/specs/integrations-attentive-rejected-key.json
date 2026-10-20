@@ -1,0 +1,24 @@
+{
+  "out": "images/integrations/attentive-rejected-key.png",
+  "alt": "The error shown when Attentive refuses the API key",
+  "_flow": "attentive step 12 \"The error says Attentive rejected the key\" (tools/flows in the elasticfunnels repo); from the recorded screenshot",
+  "image": "/Users/samueltodosiciuc/Work/elasticfunnels/.claude/worktrees/agent-aeace706919d5fb02/_dev/flows/attentive/shots/12-the-error-says-attentive-rejected-the-key.png",
+  "imageSize": {
+    "w": 2880,
+    "h": 1800
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        596,
+        624,
+        1424,
+        118
+      ],
+      "title": "Key refused",
+      "text": "Attentive refused the key, nothing is saved"
+    }
+  ]
+}

@@ -6,14 +6,12 @@ description: 'Subscribe leads and buyers to Attentive SMS and email, and send th
 ---
 
 ## Overview
-{/* SCREENSHOT: Overview · integration form · desktop */}
 
 The Attentive integration lets you keep Attentive for SMS while your funnels, split tests, email and analytics run in ElasticFunnels. Automation steps subscribe people to Attentive texts and emails, set custom attributes on them, and send events that start your Attentive journeys: leads, abandoned checkouts, purchases, refunds, chargebacks, cancelled subscriptions and declined upsells.
 
 It works with orders from every merchant ElasticFunnels supports, including ClickBank, BuyGoods, Digistore24 and JVZoo, as well as your own checkout.
 
 ## What you get
-{/* SCREENSHOT: Capabilities · automation builder · desktop */}
 
 | Step | What it does |
 |------|--------------|
@@ -27,7 +25,7 @@ It works with orders from every merchant ElasticFunnels supports, including Clic
 Steps find the person by phone, email or both. Phones are sent in international format; a 10-digit number is read as a US number.
 
 ## Setup
-{/* SCREENSHOT: Setup · integration form · desktop */}
+<img src="/images/integrations/attentive-api-key.png" alt="Attentive connection form with the API key field" />
 
 <Steps>
   <Step title="Create a custom app in Attentive">
@@ -44,7 +42,7 @@ Steps find the person by phone, email or both. Phones are sent in international 
 Without read access to Subscribers the steps still work. The subscribe step then skips its check for people who are already subscribed and sends the subscription straight away.
 
 ## Presets
-{/* SCREENSHOT: Presets · integration page · desktop */}
+<img src="/images/integrations/attentive-presets.png" alt="Attentive presets with the preview of the new form entry preset" />
 
 The **Presets** tab of the Attentive integration page creates these automations in one click:
 
@@ -79,7 +77,6 @@ A declined upsell is a click on your page, not an order, so it runs from a page 
 </Steps>
 
 ## Consent
-{/* SCREENSHOT: Consent · automation builder · desktop */}
 
 Only text people who agreed to receive texts from you.
 
@@ -91,7 +88,6 @@ Only text people who agreed to receive texts from you.
 - **Sign-up source ID** is optional: the ID of an API sign-up unit in Attentive, so its welcome journey runs. **Single opt-in** skips Attentive's reply-Y confirmation text; use it only when your form records clear consent.
 
 ## Event properties and attributes
-{/* SCREENSHOT: Properties · automation builder · desktop */}
 
 Write properties and attributes one per line, as `name=value`. Values can use variables from earlier steps:
 
@@ -104,7 +100,7 @@ Funnel={trigger.funnel_name}
 A line whose value comes out empty is left out. Brackets and quotes are removed from names, because Attentive refuses them. Fill **Event ID** to stop a retried run from counting the same event twice.
 
 ## Troubleshooting
-{/* SCREENSHOT: Troubleshooting · automation logs · desktop */}
+<img src="/images/integrations/attentive-rejected-key.png" alt="The error shown when Attentive refuses the API key" />
 
 <AccordionGroup>
   <Accordion title="Saving the integration says Attentive rejected the API key">
