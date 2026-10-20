@@ -1,0 +1,34 @@
+{
+  "out": "images/merchants/jvzoo-seller-dashboard.png",
+  "alt": "JVZoo Seller Dashboard with a product's menu open, showing Buy Buttons and Create a Test Purchase",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-seller-dashboard.png",
+  "imageSize": {
+    "w": 1140,
+    "h": 560
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        872,
+        136,
+        232,
+        44
+      ],
+      "title": "Buy Buttons",
+      "text": "Buy link and tracking image"
+    },
+    {
+      "box": [
+        872,
+        280,
+        232,
+        44
+      ],
+      "title": "Test Purchase",
+      "text": "One test sale of this product"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "out": "images/merchants/jvzoo-product-tabs.png",
+  "alt": "JVZoo product editor tabs: Affiliates, Product Access and Advanced",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-product-tabs.png",
+  "imageSize": {
+    "w": 1348,
+    "h": 190
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        621,
+        52,
+        91,
+        53
+      ],
+      "title": "Affiliates",
+      "text": "Affiliate ID passthrough"
+    },
+    {
+      "box": [
+        704,
+        52,
+        138,
+        53
+      ],
+      "title": "Product Access",
+      "text": "Thank-you page"
+    },
+    {
+      "box": [
+        1026,
+        52,
+        100,
+        53
+      ],
+      "title": "Advanced",
+      "text": "JVZIPN URL"
+    }
+  ]
+}

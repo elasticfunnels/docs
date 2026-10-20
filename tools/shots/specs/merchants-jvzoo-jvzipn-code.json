@@ -1,0 +1,34 @@
+{
+  "out": "images/merchants/jvzoo-jvzipn-code.png",
+  "alt": "JVZoo Edit seller information page with the JVZIPN code field and Generate New link",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-jvzipn-code.png",
+  "imageSize": {
+    "w": 1140,
+    "h": 300
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        33,
+        229,
+        937,
+        50
+      ],
+      "title": "JVZIPN code",
+      "text": "Same value as EF's secret key"
+    },
+    {
+      "box": [
+        979,
+        234,
+        128,
+        40
+      ],
+      "title": "Generate New",
+      "text": "Replaces the old code"
+    }
+  ]
+}

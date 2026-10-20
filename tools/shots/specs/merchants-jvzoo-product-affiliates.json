@@ -1,0 +1,24 @@
+{
+  "out": "images/merchants/jvzoo-product-affiliates.png",
+  "alt": "JVZoo product Affiliates tab with the Pass Affiliate ID to sales page checkbox ticked",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-product-affiliates.png",
+  "imageSize": {
+    "w": 1348,
+    "h": 310
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        26,
+        250,
+        250,
+        36
+      ],
+      "title": "Pass Affiliate ID",
+      "text": "Adds the affiliate to the link"
+    }
+  ]
+}

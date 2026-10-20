@@ -1,0 +1,44 @@
+{
+  "out": "images/merchants/jvzoo-funnel-overview.png",
+  "alt": "JVZoo funnel overview with the Activate Test Purchase Mode button and the Funnel Settings and Funnel Builder links",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-funnel-overview.png",
+  "imageSize": {
+    "w": 1140,
+    "h": 290
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        782,
+        5,
+        330,
+        52
+      ],
+      "title": "Test Purchase Mode",
+      "text": "Test the whole funnel"
+    },
+    {
+      "box": [
+        33,
+        100,
+        278,
+        28
+      ],
+      "title": "Funnel Settings",
+      "text": "Upsell and passthrough"
+    },
+    {
+      "box": [
+        33,
+        206,
+        311,
+        28
+      ],
+      "title": "Funnel Builder",
+      "text": "Order of the pages"
+    }
+  ]
+}

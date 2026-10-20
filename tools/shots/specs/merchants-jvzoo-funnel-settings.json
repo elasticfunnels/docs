@@ -1,0 +1,54 @@
+{
+  "out": "images/merchants/jvzoo-funnel-settings.png",
+  "alt": "JVZoo Funnel Settings: Front End Product, One Click Upsell and Allow Parameter Passthrough",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-funnel-settings.png",
+  "imageSize": {
+    "w": 1140,
+    "h": 420
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        580,
+        108,
+        528,
+        32
+      ],
+      "title": "Front End Product",
+      "text": "Your front-end product"
+    },
+    {
+      "box": [
+        618,
+        202,
+        122,
+        32
+      ],
+      "title": "One Click Upsell",
+      "text": "Turn it on for upsells"
+    },
+    {
+      "box": [
+        70,
+        290,
+        213,
+        32
+      ],
+      "title": "Param Passthrough",
+      "text": "Keeps vtid on the link"
+    },
+    {
+      "box": [
+        33,
+        368,
+        67,
+        42
+      ],
+      "title": "Save",
+      "text": "Saves the funnel"
+    }
+  ]
+}
