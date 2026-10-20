@@ -35,12 +35,12 @@ Point each product's thank-you page at your funnel's thank-you page, so buyers c
 
 1. Go to **Settings** → **Merchants** and click **Create Merchant**
 2. Select **Gateway**: Explodely, give the merchant a name, and click **Create & Configure**. A guided setup opens: it asks for your Account ID on **Account details**, then your product IDs (Step 2), the postback URLs (Step 3) and a live test (Step 4), and resumes where you left off (**Continue setup** on the merchant's row). In the merchant's full editor (**Open full editor**) the same field is on **General information**.
-3. Enter your Explodely seller username as the **Account ID**
-4. Click **Save**
+3. Enter your **Explodely seller username** (the **Account ID** in the full editor)
+4. Click **Save and continue**. **Products** opens next.
 
-There is no secret to make up or type. Once the merchant is saved, **General information** shows its complete Explodely IPN URL under **Postback security**, with **Copy**.
+There is no secret to make up or type. Once the merchant is saved, the **Postback URL** step of the guided setup (and **General information** in the full editor, under **Postback security**) holds its complete Explodely IPN URL, with **Copy**.
 
-<img src="/images/merchants/explodely-ef-settings.png" alt="An Explodely merchant in ElasticFunnels on General information: Account ID, the complete Explodely IPN URL with Copy, Make a new URL, and Save" />
+<img src="/images/merchants/explodely-setup-account.png" alt="The guided setup of an Explodely merchant on Account details: the Explodely seller username field with where to find it" />
 
 Your username is in Explodely under **Account** → **General Section** → **Username**.
 
@@ -78,7 +78,11 @@ A variant set to **Sells another product** has no Explodely ID of its own: it us
 
 ## Step 3: Set up postbacks in Explodely
 
-In **Settings** → **Merchants**, click **Postback Setup** on the Explodely merchant's row. The row shows **Needs Setup** until the first postback arrives (Step 4).
+In the guided setup, this is the **Postback URL** step: the Seller IPN URL and the three webhook URLs, each complete and with **Copy**, plus the steps in Explodely.
+
+<img src="/images/merchants/explodely-setup-postback.png" alt="The Postback URL step of the guided Explodely setup: the complete Seller IPN URL with Show and Copy, the steps in Explodely, and the Chargeback, Partial and Decline webhook URLs" />
+
+Later, in **Settings** → **Merchants**, click **Postback Setup** on the Explodely merchant's row. The row shows **Needs Setup** until the first postback arrives (Step 4).
 
 <img src="/images/merchants/explodely-ef-list.png" alt="The Merchants list in ElasticFunnels: an Explodely merchant with its Account ID, the Needs Setup status and the Postback Setup link" />
 

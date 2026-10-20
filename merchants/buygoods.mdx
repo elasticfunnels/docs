@@ -8,17 +8,18 @@ description: 'Set up Buygoods as a merchant, assign to a domain, and map product
 This guide explains how to set up Buygoods as a merchant. The overall flow matches the generic merchant setup; use this page for Buygoods-specific notes.
 
 ## Step 1: Create Buygoods Merchant
-{/* SCREENSHOT: Step 1: Create Buygoods Merchant · merchant setup screen or postback state · desktop */}
 
 <Note>
-Creating a BuyGoods merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below are the same settings in the merchant's full editor.
+Creating a BuyGoods merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below follow the guided setup. In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
 </Note>
 
 
-1. Go to **Settings** → **Merchants** → **Add Merchant**
-2. Select **Gateway**: Buygoods
-3. Enter your **Account ID** as provided by Buygoods
-4. Save
+1. Go to **Settings** → **Merchants** and click **Create Merchant**
+2. Pick **BuyGoods** as the **Gateway**, type a **Name**, and click **Create & Configure**
+3. **BuyGoods account ID**: your BuyGoods vendor account ID, from your BuyGoods account settings
+4. Click **Save and continue**. **Products** opens next.
+
+<img src="/images/merchants/buygoods-setup-account.png" alt="The guided setup of a BuyGoods merchant on Account details: the BuyGoods account ID field with where to find it" />
 
 ## Step 2: Assign Merchant to Domain
 {/* SCREENSHOT: Step 2: Assign Merchant to Domain · merchant setup screen or postback state · desktop */}
@@ -45,9 +46,12 @@ Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain an
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
 
 ## Postbacks
-{/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
-Click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for BuyGoods, then **Test**. After you configure the URLs in BuyGoods and send a test (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
+In the guided setup, this is the **Postback URL** step: the postback URL with **Copy**, and where to paste it in BuyGoods (the **New order**, **Order refund** and **Order chargeback** URLs).
+
+<img src="/images/merchants/buygoods-setup-postback.png" alt="The Postback URL step of the guided BuyGoods setup: the postback URL with Copy and the steps to paste it as the New order, Order refund and Order chargeback URL" />
+
+Later, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for BuyGoods, then **Test**. After you configure the URLs in BuyGoods and send a test (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
 
 ## Troubleshooting
 {/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}

@@ -17,29 +17,27 @@ This guide covers setting up ClickBank as a merchant to sell your products throu
 - Understanding of ClickBank pitch flow system
 
 ## Step 1: Create ClickBank Merchant
-{/* SCREENSHOT: Step 1: Create ClickBank Merchant · merchant setup screen or postback state · desktop */}
 
 <Note>
-Creating a ClickBank merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below are the same settings in the merchant's full editor.
+Creating a ClickBank merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below follow the guided setup. In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
 </Note>
 
 
-### Add Merchant Configuration
-1. Go to **Settings** → **Merchants** → **Add Merchant**
-2. Select **Gateway**: ClickBank
-3. Enter your **Account ID** (your ClickBank account nickname)
-4. Create an **Encryption Key** (see below for details)
-5. Save the merchant configuration
+### Account details
+1. Go to **Settings** → **Merchants** and click **Create Merchant**
+2. Pick **ClickBank** as the **Gateway**, type a **Name**, and click **Create & Configure**
+3. **ClickBank account nickname**: the nickname of your ClickBank vendor account, shown next to your account name at the top of ClickBank
+4. **ClickBank secret key**: the key under **Account Settings** → **My Site** → **Advanced Tools** → **Secret Key** in ClickBank. If you have none yet, click **Generate one** and save the same value in ClickBank.
+5. Click **Save and continue**. **Products** opens next.
 
-### Understanding Encryption Keys
-The encryption key is **not** an API key - it's a security key you create:
+<img src="/images/merchants/clickbank-setup-account.png" alt="The guided setup of a ClickBank merchant on Account details: the ClickBank account nickname, the ClickBank secret key with Generate one, and where to find both" />
 
-- **Purpose**: Encrypts data sent between ClickBank and ElasticFunnels
-- **Security**: Prevents man-in-the-middle attacks on postback data
-- **User-defined**: You create this key (can be any string)
-- **Synchronization**: Must be identical in both ClickBank and ElasticFunnels
+### About the secret key
+The secret key is **not** an API key. ClickBank uses it to encrypt each notification, and ElasticFunnels uses it to decrypt them:
 
-**Example**: `MySecretKey2024!` (use your own unique key)
+- **Format**: up to 16 capital letters and digits
+- **Same value in both places**: if the key in ClickBank and the key in ElasticFunnels differ, ClickBank notifications cannot be decrypted
+- **Yours to choose**: type your own or use **Generate one**
 
 <Note>
 For postback configuration, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. It gives the exact URL and the steps to follow in ClickBank.
@@ -99,9 +97,12 @@ This decouples ClickBank from individual page URLs. You can later split test or 
 - **URL access**: Visitors can access via `domain.com` or `domain.com?f=funnel_id`
 
 ## Postbacks
-{/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
-Click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for ClickBank, then **Test**. After you configure ClickBank and click **Test & Save** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
+In the guided setup, this is the **Postback URL** step. Copy the URL and paste it into ClickBank as the **Instant Notification URL**, pick **Version 8.0**, then click **Test & Save** in ClickBank and **I pasted it, continue** in ElasticFunnels.
+
+<img src="/images/merchants/clickbank-setup-postback.png" alt="The Postback URL step of the guided ClickBank setup: the postback URL with Copy and the seven steps in ClickBank, ending with Version 8.0 and Test & Save" />
+
+Later, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for ClickBank, then **Test**. After you configure ClickBank and click **Test & Save** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
 
 ## Advanced Configuration
 {/* SCREENSHOT: Advanced Configuration · merchant setup screen or postback state · desktop */}

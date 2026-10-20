@@ -1,0 +1,50 @@
+{
+  "out": "images/merchants/buygoods-setup-account.png",
+  "alt": "The guided setup of a BuyGoods merchant on Account details: the BuyGoods account ID field with where to find it",
+  "_source": "elasticfunnels app origin/main b6082460d on a local server (EF_APP=http://127.0.0.1:8031), demo brand 899, fictional merchant 200 created and taken to the Postback URL step by the app flow _dev/flows/merchant-wizard-shots (JVZoo 192: _dev/flows/merchant-wizard); the capture clicks back to Account details in the step rail, so the saved fictional values show. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs merchants-buygoods-setup",
+  "capture": {
+    "path": "/{brand}/merchants/200/setup",
+    "viewport": {
+      "width": 1200,
+      "height": 1000
+    },
+    "waitFor": "[data-testid='merchants.wizard.panel.postback']",
+    "actions": [
+      {
+        "click": "[data-testid='merchants.wizard.step'][data-tab='credentials']"
+      },
+      {
+        "waitFor": "[data-testid='merchants.wizard.panel.credentials']"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": "[data-testid='merchants.wizard']",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid='merchants.wizard.step'][data-tab='credentials']",
+      "title": "Five steps",
+      "text": "Done steps stay open to edit",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='merchants.wizard.credentials.account-id']",
+      "title": "BuyGoods account ID",
+      "text": "From your BuyGoods account"
+    },
+    {
+      "selector": "[data-testid='merchants.wizard.continue']",
+      "title": "Save and continue",
+      "text": "Opens Products next"
+    }
+  ]
+}
