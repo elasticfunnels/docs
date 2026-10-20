@@ -1,7 +1,7 @@
 {
   "out": "images/template-kits/after-stock.png",
-  "alt": "The Inventory section of a product the kit created: Stock Quantity is 0 and the Out-of-Stock Policy is Stop selling",
-  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"after-stock\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 520, y 477, 920 x 190",
+  "alt": "The Inventory section of a product the kit created: Stock Quantity is blank, so the product sells without tracking stock",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"after-stock\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 520, y 495, 920 x 190",
   "image": "tools/shots/source/kits-after-stock.png",
   "imageSize": {
     "w": 920,
@@ -18,7 +18,7 @@
         38
       ],
       "title": "Stock Quantity",
-      "text": "Clear it to sell without tracking",
+      "text": "Blank: sells without counting stock",
       "side": "left"
     },
     {
@@ -29,18 +29,7 @@
         38
       ],
       "title": "Out-of-Stock Policy",
-      "text": "Stop selling refuses orders at 0",
-      "side": "right"
-    },
-    {
-      "box": [
-        610,
-        136,
-        91,
-        20
-      ],
-      "title": "Out of Stock",
-      "text": "What 0 with Stop selling means",
+      "text": "Used only once you type a quantity",
       "side": "right"
     }
   ]

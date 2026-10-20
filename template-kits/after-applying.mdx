@@ -52,19 +52,15 @@ See [Create a funnel](/funnels/create-funnel) for the funnel builder.
 
 ### 4. Check the stock
 
-Products created by a kit start with **Stock Quantity** set to `0`. The kits in the library also set **Out-of-Stock Policy** to **Stop selling**, so the product shows **Out of Stock** and orders for it are refused.
+Products created by a kit start with **Stock Quantity** blank. A blank box means stock is not tracked: the product is always in stock and sells without counting.
 
 1. On the same product, scroll to **Inventory**.
-2. If you do not track stock, clear **Stock Quantity** so the box is empty. An empty box means the product sells without tracking stock.
-3. If you do track stock, type the number you have.
+2. If you do not track stock, leave **Stock Quantity** blank.
+3. If you do track stock, type the number you have, then pick the **Out-of-Stock Policy**: **Stop selling** refuses orders at 0, **Continue selling** keeps taking them. The policy only applies once a quantity is set.
 4. Click **Save**.
-5. Repeat for every product and variant the kit created, including free gifts.
+5. Repeat for every product and variant the kit created that you want to track, including free gifts.
 
-<img src="/images/template-kits/after-stock.png" alt="The Inventory section of a product the kit created: Stock Quantity is 0 and the Out-of-Stock Policy is Stop selling" />
-
-<Warning>
-Do this before you send traffic. With `0` and **Stop selling**, a customer can reach the checkout and have the order refused. Place a test order on each checkout once the stock is set.
-</Warning>
+<img src="/images/template-kits/after-stock.png" alt="The Inventory section of a product the kit created: Stock Quantity is blank, so the product sells without tracking stock" />
 
 ### 5. Connect your merchant and fulfillment
 
