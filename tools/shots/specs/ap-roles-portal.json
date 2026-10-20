@@ -1,0 +1,65 @@
+{
+  "out": "images/affiliate-portal/roles-portal.png",
+  "alt": "Manage permissions for an Affiliate manager role: the Affiliate portal group with View on Portal settings and View, Create and Update on Portal affiliates",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.overview']",
+    "fixtures": [
+      {
+        "url": "^/api/organizations/[^/]+/roles(\\?|$)",
+        "file": "tools/shots/fixtures/affiliate-portal/roles.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "text=Roles >> visible=true"
+      },
+      {
+        "wait": 2000
+      },
+      {
+        "click": "[data-testid='row-actions-trigger'] >> visible=true >> nth=0"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-testid='list.row.action.manage_permissions'] >> visible=true"
+      },
+      {
+        "wait": 1200
+      },
+      {
+        "scroll": "h3:text-is('Affiliate portal')"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "text=Portal affiliates >> visible=true",
+      "title": "Portal affiliates",
+      "text": "Invite, approve, disable",
+      "side": "right"
+    },
+    {
+      "selector": "text=Payouts and billing >> visible=true",
+      "title": "Payouts and billing",
+      "text": "For finance only roles",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 860,
+  "calloutWidth": 230
+}

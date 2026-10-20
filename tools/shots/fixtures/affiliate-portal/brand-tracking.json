@@ -1,0 +1,23 @@
+{
+ "success": true,
+ "brands": [
+  {
+   "brand_id": 899,
+   "brand_name": "Northwind Supplements",
+   "meta_pixel_id": "123456789012345",
+   "meta_access_token": "EAAG-demo-token",
+   "meta_event_source_url": "https://northwindsupplements.makeoffers.io/sleep-gummies",
+   "everflow_postback_url": null,
+   "taboola_event_name": null
+  },
+  {
+   "brand_id": 935,
+   "brand_name": "Northwind Sleep",
+   "meta_pixel_id": null,
+   "meta_access_token": null,
+   "meta_event_source_url": null,
+   "everflow_postback_url": null,
+   "taboola_event_name": "purchase"
+  }
+ ]
+}

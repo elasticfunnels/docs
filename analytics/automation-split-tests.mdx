@@ -1,0 +1,70 @@
+---
+title: "Automation Split Tests"
+description: "Split the contacts that enter an automation between two or more paths and compare the revenue each path brings in"
+---
+
+## At a glance
+<img src="/images/analytics/automation-split-test-report.png" alt="Automation split test report: contacts, buyers, net revenue per contact and recovery rate for each call center arm" />
+
+**What it does**: a Split Test step in an automation sends each contact down one of its arms. Every step becomes a split test of its own on the **Split Tests** page, next to your page split tests, and each arm gets its own results.
+
+**Typical use**: send half of your abandoned checkouts to one call center and half to another (two [Send to call center](/integrations/callcenters#send-from-an-automation) steps after the split), then keep the one that brings in more money after refunds.
+
+**Main metric**: net revenue per contact, which is the revenue from the contacts in an arm, minus their refunds and chargebacks, divided by the number of contacts in that arm.
+
+---
+
+## Set it up
+
+1. Open **Automations** and edit the automation (or create one with a trigger such as **On Abandoned Cart**).
+2. Add a **Split Test** step from the **General** group of steps.
+3. Add an arm for each path and give it a weight. Weights are percentages of contacts, so two arms at 50 split contacts evenly.
+4. Connect each arm to the steps that path should run.
+5. Save the automation.
+
+Saving creates the split test. It shows up on **Split Tests** with the type **Automation**, named after the automation and the step. Click **View results** on the step in the builder to open its report.
+
+<Note>
+An arm is identified by its name. Renaming an arm starts a new arm with no results; the old one stays in the report marked "(removed)" so its numbers are not lost.
+</Note>
+
+## How contacts are split
+
+- **One arm per contact.** A contact is recognised by email, or by phone when there is no email. When the same contact enters the step again (a second abandon, for example), it goes down the same arm as before.
+- **Weights apply to new contacts.** Contacts already in the test keep their arm when you change the weights.
+- **Paused test**: every contact goes down the first arm and nothing is counted.
+- **Winner declared**: every contact goes down the winning arm.
+- **Step deleted**: the split test is marked deleted and keeps its results.
+- **Test runs from the builder** and orders from a merchant in test mode are never counted.
+
+## How results are counted
+
+An order counts for an arm when the contact places it within the attribution window after entering the step:
+
+| Automation trigger | Window |
+|---|---|
+| On Abandoned Cart, On Failed Payment, On Subscription Renewal Failed | 7 days |
+| Every other trigger | 30 days |
+
+- Every order in the window counts, upsells included. The order that started the automation does not.
+- Refunds and chargebacks of a counted order are taken off that arm's revenue when they arrive.
+- A contact counts in its arm even when nobody reached them. That keeps the arms comparable: an arm that only counted the contacts it reached would look better than it is.
+
+## Reading the report
+
+| Column | Meaning |
+|---|---|
+| Contacts | Contacts that entered this arm |
+| Buyers | Contacts in the arm with at least one counted order |
+| Net revenue per contact | Net revenue divided by contacts. The arm with the highest value is the leading arm |
+| Recovery rate | Buyers divided by contacts |
+| Orders, Revenue, Refunded, Net revenue | Counted orders, their revenue, what was refunded or charged back, and the difference |
+| Significance | Whether the difference in buyer rate against the control arm is statistically significant |
+| Sent to call center | Shown when the arms use Send to call center. Calls sent; hover for the full count: sent, cancelled because the contact bought first, failed, and not sent. **Not sent** is a contact the step did not pass on (the call center was paused or off, or its filters or phone rule left the contact out), counted so an arm that skips contacts is visible |
+
+Recovery rate is shown next to net revenue per contact on purpose. An arm that wins more orders but loses more of them to refunds can have the higher recovery rate and still bring in less money.
+
+## Related
+
+- [Split Test Analytics](/analytics/split-test): significance, sample size and when to stop a test
+- [Split testing pages](/funnels/split-testing)

@@ -1,0 +1,3 @@
+[
+  { "id": 1, "stripe_card_id": "card_demo_visa", "card_brand": "visa", "last4": "4242", "exp_month": 8, "exp_year": 2028, "default": true }
+]

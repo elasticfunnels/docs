@@ -1,0 +1,118 @@
+---
+title: 'Attentive Integration'
+sidebarTitle: "Attentive"
+icon: "message"
+description: 'Subscribe leads and buyers to Attentive SMS and email, and send their orders and funnel events to start Attentive journeys.'
+---
+
+## Overview
+
+The Attentive integration lets you keep Attentive for SMS while your funnels, split tests, email and analytics run in ElasticFunnels. Automation steps subscribe people to Attentive texts and emails, set custom attributes on them, and send events that start your Attentive journeys: leads, abandoned checkouts, purchases, refunds, chargebacks, cancelled subscriptions and declined upsells.
+
+It works with orders from every merchant ElasticFunnels supports, including ClickBank, BuyGoods, Digistore24 and JVZoo, as well as your own checkout.
+
+## What you get
+
+| Step | What it does |
+|------|--------------|
+| Subscribe to texts and emails | Subscribes the phone to texts and the email to emails (or one of them). Texts are subscribed only with a recorded SMS yes, see [Consent](#consent) |
+| Send custom event | Sends an event with a name you choose (for example `Checkout abandoned`) and `name=value` properties. Use it as the trigger of an Attentive journey |
+| Set custom attributes | Saves `name=value` attributes on the subscriber, such as `Customer=true` or the last product bought |
+| Send purchase | Sends the order as an Attentive purchase, with each product of the order, its price and quantity |
+| Send add to cart | Sends the products of the checkout as an add to cart, the event Attentive's cart abandonment journeys start from |
+| Send product view | Sends a product view |
+
+Steps find the person by phone, email or both. Phones are sent in international format; a 10-digit number is read as a US number.
+
+## Setup
+<img src="/images/integrations/attentive-api-key.png" alt="Attentive connection form with the API key field" />
+
+<Steps>
+  <Step title="Create a custom app in Attentive">
+    Log in to Attentive, open **Marketplace** and create a custom app. Give it **write** access to **Subscribers**, **Custom events**, **Custom attributes** and **eCommerce**, and **read** access to **Subscribers**. Install the app and copy its API key.
+  </Step>
+  <Step title="Connect it in ElasticFunnels">
+    Go to **Integrations**, open **Attentive**, give the connection a name and paste the **API key**. Save. ElasticFunnels checks the key with Attentive when you save and shows an error if Attentive refuses it. **Test connection** runs the same check later.
+  </Step>
+  <Step title="Add the automations">
+    Start from a preset (below), or open **Automations** and add Attentive steps after any trigger.
+  </Step>
+</Steps>
+
+Without read access to Subscribers the steps still work. The subscribe step then skips its check for people who are already subscribed and sends the subscription straight away.
+
+## Presets
+<img src="/images/integrations/attentive-presets.png" alt="Attentive presets with the preview of the new form entry preset" />
+
+The **Presets** tab of the Attentive integration page creates these automations in one click:
+
+| Preset | Trigger | What it sends |
+|--------|---------|---------------|
+| New form entry | A form entry in the form you pick | Subscribes the person (texts only if they ticked the form's SMS box) and sends a `Lead` event |
+| New purchase: subscribe buyers who ticked the SMS box | A new purchase | Subscribes the buyer to texts only when they ticked the SMS box at checkout |
+| Abandoned checkout | An abandoned checkout | An add to cart with the checkout's products, then a `Checkout abandoned` event with order, total, product, merchant and funnel |
+| New purchase: send the order | A new purchase | The purchase, then the attributes `Customer=true`, `Last product`, `Last offer`, `Merchant`, `Funnel` and `UTM source` |
+| Refund | A refund | A `Refund` event |
+| Chargeback | A chargeback | A `Chargeback` event |
+| Subscription cancelled | A cancelled subscription | A `Subscription cancelled` event |
+| Upsell declined | A page event (see below) | An `Upsell declined` event with the page and funnel |
+
+In Attentive, build a journey per event: for example a journey that starts on the custom event `Checkout abandoned`, and one that starts on `Refund`.
+
+### Stopping the abandoned checkout journey
+
+Attentive has no call that stops a journey from outside. Set the journey's exit condition to **made a purchase** in Attentive. The purchase preset sends that purchase as soon as the order comes in, so a buyer leaves the abandon journey on their own.
+
+### Upsell declined
+
+A declined upsell is a click on your page, not an order, so it runs from a page event:
+
+<Steps>
+  <Step title="Create the automation">
+    Create the **Upsell declined** preset. Its trigger is **On Page Event Customer Automation**.
+  </Step>
+  <Step title="Run it from the No thanks link">
+    Open the funnel's **Page Events**, add an event on the upsell page for the click on your No thanks link, and connect an **Execute Automation on Customer** node. Pick the Upsell declined automation in it. See [Page events](/funnels/page-events).
+  </Step>
+</Steps>
+
+## Consent
+
+Only text people who agreed to receive texts from you.
+
+- The subscribe step subscribes a phone to texts only when its **SMS consent** field reads yes, true, on or 1. The presets fill it from the SMS box of your form, or from the SMS box of your checkout.
+- A purchase on its own never subscribes anyone to texts. Orders from ClickBank, BuyGoods, Digistore24 and JVZoo carry no SMS consent, so those buyers are not subscribed to texts. Events and attributes are still sent for them, which matters only if they are already Attentive subscribers.
+- **Subscribe texts without SMS consent** is off by default. Turn it on only if you collect consent somewhere the step cannot see. With it on, every phone in the step is subscribed, and texting people who never agreed can break TCPA and carrier rules.
+- When **Email consent** reads no, false, off or 0, the email is not subscribed.
+- A person who is already subscribed is left alone.
+- **Sign-up source ID** is optional: the ID of an API sign-up unit in Attentive, so its welcome journey runs. **Single opt-in** skips Attentive's reply-Y confirmation text; use it only when your form records clear consent.
+
+## Event properties and attributes
+
+Write properties and attributes one per line, as `name=value`. Values can use variables from earlier steps:
+
+```
+Product={trigger.product_names}
+Merchant={trigger.merchant}
+Funnel={trigger.funnel_name}
+```
+
+A line whose value comes out empty is left out. Brackets and quotes are removed from names, because Attentive refuses them. Fill **Event ID** to stop a retried run from counting the same event twice.
+
+## Troubleshooting
+<img src="/images/integrations/attentive-rejected-key.png" alt="The error shown when Attentive refuses the API key" />
+
+<AccordionGroup>
+  <Accordion title="Saving the integration says Attentive rejected the API key">
+    The key was revoked, the app was uninstalled, or the key was copied incompletely. Copy the key of the installed custom app again and paste it.
+  </Accordion>
+  <Accordion title="A buyer was not subscribed to texts">
+    The order had no SMS yes: the SMS box was not ticked, or the order came from a merchant that does not pass consent. This is on purpose, see [Consent](#consent).
+  </Accordion>
+  <Accordion title="An event arrived but no journey started">
+    Check the journey's trigger uses the exact event name, including capitals. Attentive does not start journeys from events that happened more than 12 hours ago, so a run that was paused for longer will not start one.
+  </Accordion>
+  <Accordion title="A step fails with a permission error">
+    The custom app is missing a scope. Add it in Attentive (Subscribers, Custom events, Custom attributes, eCommerce) and reinstall the app.
+  </Accordion>
+</AccordionGroup>

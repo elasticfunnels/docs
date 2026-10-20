@@ -1,0 +1,94 @@
+{
+ "data": {
+  "id": 1,
+  "organization_id": 798,
+  "name": "Northwind Partners",
+  "domain": "partners.example.com",
+  "subdomain": null,
+  "subdomain_root": null,
+  "hostname": "partners.example.com",
+  "is_platform_subdomain": false,
+  "request_invoices": true,
+  "visible_brand_ids": [
+   899,
+   935
+  ],
+  "visible_brands": [
+   {
+    "brand_id": 899,
+    "name": "Northwind Supplements",
+    "code": "demo-northwind",
+    "default_applicant_status": "pending_approve"
+   },
+   {
+    "brand_id": 935,
+    "name": "Northwind Sleep",
+    "code": "demo-northwind-sleep",
+    "default_applicant_status": "active"
+   }
+  ],
+  "status": "pending",
+  "txt_validation_record": {
+   "name": "_cf-custom-hostname.partners.example.com",
+   "value": "3f9c2a71-5b8e-4d0a-9e61-7c2f4b1d8a90"
+  },
+  "cloudflare_status": "pending",
+  "ssl_status": "pending_validation",
+  "cloudflare_verification_message": null,
+  "dns_records": [
+   {
+    "type": "TXT",
+    "name": "_cf-custom-hostname.partners.example.com.",
+    "value": "3f9c2a71-5b8e-4d0a-9e61-7c2f4b1d8a90"
+   },
+   {
+    "type": "CNAME",
+    "name": "partners",
+    "value": "live.elasticfunnels.io"
+   }
+  ],
+  "platform_domain": "live.elasticfunnels.io",
+  "cloudflare_validated_at": null,
+  "created_at": "2026-10-20 09:18:07",
+  "updated_at": "2026-10-20 09:48:01",
+  "branding": {
+   "primary_color": "#0f766e",
+   "accent_color": "#f59e0b",
+   "background_color": null,
+   "text_color": null,
+   "header_background_color": null,
+   "header_text_color": null,
+   "logo_url": null,
+   "logo_dark_url": null,
+   "favicon_url": null,
+   "login_aside_image_url": null,
+   "font_family": null,
+   "heading_font_family": null,
+   "header_title": "Northwind Partners",
+   "login_subheading": "Sign in to grab your links and follow your commissions.",
+   "footer_text": "\u00a9 Northwind Supplements (demo)",
+   "support_url": "https://example.com/partners/support",
+   "terms_url": "https://example.com/partners/terms",
+   "privacy_url": "https://example.com/privacy",
+   "custom_css": null,
+   "custom_html_head": null,
+   "custom_html_footer": null,
+   "welcome_email_subject": null,
+   "welcome_email_html": null,
+   "welcome_email_text": null,
+   "payout_email_subject": null,
+   "payout_email_html": null,
+   "payout_email_text": null,
+   "email_from_name": "Northwind Partners",
+   "email_reply_to": "partners@example.com"
+  },
+  "payout_schedule": {
+   "payout_frequency": "monthly",
+   "payout_frequency_days": null,
+   "payout_cutoff_day": 1,
+   "payout_net_days": 15,
+   "default_minimum_payout_threshold": "50.00",
+   "require_payout_method": true
+  }
+ }
+}

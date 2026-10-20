@@ -1,0 +1,60 @@
+{
+  "out": "images/affiliate-portal/tracking-link-modal.png",
+  "alt": "The Copy tracking link modal with a page URL entered and the final link for the matching brand",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal/affiliates/2",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "text=Edit profile",
+    "fixtures": [
+      {
+        "url": "/affiliate-portal/affiliates/\\d+/metrics",
+        "file": "tools/shots/fixtures/affiliate-portal/affiliate-metrics.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "button:has-text('Tracking link')"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "fill": "input[type=url]",
+        "value": "https://northwindsupplements.makeoffers.io/sleep-gummies"
+      },
+      {
+        "wait": 1200
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "input[type=url]",
+      "title": "Base URL",
+      "text": "A page on the brand's domain",
+      "side": "right"
+    },
+    {
+      "selector": "text=matched >> nth=0",
+      "title": "matched",
+      "text": "The brand that owns the domain",
+      "side": "left"
+    },
+    {
+      "selector": "text=Copy link >> nth=0",
+      "title": "Copy link",
+      "text": "Link with their affid",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

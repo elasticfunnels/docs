@@ -1,0 +1,40 @@
+{
+  "out": "images/affiliate-portal/portal-conversions.png",
+  "alt": "The Conversions report with date, order total, commission and status",
+  "capture": {
+    "path": "/affiliates/conversions",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "table",
+    "fixtures": [
+      {
+        "url": "^/affiliates/api/conversions",
+        "file": "tools/shots/fixtures/affiliate-portal/conversions.json"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "th:has-text('Commission')",
+      "title": "Commission",
+      "text": "What they earned on the sale",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

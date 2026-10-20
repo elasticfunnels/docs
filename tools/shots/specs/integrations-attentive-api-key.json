@@ -1,0 +1,24 @@
+{
+  "out": "images/integrations/attentive-api-key.png",
+  "alt": "Attentive connection form with the API key field",
+  "_flow": "attentive step 6 \"The API key field is shown\" (tools/flows in the elasticfunnels repo); from the recorded screenshot",
+  "image": "/Users/samueltodosiciuc/Work/elasticfunnels/.claude/worktrees/agent-aeace706919d5fb02/_dev/flows/attentive/shots/06-the-api-key-field-is-shown.png",
+  "imageSize": {
+    "w": 2880,
+    "h": 1800
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        596,
+        600,
+        1424,
+        76
+      ],
+      "title": "API key",
+      "text": "Paste the key of your Attentive custom app"
+    }
+  ]
+}

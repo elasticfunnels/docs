@@ -7,12 +7,19 @@ description: 'Set up Digistore24 as a merchant, assign to a domain, and map prod
 This guide explains how to set up Digistore24 as a merchant. The overall flow matches the generic merchant setup; use this page for platform-specific notes.
 
 ## Step 1: Create Digistore24 Merchant
-{/* SCREENSHOT: Step 1: Create Digistore24 Merchant · merchant setup screen or postback state · desktop */}
 
-1. Go to **Settings** → **Merchants** → **Add Merchant**
-2. Select **Gateway**: Digistore24
-3. Enter your **Vendor ID** as provided by Digistore24
-4. Save
+<Note>
+Creating a Digistore24 merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below follow the guided setup. In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
+</Note>
+
+
+1. Go to **Settings** → **Merchants** and click **Create Merchant**
+2. Pick **Digistore24** as the **Gateway**, type a **Name**, and click **Create & Configure**
+3. **Digistore24 vendor ID**: your Digistore24 user name or vendor ID, at the top right once you log in to Digistore24
+4. **IPN passphrase (optional)**: the SHA passphrase on your Digistore24 IPN connection, under **Settings** → **IPN Settings**. It must match exactly for signed postbacks to be accepted. Leave it empty if your connection has none.
+5. Click **Save and continue**. **Products** opens next.
+
+<img src="/images/merchants/digistore24-setup-account.png" alt="The guided setup of a Digistore24 merchant on Account details: the Digistore24 vendor ID and the optional IPN passphrase, each with where to find it" />
 
 ## Step 2: Assign Merchant to Domain
 {/* SCREENSHOT: Step 2: Assign Merchant to Domain · merchant setup screen or postback state · desktop */}
@@ -39,9 +46,12 @@ Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain an
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
 
 ## Postbacks
-{/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
-Click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for Digistore24, then **Test**. After you configure the URL in Digistore24 and click **Test IPN** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
+In the guided setup, this is the **Postback URL** step: the postback URL with **Copy**, and the steps to add it as an IPN connection in Digistore24.
+
+<img src="/images/merchants/digistore24-setup-postback.png" alt="The Postback URL step of the guided Digistore24 setup: the postback URL with Copy and the steps for the IPN connection in Digistore24" />
+
+Later, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for Digistore24, then **Test**. After you configure the URL in Digistore24 and click **Test IPN** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
 
 ## Troubleshooting
 {/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}

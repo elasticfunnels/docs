@@ -1,0 +1,50 @@
+{
+  "out": "images/affiliate-portal/affiliate-detail.png",
+  "alt": "An affiliate's page: the header with Edit profile, Tracking link, Reset password and Disable account, and the Overview tab with revenue, payouts and conversions",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal/affiliates/2",
+    "viewport": {
+      "width": 1440,
+      "height": 1250
+    },
+    "waitFor": "text=Edit profile",
+    "fixtures": [
+      {
+        "url": "/affiliate-portal/affiliates/\\d+/metrics",
+        "file": "tools/shots/fixtures/affiliate-portal/affiliate-metrics.json"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 1183,
+      "height": 800
+    }
+  },
+  "annotations": [
+    {
+      "selector": "div:has(> button:has-text('Edit profile'))",
+      "title": "Actions",
+      "text": "Edit profile, tracking link, reset password, disable",
+      "side": "right"
+    },
+    {
+      "selector": "text=Revenue >> nth=0",
+      "title": "Overview",
+      "text": "Their results across brands",
+      "side": "left"
+    },
+    {
+      "selector": "text=Payout settings >> nth=0",
+      "title": "Payout settings",
+      "text": "Their own minimum payout",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

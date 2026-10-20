@@ -1,0 +1,22 @@
+{
+  "out": "images/alerts/alerts-list.png",
+  "alt": "The Alerts page: open issues with severity, how many times each happened, when it was last seen and the last event",
+  "capture": {
+    "path": "/{brand}/alerts",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid='alerts.list.count']",
+    "fixtures": [
+      { "url": "^/api/brands/{brand}/alerts/stats", "file": "tools/shots/fixtures/alerts/stats.json" },
+      { "url": "^/api/brands/{brand}/alerts(\\?|$)", "file": "tools/shots/fixtures/alerts/list.json" }
+    ],
+    "crop": { "x": 257, "y": 60, "width": 1183, "height": 420 }
+  },
+  "annotations": [
+    { "selector": "[data-testid='alerts.list.digest-toggle']", "title": "Daily summary", "text": "One email a day about open warnings", "side": "right" },
+    { "selector": "[data-testid='settings.alerts.list'] [data-testid='list.tab.open']", "title": "Open / Acknowledged", "text": "Resolved issues move to their own tab", "side": "left" },
+    { "box": [14, 220, 90, 180], "title": "Severity", "text": "Warning, Escalating or Critical", "side": "left" },
+    { "box": [516, 220, 70, 180], "title": "Count", "text": "How many times it happened", "side": "right" }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

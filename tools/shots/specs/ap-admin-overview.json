@@ -1,0 +1,50 @@
+{
+  "out": "images/affiliate-portal/admin-overview.png",
+  "alt": "The Affiliate portal page in organization settings: the portal name and domain with its Active status, the sections and the brands on the portal",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 1180
+    },
+    "waitFor": "[data-testid='sidebar.overview']",
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 1183,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Northwind Partners >> nth=1",
+      "title": "Portal",
+      "text": "Name and domain affiliates use",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='sidebar.overview']",
+      "title": "Sections",
+      "text": "Settings, affiliates, payouts and more",
+      "side": "left"
+    },
+    {
+      "selector": "text=Remove portal",
+      "title": "Remove portal",
+      "text": "Deletes the portal",
+      "side": "right"
+    },
+    {
+      "selector": "button:text-is('Open') >> visible=true >> nth=0",
+      "title": "Setup checklist",
+      "text": "Open jumps to the fix",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

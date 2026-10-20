@@ -1,0 +1,56 @@
+{
+  "out": "images/alerts/alerts-detail.png",
+  "alt": "One alert issue: what it means, its count, first and last seen, the last event, and the Acknowledge and Resolve buttons",
+  "capture": {
+    "path": "/{brand}/alerts/9101",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='alerts.detail.overview']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/alerts/9101",
+        "file": "tools/shots/fixtures/alerts/detail.json"
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 1183,
+      "height": 430
+    }
+  },
+  "annotations": [
+    {
+      "box": [
+        915,
+        22,
+        240,
+        36
+      ],
+      "title": "Acknowledge / Resolve",
+      "text": "Mute the emails, or close the issue",
+      "side": "right"
+    },
+    {
+      "box": [
+        14,
+        118,
+        150,
+        40
+      ],
+      "title": "Overview / History",
+      "text": "History lists every escalation, email, ack and resolve",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='alerts.detail.last-event']",
+      "title": "Last event",
+      "text": "What happened and the likely cause",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

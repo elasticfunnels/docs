@@ -1,0 +1,60 @@
+{
+  "out": "images/affiliate-portal/portal-links.png",
+  "alt": "The Tracking links page: the link builder with an offer page picked and its tracking URL, the Bulk Sub IDs box and the list of all offer pages",
+  "capture": {
+    "path": "/affiliates/links",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "text=Link builder",
+    "actions": [
+      {
+        "click": ".ant-select >> nth=0"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": ".ant-select-item-option >> nth=0"
+      },
+      {
+        "wait": 800
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "label:text-is('Offer page')",
+      "title": "Offer page",
+      "text": "Pick what to link to",
+      "side": "left"
+    },
+    {
+      "selector": "div:text-is('Tracking URL')",
+      "title": "Tracking URL",
+      "text": "Copy, QR code or open",
+      "side": "left"
+    },
+    {
+      "selector": "h2:text-is('Bulk Sub IDs')",
+      "title": "Bulk Sub IDs",
+      "text": "One link per line",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

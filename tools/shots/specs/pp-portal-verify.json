@@ -1,0 +1,64 @@
+{
+  "out": "images/affiliate-portal/portal-verify.png",
+  "alt": "The verification step asking for the 6-digit code sent to the affiliate's email",
+  "capture": {
+    "path": "/affiliates/register",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "waitFor": "input[placeholder='Jane Doe']",
+    "fixtures": [
+      {
+        "method": "POST",
+        "url": "^/affiliates/api/auth/register",
+        "file": "tools/shots/fixtures/affiliate-portal/register.json"
+      }
+    ],
+    "actions": [
+      {
+        "fill": "input[placeholder='Jane Doe']",
+        "value": "Casey Morgan"
+      },
+      {
+        "fill": "input[placeholder='you@email.com']",
+        "value": "casey@example.com"
+      },
+      {
+        "fill": "input[type=password] >> nth=0",
+        "value": "demo-password-123"
+      },
+      {
+        "fill": "input[type=password] >> nth=1",
+        "value": "demo-password-123"
+      },
+      {
+        "click": "button[type=submit]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Verification code",
+      "title": "Verification code",
+      "text": "6 digits, valid 15 minutes",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

@@ -81,10 +81,12 @@ Removing a card is permanent. If a subscription is actively billing against that
 
 Instead of a browser prompt, the side rail includes an inline card form:
 
-1. Enter the card number, expiry, and CVV
+1. Enter the card number, expiry, and CVV in the secure card fields (hosted by NMI Collect.js, so the card never reaches ElasticFunnels)
 2. Click **Add Card**
-3. The system vaults the card through the gateway without charging it
+3. NMI returns a single-use token, and the system vaults the card with that token without charging it
 4. On success, the new card appears in the Cards on File list immediately
+
+The card fields use the public (tokenization) key of the brand's NMI merchant. If that merchant has no public key, the form explains that the key is missing instead of showing card fields.
 
 If the customer already has a vault on file, the new card is added as an additional billing record under the same vault. If no vault exists, a new one is created automatically.
 

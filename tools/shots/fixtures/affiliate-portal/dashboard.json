@@ -1,0 +1,446 @@
+{
+ "success": true,
+ "stats": {
+  "commission": 4046.94,
+  "clicks": 5959,
+  "conversions": 136,
+  "epc": 0.68,
+  "conversion_rate": 2.28,
+  "total_paid": 1157.5,
+  "pending_payout": 1364.05,
+  "total_adjustments": 0,
+  "total_allowance": 0,
+  "current_balance": 412.3,
+  "clicks_over_time": [
+   {
+    "date": "2026-09-21",
+    "count": 151
+   },
+   {
+    "date": "2026-09-22",
+    "count": 120
+   },
+   {
+    "date": "2026-09-23",
+    "count": 164
+   },
+   {
+    "date": "2026-09-24",
+    "count": 149
+   },
+   {
+    "date": "2026-09-25",
+    "count": 134
+   },
+   {
+    "date": "2026-09-26",
+    "count": 137
+   },
+   {
+    "date": "2026-09-27",
+    "count": 162
+   },
+   {
+    "date": "2026-09-28",
+    "count": 145
+   },
+   {
+    "date": "2026-09-29",
+    "count": 170
+   },
+   {
+    "date": "2026-09-30",
+    "count": 183
+   },
+   {
+    "date": "2026-10-01",
+    "count": 189
+   },
+   {
+    "date": "2026-10-02",
+    "count": 167
+   },
+   {
+    "date": "2026-10-03",
+    "count": 205
+   },
+   {
+    "date": "2026-10-04",
+    "count": 169
+   },
+   {
+    "date": "2026-10-05",
+    "count": 234
+   },
+   {
+    "date": "2026-10-06",
+    "count": 228
+   },
+   {
+    "date": "2026-10-07",
+    "count": 197
+   },
+   {
+    "date": "2026-10-08",
+    "count": 216
+   },
+   {
+    "date": "2026-10-09",
+    "count": 239
+   },
+   {
+    "date": "2026-10-10",
+    "count": 201
+   },
+   {
+    "date": "2026-10-11",
+    "count": 233
+   },
+   {
+    "date": "2026-10-12",
+    "count": 199
+   },
+   {
+    "date": "2026-10-13",
+    "count": 238
+   },
+   {
+    "date": "2026-10-14",
+    "count": 265
+   },
+   {
+    "date": "2026-10-15",
+    "count": 217
+   },
+   {
+    "date": "2026-10-16",
+    "count": 218
+   },
+   {
+    "date": "2026-10-17",
+    "count": 271
+   },
+   {
+    "date": "2026-10-18",
+    "count": 262
+   },
+   {
+    "date": "2026-10-19",
+    "count": 243
+   },
+   {
+    "date": "2026-10-20",
+    "count": 253
+   }
+  ],
+  "conversions_over_time": [
+   {
+    "date": "2026-09-21",
+    "count": 5,
+    "commission": 145.79
+   },
+   {
+    "date": "2026-09-22",
+    "count": 2,
+    "commission": 60.57
+   },
+   {
+    "date": "2026-09-23",
+    "count": 4,
+    "commission": 133.11
+   },
+   {
+    "date": "2026-09-24",
+    "count": 2,
+    "commission": 58.94
+   },
+   {
+    "date": "2026-09-25",
+    "count": 2,
+    "commission": 60.82
+   },
+   {
+    "date": "2026-09-26",
+    "count": 4,
+    "commission": 107.96
+   },
+   {
+    "date": "2026-09-27",
+    "count": 4,
+    "commission": 122.66
+   },
+   {
+    "date": "2026-09-28",
+    "count": 3,
+    "commission": 87.52
+   },
+   {
+    "date": "2026-09-29",
+    "count": 3,
+    "commission": 98.6
+   },
+   {
+    "date": "2026-09-30",
+    "count": 4,
+    "commission": 121.3
+   },
+   {
+    "date": "2026-10-01",
+    "count": 5,
+    "commission": 157.28
+   },
+   {
+    "date": "2026-10-02",
+    "count": 4,
+    "commission": 124.45
+   },
+   {
+    "date": "2026-10-03",
+    "count": 4,
+    "commission": 126.79
+   },
+   {
+    "date": "2026-10-04",
+    "count": 4,
+    "commission": 119.89
+   },
+   {
+    "date": "2026-10-05",
+    "count": 5,
+    "commission": 142.57
+   },
+   {
+    "date": "2026-10-06",
+    "count": 5,
+    "commission": 139.94
+   },
+   {
+    "date": "2026-10-07",
+    "count": 5,
+    "commission": 139.76
+   },
+   {
+    "date": "2026-10-08",
+    "count": 5,
+    "commission": 165.01
+   },
+   {
+    "date": "2026-10-09",
+    "count": 5,
+    "commission": 169.21
+   },
+   {
+    "date": "2026-10-10",
+    "count": 5,
+    "commission": 136.6
+   },
+   {
+    "date": "2026-10-11",
+    "count": 4,
+    "commission": 119.65
+   },
+   {
+    "date": "2026-10-12",
+    "count": 6,
+    "commission": 159.73
+   },
+   {
+    "date": "2026-10-13",
+    "count": 5,
+    "commission": 144.01
+   },
+   {
+    "date": "2026-10-14",
+    "count": 7,
+    "commission": 207.55
+   },
+   {
+    "date": "2026-10-15",
+    "count": 7,
+    "commission": 208.55
+   },
+   {
+    "date": "2026-10-16",
+    "count": 4,
+    "commission": 126.45
+   },
+   {
+    "date": "2026-10-17",
+    "count": 6,
+    "commission": 174.52
+   },
+   {
+    "date": "2026-10-18",
+    "count": 4,
+    "commission": 118.77
+   },
+   {
+    "date": "2026-10-19",
+    "count": 6,
+    "commission": 179.7
+   },
+   {
+    "date": "2026-10-20",
+    "count": 7,
+    "commission": 189.24
+   }
+  ],
+  "has_payout_method": true,
+  "clicks_by_brand": [
+   {
+    "brand_id": 899,
+    "clicks": 4052
+   },
+   {
+    "brand_id": 935,
+    "clicks": 1907
+   }
+  ]
+ },
+ "recent_payouts": [
+  {
+   "id": 1,
+   "brand_affiliate_id": 49,
+   "brand_id": 899,
+   "status": "paid",
+   "status_label": "Paid",
+   "status_color": "green",
+   "amount": 842.1,
+   "currency": "USD",
+   "invoice_number": null,
+   "invoice": null,
+   "invoice_status": "approved",
+   "invoice_rejection_reason": null,
+   "invoice_uploaded_at": null,
+   "invoice_reviewed_at": null,
+   "notes": null,
+   "admin_note": null,
+   "rejection_reason": null,
+   "paid_at": "2026-09-15T07:00:00.000Z",
+   "payment_method": "PayPal",
+   "payment_reference": "PP-1029",
+   "processed_by": null,
+   "processed_at": null,
+   "period_start": "2026-07-31T00:00:00.000Z",
+   "period_end": "2026-08-30T00:00:00.000Z",
+   "commission_summary": null,
+   "tax_amount": null,
+   "allowance": null,
+   "allowance_amount": null,
+   "allowance_hold_days": null,
+   "created_at": "2026-08-30T00:00:00.000Z",
+   "updated_at": "2026-10-20T06:21:52.000Z"
+  },
+  {
+   "id": 2,
+   "brand_affiliate_id": 51,
+   "brand_id": 935,
+   "status": "paid",
+   "status_label": "Paid",
+   "status_color": "green",
+   "amount": 315.4,
+   "currency": "USD",
+   "invoice_number": null,
+   "invoice": null,
+   "invoice_status": "approved",
+   "invoice_rejection_reason": null,
+   "invoice_uploaded_at": null,
+   "invoice_reviewed_at": null,
+   "notes": null,
+   "admin_note": null,
+   "rejection_reason": null,
+   "paid_at": "2026-09-15T07:00:00.000Z",
+   "payment_method": "PayPal",
+   "payment_reference": "PP-1029",
+   "processed_by": null,
+   "processed_at": null,
+   "period_start": "2026-07-31T00:00:00.000Z",
+   "period_end": "2026-08-30T00:00:00.000Z",
+   "commission_summary": null,
+   "tax_amount": null,
+   "allowance": null,
+   "allowance_amount": null,
+   "allowance_hold_days": null,
+   "created_at": "2026-08-30T00:00:00.000Z",
+   "updated_at": "2026-10-20T06:21:52.000Z"
+  },
+  {
+   "id": 3,
+   "brand_affiliate_id": 49,
+   "brand_id": 899,
+   "status": "pending",
+   "status_label": "Pending",
+   "status_color": "yellow",
+   "amount": 961.25,
+   "currency": "USD",
+   "invoice_number": null,
+   "invoice": null,
+   "invoice_status": "pending",
+   "invoice_rejection_reason": null,
+   "invoice_uploaded_at": null,
+   "invoice_reviewed_at": null,
+   "notes": null,
+   "admin_note": null,
+   "rejection_reason": null,
+   "paid_at": null,
+   "payment_method": null,
+   "payment_reference": null,
+   "processed_by": null,
+   "processed_at": null,
+   "period_start": "2026-08-31T00:00:00.000Z",
+   "period_end": "2026-09-29T00:00:00.000Z",
+   "commission_summary": null,
+   "tax_amount": null,
+   "allowance": null,
+   "allowance_amount": null,
+   "allowance_hold_days": null,
+   "created_at": "2026-09-29T00:00:00.000Z",
+   "updated_at": "2026-10-20T06:21:52.000Z"
+  },
+  {
+   "id": 4,
+   "brand_affiliate_id": 51,
+   "brand_id": 935,
+   "status": "pending",
+   "status_label": "Pending",
+   "status_color": "yellow",
+   "amount": 402.8,
+   "currency": "USD",
+   "invoice_number": null,
+   "invoice": null,
+   "invoice_status": "pending",
+   "invoice_rejection_reason": null,
+   "invoice_uploaded_at": null,
+   "invoice_reviewed_at": null,
+   "notes": null,
+   "admin_note": null,
+   "rejection_reason": null,
+   "paid_at": null,
+   "payment_method": null,
+   "payment_reference": null,
+   "processed_by": null,
+   "processed_at": null,
+   "period_start": "2026-08-31T00:00:00.000Z",
+   "period_end": "2026-09-29T00:00:00.000Z",
+   "commission_summary": null,
+   "tax_amount": null,
+   "allowance": null,
+   "allowance_amount": null,
+   "allowance_hold_days": null,
+   "created_at": "2026-09-29T00:00:00.000Z",
+   "updated_at": "2026-10-20T06:21:52.000Z"
+  }
+ ],
+ "brand_contexts": [
+  {
+   "brand_affiliate_id": 49,
+   "brand_id": 899,
+   "brand_name": "Northwind Supplements"
+  },
+  {
+   "brand_affiliate_id": 51,
+   "brand_id": 935,
+   "brand_name": "Northwind Sleep"
+  }
+ ]
+}

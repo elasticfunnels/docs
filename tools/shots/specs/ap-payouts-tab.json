@@ -1,0 +1,52 @@
+{
+  "out": "images/affiliate-portal/payouts-tab.png",
+  "alt": "The Payouts tab: payouts per affiliate with period, amount, method, invoice status and status, and the actions on a pending payout",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.payouts']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.payouts']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 919,
+      "height": 520
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Generate now",
+      "title": "Generate now",
+      "text": "Payouts for a date range",
+      "side": "right"
+    },
+    {
+      "selector": "button:has-text('Approve invoice') >> nth=0",
+      "title": "Next step",
+      "text": "Approve the invoice, then pay",
+      "side": "right"
+    },
+    {
+      "selector": "button:has-text('Mark as paid') >> nth=0",
+      "title": "Mark as paid",
+      "text": "After you send the money",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

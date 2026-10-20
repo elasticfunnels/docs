@@ -1,0 +1,16 @@
+{
+  "out": "images/essentials/missing-product-link.png",
+  "alt": "The Create Missing Product action with Link to existing product selected, the matching product suggested with its reasons, a product picker, and the sentence saying where the sales will be recorded",
+  "_source": "elasticfunnels repo flow _dev/flows/missing-product-link step 7, recorded at 1440x900 (2x) on demo brand 899 with the fictional action and products in that flow, cropped to CSS x 384, y 30, 672 x 676",
+  "image": "tools/shots/source/brand-actions-missing-product-link.png",
+  "imageSize": { "w": 672, "h": 676 },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [17, 234, 338, 37], "title": "Link or create", "text": "Link to a product you have, or create one" },
+    { "box": [16, 316, 640, 61], "title": "Suggested", "text": "Preselected only when it clearly matches" },
+    { "box": [16, 464, 640, 50], "title": "Any product", "text": "Search all your products" },
+    { "box": [16, 530, 640, 61], "title": "What happens", "text": "Where these sales will be recorded" },
+    { "box": [507, 624, 141, 39], "title": "Link product", "text": "Saves the code on the product" }
+  ]
+}

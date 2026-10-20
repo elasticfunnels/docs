@@ -46,7 +46,7 @@ sequenceDiagram
 | 5. Yes or No on the upsell | Your page, charge on JVZoo | Yes: a `[UPSELL=...]` tag or pasted `/b/` link, charged in one click when **One Click Upsell** is on, plus JVZoo's one-click script in the page head ([scripts](#the-one-click-upsell-script-and-the-affiliate-link-script)). No: JVZoo's No Thanks link ([Upsell pages](#upsell-pages)). |
 | 6. Thank-you page | JVZoo sends the buyer to your page | **Thank You / Download Page** on each product's Product Access tab ([Thank-you page](#thank-you-page)). |
 | 7. Orders recorded | JVZoo to ElasticFunnels | The ElasticFunnels JVZIPN URL on every product (Step 4). Each product bought sends its own JVZIPN, so the front end and each upsell become separate order lines. Refunds and chargebacks arrive the same way later. |
-| 8. Attribution | ElasticFunnels | Nothing extra. Order, amount, products and affiliate are recorded today. Linking the sale to the visit, ad and split test is not working yet ([what is attributed today](#buy-links)). |
+| 8. Attribution | ElasticFunnels | Nothing extra. The order, amount, products and affiliate are recorded, and the sale is linked to its visit, ad and split test through the `vtid` JVZoo sends back ([what is attributed](#buy-links)). |
 
 ElasticFunnels never sees the card and never decides which upsell comes next. JVZoo does both.
 
@@ -93,15 +93,15 @@ The **first** number is the funnel ID, not the last one. The last number (often 
 ## Step 1: Create the JVZoo merchant
 
 1. Go to **Settings** → **Merchants** and click **Create Merchant**
-2. Pick **JVZoo** as the **Gateway**, type a **Name**, and click **Create & Configure**. The merchant's settings open on **General information**.
+2. Pick **JVZoo** as the **Gateway**, type a **Name**, and click **Create & Configure**. A guided setup opens: it asks for the fields below on **Account details**, then the product IDs (Step 2), the JVZIPN URL (Step 4) and a live test (Step 5), and resumes where you left off (**Continue setup** on the merchant's row). In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
 
 <img src="/images/merchants/jvzoo-create.png" alt="The Create a new merchant dialog with JVZoo picked as the Gateway, the name Northwind JVZoo and the Create & Configure button" />
 
 3. **JVZoo Funnel ID**: the first number of your buy link (`120456` above)
-4. **JVZIPN Secret Key**, under **JVZIPN Configuration**: your JVZoo secret key (see below)
-5. Click **Save**
+4. **JVZIPN Secret Key (optional)**: your JVZoo secret key (see below). Postbacks are recorded without it until you add it.
+5. Click **Save and continue**. **Products** opens next.
 
-<img src="/images/merchants/jvzoo-settings.png" alt="A JVZoo merchant's settings: JVZoo Funnel ID, the Accept postbacks without verifying the key toggle and the JVZIPN Secret Key field" />
+<img src="/images/merchants/jvzoo-setup-account.png" alt="The guided setup of a JVZoo merchant on Account details: the five steps on the left, the JVZoo Funnel ID 120456 and the optional JVZIPN Secret Key" />
 
 Your secret key is on your JVZoo account, not on a product: open **My Account** → **Account Details**, and under **Seller Settings** click **Edit Information**. The key is the **JVZIPN code** field. If it is empty, type a code of your own or click **Generate New**, then click **Save Information** at the bottom of the page. Copy the same value into ElasticFunnels as it is.
 
@@ -146,10 +146,10 @@ You do not rebuild JVZoo's upsell order in ElasticFunnels. The ElasticFunnels fu
 
 ## Step 4: Paste the JVZIPN URL into every JVZoo product
 
-1. In **Settings** → **Merchants**, click **Postback Setup** on the JVZoo merchant's row (or **Copy Postback URL** in its row menu). Its steps are listed on the left: **Postback URL**, **Set up in JVZoo** and **Test**.
+1. In the guided setup, this is the **Postback URL** step. Later, in **Settings** → **Merchants**, click **Postback Setup** on the JVZoo merchant's row (or **Copy Postback URL** in its row menu). Its steps are listed on the left: **Postback URL**, **Set up in JVZoo** and **Test**.
 2. Copy **Your Postback URL**. It has the form `https://app.elasticfunnels.io/postback/vendor/<code>/jvzoo`, where `<code>` belongs to this merchant.
 
-<img src="/images/merchants/jvzoo-postback-setup-steps.png" alt="The Postback Setup dialog for a JVZoo merchant on Set up in JVZoo: the steps list, the postback URL with Copy and the four steps in JVZoo" />
+<img src="/images/merchants/jvzoo-setup-postback.png" alt="The Postback URL step of the guided JVZoo setup: the merchant's postback URL with Copy and the steps to paste it into each JVZoo product" />
 
 3. In JVZoo, open the product's editor from **Sellers** → **Seller Dashboard** (click the product, then **Edit**) and go to the **Advanced** tab
 
@@ -209,7 +209,7 @@ https://www.jvzoo.com/b/120456/451020/99?vtid=<click_code>&aff=<affiliate_id>&ai
 `subid`, `subid2` and `subid3` on the page URL are passed through, and the domain's **Buy Link Parameters** are added to every link.
 
 <Note>
-**What is attributed today.** Orders, products, amounts, refunds, chargebacks and affiliates come from the JVZIPN and are always recorded. Linking a JVZoo sale back to the visit (its page, ad and split test) is not working yet: JVZoo returns your link's parameters inside a passthrough field that ElasticFunnels does not read yet, and no live JVZIPN has carried `vtid` on its own. Your buy links already carry `vtid` (tags and pasted `/b/` links alike), so sales will be linked once this is fixed. Until then, JVZoo sales show in reports without a page or split-test.
+**What is attributed.** Orders, products, amounts, refunds, chargebacks and affiliates come from the JVZIPN and are always recorded. JVZoo also sends back the extra parameters of the buy link (`cvendthru` on JVZIPN v1, `other_params` on v2). ElasticFunnels reads `vtid` from them and links the sale to its visit, page, ad and split test. Sales recorded before 20 October 2026 were not linked.
 </Note>
 
 ### Upsell pages
@@ -231,7 +231,8 @@ reaches the visitor as `https://www.jvzoo.com/b/120456/451024/99?vtid=<click_cod
 - Other parameters on the link (`aff`, `aid`, `tid`) are kept.
 - A `vtid` you set yourself is kept. A blank one (`vtid=`) or a placeholder (`{click_id}`, `{CLICK_ID}`, `[click_id]`) is replaced with the click code.
 - JVZoo affiliate links (`/c/...`) are never changed.
-- This cannot be turned off yet.
+- A link your page script builds by joining strings (`'https://www.jvzoo.com/b/1/2/3?tid=' + sub`) is left as it is, and a full stop or comma after a link in text stays outside it.
+- To leave pasted links exactly as written, turn off **Add click tracking to pasted buy links** in the merchant's **Settings**. `[BUY=...]` tags still carry the click code. With it off, sales through pasted links are not matched to a visit.
 
 Add the click code yourself only where ElasticFunnels never sees the link in the page's HTML: a link built by JavaScript in the browser, or a link made in a backend script. In JavaScript, put `{click_id}` in the page code (it is replaced at render) and use the value. In a backend script, use the template-engine syntax:
 
@@ -323,7 +324,7 @@ JVZoo's team reviews your sales and upsell pages before the funnel goes live, an
 - **Verification:** the first JVZIPN for the merchant clears **Needs Setup**, whether it is a test purchase or a real sale.
 - **Versions:** JVZIPN v1 and v2 are both read, from either box in JVZoo.
 - **Upsells** arrive as their own JVZIPN, one per product, and are matched by the product ID.
-- **Products:** a JVZIPN for a JVZoo product ID mapped on no product raises a **Create Missing Product** action, and the order is saved without that product line.
+- **Products:** a JVZIPN for a JVZoo product ID mapped on no product raises a **Create Missing Product** action, and the order is saved without that product line. The action suggests the product it most likely is, so you can link the ID to it or create a new product; either way the sales already saved without the product are recorded on it. See [Sales for a product code you have not set up](/essentials/brand-actions#sales-for-a-product-code-you-have-not-set-up).
 - **Refunds and chargebacks** link to the original sale by JVZoo's transaction ID.
 - **Duplicates:** with **Deduplicate Orders** on, a repeated JVZIPN for the same order is recorded once.
 - **Wrong funnel:** a JVZIPN whose `funnel_id` does not match the merchant's **JVZoo Funnel ID** is still recorded and flagged, since a URL copied from another offer would otherwise pour that offer's orders in silently.
@@ -351,10 +352,10 @@ JVZoo's team reviews your sales and upsell pages before the funnel goes live, an
     The JVZIPN URL is set on the front-end product only. JVZoo sends one JVZIPN per product, so paste the same URL into every upsell and downsell product.
   </Accordion>
   <Accordion title="Sales arrive without a product">
-    The JVZoo product ID is not mapped on any product. Fill **jvzoo Product ID** on the product's Merchants tab, or accept the **Create Missing Product** action.
+    The JVZoo product ID is not mapped on any product. Open the **Create Missing Product** action and choose **Link to existing product** (it suggests the matching product) or **Create new product**. You can also fill **jvzoo Product ID** on the product's Merchants tab yourself.
   </Accordion>
   <Accordion title="JVZoo sales show no page, ad or split test">
-    Expected for now, and not caused by your links: buy tags and pasted `/b/` links both carry the click code as `vtid`. JVZoo returns it inside a passthrough field that ElasticFunnels does not read yet, so the sale cannot be matched to the visit. The order, amount and affiliate are still recorded. See the note under [Buy links](#buy-links).
+    The buy link the buyer clicked had no `vtid`. Check that it is a `[BUY=...]` tag or a pasted `/b/` link in the page's HTML (a link built by your own script needs `{click_id}` added yourself), and that **Add click tracking to pasted buy links** is on in the merchant's **Settings**. Sales recorded before 20 October 2026 were never linked. The order, amount and affiliate are recorded either way. See [Buy links](#buy-links).
   </Accordion>
   <Accordion title="My tracker shows more sales than ElasticFunnels">
     ElasticFunnels records what JVZoo reports over JVZIPN, so it should match JVZoo's own sales report for the same products and dates. If a tracker such as ClickFlare shows more, check whether it counts each upsell as a separate conversion, and compare product by product.

@@ -89,7 +89,13 @@ Price overrides are only available through Order Entry. Customer-facing checkout
 The payment section supports two paths:
 
 - **Card on File**: shown when the customer has cards saved in this brand; the agent picks which card to use, and that card is charged
-- **New Card**: standard card number, expiry, and CVV entry
+- **New Card**: the agent types the card number, expiry and CVV the customer reads out into secure card fields hosted by NMI (Collect.js, the same fields a tokenized checkout uses)
+
+When the agent places the order, NMI turns the card into a single-use payment token. ElasticFunnels receives only that token plus the card brand, last 4 digits and expiry; the full card number and CVV never reach ElasticFunnels. Order Entry does not accept a typed card number in any other way.
+
+<Warning>
+New cards need the merchant's **public (tokenization) key**. If the NMI merchant used for phone orders has no public key, Order Entry shows a warning above the form that the merchant has no Collect.js tokenization key, and new cards cannot be taken until the public key is added in the merchant settings. Cards on file still work.
+</Warning>
 
 A saved card can only be charged for the customer it was saved for, in the same brand. If the card does not belong to the customer on the order, the order is refused and nothing is charged.
 

@@ -1,0 +1,116 @@
+---
+title: 'Upsell Forms (Gift Address and Custom Fields)'
+description: 'Ask for a ship-to address or extra details on a one-click upsell, show the shipping and total, then charge the stored card once'
+---
+
+An upsell form collects a few details before a one-click upsell is charged. The most common use is a gift: the buyer adds a second pack and sends it to a friend, so the upsell needs the friend's address. The form can also collect your own fields (an engraving line, a gift note, a size).
+
+The buyer's card is not asked for again. The form only collects the details, shows the price with shipping for that address, and charges the card from the first order when the buyer confirms.
+
+## What the buyer sees
+
+1. The buyer clicks the upsell button.
+2. A form opens over the page: name, address, city, state, ZIP/postal code, country, and an optional phone.
+3. The buyer clicks **Continue**. ElasticFunnels checks the address and works out shipping for that country from the product's shipping profile.
+4. A summary shows the item, shipping, tax and the total, plus the ship-to address. The button reads **Confirm and pay $X**.
+5. On confirm, the card on file is charged once and the funnel moves to the next step, the same as a normal one-click upsell.
+
+<img src="/images/products/upsell-form-address.png" alt="The upsell form's address step: recipient name, address, city, state, ZIP, country, optional phone and Continue" />
+
+<img src="/images/products/upsell-form-summary.png" alt="The upsell form summary: item, shipping and total, the recipient's ship-to address and Confirm and pay" />
+
+If a field is missing or invalid, the form shows the error next to that field and nothing is charged. If the product does not ship to the chosen country, the country field says so and nothing is charged.
+
+## Option 1: no code, add `form=` to the upsell tag
+
+Add a `form` option to an upsell or downsell link tag:
+
+```
+[UPSELL=sleep-gummies-1 form=gift-address]
+[DOWNSELL=sleep-gummies-1 form=address]
+```
+
+| `form=` | What it asks for | Marked as a gift |
+|---------|------------------|------------------|
+| `gift-address` | Recipient name and address | Yes |
+| `address` | A different ship-to name and address | No |
+| `fields` | Only your custom fields (see below) | No |
+
+Any input on the page with a `data-ef-upsell-field` attribute is sent along as a custom field:
+
+```html
+<input data-ef-upsell-field="gift_note" placeholder="Add a note for the card">
+[UPSELL=sleep-gummies-1 form=gift-address]
+```
+
+## Option 2: your own form, call `ef.quickBuy`
+
+If the page already has its own gift form, pass what it collected to `ef.quickBuy`. ElasticFunnels validates it, shows the summary with shipping, and charges on confirm.
+
+```js
+const result = await window.ef.quickBuy('sleep-gummies-1', {
+  ship_to: {
+    first_name: 'Ann', last_name: 'Lee',
+    address: '1 Main St', address2: '',
+    city: 'Toronto', state: 'ON', zip: 'M5V 2T6', country: 'CA',
+    phone: '4165550100'
+  },
+  gift: true,
+  fields: { gift_note: 'Happy birthday' }
+});
+
+// result = { success: true, nextUrl: '/next-step' }
+//       or { success: false, code: 'cancelled' | 'invalid' | 'no_shipping_rate' | 'declined' | ..., error, errors }
+```
+
+`ef.quickBuy` does not leave the page on its own: send the buyer to `result.nextUrl` when you are ready. Pass `redirect: true` to have it go there for you.
+
+The address keys also accept the names most page forms already use: `address1`, `region` or `province`, `postal_code` or `postcode`, `firstName`, `lastName`. `country` is the two-letter code (`US`, `CA`, `GB`). State is required for the US, Canada and Australia.
+
+### Options
+
+| Option | Meaning |
+|--------|---------|
+| `ship_to` | The recipient's address. Leave it out to ship to the buyer. |
+| `gift` | `true` marks the order as a gift. |
+| `fields` | Up to 20 custom fields. Keys are lower-case letters, digits and `_`; values up to 500 characters. |
+| `confirm` | `false` skips the summary and charges straight away. The address is still checked first. |
+| `redirect` | `true` goes to the next funnel step after a successful charge. |
+
+To get the price with shipping without charging (for example to show it in your own layout), call `ef.quickBuy.quote(code, { ship_to })`.
+
+### Example: a page whose gift form calls `handleLovedOneGift`
+
+Some landing pages ship with their own "send one to a loved one" form that calls a function named `handleLovedOneGift` with the package the buyer picked and the address they typed. Map each package to its product code and hand the rest to `ef.quickBuy`:
+
+```html
+<script>
+window.handleLovedOneGift = function (o) {
+  var codes = { PKG1: 'sleep-gummies-1', PKG3: 'sleep-gummies-3' };
+  return window.ef.quickBuy(codes[o.packageKey], { ship_to: o.shippingAddress, gift: true });
+};
+</script>
+```
+
+## Shipping and tax
+
+- Shipping is charged from the product's [shipping profile](/products/product-management) for the ship-to country (and state, where the profile has state rates), not the buyer's address.
+- A product whose profile has no rate for that country cannot be sent there: the form says so before anything is charged.
+- A product with no shipping profile, or a profile with no rates, ships free.
+- Tax is worked out for the ship-to address the same way as on checkout.
+
+## What is saved on the order
+
+- The upsell order's **shipping** name and address are the recipient's. The **customer** and billing details stay the buyer's, so receipts and tracking emails go to the buyer.
+- The recipient's phone, the gift mark and your custom fields are saved as order flags.
+- Fulfillment providers get the recipient's name, address and phone on the label.
+
+Open the order in **Reports** → **Conversions** to see them: its drawer has an **Upsell form** section with the ship-to, the gift mark and each custom field.
+
+## Limits
+
+- Works with NMI, Stripe and the Test merchant (the gateways that charge a stored card for one-click upsells). With other merchants the form shows an error and nothing is charged.
+- If the first order was paid with PayPal, or with Apple Pay on an NMI merchant that does not store the card, a form that asks for an address says the offer cannot be sent to another address and charges nothing. Give those buyers a plain upsell link next to the gift one.
+- Needs an active purchase session, like every one-click upsell. If the session has ended the form says so.
+- If the buyer already bought that upsell in this session, the form says so and does not charge again. Clicking **Confirm** twice also charges once.
+- The form needs JavaScript. Without it, a link with `form=gift-address` or `form=address` shows a short "not available" message and charges nothing, so an order never ships to the wrong address. A `form=fields` link works as a plain upsell without the fields.

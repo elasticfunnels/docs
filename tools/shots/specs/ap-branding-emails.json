@@ -1,0 +1,56 @@
+{
+  "out": "images/affiliate-portal/branding-emails.png",
+  "alt": "The Transactional emails section: from name, reply-to, and the welcome and payout status subject and body with their macros",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.branding']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.branding']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "eval": "[...document.querySelectorAll('h2,h3,h4,p,div')].filter(h=>h.offsetParent&&h.children.length===0&&h.textContent.trim()==='Transactional emails')[0].scrollIntoView({block:'start'});window.scrollBy(0,0)",
+        "wait": 600
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 80,
+      "width": 919,
+      "height": 820
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=From name",
+      "title": "From name",
+      "text": "The sender name affiliates see",
+      "side": "right"
+    },
+    {
+      "selector": "text=Welcome email (account created)",
+      "title": "Welcome",
+      "text": "Invite and password reset email",
+      "side": "right"
+    },
+    {
+      "selector": "text=Payout status email",
+      "title": "Payout status",
+      "text": "Sent when a payout changes",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

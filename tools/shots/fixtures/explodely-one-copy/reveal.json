@@ -1,0 +1,8 @@
+{
+  "vendor_postback_url": "https://app.elasticfunnels.io/postback/vendor/nwdemoexp01/explodely/DemoSecretForScreenshotsOnly0000000000AB",
+  "vendor_postback_event_urls": {
+    "chargeback": "https://app.elasticfunnels.io/postback/vendor/nwdemoexp01/explodely/DemoSecretForScreenshotsOnly0000000000AB?event=chargeback",
+    "partial": "https://app.elasticfunnels.io/postback/vendor/nwdemoexp01/explodely/DemoSecretForScreenshotsOnly0000000000AB?event=partial",
+    "decline": "https://app.elasticfunnels.io/postback/vendor/nwdemoexp01/explodely/DemoSecretForScreenshotsOnly0000000000AB?event=decline"
+  }
+}

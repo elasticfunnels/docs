@@ -1,0 +1,53 @@
+{
+  "out": "images/affiliates/portal-brands-tab.png",
+  "alt": "The affiliate portal's Brands tab listing each brand on the portal with its status after sign-up",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal?tab=brands",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='org.affiliate-portal.brands.list']",
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/brands",
+        "file": "tools/shots/fixtures/internal-affiliates/org-brands.json"
+      },
+      {
+        "url": "^/api/organizations/798/affiliate-portal/affiliates",
+        "file": "tools/shots/fixtures/internal-affiliates/portal-affiliates.json"
+      },
+      {
+        "url": "^/api/organizations/798/affiliate-portal(\\?|$)",
+        "file": "tools/shots/fixtures/internal-affiliates/portal.json"
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 1183,
+      "height": 500
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.list'] [data-testid='list.new-button']",
+      "title": "Add",
+      "text": "Puts another brand on the portal",
+      "side": "right"
+    },
+    {
+      "box": [
+        757,
+        272,
+        205,
+        170
+      ],
+      "title": "Status after sign-up",
+      "text": "Per brand; the stricter setting wins",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

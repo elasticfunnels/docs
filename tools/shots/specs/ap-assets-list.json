@@ -1,0 +1,46 @@
+{
+  "out": "images/affiliate-portal/assets-list.png",
+  "alt": "The Assets tab listing offer pages and an email swipe, each with its brand, and tabs to filter by type",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.assets']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.assets']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 919,
+      "height": 440
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='list.new-button'] >> visible=true",
+      "title": "Create resource",
+      "text": "Adds an asset for one brand",
+      "side": "left"
+    },
+    {
+      "selector": "text=Sleep Gummies offer >> nth=0",
+      "title": "Offer page",
+      "text": "What affiliates link to",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

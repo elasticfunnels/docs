@@ -1,64 +1,100 @@
 ---
 title: 'Explodely'
 icon: "store"
-description: 'Sell your own products through Explodely: payment links, the seller IPN, webhooks, the callback secret, and attribution'
+description: 'Sell your own products through Explodely, start to finish: products and funnel in Explodely, the merchant and product IDs in ElasticFunnels, per-variant Explodely IDs, the seller IPN and webhooks, a test sale, and buy links on your pages'
 ---
 
 Explodely is a hosted checkout. Your funnel owns the sales pages, and buyers leave them for an Explodely payment link where Explodely takes the payment and runs its own upsell sequence. ElasticFunnels sends the buyer there with their click code attached, then records the order when Explodely reports it back.
 
-## What you need
+## Checklist
 
-- An Explodely seller account with at least one product, and one Explodely funnel (the webhook form asks for a funnel)
-- Your Explodely seller **username**
-- The Explodely **product ID** of each product you sell
+Follow the steps in order. Each one links to the section that explains it.
+
+1. [In Explodely: a funnel and one product per offer](#step-0-set-up-your-funnel-and-products-in-explodely), with each **Pro. ID** written down
+2. [In ElasticFunnels: the Explodely merchant](#step-1-create-the-explodely-merchant) with your username
+3. [Your products in ElasticFunnels](#step-2-create-your-products-and-enter-their-explodely-ids), each with its Explodely product ID (and each variant with its own, if it has one)
+4. [Postbacks in Explodely](#step-3-set-up-postbacks-in-explodely): the Global IPN plus three webhooks
+5. [A test](#step-4-test-the-connection): **Try IPN Builder** until the merchant shows **Verified**, then one `?testmode=yes` sale
+6. [Buy links on your funnel pages](#step-5-put-the-buy-links-on-your-pages)
 
 Everything in your Explodely account used below sits under **Seller Hub** in the top menu: **Products**, **Settings** and **Integrations**.
 
 <img src="/images/merchants/explodely-menu.png" alt="Explodely Seller Hub menu with Products, Settings and Integrations" />
 
+## Step 0: Set up your funnel and products in Explodely
+
+1. Create the funnel your products sell in. The webhook form in Step 3 cannot be saved without one.
+2. Create one Explodely product per offer the buyer can pay for. A bundle sold as 1, 3 or 6 bottles is three Explodely products, each with its own price.
+3. Open **Seller Hub** → **Products** and write down each product's ID from the **Pro. ID** column and its **Payment Link**.
+
+<img src="/images/merchants/explodely-products.png" alt="Explodely Seller Hub Products list with the Pro. ID and Payment Link columns" />
+
+Point each product's thank-you page at your funnel's thank-you page, so buyers come back to your pages after paying.
+
 ## Step 1: Create the Explodely merchant
 
 1. Go to **Settings** → **Merchants** and click **Create Merchant**
-2. Select **Gateway**: Explodely, give the merchant a name, and click **Create & Configure**. The merchant's settings open on **General information**.
-3. Enter your Explodely seller username as the **Account ID**
-4. In **Callback secret**, enter a random string of 24 to 128 characters (letters, digits, `-` or `_`), or click **Generate a random secret**. Keep a copy: it goes at the end of every URL you paste into Explodely in Step 3.
-5. Click **Save**
+2. Select **Gateway**: Explodely, give the merchant a name, and click **Create & Configure**. A guided setup opens: it asks for your Account ID on **Account details**, then your product IDs (Step 2), the postback URLs (Step 3) and a live test (Step 4), and resumes where you left off (**Continue setup** on the merchant's row). In the merchant's full editor (**Open full editor**) the same field is on **General information**.
+3. Enter your **Explodely seller username** (the **Account ID** in the full editor)
+4. Click **Save and continue**. **Products** opens next.
 
-<img src="/images/merchants/explodely-ef-settings.png" alt="An Explodely merchant in ElasticFunnels on General information: Account ID, Callback secret, Generate a random secret, Deduplicate Orders and Save" />
+There is no secret to make up or type. Once the merchant is saved, the **Postback URL** step of the guided setup (and **General information** in the full editor, under **Postback security**) holds its complete Explodely IPN URL, with **Copy**.
+
+<img src="/images/merchants/explodely-setup-account.png" alt="The guided setup of an Explodely merchant on Account details: the Explodely seller username field with where to find it" />
 
 Your username is in Explodely under **Account** → **General Section** → **Username**.
 
 <img src="/images/merchants/explodely-username.png" alt="Explodely Account, General Section with the Username field" />
 
-Explodely does not sign its IPN or its webhooks, so the callback secret is what proves a postback came from your account. It is stored encrypted and shown masked after you save. A postback with a missing or wrong secret is refused with `401`.
+Explodely does not sign its IPN or its webhooks, so each Explodely merchant gets a secret of its own when you create it, and that secret is what proves a postback came from your account. It is already at the end of every URL ElasticFunnels gives you, stored encrypted, and only shown to people who can edit the merchant. A postback with a missing or wrong secret is refused with `401`.
+
+If a URL ever leaks, click **Make a new URL** under **Postback security** and paste the new IPN and webhook URLs in Explodely. The old ones stop working at once.
 
 New Explodely merchants have **Deduplicate Orders** on, so a retried IPN makes one order.
 
-## Step 2: Map your products
+## Step 2: Create your products and enter their Explodely IDs
 
-1. In Explodely, open **Seller Hub** → **Products** and note each product's ID in the **Pro. ID** column
-2. In ElasticFunnels, go to **Products** → edit the product
-3. Under **Merchant Product IDs**, set the **explodely** value to that ID
+Every Explodely product you sell needs a matching product in ElasticFunnels, so orders land on the right product with its price, units and bonuses.
 
-<img src="/images/merchants/explodely-products.png" alt="Explodely Seller Hub Products list with the Pro. ID and Payment Link columns" />
+1. Go to **Settings** → **Products**. Click **Add Product** for a new one (see [Product management](/products/product-management)), or open one you already have.
+2. Open the **Merchants** tab. Your Explodely merchant has a **Product ID** field: enter the Explodely **Pro. ID** from Step 0.
+3. Click **Save**.
 
-Without a mapping, the ElasticFunnels product code is sent as the product ID, which Explodely will only recognise if the two happen to match.
+Without an ID, the ElasticFunnels product code is sent as the product ID, which Explodely will only recognise if the two happen to match.
+
+### Variants: one Explodely ID per pack
+
+When a product has [variants](/products/variants) (1, 3 and 6 bottles, say) and each one is its own Explodely product, give each variant its own ID:
+
+1. Open the product's **Variants** tab
+2. In the variant rows, fill the **Explodely ID** column with that variant's **Pro. ID**. The column shows when your project has an Explodely merchant.
+3. Click **Save**
+
+<img src="/images/merchants/explodely-variant-ids.png" alt="The variant rows of a product's Variants tab with the Explodely ID column: the 1 bottle row empty and showing the product's ID as Inherited, the 3 and 6 bottle rows with their own Explodely IDs" />
+
+A variant left empty sells under the product's Explodely ID, shown as **Inherited** in the field. A sale of a variant's own ID is recorded on the parent product with the variant on the order line (its code, options and units), the same as an order from the ElasticFunnels checkout.
+
+A variant set to **Sells another product** has no Explodely ID of its own: it uses the ID of the product it sells, from that product's **Merchants** tab.
 
 ## Step 3: Set up postbacks in Explodely
 
-In **Settings** → **Merchants**, click **Postback Setup** on the Explodely merchant's row. The row shows **Needs Setup** until the first postback arrives (Step 4).
+In the guided setup, this is the **Postback URL** step: the Seller IPN URL and the three webhook URLs, each complete and with **Copy**, plus the steps in Explodely.
+
+<img src="/images/merchants/explodely-setup-postback.png" alt="The Postback URL step of the guided Explodely setup: the complete Seller IPN URL with Show and Copy, the steps in Explodely, and the Chargeback, Partial and Decline webhook URLs" />
+
+Later, in **Settings** → **Merchants**, click **Postback Setup** on the Explodely merchant's row. The row shows **Needs Setup** until the first postback arrives (Step 4).
 
 <img src="/images/merchants/explodely-ef-list.png" alt="The Merchants list in ElasticFunnels: an Explodely merchant with its Account ID, the Needs Setup status and the Postback Setup link" />
 
-Postback Setup lists its steps on the left: **Postback URL**, **Seller IPN**, **Webhooks** and **Test**. Use **Next** to move through them. Every URL has its own **Copy** button and looks like this:
+Postback Setup lists its steps on the left: **Postback URL**, **Seller IPN**, **Webhooks** and **Test**. Use **Next** to move through them. Every URL has its own **Copy** button and is complete, your merchant's secret included:
 
 ```
-https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/YOUR_CALLBACK_SECRET
+https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/<your merchant's secret>
 ```
 
-Replace `YOUR_CALLBACK_SECRET` with the secret you saved in Step 1, in every URL.
+Copy each URL and paste it into Explodely as it is. Nothing in it needs editing. On screen the secret is masked; **Show** reveals it, and **Copy** always copies the whole URL.
 
-<img src="/images/merchants/explodely-ef-setup-url.png" alt="The Postback Setup dialog for Explodely on its first step: the steps list, the postback URL with Copy, and the callback secret note" />
+<img src="/images/merchants/explodely-ef-setup-url.png" alt="The Postback Setup dialog for Explodely on its first step: the steps list, the complete postback URL with Copy, and the note that it already carries its secret" />
 
 <video autoPlay muted loop playsInline controls src="/images/merchants/explodely-postback-setup-steps.mp4" style={{ width: '100%', maxWidth: '680px', borderRadius: '12px' }} />
 
@@ -66,11 +102,11 @@ Replace `YOUR_CALLBACK_SECRET` with the secret you saved in Step 1, in every URL
 
 The IPN sends sales, rebills, refunds and rebill cancels. The **Seller IPN** step in Postback Setup has the URL and these steps.
 
-<img src="/images/merchants/explodely-ef-setup-ipn.png" alt="The Seller IPN step of Postback Setup for Explodely: the IPN URL with Copy and the five steps in Explodely" />
+<img src="/images/merchants/explodely-ef-setup-ipn.png" alt="The Seller IPN step of Postback Setup for Explodely: the complete IPN URL with Copy and the steps in Explodely" />
 
 1. Log in to your Explodely seller account
 2. Open **Seller Hub** → **Settings** and expand **Global IPN** under **Developers**
-3. Paste the IPN URL (with your secret) into **IPN URL**, set **Send IPN** to Yes and **IPN Type** to POST. Leave **Refund IPN** empty.
+3. Paste the IPN URL you copied into **IPN URL**, set **Send IPN** to Yes and **IPN Type** to POST. Leave **Refund IPN** empty.
 4. Click **Update**
 
 <img src="/images/merchants/explodely-global-ipn.png" alt="Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Try IPN Builder and Update" />
@@ -98,7 +134,7 @@ Add three webhooks, one per row below. For each one:
 
 The **Webhooks** step in Postback Setup has the three URLs, each with its own **Copy**.
 
-<img src="/images/merchants/explodely-ef-setup-webhooks.png" alt="The Webhooks step of Postback Setup for Explodely: where to add them and the Chargeback, Partial and Decline URLs, each with Copy" />
+<img src="/images/merchants/explodely-ef-setup-webhooks.png" alt="The Webhooks step of Postback Setup for Explodely: where to add them and the complete Chargeback, Partial and Decline URLs, each with Copy" />
 
 Explodely webhooks carry no event name, which is why each one needs its own `?event=` URL. Do not add webhooks for Sale, Rebill, Refund or Rebill Cancel: the IPN already sends those, and a webhook for them records each one twice.
 
@@ -106,7 +142,7 @@ Explodely webhooks carry no event name, which is why each one needs its own `?ev
 
 1. In ElasticFunnels, open the **Test** step of **Postback Setup** and leave it open. It shows **Waiting for a test postback** and checks every 5 seconds for 2 minutes.
 2. In Explodely, go back to **Seller Hub** → **Settings** → **Global IPN** and click **Try IPN Builder**
-3. Paste the IPN URL (with your secret) into **Enter IPN URL**, pick any fields and click **Submit**. Explodely sends a sample IPN to that URL.
+3. Paste the IPN URL you copied into **Enter IPN URL**, pick any fields and click **Submit**. Explodely sends a sample IPN to that URL.
 4. The first postback that reaches ElasticFunnels with the right secret marks the merchant verified, even a sample like this one. The status next to the dialog's title changes to **Verified** and **Needs Setup** clears from the merchant's row. If nothing arrives in 2 minutes, it shows **No test yet** with **Check again**.
 
 <img src="/images/merchants/explodely-ipn-builder.png" alt="The Try IPN Builder dialog in Explodely with the IPN URL field, the field chips and Submit" />
@@ -115,15 +151,22 @@ Explodely webhooks carry no event name, which is why each one needs its own `?ev
 
 Then place a real test sale: open one of your payment links with `?testmode=yes` added, complete the order, and check it under **Reports** → **Conversions**.
 
-## Payment links
+## Step 5: Put the buy links on your pages
 
-Use the standard tag on your sales page:
+Use the standard tag on your sales page, with the ElasticFunnels product code, or a variant's code for one pack:
 
 ```html
-<a href="[BUY=SLEEP_GUMMIES_1]">Buy Now</a>
+<a href="[BUY=sleep-gummies-1]">Buy 1 bottle</a>
+<a href="[BUY=sleep-gummies-3]">Buy 3 bottles</a>
 ```
 
-It becomes an Explodely payment link with the visitor's click code attached:
+A plain Explodely payment link (`https://explodely.com/p/<product id>`) pasted into the page works too; see below for what is added to it.
+
+After the payment, Explodely runs the upsells you set up in your Explodely funnel, then sends the buyer to the thank-you page set on the product. Upsells are not ElasticFunnels pages here: each upsell is its own Explodely product, and its sale arrives on the IPN like any other. Give the matching ElasticFunnels product the upsell **Classification**: the IPN has no front-end flag, so that is how an upsell sale is told apart from a front-end one.
+
+## Payment links
+
+A `[BUY=...]` tag becomes an Explodely payment link with the visitor's click code attached:
 
 ```
 https://explodely.com/p/<product id>?custom1=<click code>&tid=<click code>
@@ -137,7 +180,7 @@ https://explodely.com/p/<product id>?custom1=<click code>&tid=<click code>
 
 ElasticFunnels never adds `tpa` to a payment link, because a third-party affiliate ID sets that product's Explodely commission to 0%.
 
-A payment link you paste by hand (`https://explodely.com/p/...`) gets `custom1` added when the page renders. A `custom1` you set yourself is kept.
+A payment link you paste by hand (`https://explodely.com/p/...`) gets `custom1` added when the page renders. A `custom1` you set yourself is kept. To leave pasted links exactly as written, turn off **Add click tracking to pasted buy links** in the merchant's **Settings**; sales through them are then not matched to a visit.
 
 ## How orders are recorded
 
@@ -151,10 +194,10 @@ A payment link you paste by hand (`https://explodely.com/p/...`) gets `custom1` 
 
 <AccordionGroup>
   <Accordion title="Explodely shows the postback failing with 401">
-    The URL is missing the callback secret, or the secret does not match the one saved on the merchant. Copy the URL again from **Postback Setup** and replace `YOUR_CALLBACK_SECRET` with the saved value. If you no longer have it, enter a new secret on the merchant and update every Explodely IPN and webhook URL.
+    The URL in Explodely is cut short or out of date (for example after **Make a new URL**). Copy each URL again from **Postback Setup** and paste it over the old one in Explodely, the IPN and all three webhooks.
   </Accordion>
   <Accordion title="The merchant still says Needs Setup">
-    No postback with the right secret has reached ElasticFunnels yet. Check that **Send IPN** is Yes and the IPN URL ends with your callback secret, then send a sample with **Try IPN Builder**.
+    No postback with the right secret has reached ElasticFunnels yet. Check that **Send IPN** is Yes and the IPN URL is the one copied from **Postback Setup**, then send a sample with **Try IPN Builder**.
   </Accordion>
   <Accordion title="Every refund appears twice">
     A refund webhook was added in Seller Hub as well as the IPN. Remove the webhook: refunds come through the IPN.
@@ -163,6 +206,9 @@ A payment link you paste by hand (`https://explodely.com/p/...`) gets `custom1` 
     The payment link reached Explodely without `custom1` or `tid`, for example a link built in a script that runs after the page renders. Use a `[BUY=...]` tag, or a plain `explodely.com/p/` link in the page HTML. Inbound payloads are recorded under **Logs** → **Inbound Postbacks**.
   </Accordion>
   <Accordion title="Buy link points at the wrong product">
-    Check the product's **Merchant Product ID** for explodely. With no mapping, the ElasticFunnels product code is sent as the product ID.
+    Check the Explodely **Product ID** on the product's **Merchants** tab, and for a variant its **Explodely ID** on the **Variants** tab. An empty variant uses the product's ID; with no ID at all, the ElasticFunnels code is sent as the product ID.
+  </Accordion>
+  <Accordion title="A pack's sales show up as the main product, without the variant">
+    The sale came in under the product's Explodely ID, so it is recorded as the product. Give the variant its own **Explodely ID** (the Pro. ID of that pack in Explodely) and use the variant's code in the buy link.
   </Accordion>
 </AccordionGroup>

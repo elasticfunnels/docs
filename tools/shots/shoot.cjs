@@ -8,6 +8,9 @@
 //
 // Env: EF_APP (the app origin, required for capture), EF_DEMO_CONTEXT (demo-context.json with brand_id + access_key,
 // default ~/Work/elasticfunnels/_dev/marketing/demo-context.json), PLAYWRIGHT_PATH. See README.md.
+// Affiliate portal specs ("site": "portal"): EF_PORTAL (the portal origin on the local website runtime, e.g.
+// http://partners.northwind.test:8093), EF_PORTAL_RESOLVE (the IP its host maps to, default 127.0.0.1) and
+// EF_PORTAL_PASSWORD (the demo affiliate's password, never written anywhere).
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -27,12 +30,15 @@ function loadPlaywright() {
 }
 
 async function launch(chromium) {
-  try { return await chromium.launch(); } catch (e) {
+  // The portal runs on a test hostname: point it at the local runtime instead of DNS.
+  const portal = process.env.EF_PORTAL ? new URL(process.env.EF_PORTAL).hostname : null;
+  const opts = portal ? { args: [`--host-resolver-rules=MAP ${portal} ${process.env.EF_PORTAL_RESOLVE || "127.0.0.1"}`] } : {};
+  try { return await chromium.launch(opts); } catch (e) {
     const root = path.join(os.homedir(), "Library/Caches/ms-playwright");
     const dirs = fs.existsSync(root) ? fs.readdirSync(root).filter((d) => /^chromium_headless_shell-\d+$/.test(d)).sort((a, b) => +b.split("-")[1] - +a.split("-")[1]) : [];
     for (const d of dirs) {
       const exe = path.join(root, d, "chrome-headless-shell-mac-arm64/chrome-headless-shell");
-      if (fs.existsSync(exe)) return chromium.launch({ executablePath: exe });
+      if (fs.existsSync(exe)) return chromium.launch({ ...opts, executablePath: exe });
     }
     throw e;
   }
@@ -47,39 +53,54 @@ function demoContext() {
   return ctx;
 }
 
-const fill = (s, ctx) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k === "brand" ? ctx.brand_id : (ctx[k] ?? m)));
+const fill = (s, ctx) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k === "brand" ? ctx?.brand_id ?? m : (ctx?.[k] ?? m)));
 
 const SETTLE_CSS = `*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}`;
 
 // ---- capture ------------------------------------------------------------------------------------------
 async function capture(browser, spec, ctx) {
-  const app = (process.env.EF_APP || "").replace(/\/$/, "");
-  if (!app) throw new Error("EF_APP is not set (the app origin to capture from)");
-  const origin = new URL(app).origin;
   const c = spec.capture;
+  const portal = c.site === "portal";
+  const app = ((portal ? process.env.EF_PORTAL : process.env.EF_APP) || "").replace(/\/$/, "");
+  if (!app) throw new Error(portal ? "EF_PORTAL is not set (the affiliate portal origin)" : "EF_APP is not set (the app origin to capture from)");
+  const origin = new URL(app).origin;
   const vp = c.viewport || { width: 1440, height: 900 };
-  const context = await browser.newContext({ viewport: vp, deviceScaleFactor: 2, colorScheme: "light", locale: "en-US" });
+  const context = await browser.newContext({ viewport: vp, deviceScaleFactor: 2, colorScheme: "light", locale: "en-US", timezoneId: "UTC" });
+  // Portal specs sign in as a demo affiliate first (the only POST they make), then go read-only like the app.
+  if (portal && c.login) {
+    // "passwordEnv" names another env var, for a second demo affiliate (e.g. one still pending approval).
+    const pwEnv = c.passwordEnv || "EF_PORTAL_PASSWORD";
+    if (!process.env[pwEnv]) throw new Error(`${pwEnv} is not set`);
+    const lp = await context.newPage();
+    await lp.goto(app + "/affiliates/login", { waitUntil: "networkidle", timeout: 60000 });
+    await lp.fill("#email", c.login);
+    await lp.fill("#password", process.env[pwEnv]);
+    await Promise.all([lp.waitForURL(/\/affiliates\/?$/, { timeout: 30000 }), lp.click("button[type=submit]")]);
+    await lp.close();
+  }
   // Header auth only for the app's own origin. Read-only: every mutating request to the app is refused,
   // so a stray click can never save, delete or send anything.
   const allowPost = (c.allowPost || []).map((r) => new RegExp(r));
   // Fixtures: a GET whose path+query matches answers with fictional JSON, for screens the demo seed has no data for.
-  const fixtures = (c.fixtures || []).map((f) => ({ re: new RegExp(fill(f.url, ctx)), body: fs.readFileSync(path.resolve(ROOT, f.file), "utf8") }));
+  // `"method": "POST"` answers a read-only lookup the app sends as a POST (it never reaches the app).
+  const fixtures = (c.fixtures || []).map((f) => ({ re: new RegExp(fill(f.url, ctx)), method: (f.method || "GET").toUpperCase(), body: fs.readFileSync(path.resolve(ROOT, f.file), "utf8") }));
   await context.route("**/*", (route) => {
     const req = route.request();
     if (new URL(req.url()).origin !== origin) return route.continue();
     const u = new URL(req.url());
-    const fx = req.method() === "GET" && fixtures.find((f) => f.re.test(u.pathname + u.search));
+    const fx = fixtures.find((f) => f.method === req.method() && f.re.test(u.pathname + u.search));
     if (fx) return route.fulfill({ status: 200, contentType: "application/json", body: fx.body });
     if (req.method() !== "GET" && req.method() !== "HEAD" && !allowPost.some((r) => r.test(req.url()))) {
       console.warn(`  blocked ${req.method()} ${req.url().replace(origin, "")}`);
       return route.fulfill({ status: 204, body: "" });
     }
+    if (portal) return route.continue();
     return route.continue({ headers: { ...req.headers(), "ef-access-key": ctx.access_key } });
   });
   const page = await context.newPage();
   const url = app + fill(c.path, ctx);
   await page.goto(url, { waitUntil: "networkidle", timeout: 60000 });
-  if (c.path.includes("{brand}") && !new URL(page.url()).pathname.startsWith(`/${ctx.brand_id}`)) {
+  if (!portal && c.path.includes("{brand}") && !new URL(page.url()).pathname.startsWith(`/${ctx.brand_id}`)) {
     throw new Error(`landed on ${page.url()}, not on demo brand ${ctx.brand_id}: refusing to capture`);
   }
   await page.addStyleTag({ content: SETTLE_CSS + (c.css || "") });
@@ -91,7 +112,8 @@ async function capture(browser, spec, ctx) {
     else if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 30000 });
     else if (a.select) await page.selectOption(a.select, String(a.value));
     else if (a.fill) await page.fill(a.fill, String(a.value));
-    if (a.wait || a.click || a.hover || a.select || a.fill) await page.waitForTimeout(a.wait || 600);
+    else if (a.eval) await page.evaluate(a.eval);
+    if (a.wait || a.click || a.hover || a.select || a.fill || a.eval) await page.waitForTimeout(a.wait || 600);
   }
   for (const h of c.hide || []) await page.locator(h).evaluateAll((els) => els.forEach((e) => (e.style.visibility = "hidden")));
   await page.evaluate(() => document.fonts.ready);
@@ -165,7 +187,7 @@ async function compose(browser, spec) {
   if (!specs.length) throw new Error("no spec matched");
   const { chromium } = loadPlaywright();
   const browser = await launch(chromium);
-  const needsApp = !flag("--compose-only") && specs.some((s) => s.capture);
+  const needsApp = !flag("--compose-only") && specs.some((s) => s.capture && s.capture.site !== "portal");
   const ctx = needsApp ? demoContext() : null;
   let failed = 0;
   for (const spec of specs) {

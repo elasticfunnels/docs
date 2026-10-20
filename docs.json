@@ -187,7 +187,8 @@
                 "icon": "arrow-trend-up",
                 "pages": [
                   "products/upsells",
-                  "products/subscription-upsells"
+                  "products/subscription-upsells",
+                  "products/upsell-forms"
                 ]
               },
               {
@@ -265,7 +266,8 @@
                 "pages": [
                   "funnels/funnel-split-testing",
                   "funnels/split-testing",
-                  "analytics/split-test"
+                  "analytics/split-test",
+                  "analytics/automation-split-tests"
                 ]
               },
               {
@@ -279,7 +281,33 @@
                 "group": "Affiliates",
                 "icon": "handshake",
                 "pages": [
-                  "affiliates/postback-urls"
+                  "affiliates/internal-affiliates",
+                  "affiliates/postback-urls",
+                  {
+                    "group": "Affiliate portal",
+                    "icon": "door-open",
+                    "pages": [
+                      "affiliate-portal/overview",
+                      "affiliate-portal/set-up",
+                      "affiliate-portal/brands",
+                      "affiliate-portal/affiliates",
+                      "affiliate-portal/payouts",
+                      "affiliate-portal/assets",
+                      "affiliate-portal/branding",
+                      "affiliate-portal/permissions",
+                      {
+                        "group": "What affiliates see",
+                        "icon": "eye",
+                        "pages": [
+                          "affiliate-portal/affiliate-sign-up",
+                          "affiliate-portal/affiliate-dashboard",
+                          "affiliate-portal/affiliate-links",
+                          "affiliate-portal/affiliate-payouts",
+                          "affiliate-portal/affiliate-tracking"
+                        ]
+                      }
+                    ]
+                  }
                 ]
               },
               {
@@ -364,7 +392,8 @@
                     "pages": [
                       "integrations/ai-providers",
                       "integrations/twilio",
-                      "integrations/slicktext"
+                      "integrations/slicktext",
+                      "integrations/attentive"
                     ]
                   },
                   {
@@ -385,13 +414,16 @@
             "icon": "gear",
             "pages": [
               "essentials/brand-actions",
+              "essentials/alerts",
               {
                 "group": "Account and security",
                 "icon": "shield-halved",
                 "pages": [
                   "account/two-factor-authentication",
                   "account/passkeys",
-                  "account/cli-and-api-keys"
+                  "account/cli-and-api-keys",
+                  "account/refer-and-earn",
+                  "account/ai-credits"
                 ]
               },
               {
@@ -583,6 +615,10 @@
     "dark": "/logo/light.svg"
   },
   "redirects": [
+    {
+      "source": "/products/quickbuy",
+      "destination": "/products/buy-links"
+    },
     {
       "source": "/analytics/audience-destinations",
       "destination": "/analytics/audience-actions"

@@ -21,7 +21,7 @@ GET /api/brands/{brand}/affiliates
 </ParamField>
 
 <ParamField query="type" type="string">
-  Filter by type: `external` or `affcenter`
+  Filter by type: `external` or `affcenter` (Internal: linked to your affiliate portal)
 </ParamField>
 
 <ParamField query="q" type="string">
@@ -94,7 +94,7 @@ GET /api/brands/{brand}/affiliates/quick-access
 
 ## Organization Affiliates Options
 
-Search affiliates from the organization's affiliate center — used for linking org affiliates to a brand.
+Search affiliates from the organization's affiliate portal — used for linking org affiliates to a brand.
 
 ```
 GET /api/brands/{brand}/affiliates/organization-affiliates-options
@@ -173,7 +173,7 @@ POST /api/brands/{brand}/affiliates
 </ParamField>
 
 <ParamField body="type" type="string">
-  `external` (manually managed) or `affcenter` (linked to org affiliate center)
+  `external` (manually managed) or `affcenter` (Internal: linked to your organization's affiliate portal)
 </ParamField>
 
 <ParamField body="commission_rate" type="number">
@@ -423,7 +423,7 @@ POST /api/brands/{brand}/affiliates/payouts/{payout}/invoice
 ## Notes
 
 <Info>
-  - `type: "affcenter"` affiliates are linked to your organization's affiliate center and require the `viewOrganizationAffiliates` permission
+  - `type: "affcenter"` affiliates are Internal affiliates, linked to your organization's affiliate portal, and require the `viewOrganizationAffiliates` permission
   - Some organization portals require an uploaded invoice before a payout can be marked as `paid`
   - Payout amounts are calculated from the affiliate's commissions on approved conversions within the period
 </Info>
