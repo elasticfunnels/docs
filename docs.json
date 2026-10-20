@@ -390,7 +390,8 @@
                     "pages": [
                       "integrations/ai-providers",
                       "integrations/twilio",
-                      "integrations/slicktext"
+                      "integrations/slicktext",
+                      "integrations/attentive"
                     ]
                   },
                   {
