@@ -62,7 +62,7 @@ An alert with a waiting fix has no **Resolve** button and does not close on its 
 | Merchant postbacks are being rejected | A merchant sends sales and ElasticFunnels rejects them because a setting is missing. |
 | Checkout is failing for shoppers | Checkout submissions fail and the failures are growing, or the payment processor refuses them. |
 | Sales arrive for a product code you do not have | A merchant sends a sale for a product code that is not in your products. Its fix creates the product, or links the code to one you already have. |
-| A buy link asks for a product code you do not have | Someone opens a buy link on your page with a product code that is not in your products, so the click cannot reach checkout. Create the product, or correct the code in the link. Codes that look like attacks (SQL fragments, long random strings) come from bots: decline them. |
+| A buy link asks for a product code you do not have | Someone opens a buy link with a product code that is not in your products, so the click cannot reach checkout. It opens only when the code is used on one of your pages, or when at least 3 different visitors ask for it within 24 hours. Codes that bots try (test values like prod_999, SQL fragments, long random strings) never open an alert. Create the product, or correct the code in the link. |
 | Postbacks arrive for a different merchant account | A postback names an account that does not match your merchant. |
 | An integration keeps failing / has gone quiet | An integration fails most of its attempts, or stops doing anything for days. |
 | An ad account lost access | ElasticFunnels can no longer read the ad account, so spend stops importing. |
