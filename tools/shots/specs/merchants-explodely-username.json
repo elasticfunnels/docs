@@ -1,32 +1,32 @@
 {
   "out": "images/merchants/explodely-username.png",
   "alt": "Explodely Account, General Section with the Username field",
-  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
   "image": "tools/shots/source/merchants-explodely-username.png",
   "imageSize": {
-    "w": 745,
-    "h": 368
+    "w": 1340,
+    "h": 720
   },
   "maxWidth": 760,
   "calloutWidth": 210,
   "annotations": [
     {
       "box": [
-        151,
-        3,
-        162,
+        167,
+        57,
+        166,
         40
       ],
       "title": "Account",
       "text": "Top menu",
-      "side": "right"
+      "side": "left"
     },
     {
       "box": [
-        14,
-        83,
-        212,
-        38
+        27,
+        138,
+        216,
+        39
       ],
       "title": "General Section",
       "text": "Your profile details",
@@ -34,9 +34,9 @@
     },
     {
       "box": [
-        236,
-        298,
-        498,
+        254,
+        360,
+        510,
         57
       ],
       "title": "Username",

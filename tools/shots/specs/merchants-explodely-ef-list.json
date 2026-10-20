@@ -1,0 +1,47 @@
+{
+  "out": "images/merchants/explodely-ef-list.png",
+  "alt": "The Merchants list in ElasticFunnels: an Explodely merchant with its Account ID, the Needs Setup status and the Postback Setup link",
+  "image": "tools/shots/source/merchants-explodely-ef-list.png",
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
+  "imageSize": {
+    "w": 708,
+    "h": 300
+  },
+  "annotations": [
+    {
+      "box": [
+        15,
+        160,
+        80,
+        18
+      ],
+      "title": "Account ID",
+      "text": "Your Explodely username",
+      "side": "left"
+    },
+    {
+      "box": [
+        551,
+        11,
+        140,
+        31
+      ],
+      "title": "Create Merchant",
+      "text": "Starts a new merchant",
+      "side": "right"
+    },
+    {
+      "box": [
+        553,
+        158,
+        88,
+        22
+      ],
+      "title": "Postback Setup",
+      "text": "The URLs to paste into Explodely",
+      "side": "right"
+    }
+  ]
+}

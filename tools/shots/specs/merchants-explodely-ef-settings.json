@@ -1,7 +1,7 @@
 {
   "out": "images/merchants/explodely-ef-settings.png",
   "alt": "An Explodely merchant in ElasticFunnels on General information: Account ID, Callback secret, Generate a random secret, Deduplicate Orders and Save",
-  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
   "image": "tools/shots/source/merchants-explodely-ef-settings.png",
   "imageSize": {
     "w": 1005,

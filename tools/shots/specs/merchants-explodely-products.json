@@ -1,20 +1,20 @@
 {
   "out": "images/merchants/explodely-products.png",
   "alt": "Explodely Seller Hub Products list with the Pro. ID and Payment Link columns",
-  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
   "image": "tools/shots/source/merchants-explodely-products.png",
   "imageSize": {
-    "w": 1300,
-    "h": 418
+    "w": 1340,
+    "h": 480
   },
   "maxWidth": 760,
   "calloutWidth": 210,
   "annotations": [
     {
       "box": [
-        810,
-        3,
-        162,
+        833,
+        57,
+        166,
         40
       ],
       "title": "Seller Hub",
@@ -23,9 +23,9 @@
     },
     {
       "box": [
-        28,
-        286,
-        100,
+        30,
+        346,
+        104,
         32
       ],
       "title": "Pro. ID",
@@ -34,9 +34,9 @@
     },
     {
       "box": [
-        818,
-        286,
+        840,
         346,
+        355,
         32
       ],
       "title": "Payment Link",

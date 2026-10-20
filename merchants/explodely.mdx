@@ -17,7 +17,7 @@ Everything in your Explodely account used below sits under **Seller Hub** in the
 
 ## Step 1: Create the Explodely merchant
 
-1. Go to **Settings** → **Merchants** and click **New merchant**
+1. Go to **Settings** → **Merchants** and click **Create Merchant**
 2. Select **Gateway**: Explodely, give the merchant a name, and click **Create & Configure**. The merchant's settings open on **General information**.
 3. Enter your Explodely seller username as the **Account ID**
 4. In **Callback secret**, enter a random string of 24 to 128 characters (letters, digits, `-` or `_`), or click **Generate a random secret**. Keep a copy: it goes at the end of every URL you paste into Explodely in Step 3.
@@ -45,7 +45,11 @@ Without a mapping, the ElasticFunnels product code is sent as the product ID, wh
 
 ## Step 3: Set up postbacks in Explodely
 
-Open your merchant and click **Postback Setup**. It shows the IPN URL and one webhook URL per event:
+In **Settings** → **Merchants**, click **Postback Setup** on the Explodely merchant's row. The row shows **Needs Setup** until the first postback arrives (Step 4).
+
+<img src="/images/merchants/explodely-ef-list.png" alt="The Merchants list in ElasticFunnels: an Explodely merchant with its Account ID, the Needs Setup status and the Postback Setup link" />
+
+Postback Setup shows the IPN URL and one webhook URL per event:
 
 ```
 https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/YOUR_CALLBACK_SECRET

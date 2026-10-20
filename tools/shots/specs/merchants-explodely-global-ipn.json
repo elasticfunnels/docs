@@ -1,21 +1,21 @@
 {
   "out": "images/merchants/explodely-global-ipn.png",
   "alt": "Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Try IPN Builder and Update",
-  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
   "image": "tools/shots/source/merchants-explodely-global-ipn.png",
   "imageSize": {
-    "w": 820,
-    "h": 620
+    "w": 860,
+    "h": 640
   },
   "maxWidth": 760,
   "calloutWidth": 210,
   "annotations": [
     {
       "box": [
-        188,
-        170,
-        604,
-        48
+        207,
+        178,
+        617,
+        45
       ],
       "title": "Global IPN",
       "text": "Expand it under Developers",
@@ -23,9 +23,9 @@
     },
     {
       "box": [
-        209,
-        325,
-        272,
+        228,
+        333,
+        278,
         57
       ],
       "title": "IPN URL",
@@ -34,9 +34,9 @@
     },
     {
       "box": [
-        209,
-        415,
-        272,
+        228,
+        425,
+        278,
         57
       ],
       "title": "IPN Type",
@@ -45,9 +45,9 @@
     },
     {
       "box": [
-        500,
-        325,
-        272,
+        526,
+        333,
+        278,
         57
       ],
       "title": "Send IPN",
@@ -56,9 +56,9 @@
     },
     {
       "box": [
-        653,
-        237,
-        118,
+        683,
+        244,
+        120,
         32
       ],
       "title": "Try IPN Builder",
@@ -67,9 +67,9 @@
     },
     {
       "box": [
-        699,
-        497,
-        68,
+        731,
+        511,
+        69,
         32
       ],
       "title": "Update",

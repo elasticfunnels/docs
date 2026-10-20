@@ -1,20 +1,20 @@
 {
   "out": "images/merchants/explodely-webhook-form.png",
   "alt": "The Explodely webhook form: Funnel, Event Name, Request Type, Webhook URL, data point checkboxes and Submit",
-  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
   "image": "tools/shots/source/merchants-explodely-webhook-form.png",
   "imageSize": {
-    "w": 960,
-    "h": 712
+    "w": 983,
+    "h": 728
   },
   "maxWidth": 760,
   "calloutWidth": 210,
   "annotations": [
     {
       "box": [
-        14,
-        81,
-        932,
+        13,
+        82,
+        955,
         57
       ],
       "title": "Funnel",
@@ -23,9 +23,9 @@
     },
     {
       "box": [
-        14,
-        286,
-        932,
+        13,
+        293,
+        955,
         57
       ],
       "title": "Event Name",
@@ -34,10 +34,10 @@
     },
     {
       "box": [
-        14,
-        356,
-        932,
-        57
+        13,
+        364,
+        955,
+        58
       ],
       "title": "Request Type",
       "text": "Set to POST",
@@ -45,10 +45,10 @@
     },
     {
       "box": [
-        14,
-        426,
-        932,
-        57
+        13,
+        436,
+        955,
+        58
       ],
       "title": "Webhook URL",
       "text": "The URL for that event",
@@ -56,10 +56,10 @@
     },
     {
       "box": [
-        14,
-        524,
-        750,
-        85
+        13,
+        536,
+        770,
+        88
       ],
       "title": "Data points",
       "text": "Tick every box",
@@ -67,8 +67,8 @@
     },
     {
       "box": [
-        446,
-        666,
+        457,
+        682,
         68,
         32
       ],
