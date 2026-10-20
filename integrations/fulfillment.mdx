@@ -42,7 +42,9 @@ Shipping from Shopify instead? With [Shopify Order Sync](/integrations/shopify-o
 ## Send from an automation
 {/* SCREENSHOT: Send to fulfillment step in the automation builder · desktop */}
 
-You can also send orders from an automation that starts with **On New Purchase**: add the **Send to fulfillment** step, pick the fulfillment integration and, if you want, a **Delay (minutes)** (empty uses the integration's delay). Put conditions or a split test before it to choose which orders go where. The builder will not save the step on any other trigger, or without a connected fulfillment integration.
+You can also send orders from an automation that starts with **On New Purchase**: add the **Send to fulfillment** step, pick the fulfillment integration and, if you want, a **Delay (minutes)** (empty uses the integration's delay). Put conditions or a split test before it to choose which orders go where. The builder will not save the step on any other trigger, or without a connected fulfillment integration. The **Presets** tab of the fulfillment integration has a ready one: **New purchase: send the order to ... to ship**, and the **Automations** panel at the top of its page shows how many automations send to it.
+
+A fulfillment integration is not moved to automations the way a call center is: which orders it ships follows your merchants and products, and one automation cannot copy that exactly. Keep the merchant and product settings, and use the step for the orders you want to route yourself.
 
 The step runs the same order job as the merchant setting: only physical items, never test orders, gift orders wait for their main payment, and the integration's SKU map and tracking sync apply.
 
