@@ -12,6 +12,44 @@ JVZoo is a hosted checkout. Your funnel owns the sales pages, and buyers leave t
 The two use different tracking parameters: `vtid` carries your click code on your own buy links, `tid` is the affiliate's SubID. ElasticFunnels never writes to `tid` on a vendor buy link, so an affiliate's own sub-tracking passes through untouched.
 </Note>
 
+## How a JVZoo purchase flows
+
+Your pages live on ElasticFunnels. The checkout, the upsell charges and the order sequence live on JVZoo. A buyer moves between the two like this:
+
+```mermaid
+sequenceDiagram
+    participant V as Buyer
+    participant EF as ElasticFunnels pages
+    participant J as JVZoo
+    V->>EF: Opens your sales page from an ad or affiliate link
+    Note over EF: Click code created, aid and subids kept for the visit
+    V->>J: Clicks Buy, the /b/ link carries vtid
+    J->>V: JVZoo checkout takes the payment
+    J->>EF: JVZIPN for the front-end product
+    J->>V: Sends the buyer to the next step of the JVZoo funnel
+    V->>EF: Opens your upsell page
+    alt Yes
+        V->>J: One-click charge on JVZoo
+        J->>EF: JVZIPN for the upsell
+    else No thanks
+        V->>J: JVZoo No Thanks link
+    end
+    J->>V: After the last step, your thank-you page
+```
+
+| Step | Where it happens | What you set up |
+| --- | --- | --- |
+| 1. The visitor lands on your sales page | ElasticFunnels | Your page on an ElasticFunnels domain. Affiliate traffic carries `aid` only with **Pass Affiliate ID to sales page** on in JVZoo ([Affiliate attribution](#affiliate-attribution)). ElasticFunnels creates the click code and keeps `aid` and the subids for the visit. |
+| 2. The buyer clicks Buy | ElasticFunnels page, link to JVZoo | A `[BUY=...]` tag or a pasted `/b/` link. Both reach JVZoo with `vtid=<click code>`; the tag also adds the affiliate ID ([Buy links](#buy-links)). |
+| 3. Payment | JVZoo checkout | Nothing in ElasticFunnels. JVZoo hosts the checkout and charges the card. |
+| 4. Next step of the funnel | JVZoo sends the buyer to your page | The order of products in JVZoo's **Funnel Builder**, and each product's **Sales Page URL** (General Information tab) pointing at your ElasticFunnels upsell page. Parameters ride along only with **Allow Parameter Passthrough** on. |
+| 5. Yes or No on the upsell | Your page, charge on JVZoo | Yes: a `[UPSELL=...]` tag or pasted `/b/` link, charged in one click when **One Click Upsell** is on, plus JVZoo's one-click script in the page head ([scripts](#the-one-click-upsell-script-and-the-affiliate-link-script)). No: JVZoo's No Thanks link ([Upsell pages](#upsell-pages)). |
+| 6. Thank-you page | JVZoo sends the buyer to your page | **Thank You / Download Page** on each product's Product Access tab ([Thank-you page](#thank-you-page)). |
+| 7. Orders recorded | JVZoo to ElasticFunnels | The ElasticFunnels JVZIPN URL on every product (Step 4). Each product bought sends its own JVZIPN, so the front end and each upsell become separate order lines. Refunds and chargebacks arrive the same way later. |
+| 8. Attribution | ElasticFunnels | Nothing extra. Order, amount, products and affiliate are recorded today. Linking the sale to the visit, ad and split test is not working yet ([what is attributed today](#buy-links)). |
+
+ElasticFunnels never sees the card and never decides which upsell comes next. JVZoo does both.
+
 ## What you need
 
 - A JVZoo seller account with your products added, and a JVZoo funnel that chains them (front end, then each upsell and downsell)
@@ -294,6 +332,9 @@ JVZoo's team reviews your sales and upsell pages before the funnel goes live, an
 ## Troubleshooting
 
 <AccordionGroup>
+  <Accordion title="Do I need a funnel in ElasticFunnels?">
+    Only to hold your pages. The upsell order lives in JVZoo's **Funnel Builder**, and ElasticFunnels does not change it. The ElasticFunnels funnel is where the **JVZoo Button ID** sits on the domain row (Step 3), so put the sales and upsell pages in one and fill that field.
+  </Accordion>
   <Accordion title="Buy links go to the wrong JVZoo page">
     Compare the link on your page with the one JVZoo gives you under **Buy Buttons**. The merchant's **JVZoo Funnel ID** must be the first number (not `99`, not your vendor or affiliate ID), the product's **jvzoo Product ID** the middle one, and the domain row's **JVZoo Button ID** the third one (`99` for your own button, never a code with letters).
   </Accordion>
