@@ -1,0 +1,40 @@
+{
+  "out": "images/affiliate-portal/portal-resources.png",
+  "alt": "The Resources page on the portal with an email swipe card and its Copy text button",
+  "capture": {
+    "path": "/affiliates/resources",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "text=Launch email #1",
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Launch email #1",
+      "title": "Email swipe",
+      "text": "Copy text, preview, attachment",
+      "side": "right"
+    },
+    {
+      "selector": "input[placeholder*='Search']",
+      "title": "Search",
+      "text": "Or filter by type",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

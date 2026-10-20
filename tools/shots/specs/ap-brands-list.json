@@ -1,0 +1,52 @@
+{
+  "out": "images/affiliate-portal/brands-list.png",
+  "alt": "The Brands tab listing two brands with their Status after sign-up: Pending approval and Active",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.brands']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.brands']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 919,
+      "height": 320
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.list'] [data-testid='list.new-button']",
+      "title": "Add",
+      "text": "Puts another brand on the portal",
+      "side": "right"
+    },
+    {
+      "selector": "text=PENDING APPROVAL",
+      "title": "Status after sign-up",
+      "text": "What a new sign-up gets",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.list'] [data-testid='row-actions-trigger'] >> nth=0",
+      "title": "Menu",
+      "text": "Settings or Remove from portal",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

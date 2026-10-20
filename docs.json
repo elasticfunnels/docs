@@ -280,7 +280,32 @@
                 "icon": "handshake",
                 "pages": [
                   "affiliates/internal-affiliates",
-                  "affiliates/postback-urls"
+                  "affiliates/postback-urls",
+                  {
+                    "group": "Affiliate portal",
+                    "icon": "door-open",
+                    "pages": [
+                      "affiliate-portal/overview",
+                      "affiliate-portal/set-up",
+                      "affiliate-portal/brands",
+                      "affiliate-portal/affiliates",
+                      "affiliate-portal/payouts",
+                      "affiliate-portal/assets",
+                      "affiliate-portal/branding",
+                      "affiliate-portal/permissions",
+                      {
+                        "group": "What affiliates see",
+                        "icon": "eye",
+                        "pages": [
+                          "affiliate-portal/affiliate-sign-up",
+                          "affiliate-portal/affiliate-dashboard",
+                          "affiliate-portal/affiliate-links",
+                          "affiliate-portal/affiliate-payouts",
+                          "affiliate-portal/affiliate-tracking"
+                        ]
+                      }
+                    ]
+                  }
                 ]
               },
               {

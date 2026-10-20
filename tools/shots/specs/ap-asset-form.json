@@ -1,0 +1,47 @@
+{
+  "out": "images/affiliate-portal/asset-form.png",
+  "alt": "The resource form for an Offer Page: name, type, brand, the picked page and the Destination URL field",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.assets']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.assets']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "[data-testid='row-actions-trigger'] >> visible=true >> nth=2"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-testid='list.row.action.edit'] >> visible=true"
+      },
+      {
+        "wait": 1800
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "text=Destination URL",
+      "title": "Destination URL",
+      "text": "Overrides the page's address",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 860,
+  "calloutWidth": 230
+}

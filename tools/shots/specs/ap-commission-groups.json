@@ -1,0 +1,40 @@
+{
+  "out": "images/affiliate-portal/commission-groups.png",
+  "alt": "The Commission groups tab listing a Standard partners group at 40% and a VIP partners group at 50%",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.commission-groups']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.commission-groups']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 919,
+      "height": 440
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=VIP partners >> nth=0",
+      "title": "Group",
+      "text": "One rate set, used per brand",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

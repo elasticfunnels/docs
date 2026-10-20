@@ -1,0 +1,62 @@
+{
+  "out": "images/affiliate-portal/settings-payouts.png",
+  "alt": "The Payouts section of the Settings tab: invoice rule, frequency, cutoff day, net days, minimum threshold and the payout method switch",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.settings']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.settings']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "eval": "[...document.querySelectorAll('h3')].filter(h=>h.offsetParent&&h.textContent.trim()==='Payouts')[0].scrollIntoView({block:'start'});window.scrollBy(0,0)",
+        "wait": 600
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 80,
+      "width": 919,
+      "height": 820
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Require invoices before payment >> nth=0",
+      "title": "Invoices",
+      "text": "Paid only after an invoice",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.settings.frequency']",
+      "title": "Frequency",
+      "text": "Manual or a fixed schedule",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.settings.default-minimum']",
+      "title": "Default minimum",
+      "text": "Smaller earnings wait",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.settings.save-schedule']",
+      "title": "Save schedule",
+      "text": "Applies to the next period",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

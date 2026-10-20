@@ -1,0 +1,40 @@
+{
+  "out": "images/affiliate-portal/portal-clicks.png",
+  "alt": "The Clicks report with date, URL, referrer, UTM and sub ID columns",
+  "capture": {
+    "path": "/affiliates/clicks",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "table",
+    "fixtures": [
+      {
+        "url": "^/affiliates/api/clicks",
+        "file": "tools/shots/fixtures/affiliate-portal/clicks.json"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Export >> nth=0",
+      "title": "Export",
+      "text": "Downloads the rows as CSV",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

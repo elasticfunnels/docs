@@ -1,0 +1,46 @@
+{
+  "out": "images/affiliate-portal/branding.png",
+  "alt": "The Branding tab with colors, logos, fonts, copy and links, and the live preview of the portal",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.branding']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.branding']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 919,
+      "height": 700
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Primary >> nth=0",
+      "title": "Colors",
+      "text": "Primary, accent, text",
+      "side": "right"
+    },
+    {
+      "selector": "text=Live preview",
+      "title": "Live preview",
+      "text": "Shows changes before saving",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

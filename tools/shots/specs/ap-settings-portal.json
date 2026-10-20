@@ -1,0 +1,52 @@
+{
+  "out": "images/affiliate-portal/settings-portal.png",
+  "alt": "The Settings tab: Portal name with Save name, and the read-only Domain with Open portal",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.settings']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.settings']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 919,
+      "height": 330
+    }
+  },
+  "annotations": [
+    {
+      "selector": "p:text-is('Portal name') >> visible=true",
+      "title": "Portal name",
+      "text": "Save name renames it",
+      "side": "left"
+    },
+    {
+      "selector": "p:text-is('Domain') >> visible=true",
+      "title": "Domain",
+      "text": "Change domain moves it, after a confirm",
+      "side": "left"
+    },
+    {
+      "selector": "text=Open portal",
+      "title": "Open portal",
+      "text": "Opens the sign-in page",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 820,
+  "calloutWidth": 230
+}

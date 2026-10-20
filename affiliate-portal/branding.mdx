@@ -1,0 +1,54 @@
+---
+title: Brand the portal and its emails
+sidebarTitle: "Branding and emails"
+icon: "palette"
+description: Give the portal your colors, logo, fonts, copy and links, and set the sender and content of the emails it sends affiliates.
+---
+
+The portal's **Branding** tab sets how the portal looks to affiliates and how its emails read. **Live preview**,
+beside the fields, shows an approximate result before you save; **Open in new tab** shows the real portal.
+
+<img src="/images/affiliate-portal/branding.png" alt="The Branding tab with colors, logos, fonts, copy and links, and the live preview of the portal" />
+
+## Look
+
+| Section | Fields |
+|---|---|
+| **Visual identity** | Primary, Accent, Background, Text, Header background and Header text colors. Leave one empty to keep the default. |
+| **Logos and images** | Logo for light backgrounds, logo for dark backgrounds, Favicon, and the image beside the sign-in form. |
+| **Typography** | Body and heading font family. For Google Fonts, also paste the font's `<link>` tag into **Custom HTML (head)**. |
+| **Copy and labels** | Header title, Footer text, and the Login subheading under the sign-in title. |
+| **Support and legal links** | Support, Terms and Privacy URLs, shown to affiliates on the portal. |
+| **Advanced** | Custom CSS, Custom HTML (head) for fonts or analytics, and Custom HTML (footer) for a chat widget. |
+
+<img src="/images/affiliate-portal/portal-login.png" alt="The portal's sign-in page on its own domain with the Northwind Partners header, the login subheading and the brand colors" />
+
+<Warning>
+Custom CSS and HTML are applied as is. Broken markup can hide parts of the portal or break it, so open the portal
+in a new tab and check it after you save.
+</Warning>
+
+## Emails
+
+Under **Transactional emails**:
+
+- **From name** and **Reply-to**: the sender name affiliates see and where their replies go. Portal emails go out
+  from a no-reply address, so set a reply-to if affiliates should be able to answer you.
+- **Welcome email (account created)**: the email an affiliate gets when you invite them or reset their password. Macros:
+  `{{ first_name }}`, `{{ last_name }}`, `{{ email }}`, `{{ portal_name }}`, `{{ login_url }}`,
+  `{{ temp_password }}`, `{{ is_reset }}`.
+- **Payout status email**: the email an affiliate gets when a payout changes status, and when a payout is held because
+  they have no payout details. Macros: `{{ first_name }}`, `{{ amount }}`, `{{ currency }}`, `{{ status }}`,
+  `{{ method }}`, `{{ brand_name }}`, `{{ payout_id }}`, `{{ created_at }}`, `{{ note }}`.
+
+Each has a **Subject** and an **HTML body**. Leave a field empty to use the default email.
+
+<img src="/images/affiliate-portal/branding-emails.png" alt="The Transactional emails section: from name, reply-to, and the welcome and payout status subject and body with their macros" />
+
+Every portal email, including the sign-up code and the password reset, carries the portal's logo, primary color
+and name. The wording of the sign-up code email, and the approval email from each brand, are not changed here.
+
+## Related
+
+- [Set up the portal](/affiliate-portal/set-up)
+- [Sign-up and sign-in](/affiliate-portal/affiliate-sign-up)

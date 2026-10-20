@@ -1,0 +1,54 @@
+{
+  "out": "images/affiliate-portal/create-portal.png",
+  "alt": "The Create affiliate portal form with a portal name, the custom domain partners.example.com and the Create portal button",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='org.affiliate-portal.create.submit']",
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/affiliate-portal(\\?|$)",
+        "file": "tools/shots/fixtures/affiliate-portal/portal-none.json"
+      }
+    ],
+    "actions": [
+      {
+        "fill": "main input >> nth=0",
+        "value": "Northwind Partners"
+      },
+      {
+        "fill": "[data-testid='org.affiliate-portal.create.domain']",
+        "value": "partners.example.com"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 1183,
+      "height": 640
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.create.domain']",
+      "title": "Custom domain",
+      "text": "A hostname you can add DNS to",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.create.submit']",
+      "title": "Create portal",
+      "text": "Enabled once a domain is in",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

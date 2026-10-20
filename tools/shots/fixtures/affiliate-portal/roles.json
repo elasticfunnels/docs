@@ -1,0 +1,18 @@
+[
+ {
+  "id": 901,
+  "name": "Affiliate manager",
+  "code": "affiliate-manager",
+  "type": "custom",
+  "organization_id": 798,
+  "permissions": [
+   "organization.affiliate_portal.view",
+   "organization.affiliate_portal_affiliates.view",
+   "organization.affiliate_portal_affiliates.create",
+   "organization.affiliate_portal_affiliates.update",
+   "organization.affiliate_portal_commission_groups.view",
+   "organization.affiliate_portal_assets.view",
+   "affiliates.organization_affiliates.view"
+  ]
+ }
+]

@@ -1,0 +1,34 @@
+{
+  "out": "images/affiliate-portal/portal-payout-details.png",
+  "alt": "Settings, Payouts tab on the portal: payout method, the account fields for it and the minimum payout threshold",
+  "capture": {
+    "path": "/affiliates/profile#payouts",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "text=Payout method",
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Payout method >> nth=0",
+      "title": "Payout method",
+      "text": "PayPal, Wise, bank or check",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

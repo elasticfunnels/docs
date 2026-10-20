@@ -1,0 +1,63 @@
+{
+  "out": "images/affiliate-portal/approve-affiliate.png",
+  "alt": "The affiliate's Brands tab with the Edit assignment modal: Status set to Active and a commission group picked",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal/affiliates/6",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "text=Edit profile",
+    "fixtures": [
+      {
+        "url": "/affiliate-portal/affiliates/\\d+/metrics",
+        "file": "tools/shots/fixtures/affiliate-portal/affiliate-metrics.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.brands']"
+      },
+      {
+        "wait": 1200
+      },
+      {
+        "click": "[data-testid='row-actions-trigger'] >> visible=true >> nth=0"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "text=Edit assignment >> visible=true"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "select": "select:has(option[value='blacklisted']) >> visible=true",
+        "value": "active"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "select:has(option[value='blacklisted']) >> visible=true",
+      "title": "Status",
+      "text": "Active approves them",
+      "side": "right"
+    },
+    {
+      "selector": "select:has(option:text('No commission group')) >> visible=true",
+      "title": "Commission group",
+      "text": "What they earn on this brand",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

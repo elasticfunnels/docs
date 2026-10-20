@@ -1,0 +1,18 @@
+{
+ "success": true,
+ "config": {
+  "secret_version": 1,
+  "entries": [
+   {
+    "type": "sale",
+    "url": "https://tracker.example.com/postback?event=sale",
+    "format": "json"
+   },
+   {
+    "type": "refund",
+    "url": "https://tracker.example.com/postback?event=refund",
+    "format": "json"
+   }
+  ]
+ }
+}

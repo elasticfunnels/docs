@@ -1,0 +1,52 @@
+{
+  "out": "images/affiliate-portal/portal-tracking.png",
+  "alt": "The Tracking page on the portal with a Meta pixel on one brand, Taboola on the other, and the Add tracking button",
+  "capture": {
+    "path": "/affiliates/profile#tracking",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "text=Add tracking",
+    "fixtures": [
+      {
+        "url": "^/affiliates/api/profile/brand-tracking",
+        "file": "tools/shots/fixtures/affiliate-portal/brand-tracking.json"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 380,
+      "y": 96,
+      "width": 940,
+      "height": 420
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Add tracking",
+      "title": "Add tracking",
+      "text": "Meta, Everflow or Taboola",
+      "side": "right"
+    },
+    {
+      "selector": ".ant-tag:has-text('Meta pixel') >> nth=0",
+      "title": "Meta pixel",
+      "text": "Their own pixel, via CAPI",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-tag:has-text('Taboola') >> nth=0",
+      "title": "Taboola",
+      "text": "Reported against tblci",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 860,
+  "calloutWidth": 230
+}

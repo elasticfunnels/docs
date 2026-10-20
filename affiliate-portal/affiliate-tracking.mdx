@@ -1,0 +1,52 @@
+---
+title: Affiliates' own pixels and postbacks
+sidebarTitle: "Tracking and postbacks"
+icon: "satellite-dish"
+description: How affiliates send the conversions they bring in to their own Meta pixel, Everflow or Taboola account, or to their own server as signed postbacks.
+---
+
+Affiliates who buy traffic need their conversions in their own ad accounts. The portal lets them set that up
+themselves, under **Tracking** and **Postbacks** in the menu. You do not need to do anything.
+
+## Tracking
+
+**Tracking** forwards the affiliate's conversions on one brand to an ad platform. They click **Add tracking**, pick
+what to connect and the **Brand** it applies to:
+
+| Connection | What they fill in | What is sent |
+|---|---|---|
+| **Meta pixel** | Meta Pixel ID, Conversions API access token, Purchased-from URL | Purchases, through the Conversions API |
+| **Everflow postback** | The postback URL from Everflow, with macros | A postback for each conversion |
+| **Taboola S2S** | The Event Name of their conversion rule in Taboola Realize | Conversions against the `tblci` click id |
+
+<img src="/images/affiliate-portal/portal-tracking.png" alt="The Tracking page on the portal with a Meta pixel on one brand, Taboola on the other, and the Add tracking button" />
+
+The revenue reported is always the affiliate's commission, not your order total, so their ROAS is measured against
+what they earn.
+
+- **Everflow** macros: `{sub1}` to `{sub5}` (the sub IDs from their link), `{payout_amount}` (their commission),
+  `{amount}` (the order total), `{currency}`, `{order_id}` and `{event}`.
+- **Taboola** needs `tblci` on the landing URL. Taboola adds it when the campaign URL ends in `?tblci={click_id}`.
+  Clicks without it are skipped, and refunds and chargebacks are not sent.
+
+## Postbacks
+
+**Postbacks** sends the affiliate's conversions to their own server. They are set per brand: the affiliate picks
+the brand in the brand picker at the top first.
+
+<img src="/images/affiliate-portal/portal-postbacks.png" alt="The Postbacks page on the portal: the signing secret with Reveal and Rotate, and endpoints for sale and refund events" />
+
+1. **Add postback**: pick the **Event type**, the **Endpoint URL** and the **Payload format** (JSON or form-encoded).
+   **Send test** posts a sample before they save.
+2. Events: **Sale**, **Lead**, **Upsell**, **Rebill**, **Refund**, **Chargeback**, **Hold**, **Approve**,
+   **Reject**.
+3. Each request carries `X-EF-Event` with the event, and `X-EF-Signature` in the form `v1=<hex digest>`: an
+   HMAC-SHA256 of the raw body with the **Signing secret** shown on the page. **Rotate** makes a new secret, and
+   the version number goes up.
+4. **What we send** lists the fields. Customer details are not sent.
+5. **Recent deliveries** shows the last 25 attempts, tests included, with their HTTP status.
+
+## Related
+
+- [Affiliate postback URLs](/affiliates/postback-urls): postbacks you set up for an affiliate from the brand side.
+- [Tracking links](/affiliate-portal/affiliate-links)
