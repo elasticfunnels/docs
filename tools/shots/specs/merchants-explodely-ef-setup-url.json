@@ -1,0 +1,69 @@
+{
+  "out": "images/merchants/explodely-ef-setup-url.png",
+  "alt": "The Postback Setup dialog for Explodely on its first step: the steps list, the postback URL with Copy, and the callback secret note",
+  "_source": "ElasticFunnels app on prod (app 47daabe38), Postback Setup on an Explodely merchant, captured 2026-10-20 at 1492x812; account details replaced in the page with generic values (Acme Health, Alex Morgan, postback code AbC123xYz) before capture; cropped to the dialog.",
+  "image": "tools/shots/source/merchants-explodely-ef-setup-url.png",
+  "imageSize": {
+    "w": 774,
+    "h": 577
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        24,
+        71,
+        208,
+        140
+      ],
+      "title": "Steps",
+      "text": "Postback URL, Seller IPN, Webhooks, Test",
+      "side": "left"
+    },
+    {
+      "box": [
+        189,
+        14,
+        100,
+        17
+      ],
+      "title": "Waiting for a test",
+      "text": "Changes when a postback arrives",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        161,
+        494,
+        52
+      ],
+      "title": "Postback URL",
+      "text": "Copy it, then add your secret",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        259,
+        494,
+        80
+      ],
+      "title": "Callback secret",
+      "text": "Replace the placeholder with it",
+      "side": "right"
+    },
+    {
+      "box": [
+        637,
+        532,
+        116,
+        35
+      ],
+      "title": "Next",
+      "text": "Goes to Seller IPN",
+      "side": "right"
+    }
+  ]
+}

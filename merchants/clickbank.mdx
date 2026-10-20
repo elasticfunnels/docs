@@ -36,7 +36,7 @@ The encryption key is **not** an API key - it's a security key you create:
 **Example**: `MySecretKey2024!` (use your own unique key)
 
 <Note>
-For postback configuration, use the **Setup** modal available from the **Merchants** list. It provides the exact URL and parameters to copy into ClickBank and is kept up to date.
+For postback configuration, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. It gives the exact URL and the steps to follow in ClickBank.
 </Note>
 
 ## Step 2: Configure Domain-Merchant Assignment
@@ -95,7 +95,7 @@ This decouples ClickBank from individual page URLs. You can later split test or 
 ## Postbacks
 {/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
-Use the **Setup** modal in the **Merchants** list for step-by-step, up-to-date postback instructions and your unique URL. After you configure ClickBank and trigger a test (or run a test purchase), the modal will automatically mark the connection as validated once the webhook is received.
+Click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for ClickBank, then **Test**. After you configure ClickBank and click **Test & Save** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
 
 ## Advanced Configuration
 {/* SCREENSHOT: Advanced Configuration · merchant setup screen or postback state · desktop */}

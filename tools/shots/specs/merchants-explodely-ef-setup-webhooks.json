@@ -1,79 +1,57 @@
 {
   "out": "images/merchants/explodely-ef-setup-webhooks.png",
-  "alt": "The Postback Setup dialog for Explodely: the IPN settings, the verify step and the Chargeback, Partial and Decline webhook URLs",
-  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20 at 1456x840; the local app could not render an Explodely merchant. Cropped and redacted (seller name, username, email, brand name, postback code and secret covered; Account ID shown as the example acmehealth) with ImageMagick before entering the repo.",
+  "alt": "The Webhooks step of Postback Setup for Explodely: where to add them and the Chargeback, Partial and Decline URLs, each with Copy",
+  "_source": "ElasticFunnels app on prod (app 47daabe38), Postback Setup on an Explodely merchant, captured 2026-10-20 at 1492x812; account details replaced in the page with generic values (Acme Health, Alex Morgan, postback code AbC123xYz) before capture; cropped to the dialog.",
   "image": "tools/shots/source/merchants-explodely-ef-setup-webhooks.png",
   "imageSize": {
-    "w": 432,
-    "h": 736
+    "w": 774,
+    "h": 577
   },
   "maxWidth": 760,
   "calloutWidth": 210,
   "annotations": [
     {
       "box": [
-        24,
-        155,
-        390,
-        34
+        263,
+        96,
+        494,
+        70
       ],
-      "title": "IPN settings",
-      "text": "Send IPN Yes, IPN Type POST",
+      "title": "Where",
+      "text": "Seller Hub, Integrations, Webhook",
       "side": "right"
     },
     {
       "box": [
-        24,
-        195,
-        390,
-        82
-      ],
-      "title": "Verify",
-      "text": "Try IPN Builder, then a test sale",
-      "side": "left"
-    },
-    {
-      "box": [
-        14,
-        320,
-        404,
-        100
-      ],
-      "title": "Webhooks",
-      "text": "Three webhooks, POST, all data points",
-      "side": "right"
-    },
-    {
-      "box": [
-        27,
-        453,
-        378,
-        22
+        263,
+        180,
+        494,
+        68
       ],
       "title": "Chargeback",
-      "text": "URL for the chargeback webhook",
+      "text": "Event Name Chargeback",
       "side": "left"
     },
     {
       "box": [
-        27,
-        502,
-        378,
-        22
+        263,
+        260,
+        494,
+        68
       ],
       "title": "Partial",
-      "text": "URL for the partial webhook",
-      "side": "right"
+      "text": "Event Name Partial",
+      "side": "left"
     },
     {
       "box": [
-        27,
-        551,
-        378,
-        22
+        263,
+        339,
+        494,
+        68
       ],
       "title": "Decline",
-      "text": "URL for the decline webhook",
+      "text": "Event Name Decline",
       "side": "left"
     }
   ]

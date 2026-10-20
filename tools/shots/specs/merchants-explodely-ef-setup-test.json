@@ -1,0 +1,58 @@
+{
+  "out": "images/merchants/explodely-ef-setup-test.png",
+  "alt": "The Test step of Postback Setup for Explodely: the waiting status card and how to send a test",
+  "_source": "ElasticFunnels app on prod (app 47daabe38), Postback Setup on an Explodely merchant, captured 2026-10-20 at 1492x812; account details replaced in the page with generic values (Acme Health, Alex Morgan, postback code AbC123xYz) before capture; cropped to the dialog.",
+  "image": "tools/shots/source/merchants-explodely-ef-setup-test.png",
+  "imageSize": {
+    "w": 774,
+    "h": 577
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        24,
+        177,
+        208,
+        34
+      ],
+      "title": "Test",
+      "text": "The last step",
+      "side": "left"
+    },
+    {
+      "box": [
+        263,
+        96,
+        494,
+        84
+      ],
+      "title": "Waiting",
+      "text": "Updates by itself, keep it open",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        196,
+        494,
+        75
+      ],
+      "title": "How to send a test",
+      "text": "Try IPN Builder in Explodely",
+      "side": "right"
+    },
+    {
+      "box": [
+        263,
+        315,
+        494,
+        24
+      ],
+      "title": "Check window",
+      "text": "Every 5 seconds for 2 minutes",
+      "side": "right"
+    }
+  ]
+}
