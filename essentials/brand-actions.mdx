@@ -36,6 +36,24 @@ Before making any changes, you can:
 - Review safety warnings for bulk operations
 - Apply changes with confidence
 
+## Sales for a product code you have not set up
+
+When a merchant (JVZoo, ClickBank, Digistore24, BuyGoods, Cartpanda, Shopify, Explodely) sends a sale for a product code that is not on any of your products, you get a **Create Missing Product** action. The sale is recorded, but without that product.
+
+Often the product already exists and only lacks this merchant's ID. Open the action with **Review** and choose:
+
+<img src="/images/essentials/missing-product-link.png" alt="The Create Missing Product action with Link to existing product selected, the matching product suggested with its reasons, a product picker, and the sentence saying where the sales will be recorded" />
+
+- **Link to existing product** lists your products that look like the one the merchant sent, with the reasons: the same price (exact, or within 1%), words the names share (`Done-For-You` and `done for you` count as the same), and no ID for this merchant yet. A product that already has a different ID for this merchant is never listed.
+- One product is marked **Suggested** and preselected only when it is clearly the best match. When several fit, none is preselected: pick the right one, or search all your products under **Or pick any product**.
+- The box under the list says what will happen: sales with that merchant product code will be recorded as the product you picked.
+- **Link product** saves the code as the product's ID for that merchant (its other merchant IDs stay as they are), closes any duplicate action for the same code, and resolves the matching alert.
+- **Create new product** creates a product with the code instead. The name starts as the product name the merchant sent.
+
+After either choice, JVZoo and ClickBank sales that already came in for that code without a product are recorded on the product within a few minutes. Refunds are left as they are, and so are ClickBank orders with more than one item. For other merchants, new sales land on the product from then on.
+
+You can also set the ID yourself: open the product, then its **Merchants** tab, and fill the merchant's product ID.
+
 ## Types of Brand Actions
 {/* SCREENSHOT: Types of Brand Actions · relevant screen or example output · desktop */}
 

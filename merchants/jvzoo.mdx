@@ -323,7 +323,7 @@ JVZoo's team reviews your sales and upsell pages before the funnel goes live, an
 - **Verification:** the first JVZIPN for the merchant clears **Needs Setup**, whether it is a test purchase or a real sale.
 - **Versions:** JVZIPN v1 and v2 are both read, from either box in JVZoo.
 - **Upsells** arrive as their own JVZIPN, one per product, and are matched by the product ID.
-- **Products:** a JVZIPN for a JVZoo product ID mapped on no product raises a **Create Missing Product** action, and the order is saved without that product line.
+- **Products:** a JVZIPN for a JVZoo product ID mapped on no product raises a **Create Missing Product** action, and the order is saved without that product line. The action suggests the product it most likely is, so you can link the ID to it or create a new product; either way the sales already saved without the product are recorded on it. See [Sales for a product code you have not set up](/essentials/brand-actions#sales-for-a-product-code-you-have-not-set-up).
 - **Refunds and chargebacks** link to the original sale by JVZoo's transaction ID.
 - **Duplicates:** with **Deduplicate Orders** on, a repeated JVZIPN for the same order is recorded once.
 - **Wrong funnel:** a JVZIPN whose `funnel_id` does not match the merchant's **JVZoo Funnel ID** is still recorded and flagged, since a URL copied from another offer would otherwise pour that offer's orders in silently.
@@ -351,7 +351,7 @@ JVZoo's team reviews your sales and upsell pages before the funnel goes live, an
     The JVZIPN URL is set on the front-end product only. JVZoo sends one JVZIPN per product, so paste the same URL into every upsell and downsell product.
   </Accordion>
   <Accordion title="Sales arrive without a product">
-    The JVZoo product ID is not mapped on any product. Fill **jvzoo Product ID** on the product's Merchants tab, or accept the **Create Missing Product** action.
+    The JVZoo product ID is not mapped on any product. Open the **Create Missing Product** action and choose **Link to existing product** (it suggests the matching product) or **Create new product**. You can also fill **jvzoo Product ID** on the product's Merchants tab yourself.
   </Accordion>
   <Accordion title="JVZoo sales show no page, ad or split test">
     Expected for now, and not caused by your links: buy tags and pasted `/b/` links both carry the click code as `vtid`. JVZoo returns it inside a passthrough field that ElasticFunnels does not read yet, so the sale cannot be matched to the visit. The order, amount and affiliate are still recorded. See the note under [Buy links](#buy-links).
