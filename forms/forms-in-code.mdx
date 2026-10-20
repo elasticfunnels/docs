@@ -1,0 +1,174 @@
+---
+title: 'Add a form to a page with code'
+sidebarTitle: "Forms in code"
+icon: "code"
+description: 'Write your own HTML form, connect it to a collection, and see where each entry is stored.'
+---
+
+Any `<form>` on an ElasticFunnels page can store its entries in a collection. The builder does this for you when you drag a form onto the page. This page is for when you write the HTML yourself: in the code editor, with the `ef` CLI, or with an AI agent.
+
+A form needs two things:
+
+1. A collection with one field for each input you want to keep.
+2. A form whose `action` is `/api/collection/<code>/store`, where `<code>` is the collection's code.
+
+## With the ef CLI or an AI agent
+
+If you work with the [`ef` CLI](/account/cli-and-api-keys), the fastest route is to ask your agent. `ef init` (and `ef claude`) writes the ElasticFunnels guidance into your project's `CLAUDE.md`, and `ef codex` writes the same into `AGENTS.md`. That guidance covers forms and collections, so in Claude Code you can say *"add a form that collects phone numbers to the landing page"* and it creates the collection and writes the markup.
+
+To do it yourself, create the collection first and note the code it prints:
+
+```bash
+ef collections create "Newsletter" --field email:email:required --field name:text
+# prints the new collection's code, for example 4k2xqa
+```
+
+Each `--field` is `name:type[:required]`. Types are `text`, `email`, `number`, `checkbox`, `password`, `textarea`, `select` and `hidden`.
+
+<Warning>
+Name each field exactly like the input's `name` attribute, in lowercase (`email`, not `Email`). When you save the page, ElasticFunnels compares the inputs in your form with the collection's field names. An input with no field of the same name gets a new field added, with a suffix on its key, and the input no longer matches it. If that new field is required, every submission fails with "is required". Keep field names short too: keys are cut to 15 characters.
+</Warning>
+
+Then point the form at it:
+
+```html
+<form action="/api/collection/4k2xqa/store" method="post">
+  <input name="email" type="email" placeholder="Your email" required>
+  <input name="name" type="text" placeholder="First name">
+  <button type="submit">Join</button>
+  <div data-form-success-message style="display:none"></div>
+  <div data-form-error-message style="display:none"></div>
+</form>
+```
+
+Other commands you'll use:
+
+| Command | What it does |
+| --- | --- |
+| `ef collections list` | Lists your collections with their codes |
+| `ef collections fields <code> --json` | Shows a collection's fields; `code` is the key each input's `name` must match |
+| `ef collections entries <code>` | Shows the entries stored so far, to confirm the form works |
+
+## Without the CLI
+
+1. Go to **Pages** → **Advanced** → **Collections** and click **Create Collection**.
+2. Add one field per input, named exactly like the input's `name` attribute (see the warning above).
+3. Save, and copy the collection's code.
+4. Paste the form above into your page's code, with your code in place of `4k2xqa`.
+
+## Let ElasticFunnels create the collection
+
+You can also write a plain form with no `action`:
+
+```html
+<form>
+  <input name="email" type="email" placeholder="Your email" required>
+  <button type="submit">Join</button>
+</form>
+```
+
+When you save or push the page, ElasticFunnels creates a collection from the inputs and rewrites the form: it sets the `action`, adds `data-collection` attributes and inserts success and error message elements. `ef push` prints the new code and saves the rewritten HTML back into your local file, so open the file again before your next edit.
+
+Two limits:
+
+- It is skipped when the page contains template syntax anywhere (`{{ }}`, `@if`, `@foreach`, `@set`, `@extends`). Use the route above for those pages.
+- Any form with a non-empty `action` that is not `/api/collection/.../store` is left alone. Use that for search boxes or forms that post somewhere else.
+
+## Full example: a form that collects phone numbers
+
+One phone field and a checkbox that starts unticked. Hidden fields keep the exact wording shown next to the box, the page address and the time the visitor submitted. Tested on a live demo page.
+
+Create the collection:
+
+```bash
+ef collections create "Phone numbers" \
+  --field phone:text:required \
+  --field sms_opt_in:checkbox:required \
+  --field consent_text:hidden \
+  --field page_url:hidden \
+  --field consented_at:hidden
+```
+
+Paste the form, with your code in place of `0ws38w` and your own wording and links:
+
+```html
+<form action="/api/collection/0ws38w/store" method="post">
+  <label for="phone">Mobile number</label>
+  <input id="phone" name="phone" type="tel" autocomplete="tel"
+         placeholder="+1 555 010 0199" required>
+
+  <label>
+    <input type="checkbox" name="sms_opt_in" value="yes" required>
+    <span id="consent-text">Yes, Demo Store may text me offers and order updates at this number.
+      Msg &amp; data rates may apply. Msg frequency varies. Reply STOP to opt out.
+      See our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</span>
+  </label>
+
+  <input type="hidden" name="consent_text">
+  <input type="hidden" name="page_url">
+  <input type="hidden" name="consented_at">
+
+  <button type="submit">Send me texts</button>
+  <p id="phone-thanks" style="display:none">Thanks, we saved your number.</p>
+  <div data-form-error-message style="display:none"></div>
+</form>
+
+<script>
+  // Fill the hidden fields just before ElasticFunnels sends the form.
+  document.addEventListener('submit', function (e) {
+    var form = e.target;
+    if (!form.consent_text) return;
+    form.consent_text.value = document.getElementById('consent-text').textContent.replace(/\s+/g, ' ').trim();
+    form.page_url.value = location.href;
+    form.consented_at.value = new Date().toISOString();
+  }, true);
+
+  // Show your own thank-you text once the entry is saved.
+  document.addEventListener('on-form-success', function (e) {
+    if (e.detail.form.consent_text) document.getElementById('phone-thanks').style.display = 'block';
+  });
+</script>
+```
+
+The entry it stores:
+
+```json
+{
+  "phone": "+1 555 010 0199",
+  "sms_opt_in": "yes",
+  "consent_text": "Yes, Demo Store may text me offers and order updates at this number. Msg & data rates may apply. Msg frequency varies. Reply STOP to opt out. See our Terms and Privacy Policy.",
+  "page_url": "https://example.elasticpages.co/sms-optin-demo",
+  "consented_at": "2026-10-20T19:13:40.335Z",
+  "session_id": "JoCEW8P9-…",
+  "ip_address": "86.121.…"
+}
+```
+
+Phone numbers are kept as typed, so ask for the country code in the label or placeholder. If you'd rather accept numbers without the checkbox ticked, drop `:required` from `sms_opt_in` and the `required` attribute from the checkbox.
+
+<Note>
+An entry is stored data only. Saving it doesn't add the number to any text message list and doesn't send a text to anyone.
+</Note>
+
+## How the form behaves
+
+ElasticFunnels' page script sends every form whose `action` starts with `/api/` and shows the result, without reloading the page.
+
+- **Errors.** Server errors ("phone is required", "Your session has expired") appear in the element with `data-form-error-message`. Without one, a red box appears above the submit button.
+- **Success.** The element with `data-form-success-message` shows "Thank you for submitting the form." and the form is cleared. Saving the page resets the `data-success-message` attribute, so for your own wording use the `on-form-success` event as in the example.
+- **Redirect.** Add `data-redirect-url="/thank-you"` to the `<form>` to send the visitor to another page after a successful entry.
+- **Checks.** Required fields, email fields and number fields are checked on the server. Text fields are also screened for random-looking spam text. If the collection has reCAPTCHA v3 turned on, put `<div data-recaptcha-v3="true" data-site-key="YOUR_SITE_KEY"></div>` inside the form.
+- **Session.** The form only works on pages served by ElasticFunnels. It sends a security token from the page, so a copy of the form on another site is rejected.
+
+## Where entries show up
+
+- **Collections.** Go to **Pages** → **Advanced** → **Collections** and open the collection to see each entry with its fields.
+- **CRM.** Every collection has a matching CRM entity, and each entry is also a record there.
+- **CLI.** `ef collections entries <code>` lists the stored entries.
+- **Export.** Download entries as CSV, see [Export form data](/forms/export-data).
+
+## How an entry links to a visitor
+
+Each entry stores the visitor's session id and IP address with the fields. The submission also counts as a form-submit event for that visit in your analytics.
+
+An entry doesn't create or update a customer, and a phone number in it isn't matched to an existing customer. If the form has an email field, the form-submit event also carries a hashed copy of that email. The entry itself stays a collection record.
