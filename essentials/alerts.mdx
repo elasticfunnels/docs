@@ -2,12 +2,31 @@
 title: "Alerts"
 sidebarTitle: "Alerts"
 icon: "triangle-exclamation"
-description: "Problems on your brand that keep happening: how often, how serious, who gets emailed, and how to acknowledge or resolve them"
+description: "Problems on your brand and how to fix them: the bell, fixes you can apply or decline, how often each problem happens, who gets emailed, and how to acknowledge or resolve it"
 ---
 
 Alerts collect the problems on a brand that cost sales or data, such as a merchant postback that is not set up or a checkout that keeps failing. Each problem is one issue that counts every time it happens again, so you see one line with a count instead of a pile of repeated notifications.
 
-Open them from **Settings > Alerts**.
+Suggested fixes are part of the same list. When ElasticFunnels can fix a problem for you (create a missing product, set up order emails), the alert carries that fix, and applying or declining it closes the alert.
+
+Open alerts from the bell (the star at the top right of every screen) or from **Settings > Alerts**.
+
+## The bell
+
+The bell's badge counts the brand's open alerts. Click it to see them, most serious first, one row per problem: twelve buy links asking for the same missing product code are one row that says "12 times".
+
+<img src="/images/alerts/alerts-bell.png" alt="The alerts bell in the top bar: open alerts with severity, count and the fix buttons Review, Decline and Decline all like this" />
+
+- **All / Critical / Escalating** filter the list by severity.
+- When an alert carries a fix, its buttons sit on the row:
+  - **Review** opens the fix so you can check it and apply it;
+  - **Decline** turns the fix down and closes the alert;
+  - **Decline all like this** declines every fix of the same kind on the brand.
+- Click an alert's title to open its details.
+- **View all alerts** opens **Settings > Alerts**.
+
+When there are critical alerts, a red bar at the top of the screen says how many; click it to open the bell on the Critical filter.
+
 
 <img src="/images/alerts/alerts-list.png" alt="The Alerts page: open issues with severity, how many times each happened, when it was last seen and the last event" />
 
@@ -27,6 +46,14 @@ Click an issue to see the full details, a button that takes you to the screen wh
 
 <img src="/images/alerts/alerts-detail.png" alt="One alert issue: what it means, its count, first and last seen, the last event, and the Acknowledge and Resolve buttons" />
 
+## Fixes
+
+An alert with a fix shows **Fix ready** in the list and a **Fix** panel on its detail page. **Review** opens the fix so you can check every change before you apply it. Applying it, or declining it, closes the alert and is recorded in **History**. If several fixes are waiting on one alert (twelve buy links for the same missing code, for example), the alert closes when the last one is applied or declined.
+
+<img src="/images/alerts/alerts-fix.png" alt="An alert with a fix: the Fix panel with Review, Decline and Decline all like this" />
+
+An alert with a waiting fix has no **Resolve** button and does not close on its own when it goes quiet: apply or decline the fix to close it.
+
 ## Alert types
 
 | Type | When it opens |
@@ -34,11 +61,13 @@ Click an issue to see the full details, a button that takes you to the screen wh
 | Shoppers add to cart but no sales come in | Shoppers add to cart or open the checkout and no purchase is recorded. See below. |
 | Merchant postbacks are being rejected | A merchant sends sales and ElasticFunnels rejects them because a setting is missing. |
 | Checkout is failing for shoppers | Checkout submissions fail and the failures are growing, or the payment processor refuses them. |
-| Sales arrive for a product code you do not have | A merchant sends a sale for a product code that is not in your products. |
+| Sales arrive for a product code you do not have | A merchant sends a sale for a product code that is not in your products. Its fix creates the product, or links the code to one you already have. |
+| A buy link asks for a product code you do not have | Someone opens a buy link on your page with a product code that is not in your products, so the click cannot reach checkout. Create the product, or correct the code in the link. Codes that look like attacks (SQL fragments, long random strings) come from bots: decline them. |
 | Postbacks arrive for a different merchant account | A postback names an account that does not match your merchant. |
 | An integration keeps failing / has gone quiet | An integration fails most of its attempts, or stops doing anything for days. |
 | An ad account lost access | ElasticFunnels can no longer read the ad account, so spend stops importing. |
 | The tax provider keeps failing | Tax calculation keeps failing at checkout for a merchant. |
+| Suggestion | Any other recommended change for the brand, named after the change itself (for example "Set up your order emails"). Suggestions never email you; their severity comes from how urgent the change is. |
 
 ### Shoppers add to cart but no sales come in
 
@@ -59,6 +88,8 @@ Every issue starts as a **Warning**. It becomes:
 - **Critical** after 50 occurrences or 72 hours.
 
 Problems that lose sales directly (no sales on carts, rejected postbacks, failing checkouts) become Critical after 6 hours.
+
+Time only counts while the problem keeps happening. An alert that has gone quiet but is still open because its fix is waiting keeps its severity: it does not climb to Critical, or email you, just because days pass.
 
 ## Emails
 
@@ -90,5 +121,5 @@ Every acknowledge and resolve is recorded in **History** with who did it and whe
 
 ## Related
 
-- [Brand actions and alerts](/essentials/brand-actions) for suggestions you can preview and apply.
+- [Brand actions and alerts](/essentials/brand-actions) for the kinds of fixes ElasticFunnels suggests and how their preview works.
 - [Postback URLs](/merchants/postback-urls) for setting up a merchant postback.

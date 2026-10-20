@@ -1,0 +1,42 @@
+{
+  "out": "images/alerts/alerts-fix.png",
+  "alt": "An alert with a fix: the Fix panel with Review, Decline and Decline all like this",
+  "capture": {
+    "path": "/{brand}/alerts/9202",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='alerts.detail.fix-panel']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/alerts/stats",
+        "file": "tools/shots/fixtures/alerts/bell-stats.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/alerts/9202",
+        "file": "tools/shots/fixtures/alerts/detail-fix.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/alerts(\\?|$)",
+        "file": "tools/shots/fixtures/alerts/bell-list.json"
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 120,
+      "width": 1183,
+      "height": 520
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='alerts.detail.fix-panel']",
+      "title": "Fix",
+      "text": "Review applies it, Decline closes the alert. Decline all like this declines every fix of the same kind.",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}
