@@ -1,5 +1,6 @@
 ---
 title: 'Package selector'
+icon: "table-cells-large"
 description: 'Let buyers pick a quantity or bundle (1x, 2x, 4x) on the checkout page itself. The product, totals, bonuses, tax and payment amounts switch in place, with no reload.'
 ---
 
@@ -143,6 +144,12 @@ setVariable("checkout_packages", ["WRAP-1", "WRAP-2", "WRAP-4"]); // what the ro
 ```
 
 With `checkout_packages` set, a posted code from that list is charged, `?p=` naming one of them is rendered on reload, and any other posted code still falls back to `checkout_product`. See [How to design a checkout page](/guides/how-to-design-a-checkout-page).
+
+---
+
+## Packs with a color or size
+
+When each pack has variants (an insole in 5 colors and 11 sizes, sold as 1, 2, 3 or 5 pairs), give every option the **variant code** of that pack in the buyer's color and size, so a switch changes the pack and keeps the choice. Build the rows in a backend script from the variant in `?p=`; the full example is in [Product Variants](/products/variants#checkout-pack-selector-that-keeps-the-color-and-size).
 
 ---
 

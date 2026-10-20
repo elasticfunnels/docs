@@ -27,6 +27,16 @@ following stale rules. In the same piece of work, check and update:
 
 If nothing there needed changing, say so in the commit message ("agent rules checked, no change").
 
+# Docs, Academy, blog and the app: who says what
+
+- **Docs are the reference:** step by step, field by field, with real screenshots. They are the single
+  source of truth for setup.
+- **Academy** is the video walk-through of the same flow. It links to the docs page and never restates
+  field details differently.
+- **Blog** is the why and the SEO piece. It links to the docs for the how.
+- **The app links only to docs**, never to the blog or the Academy.
+- Each docs page links to its Academy video when one exists (check the link answers 200 before adding it).
+
 # Writing rules
 
 - Follow `~/.claude/copy-rules.md` (no em dashes, no invented experience).

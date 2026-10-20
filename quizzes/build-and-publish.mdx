@@ -1,0 +1,67 @@
+---
+title: 'Build and Publish a Quiz'
+sidebarTitle: "Build and publish"
+icon: "hammer"
+description: 'Create a quiz from scratch or a template, save drafts, and fix the checks that run when you publish.'
+---
+
+Quizzes are interactive funnels: a visitor answers questions screen by screen and ends on an outcome, a lead form or a checkout. You build them in the quiz builder, a canvas of screens and blocks with a flow view that connects the screens.
+
+<Note>
+Quizzes are in beta.
+</Note>
+
+## Create a quiz
+{/* SCREENSHOT: Quizzes list · Templates picker · desktop */}
+
+Open **Quizzes** and create a new quiz. You can start blank, or pick one of the niche templates under **Templates** ("Pick a quiz template", then **Use this template**). A template comes with its questions, proof screens, summary, lead capture and pricing already wired, and you can change anything in the builder.
+
+Every new quiz, blank or from a template, starts as a **draft**. Its page stays offline until you publish the quiz for the first time, so nobody can reach a half-built quiz. The builder shows a **Not published** pill until then.
+
+## Save your work
+{/* SCREENSHOT: Quiz builder toolbar · Save draft, Draft pill, Publish · desktop */}
+
+Click **Save draft** in the builder toolbar, or press **Ctrl+S** (Windows) or **Cmd+S** (Mac). A draft is private: visitors keep seeing the published version until you click **Publish**.
+
+When the quiz has unpublished changes, the toolbar shows a **Draft** pill. Click it to throw the draft away and go back to the live version.
+
+## Connect screens in the flow
+{/* SCREENSHOT: Flow view · edge selected · condition panel open · desktop */}
+
+The flow view shows each screen and the connections (edges) between them. Click an edge to open its condition panel, where you set when the visitor takes that path (for example, an answer equals a value, or the score is at least a number). Every comparison the panel offers publishes, including `>`, `>=`, `<` and `<=`.
+
+### Multiple-choice screens need a Continue button
+
+A single-choice question moves the visitor on as soon as they pick an answer. A question with **Allow multiple choice** turned on does not: the visitor picks several answers, then needs a button to go on. Every multiple-choice screen therefore needs a button (for example **Continue**) connected to the next screen. The quiz templates already have one on every multiple-choice screen.
+
+## Publish checks
+{/* SCREENSHOT: Publish refused · error list · desktop */}
+
+When you click **Publish**, the builder checks the quiz and refuses to publish while any of these is true. Fix the screen or block named in the message and publish again.
+
+| Message | What to do |
+|---------|-----------|
+| *Screen '...' has no exit: multi-select choices do not move the visitor on by themselves. Add a Continue button and connect it to the next screen.* | Add a button on that multiple-choice screen and connect it to the next screen in the flow. |
+| *Screen '...' has no exit: connect a button, a single-choice option, a loader or a timer on it to the next screen.* | Give the screen a way forward: a button, a single-choice option, a loader or a timer connected to another screen. The last screen of the quiz is not checked. |
+| *Question has no answer options.* | Add at least one answer option to the question, or delete the block. |
+| *Answer option N has no label.* | Give that option a label or an image. |
+| *Score range needs an outcome screen.* / *Score range min (...) must be less than or equal to max (...).* / *Score range ...-... overlaps range ...-...; a score in both always gets the first outcome.* | Fix the score ranges in the outcome settings: each range needs an outcome screen, a numeric min and max, and no overlap with another range. |
+
+### Score ranges apply only to score-based outcomes
+
+Score ranges are used, and checked, only when the quiz's **Outcome strategy** is **Score based**. With any other strategy the ranges are ignored, so leftover or overlapping rows do not stop you from publishing.
+
+## Template example values
+{/* SCREENSHOT: Canvas block with Example values badge · desktop */}
+
+Some template screens show example numbers in a personalized summary (for example an estimated result or a percentage). Your quiz does not compute those numbers, so the builder marks those blocks:
+
+- In the builder, the block carries an **Example values** badge ("Template numbers this quiz does not compute. Edit them or delete the block.").
+- When you publish, you get a **Published with example values** warning that says how many blocks still show them. The quiz still publishes.
+- On the live quiz, visitors never see these blocks. In a preview you see a note in their place instead.
+
+To clear the mark, edit the block's content (replace the numbers with your own, for example a variable this quiz computes such as `[[score.total]]`, or reword it) and save. The badge and the warning go away and the block shows on the live quiz. Or delete the block.
+
+## Related
+
+- [Quiz blocks and answers](/quizzes/blocks-and-answers): loader timing, height and weight, variables and validation.

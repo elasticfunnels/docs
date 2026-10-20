@@ -1,5 +1,7 @@
 ---
 title: "Split Test Analytics"
+sidebarTitle: "Split test results"
+icon: "chart-simple"
 description: "Understand split testing metrics, statistical significance, and how to interpret your A/B test results"
 ---
 
@@ -105,6 +107,16 @@ Your split test results are reliable when you have:
 **Clear Loser**:
 - Statistically significant negative results
 - **Action**: Stop the test, keep your original version
+
+### Component and inline tests
+
+Every kind of test opens the same report: page and funnel tests, [component split tests](/funnels/split-testing) and inline split tests. The cards, the traffic flow, the variant table and the significance figures read the same way for all of them. Old links to a component test's report open this one.
+
+A few numbers are counted differently for component and inline tests, and the report says so under its header:
+
+- **Sessions** counts each time a variant was shown, since these tests are tagged where the variant renders, not when a visitor lands.
+- **Net EPC** equals **Gross EPC**, because refunds are not split by variant.
+- **Goals** is one total for the test, not one column per named goal.
 
 ## Advanced Features
 {/* SCREENSHOT: Advanced Features · report chart, filters, or metric card · desktop */}

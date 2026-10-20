@@ -1,5 +1,7 @@
 ---
 title: 'JVZoo Integration'
+sidebarTitle: "JVZoo"
+icon: "store"
 description: 'Receive JVZoo affiliate postbacks and vendor IPNs to record sales, refunds, and chargebacks in ElasticFunnels.'
 ---
 
@@ -9,7 +11,7 @@ description: 'Receive JVZoo affiliate postbacks and vendor IPNs to record sales,
 JVZoo has two postback flows. ElasticFunnels supports both, as separate integrations:
 
 - **JVZoo Affiliate S2S** — Set up when you promote JVZoo offers as an affiliate. ElasticFunnels receives a postback for each commission so the affiliate sale is attributed back to the original ElasticFunnels click.
-- **JVZoo Vendor IPN** — Set up when you sell **your own** offers through JVZoo checkout. ElasticFunnels receives the JVZoo Instant Payment Notification for every sale, rebill, refund, chargeback, and cancellation, and verifies it with your JVZoo `cverify` secret.
+- **JVZoo Vendor IPN**: a simple receiver for JVZoo notifications on **your own** offers. For full order matching, connect JVZoo as a [merchant](/merchants/jvzoo) instead. ElasticFunnels receives the JVZoo Instant Payment Notification for every sale, rebill, refund, chargeback, and cancellation, and verifies it with your JVZoo `cverify` secret.
 
 You can run both integrations side by side if you both vend on JVZoo and run affiliate traffic.
 
@@ -53,6 +55,10 @@ You can run both integrations side by side if you both vend on JVZoo and run aff
 ## JVZoo Vendor IPN
 {/* SCREENSHOT: JVZoo Vendor IPN · integration settings · desktop */}
 
+<Tip>
+**Selling your own product on JVZoo? Use the JVZoo merchant's postback URL instead.** Under **Settings** → **Merchants**, the JVZoo merchant gives you a JVZIPN URL (`/postback/vendor/<code>/jvzoo`) that matches each order to your products, links refunds and chargebacks to the original sale and records the affiliate. This integration is a simpler receiver that stores the product name only. See [JVZoo merchant setup](/merchants/jvzoo).
+</Tip>
+
 ### How it works
 
 JVZoo posts a `JVZIPN` payload to your IPN URL on every transaction event for products you vend. ElasticFunnels:
@@ -71,13 +77,13 @@ JVZoo posts a `JVZIPN` payload to your IPN URL on every transaction event for pr
 
 <Steps>
   <Step title="Get your JVZoo secret key">
-    In your JVZoo vendor account: **My Account** → **Seller Settings** → **Postbacks**. Copy the **Secret Key**.
+    In your JVZoo account, open **My Account** and find the **JVZIPN Secret Key** field. You choose the key there; copy it. (Third-party JVZIPN guides place it there; the exact JVZoo menu may differ.)
   </Step>
   <Step title="Activate the integration">
     Go to **Integrations** → **Affiliate Networks** → **JVZoo Vendor IPN**. Paste the secret key and save.
   </Step>
   <Step title="Configure the IPN URL in JVZoo">
-    Copy the **IPN URL** from the form and paste it into the JVZoo product's **Notify URL** field. Save the JVZoo product.
+    Copy the **IPN URL** from the form and paste it into the JVZoo product's **JVZIPN URL** field (in the product editor, under **External Program Integration**). Save the JVZoo product.
   </Step>
   <Step title="Use tracking IDs from EF">
     Build your buy links with `[BUY=...]` tags rather than hardcoding them. ElasticFunnels then passes the click code automatically as `vtid`, the vendor tracking parameter, and reads it back from the IPN to attribute the order. Hardcoded links carry no click code, so their sales arrive unattributed. See [JVZoo merchant setup](/merchants/jvzoo) for buy links, the funnel ID, and the sales pixel.

@@ -1,0 +1,69 @@
+{
+  "out": "images/template-kits/images.png",
+  "alt": "The Images section of the kit: Generate all, Your pictures with a product photo added, and the image slots with their prompt, where each is used, Copy prompt and Create more like this",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"images\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 288, y 100, 736 x 700",
+  "image": "tools/shots/source/kits-images.png",
+  "imageSize": {
+    "w": 736,
+    "h": 700
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        602,
+        14,
+        116,
+        31
+      ],
+      "title": "Generate all",
+      "text": "Make many images in one go",
+      "side": "right"
+    },
+    {
+      "box": [
+        2,
+        83,
+        730,
+        150
+      ],
+      "title": "Your pictures",
+      "text": "Product photo, logo, packaging",
+      "side": "left"
+    },
+    {
+      "box": [
+        19,
+        246,
+        62,
+        62
+      ],
+      "title": "Image slot",
+      "text": "The kit image and where it is used",
+      "side": "left"
+    },
+    {
+      "box": [
+        203,
+        361,
+        93,
+        18
+      ],
+      "title": "Copy prompt",
+      "text": "Use it in another tool",
+      "side": "left"
+    },
+    {
+      "box": [
+        559,
+        357,
+        159,
+        26
+      ],
+      "title": "Create more like this",
+      "text": "One image from this prompt",
+      "side": "right"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 ---
 title: 'Email Marketing & Validation Integrations'
+sidebarTitle: "Email marketing"
+icon: "envelope-open-text"
 description: 'Sync contacts, send transactional email, and validate addresses through external email platforms.'
 ---
 
@@ -35,7 +37,7 @@ ElasticFunnels ships its own email engine for broadcasts and automations, but yo
 | **Kit (ConvertKit)** | API key (v4) | Create / update subscriber, manage tags, enroll in form / sequence |
 | **AWeber** | OAuth 2.0 | Create / update contact (dynamic list selection), manage tags |
 | **Brevo** (Sendinblue) | API key | Create / update contact, check existence, manage tags, SMS. The same key also sends order emails and campaigns |
-| **Maropost** | API key + account | Send transactional via `emails/deliver.json`, sync contacts |
+| **Maropost** | API key + account | Create / update contact, subscribe to lists, tags and custom fields, transactional send. See [Maropost](/integrations/maropost) |
 
 <Tip>
 **Pick where the source of truth lives.** If Klaviyo or ActiveCampaign already runs your email program, sync EF data into them. If you want to retire your ESP and run broadcasts from EF, use the built-in **Emails** module instead.
@@ -55,7 +57,7 @@ These providers send one-off emails — order receipts, dunning notices, passwor
 | **SendGrid** | REST API v3 | Sender identity, stats, bounces, suppression management |
 | **Mailgun** | REST API v3 | Sender, mailing lists, bounce / complaint tracking, opens & clicks |
 | **Generic SMTP** (labelled "Mailrelay") | Any SMTP relay | Host, port, username, password — works with Gmail, Outlook, Postmark, Amazon SES, etc. |
-| **Maropost** | Marketing Cloud REST API | Transactional sends via campaign ID |
+| **Maropost** | Marketing Cloud REST API | Transactional campaign, subject, sender and reply-to per send |
 
 Setup for Amazon SES, Postmark, Brevo and Resend is on [Email Sending Accounts](/emails/sending-accounts),
 and their opens, clicks and bounces on [Delivery events](/emails/delivery-events).

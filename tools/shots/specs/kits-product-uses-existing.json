@@ -1,0 +1,36 @@
+{
+  "out": "images/template-kits/product-uses-existing.png",
+  "alt": "A product row set to Use an existing product, showing which of the project's products it uses and a Change link",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"product-uses-existing\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 286, y 1040, 740 x 87",
+  "image": "tools/shots/source/kits-product-uses-existing.png",
+  "imageSize": {
+    "w": 740,
+    "h": 87
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        104,
+        48,
+        153,
+        22
+      ],
+      "title": "Use an existing product",
+      "text": "Nothing new is created",
+      "side": "left"
+    },
+    {
+      "box": [
+        504,
+        50,
+        45,
+        18
+      ],
+      "title": "Change",
+      "text": "Pick another product",
+      "side": "right"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "out": "images/merchants/explodely-global-ipn.png",
+  "alt": "Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Try IPN Builder and Update",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
+  "image": "tools/shots/source/merchants-explodely-global-ipn.png",
+  "imageSize": {
+    "w": 860,
+    "h": 640
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        207,
+        178,
+        617,
+        45
+      ],
+      "title": "Global IPN",
+      "text": "Expand it under Developers",
+      "side": "left"
+    },
+    {
+      "box": [
+        228,
+        333,
+        278,
+        57
+      ],
+      "title": "IPN URL",
+      "text": "Paste the ElasticFunnels URL",
+      "side": "left"
+    },
+    {
+      "box": [
+        228,
+        425,
+        278,
+        57
+      ],
+      "title": "IPN Type",
+      "text": "Set to POST",
+      "side": "left"
+    },
+    {
+      "box": [
+        526,
+        333,
+        278,
+        57
+      ],
+      "title": "Send IPN",
+      "text": "Set to Yes",
+      "side": "right"
+    },
+    {
+      "box": [
+        683,
+        244,
+        120,
+        32
+      ],
+      "title": "Try IPN Builder",
+      "text": "Sends a sample IPN",
+      "side": "right"
+    },
+    {
+      "box": [
+        731,
+        511,
+        69,
+        32
+      ],
+      "title": "Update",
+      "text": "Saves the IPN settings",
+      "side": "right"
+    }
+  ]
+}

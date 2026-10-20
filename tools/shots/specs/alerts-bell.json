@@ -1,0 +1,62 @@
+{
+  "out": "images/alerts/alerts-bell.png",
+  "alt": "The alerts bell in the top bar: open alerts with severity, count and the fix buttons Review, Decline and Decline all like this",
+  "capture": {
+    "path": "/{brand}/alerts",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='settings.alerts.list']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/alerts/stats",
+        "file": "tools/shots/fixtures/alerts/bell-stats.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/alerts/9202",
+        "file": "tools/shots/fixtures/alerts/detail-fix.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/alerts(\\?|$)",
+        "file": "tools/shots/fixtures/alerts/bell-list.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='brand-actions.open'] >> visible=true"
+      },
+      {
+        "wait": 1200
+      }
+    ],
+    "crop": {
+      "x": 960,
+      "y": 10,
+      "width": 420,
+      "height": 620
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='alerts.bell.tab.all']",
+      "title": "Severity",
+      "text": "All, Critical or Escalating",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='alerts.bell.row'][data-row-id='9202'] [data-testid='brand-actions.row']",
+      "title": "The fix",
+      "text": "Review applies it, Decline closes the alert",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='alerts.bell.view-all']",
+      "title": "View all alerts",
+      "text": "Opens Settings > Alerts",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

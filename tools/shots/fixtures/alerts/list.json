@@ -1,0 +1,108 @@
+{
+ "data": [
+  {
+   "brand_id": 0,
+   "brand_name": null,
+   "status": "open",
+   "acknowledged_at": null,
+   "acknowledged_by": null,
+   "resolved_at": null,
+   "resolved_by": null,
+   "resolve_reason": null,
+   "brand_action_id": null,
+   "id": 9101,
+   "type": "carts_no_sales",
+   "fingerprint": "brand",
+   "severity": "critical",
+   "title": "Shoppers are adding to cart but no sales are coming in",
+   "occurrence_count": 26,
+   "first_seen_at": "2026-10-20T05:37:06.584Z",
+   "last_seen_at": "2026-10-20T12:03:06.584Z",
+   "last_event": {
+    "message": "158 add to carts or checkout starts in the last 6 hours and 0 sales. Your last 14 days predict about 9 sales in that time. Merchant \"JVZoo main\" is still in Needs Setup: no postback has reached ElasticFunnels yet, so its sales cannot be recorded.",
+    "link": null,
+    "kind": "merchant_not_set_up:227",
+    "payload": {
+     "carts": 158,
+     "purchases": 0
+    },
+    "at": "2026-10-20T12:03:06.584Z"
+   },
+   "kinds": [
+    "merchant_not_set_up:227"
+   ],
+   "link": null,
+   "last_emailed_at": "2026-10-20T11:37:06.584Z",
+   "emails_sent": 2
+  },
+  {
+   "brand_id": 0,
+   "brand_name": null,
+   "status": "open",
+   "acknowledged_at": null,
+   "acknowledged_by": null,
+   "resolved_at": null,
+   "resolved_by": null,
+   "resolve_reason": null,
+   "brand_action_id": null,
+   "id": 9102,
+   "type": "missing_product",
+   "fingerprint": "227:SLEEP-6",
+   "severity": "escalating",
+   "title": "A sale arrived for a product code that is not in your catalog",
+   "occurrence_count": 12,
+   "first_seen_at": "2026-10-19T06:07:06.584Z",
+   "last_seen_at": "2026-10-20T10:32:06.584Z",
+   "last_event": {
+    "message": "JVZoo sent a sale for product code SLEEP-6, which no product in this brand uses.",
+    "link": null,
+    "kind": "missing_product",
+    "payload": {},
+    "at": "2026-10-20T10:32:06.584Z"
+   },
+   "kinds": [
+    "missing_product"
+   ],
+   "link": null,
+   "last_emailed_at": "2026-10-19T16:07:06.584Z",
+   "emails_sent": 1
+  },
+  {
+   "brand_id": 0,
+   "brand_name": null,
+   "status": "open",
+   "acknowledged_at": null,
+   "acknowledged_by": null,
+   "resolved_at": null,
+   "resolved_by": null,
+   "resolve_reason": null,
+   "brand_action_id": null,
+   "id": 9103,
+   "type": "tax_provider_failing",
+   "fingerprint": "merchant:41",
+   "severity": "warning",
+   "title": "Tax could not be calculated at checkout",
+   "occurrence_count": 3,
+   "first_seen_at": "2026-10-20T07:07:06.584Z",
+   "last_seen_at": "2026-10-20T10:07:06.584Z",
+   "last_event": {
+    "message": "The tax provider timed out for 3 checkouts; they were charged without tax.",
+    "link": null,
+    "kind": "timeout",
+    "payload": {},
+    "at": "2026-10-20T10:07:06.584Z"
+   },
+   "kinds": [
+    "timeout"
+   ],
+   "link": null,
+   "last_emailed_at": null,
+   "emails_sent": 0
+  }
+ ],
+ "total": 3,
+ "per_page": 25,
+ "current_page": 1,
+ "last_page": 1,
+ "next_page_url": null
+}

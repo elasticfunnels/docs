@@ -1,0 +1,65 @@
+{
+  "out": "images/merchants/explodely-ef-setup-ipn.png",
+  "alt": "The Seller IPN step of Postback Setup for Explodely: the complete IPN URL with Copy and the steps in Explodely",
+  "_source": "ElasticFunnels app (feat/explodely-one-copy), Postback Setup on a fictional Explodely merchant of the demo brand; the merchant list and the revealed URL are fixtures (postback code nwdemoexp01, secret DemoSecretForScreenshotsOnly..., neither real). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs explodely-ef-setup",
+  "capture": {
+    "path": "/{brand}/merchants",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-row-id=\"9101\"]",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/merchants/9101/postback-secret/reveal",
+        "method": "POST",
+        "file": "tools/shots/fixtures/explodely-one-copy/reveal.json"
+      },
+      {
+        "url": "/api/brands/\\d+/merchants/\\d+/wait-for-test",
+        "file": "tools/shots/fixtures/explodely-one-copy/not-verified.json"
+      },
+      {
+        "url": "/api/brands/\\d+/merchants(\\?|$)",
+        "file": "tools/shots/fixtures/explodely-one-copy/merchants-list.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-row-id=\"9101\"] [data-testid=\"merchants.list.postback-setup\"]"
+      },
+      {
+        "waitFor": "[data-testid=\"merchants.postback-setup.url\"][data-ready=\"true\"]"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-testid=\"merchants.postback-setup.next\"]"
+      },
+      {
+        "waitFor": "[data-testid=\"merchants.postback-setup.explodely-ipn.url\"]"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"merchants.postback-setup.explodely-ipn.url\"]",
+      "title": "IPN URL",
+      "text": "Paste into Global IPN",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid=\"merchants.postback-setup.explodely-ipn.copy\"]",
+      "title": "Copy",
+      "text": "Copies the whole URL",
+      "side": "right"
+    }
+  ]
+}

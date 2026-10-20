@@ -1,5 +1,7 @@
 ---
 title: "How to set up a new merchant"
+sidebarTitle: "Set up a merchant"
+icon: "circle-plus"
 description: "Create a merchant, assign it to a domain, map product IDs, and connect funnels"
 ---
 
@@ -8,6 +10,22 @@ This guide walks you through publishing an offer with a new merchant end-to-end.
 <Warning>
 A domain can have only one merchant assigned at a time. Changing a domain's merchant affects all auto-generated buy links on that domain.
 </Warning>
+
+## Guided setup for JVZoo, ClickBank, Digistore24, BuyGoods and Explodely
+
+When you create one of these merchants, ElasticFunnels opens a guided setup instead of the merchant's settings. It has five steps, listed on the left:
+
+1. **Merchant**: created from the **Create Merchant** dialog
+2. **Account details**: the account ID and secret the merchant needs. The text under each field says where it is in that platform's account, and the **Setup guide** button opens its docs page.
+3. **Products**: each product's ID in that platform, so postbacks land on the right product. A product left empty is matched by its own **Code**.
+4. **Postback URL**: your URL with **Copy**, and the steps to paste it in that platform
+5. **Live test**: the page waits for the first postback and shows **Postback received** when it arrives. **Skip, I'll test later** ends the setup; the merchant then shows **Needs Setup** until its first postback arrives.
+
+<img src="/images/merchants/merchant-wizard-account-details.png" alt="The guided setup of a new JVZoo merchant on Account details: the five numbered steps on the left with Merchant done, and the JVZoo Funnel ID field with where to find it" />
+
+Each step is saved when you continue. If you leave, the merchant shows **Setup in progress** in the list: click **Continue setup** on its row, or open the merchant, and the setup resumes at the first step not done yet. **Open full editor** in the setup leads to the merchant's full settings at any time.
+
+Other gateways open the merchant's settings directly, as in Step 1 below.
 
 ## Step 1: Create the merchant
 {/* SCREENSHOT: Step 1: Create the merchant · relevant screen or example output · desktop */}
@@ -86,7 +104,7 @@ Hardcoded external checkout URLs (e.g., pasted Buygoods/ClickBank links) will no
 
 ### Postback setup and validation
 
-Use the **Setup** modal from the **Merchants** list for gateway-specific postback instructions and your unique URL. After you configure the postback in the merchant platform (Buygoods, ClickBank, Digistore24) and trigger a test event, the modal automatically updates to show validation status when the webhook is received.
+Click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for that merchant, then **Test**. After you configure the postback in the merchant platform (BuyGoods, ClickBank, Digistore24, JVZoo, Explodely) and trigger a test event, keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
 
 Recommended ways to trigger validation:
 

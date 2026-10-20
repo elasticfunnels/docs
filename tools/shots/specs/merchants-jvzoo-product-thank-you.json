@@ -1,0 +1,44 @@
+{
+  "out": "images/merchants/jvzoo-product-thank-you.png",
+  "alt": "JVZoo product Product Access tab with Thank You / Download Page on and its URL field",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-product-thank-you.png",
+  "imageSize": {
+    "w": 1348,
+    "h": 380
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        52,
+        200,
+        248,
+        32
+      ],
+      "title": "Thank You page",
+      "text": "Turn this on"
+    },
+    {
+      "box": [
+        99,
+        234,
+        1212,
+        46
+      ],
+      "title": "Page URL",
+      "text": "Your thank-you page"
+    },
+    {
+      "box": [
+        99,
+        288,
+        300,
+        30
+      ],
+      "title": "Send to Thank You",
+      "text": "Skips JVZoo's page"
+    }
+  ]
+}

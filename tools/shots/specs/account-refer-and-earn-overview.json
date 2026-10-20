@@ -1,0 +1,27 @@
+{
+  "out": "images/account/refer-and-earn-overview.png",
+  "alt": "The Your referrals card in Refer and Earn: signups with how many were active this month, on trial with how many have a card on file, expected to pay, paying, and the expected monthly commission",
+  "capture": {
+    "path": "/{brand}/dashboard",
+    "viewport": { "width": 1440, "height": 1100 },
+    "fixtures": [
+      { "url": "^/api/user/affiliate/summary", "file": "tools/shots/fixtures/refer-and-earn/summary.json" },
+      { "url": "^/api/user/referral-usages", "file": "tools/shots/fixtures/refer-and-earn/usages.json" }
+    ],
+    "actions": [
+      { "click": "[data-testid='nav.pane.referrals']" },
+      { "waitFor": "[data-testid='affiliate.overview.pipeline']" },
+      { "wait": 600 }
+    ],
+    "crop": "[data-testid='affiliate.overview.pipeline']",
+    "cropPad": 12
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "[data-testid='affiliate.overview.pipeline.signups']", "title": "Signups", "text": "Everyone who signed up with your code", "side": "left" },
+    { "selector": "[data-testid='affiliate.overview.pipeline.expected']", "title": "Expected to pay", "text": "Trial ends soon, card on file" },
+    { "selector": "[data-testid='affiliate.overview.pipeline.paying']", "title": "Paying", "text": "On a paid plan and charged" },
+    { "selector": "[data-testid='affiliate.overview.pipeline.commission']", "title": "Expected commission", "text": "Monthly, once these customers pay", "side": "left" }
+  ]
+}

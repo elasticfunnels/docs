@@ -1,5 +1,7 @@
 ---
 title: 'Subscriptions Overview'
+sidebarTitle: "Overview"
+icon: "book-open"
 description: 'Manage recurring subscriptions, view billing history, and take admin actions from the CRM'
 ---
 
@@ -10,7 +12,7 @@ ElasticFunnels can bill recurring products on schedule. Use the subscription scr
 | Status | Meaning |
 |--------|---------|
 | **Active** | Subscription is being billed on schedule |
-| **Trial** | Customer is in a free trial period before their first charge |
+| **Trial** | Customer is in a free trial period before their first charge. Trial subscriptions are not charged automatically when the trial ends yet; see the note under [Setting Up Subscription Products](#setting-up-subscription-products) |
 | **Paused** | Billing is temporarily stopped; resumes later |
 | **Past Due** | A renewal charge failed; retries are in progress |
 | **Canceled** | Subscription has been terminated |
@@ -70,7 +72,7 @@ Action buttons appear at the bottom of the drawer:
 - **Skip Next Charge** — Move the next scheduled billing forward by one cycle without charging now
 - **Force Bill** — Trigger an immediate charge attempt
 - **Change Date** — Set a new next billing date (opens a date picker)
-- **Reactivate** — Restart a canceled or past-due subscription
+- **Reactivate** — Restart a canceled or past-due subscription. If its next billing date has already passed, the subscription is billed on the reactivation day and the next cycle follows one billing period later. Cycles missed while it was canceled are never charged.
 - **Edit Pricing** — Adjust the recurring charge amount, shipping, and discount for the subscription
 
 <Note>
@@ -90,6 +92,8 @@ The **Edit Pricing** action opens a modal where you can adjust:
 
 Changes take effect on the next billing cycle. The discount amount is calculated automatically based on the type and value.
 
+A new **Amount** you type here is treated as the price before tax: renewals add tax on top of it (see [Tax on renewals](#tax-on-renewals)). Saving the modal without changing the amount keeps how the subscription was taxed before.
+
 ### Bulk Actions
 
 On the **Subscriptions** list, select multiple rows with the checkboxes, then use the bulk action menu:
@@ -107,6 +111,16 @@ Subscription lifecycle events also appear in the main conversions list at **Repo
 - **Renewal Failed** — Failed renewal attempts
 
 Purchase conversions that are subscription renewals display a small purple **Recurring** badge. You can also use the **Subscription Only** checkbox filter to show only subscription-related conversions.
+
+## Rebills and Affiliates
+
+A rebill is credited to the affiliate who referred the original purchase, so it shows in that affiliate's reports. By default a rebill sends **no postback** to the affiliate and earns **no commission**. To pay an affiliate on renewals, open **Affiliates**, edit the affiliate and turn on **Send rebills: postbacks and commission**. From then on each successful renewal earns commission at that affiliate's rates and reaches their postbacks. First sales are not affected by this setting.
+
+Ad platforms (Meta Conversions API, Google Ads, TikTok and the other ad networks) never receive renewals, so a renewal is never reported to them as a new purchase.
+
+## Tax on Renewals
+
+Each renewal is taxed again when it is charged, with the merchant's current tax settings. The tax is calculated at the ship-to address stored with the subscription (the billing address when there is none), and the renewal charges the price before tax plus that tax. A retention discount applies to the price before tax, and an EU business customer whose first order was reverse-charged keeps the reverse charge. When the merchant's **Collect tax at checkout** switch is off, renewals charge no tax. Details: [Sales tax: subscription renewals](/integrations/tax#subscription-renewals).
 
 ## Automation Triggers
 
@@ -127,6 +141,10 @@ To make a product recurring:
 2. Open a product and enable **Is Subscription**
 3. Set the **Frequency** and **Frequency Unit** (e.g., every 1 month)
 4. Optionally configure a **Trial Period** (in days) and **First Charge Free**
+
+<Warning>
+A subscription that starts with a trial period stays in **Trial** status, and the renewal runner only charges **Active** subscriptions, so it is never billed when the trial ends. Until this is fixed, sell subscriptions without a trial period (an intro price or stepped pricing works instead).
+</Warning>
 
 #### Subscription tiers (optional)
 
@@ -190,18 +208,13 @@ The recurring coupon logic is enforced during billing. The subscription detail d
 
 ## Brand Subscription Settings
 
-Global subscription policies are configured under **Settings** → **Subscriptions**:
+**Settings** → **Subscriptions** holds the brand-wide subscription settings and the default email templates.
 
-| Setting | Description |
-|---------|-------------|
-| **Cancellation Policy** | Immediate, end of period, or admin only |
-| **Grace Period (days)** | Days after failed payment before cancellation |
-| **Max Billing Cycles** | Automatically cancel after N cycles (0 = unlimited) |
-| **Allow Pause** | Let customers pause their subscription |
-| **Allow Skip** | Let customers skip the next charge |
-| **Allow Swap Product** | Let customers switch to a different subscription product |
-| **Allow Change Date** | Let customers change their next billing date |
-| **Customer Self-Service** | Enable the customer-facing subscription management portal |
+<Warning>
+**Cancellation Policy** (Immediate, End of Period, Custom Grace Period) and **Maximum billing cycles** are saved on this page, but billing does not apply them yet. Every cancel takes effect right away, and a subscription keeps renewing past the cycle limit. To stop a subscription after a set number of charges, cancel it from the subscription drawer.
+</Warning>
+
+What buyers can do themselves (pause, skip, resume, cancel) depends on the members area template, not on a setting here. See [Members Area Subscription Management](/members-area/subscription-management).
 
 ### Default Email Templates
 

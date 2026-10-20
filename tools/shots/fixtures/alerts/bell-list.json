@@ -1,0 +1,124 @@
+{
+ "data": [
+  {
+   "brand_id": 0,
+   "brand_name": null,
+   "status": "open",
+   "kinds": [],
+   "link": null,
+   "acknowledged_at": null,
+   "acknowledged_by": null,
+   "resolved_at": null,
+   "resolved_by": null,
+   "resolve_reason": null,
+   "last_emailed_at": null,
+   "emails_sent": 0,
+   "brand_action_id": null,
+   "pending_fix_count": 0,
+   "fixes": [],
+   "id": 9201,
+   "type": "carts_no_sales",
+   "fingerprint": "brand",
+   "severity": "critical",
+   "title": "Shoppers are adding to cart but no sales are coming in",
+   "occurrence_count": 26,
+   "first_seen_at": "2026-10-20T02:30:00.000Z",
+   "last_seen_at": "2026-10-20T08:56:00.000Z",
+   "last_event": {
+    "message": "158 add to carts or checkout starts in the last 6 hours and 0 sales. Your last 14 days predict about 9 sales in that time.",
+    "at": "2026-10-20T08:56:00.000Z"
+   }
+  },
+  {
+   "brand_id": 0,
+   "brand_name": null,
+   "status": "open",
+   "kinds": [],
+   "link": "/{brand}/products",
+   "acknowledged_at": null,
+   "acknowledged_by": null,
+   "resolved_at": null,
+   "resolved_by": null,
+   "resolve_reason": null,
+   "last_emailed_at": null,
+   "emails_sent": 0,
+   "brand_action_id": null,
+   "pending_fix_count": 12,
+   "fixes": [
+    {
+     "id": 77001,
+     "brand_id": 0,
+     "title": "Create Missing Product",
+     "description": "Product \"SLEEP-6\" was requested but doesn't exist. Create it so the buy link reaches checkout.",
+     "category": "product_management",
+     "priority": "medium",
+     "status": "pending",
+     "source": "system",
+     "unique_identifier": null,
+     "metadata": {},
+     "created_at": "2026-10-20T07:30:00.000Z"
+    }
+   ],
+   "id": 9202,
+   "type": "missing_product",
+   "fingerprint": "buy_link:sleep-6",
+   "severity": "escalating",
+   "title": "A buy link asks for unknown product code SLEEP-6",
+   "occurrence_count": 12,
+   "first_seen_at": "2026-10-19T03:00:00.000Z",
+   "last_seen_at": "2026-10-20T07:25:00.000Z",
+   "last_event": {
+    "message": "A shopper opened a buy link for product code \"SLEEP-6\", which is not in your products, so the click could not reach checkout.",
+    "at": "2026-10-20T07:25:00.000Z"
+   }
+  },
+  {
+   "brand_id": 0,
+   "brand_name": null,
+   "status": "open",
+   "kinds": [],
+   "link": null,
+   "acknowledged_at": null,
+   "acknowledged_by": null,
+   "resolved_at": null,
+   "resolved_by": null,
+   "resolve_reason": null,
+   "last_emailed_at": null,
+   "emails_sent": 0,
+   "brand_action_id": null,
+   "pending_fix_count": 1,
+   "fixes": [
+    {
+     "id": 77002,
+     "brand_id": 0,
+     "title": "Set up your order emails",
+     "description": "No order confirmation template is active, so buyers get no receipt.",
+     "category": "email",
+     "priority": "medium",
+     "status": "pending",
+     "source": "system",
+     "unique_identifier": null,
+     "metadata": {},
+     "created_at": "2026-10-20T07:30:00.000Z"
+    }
+   ],
+   "id": 9203,
+   "type": "suggestion",
+   "fingerprint": "action:email_templates_missing_0",
+   "severity": "warning",
+   "title": "Set up your order emails",
+   "occurrence_count": 1,
+   "first_seen_at": "2026-10-19T07:00:00.000Z",
+   "last_seen_at": "2026-10-19T07:00:00.000Z",
+   "last_event": {
+    "message": "No order confirmation template is active, so buyers get no receipt.",
+    "at": "2026-10-19T07:00:00.000Z"
+   }
+  }
+ ],
+ "total": 3,
+ "per_page": 5,
+ "current_page": 1,
+ "last_page": 1,
+ "next_page_url": null
+}

@@ -91,7 +91,7 @@ The card fields use the public (tokenization) key of the brand's NMI merchant. I
 If the customer already has a vault on file, the new card is added as an additional billing record under the same vault. If no vault exists, a new one is created automatically.
 
 <Info>
-The vaulted card is stored as a reusable payment token on the customer record. It can be used later in Order Entry or subscription updates. Cards are shared across all brands in the same organization.
+The vaulted card is stored as a reusable payment token on the customer record. It can be used later in Order Entry. Cards are shared across all brands in the same organization.
 </Info>
 
 ## Managing Subscriptions
@@ -100,13 +100,15 @@ Agents can take action on a customer's subscriptions directly from the profile:
 
 | Action | When Available | What It Does |
 |--------|----------------|-------------|
-| **Cancel** | Any non-canceled subscription | Cancels with a reason select |
-| **Pause** | Active subscriptions | Pauses billing with optional resume date |
+| **Cancel** | Any non-canceled subscription | Asks for a reason and can show retention offers (discount, pause, downgrade) before canceling |
+| **Pause** | Active subscriptions | Pauses billing until an agent resumes it (no resume date) |
 | **Resume** | Paused subscriptions | Restarts billing |
-| **Skip Next Charge** | Active subscriptions | Skips one billing cycle and advances the next charge date |
+| **Skip** | Non-canceled subscriptions | Skips one billing cycle and advances the next charge date |
 | **Force Bill** | Non-canceled subscriptions | Triggers an immediate charge attempt |
-| **Update Payment** | Any active subscription | Updates the payment method on file |
+| **Change Date** | Non-canceled subscriptions | Sets a new next charge date |
 | **Edit Pricing** | Any non-canceled subscription | Opens the pricing editor modal |
+
+This screen has no action to change the card a subscription renews on.
 
 Subscription actions are executed against the brand that actually owns the customer's subscription, not just the first organization brand.
 

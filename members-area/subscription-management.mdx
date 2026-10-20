@@ -1,15 +1,22 @@
 ---
 title: 'Subscription Management Page'
+sidebarTitle: "Manage subscriptions"
+icon: "arrows-rotate"
 description: 'Build a members-area page where customers can see, change and cancel their subscriptions, and record why they left.'
 ---
 
-A subscription management page lists a customer's plans and lets them cancel one.
-This page is the only place a cancellation reason can come from, so it is worth
-building properly: without it your churn reporting can only ever say "Not
-specified".
+A subscription management page lists a customer's plans and lets them cancel,
+pause, skip or resume one. It is where most self-service cancellation reasons
+come from (agents add theirs from the Call Center cancel flow), so build the exit
+survey properly: a cancel sent without a reason shows as "Not specified" in your
+churn reporting.
 
-Enable **Manage** first in **Merchant settings → Customer care**. Without it the
-helpers below return nothing.
+The exit survey and retention offers (`cc.getManageData`, `cc.applyOffer`) need
+**Manage** switched on in **Merchant settings → Customer care**; without it they
+return nothing. The subscription template functions (`getSubscriptions`,
+`cancelSubscription`, `pauseSubscription`, `resumeSubscription`,
+`skipSubscription`) work without that toggle, for every subscription your brand
+bills.
 
 ## Listing subscriptions
 
@@ -104,10 +111,28 @@ cc.applyOffer({
 
 See [Retention Offers](/subscriptions/retention-offers) for configuring them.
 
+## Pause, skip and resume
+
+The built-in Manage page only cancels (or applies an offer). To let customers
+pause, skip a charge or resume, call the template functions from a page-based API
+in your members area. Each takes the subscription's `original_transaction_id` and
+checks that it belongs to the logged-in customer.
+
+| Function | What it does |
+| --- | --- |
+| `pauseSubscription(transactionId, resumeAt?)` | Pauses an active subscription. Pass an ISO date to resume it automatically. |
+| `skipSubscription(transactionId)` | Moves the next charge one cycle later without charging. Active subscriptions only. |
+| `resumeSubscription(transactionId)` | Restarts a paused subscription. A next charge date already in the past moves forward. |
+| `cancelSubscription(transactionId, reason?)` | Cancels right away, with the reason if you pass one. |
+
+Each change shows on the subscription's **Changes** tab in **Reports → Subscriptions**.
+See [Subscriptions in the template engine](/backend-template-engine/subscriptions)
+for full examples.
+
 ## Checking it worked
 
-Cancel a test subscription, choose a reason, then open **Reports → Subscriptions**
-and look at the Cancel Reasons card. The reason should appear by name within a
+Cancel a test subscription, choose a reason, then open a dashboard with the
+**Cancel Reasons** card (the **Subscriptions** dashboard preset has it). The reason should appear by name within a
 minute or two.
 
 If it says "Not specified", the reason is not reaching the server. In almost every

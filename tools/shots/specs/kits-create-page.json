@@ -1,0 +1,25 @@
+{
+  "out": "images/template-kits/create-page.png",
+  "alt": "The Create Page screen with the Choose Template card, which opens the template library",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"create-page\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 257, y 61, 1183 x 760",
+  "image": "tools/shots/source/kits-create-page.png",
+  "imageSize": {
+    "w": 1183,
+    "h": 760
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        319,
+        494,
+        260,
+        217
+      ],
+      "title": "Choose Template",
+      "text": "Page templates, kits and checkouts",
+      "side": "left"
+    }
+  ]
+}

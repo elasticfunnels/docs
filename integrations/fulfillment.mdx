@@ -1,5 +1,7 @@
 ---
 title: 'Fulfillment Integration'
+sidebarTitle: "Fulfillment"
+icon: "truck-fast"
 description: 'Send orders to a 3PL provider (ShipOffers or Jetpack) and reconcile cost of goods automatically.'
 ---
 
@@ -36,6 +38,17 @@ The fulfillment integrations push completed orders to a 3PL (Third-Party Logisti
 <Note>
 Shipping from Shopify instead? With [Shopify Order Sync](/integrations/shopify-order-sync#tracking-back-from-shopify), the tracking your store or its 3PL app adds in Shopify comes back to ElasticFunnels too, and is sent to PayPal for PayPal-paid orders.
 </Note>
+
+## Send from an automation
+{/* SCREENSHOT: Send to fulfillment step in the automation builder · desktop */}
+
+You can also send orders from an automation that starts with **On New Purchase**: add the **Send to fulfillment** step, pick the fulfillment integration and, if you want, a **Delay (minutes)** (empty uses the integration's delay). Put conditions or a split test before it to choose which orders go where. The builder will not save the step on any other trigger, or without a connected fulfillment integration.
+
+The step runs the same order job as the merchant setting: only physical items, never test orders, gift orders wait for their main payment, and the integration's SKU map and tracking sync apply.
+
+<Warning>
+An order is never sent twice. While an active automation sends orders to a fulfillment integration, the merchant's default and product routing stop sending orders to that integration, and an order that is already scheduled is never scheduled again.
+</Warning>
 
 ## Setup — ShipOffers
 {/* SCREENSHOT: ShipOffers setup · integration settings · desktop */}

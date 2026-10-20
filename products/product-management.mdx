@@ -1,5 +1,7 @@
 ---
 title: 'Product Management'
+sidebarTitle: "Manage products"
+icon: "boxes-stacked"
 description: 'Create and manage products with full e-commerce data: SEO, gallery, inventory, variants, attributes, fulfillment, subscriptions and more'
 ---
 
@@ -82,11 +84,28 @@ Warehousing, inventory, cost breakdown, SKU categorisation, product specificatio
 |---------|--------|
 | **Identity & Structure** | SKU, Barcode, Units per Package, Weight (oz), Dimensions (L/W/H cm) |
 | **Integration** | Fulfillment Integration override, Multiply SKU toggle |
-| **Inventory** | Stock Quantity, Out-of-Stock Policy (continue/deny) |
+| **Inventory** | Stock Quantity (leave it blank to sell without tracking stock), Out-of-Stock Policy (Continue selling / Stop selling), **Restock on refund** (off by default). Products created by a [template kit](/template-kits/after-applying#4-check-the-stock) start with Stock Quantity blank (not tracked, always in stock); the policy applies only once you type a quantity. See [How stock moves](#how-stock-moves) |
+| **Bundle components** | For a bundle or kit: the products (and variants) inside it and how many of each. A sale of the bundle takes each component's stock times the quantity sold. Leave it empty and the bundle uses its own Stock Quantity |
 | **Cost Breakdown** | Product Cost, Fulfillment Cost, Packaging Cost, Avg. Shipping, Fuel Surcharge, Auto-calculated COGS |
 | **SKU Categorisation** | SKU Category, SKU Subcategory (for internal reporting) |
 | **Product Specifications** | Repeater: Name / Value / Unit pairs (e.g. Dimensions: 10×5×3 cm) |
 | **Shipping Profile** | Assign a brand-level shipping profile |
+
+#### How stock moves
+
+ElasticFunnels never cancels or refuses an order that was already paid because of stock. This is how stock changes:
+
+| Event | What happens to stock |
+|-------|-----------------------|
+| A checkout starts on a product set to **Stop selling** with 0 or less in stock | The buyer is told the product is sold out before any card is charged. This covers the main product, order bumps, one-click upsells, PayPal and Klarna. A free bonus that is sold out is left out of the order |
+| A paid order | Stock goes down by the quantity sold, every time, even below 0 |
+| An order that took more than was left on a **Stop selling** product | The order still goes through and is marked **Oversold**. Your team gets an in-app notification and an email (at most one email a day per brand). Open **Conversions → Oversold** to see these orders and decide whether to ship late or refund |
+| A subscription renewal | Stock goes down on every successful rebill. A rebill is never blocked for stock |
+| A sale from another merchant (ClickBank, Digistore24, JVZoo, BuyGoods, Cartpanda, Shopify, Shop Pay, Explodely and postbacks) | Stock goes down when the order's lines match an ElasticFunnels product by product code or SKU. Each order counts once, even if the merchant sends the postback again |
+| A refund or chargeback | Stock does **not** come back by default: most refunded units are never returned. Turn on **Restock on refund** on a product to put its units back. A full refund or a chargeback restocks the whole order; a partial refund restocks only the line whose price matches the refunded amount |
+| A return received by your fulfillment center | Stock comes back for the units actually returned, converted with **Units per Package** when the SKU is shipped in packs |
+
+**Continue selling** never marks an order Oversold: you chose to keep selling at 0, so stock simply goes below zero.
 
 #### How a shipping rate is chosen
 
@@ -170,16 +189,13 @@ Legacy unstructured key/value pairs for ad-hoc product metadata (e.g. a download
 
 ### Variants Tab
 
-Define product variants (e.g. Color, Size) with individual pricing.
-
-1. **Select variant options** — Check which brand-level variant options apply to this product (managed under Settings → Variant Options)
-2. **Add variants** — Each row shows one field per selected option plus Code and Price
+Sell one product in several versions (Color, Size). In **1. What the buyer chooses** add each option and its values; in **2. Variants, one per combination** click **Create all combinations**, set a price for all if needed, and **Fill empty codes**. Each variant is **Own price** (its own code, price and SKU) or **Sells another product** (an existing product, such as a 3-bottle pack). The full guide, the page picker and the checkout setup are in [Product Variants](/products/variants).
 
 ---
 
 ## Template Reference
 
-All product data is available in ElasticFunnels templates via data functions and filters. Functions are called with `{% set x = FunctionName(args) %}` or inline. Filters are applied with `{{ value | filterName:arg }}`.
+All product data is available in ElasticFunnels templates via data functions and filters. Functions are called with `@set(x = FunctionName(args))` or inline (`{{ FunctionName(args).field }}`). Filters are applied with `{{ value | filterName:arg }}`.
 
 ---
 
@@ -211,9 +227,9 @@ Every product returned by a data function has the following fields:
 | `gallery` | `string[]` | Additional image CDN URLs — **always an array**, never `null` |
 | `has_gallery` | `boolean` | `true` when `gallery.length > 0` |
 | `has_description` | `boolean` | `true` when `description` is non-empty |
-| `in_stock` | `boolean` | `true` when `inventory_quantity` is `null` or `> 0` |
-| `inventory_quantity` | `number \| null` | Current stock count; `null` = unlimited |
-| `inventory_policy` | `"continue" \| "deny"` | Behaviour when out of stock |
+| `in_stock` | `boolean` | `false` only when stock is tracked, `inventory_quantity` is 0 or less, and the policy is Stop selling (`deny`); `true` otherwise |
+| `inventory_quantity` | `number \| null` | Current stock count; `null` = stock not tracked |
+| `inventory_policy` | `"allow" \| "deny"` | Behaviour at zero stock: `allow` = Continue selling, `deny` = Stop selling |
 | `is_subscription` | `boolean` | Whether recurring billing is enabled |
 | `subscription_frequency` | `number \| null` | Billing interval value (e.g. `1`) |
 | `subscription_frequency_unit` | `"day" \| "week" \| "month" \| "year" \| null` | Billing interval unit |
@@ -259,8 +275,8 @@ Each item in `product_files`, `digital_files`, and `bonus_files`:
 Loads a single product by its **code** for the current brand. Also pre-loads structured attribute values so the `attr` and `attrLabel` filters work immediately on the returned object.
 
 ```
-{% set product = getProduct('PROD-001') %}
-{{ product.title }} — {{ product.price | formatPrice:product.currency }}
+@set(product = getProduct('PROD-001'))
+{{ product.title }}: {{ product.price | currency:product.currency }}
 ```
 
 **Returns:** `ProductObject | null`
@@ -280,10 +296,10 @@ Returns the brand's products, with optional filters. Products with **Show in fro
 | `show_in_frontend` | `boolean \| string` | Defaults to `true`. Pass `'any'` for everything, `false` for hidden products only |
 
 ```
-{% set upsells = getProducts({ classification: 'upsell' }) %}
-{% for p in upsells %}
-  <div>{{ p.title }} — {{ p.price | formatPrice:p.currency }}</div>
-{% endfor %}
+@set(upsells = getProducts({ classification: 'upsell' }))
+@foreach(p in upsells)
+  <div>{{ p.title }}: {{ p.price | currency:p.currency }}</div>
+@endforeach
 ```
 
 **Returns:** `ProductObject[]`
@@ -294,10 +310,10 @@ Returns the brand's products, with optional filters. Products with **Show in fro
 Returns every product for the brand without filters. Fastest when you need to iterate all products and filter in the template.
 
 ```
-{% set all = getAllProducts() %}
-{% for p in all %}{% if p.status == 'active' %}
+@set(all = getAllProducts())
+@foreach(p in all)@if(p.status eq 'active')
   {{ p.title }}
-{% endif %}{% endfor %}
+@endif@endforeach
 ```
 
 **Returns:** `ProductObject[]`
@@ -317,12 +333,12 @@ Returns product categories. By default returns a full tree ordered by position, 
 Each item: `{ id, name, position, parent_id, depth? }`
 
 ```
-{% set cats = getProductCategories({ top_level: true }) %}
-{% for cat in cats %}
+@set(cats = getProductCategories({ top_level: true }))
+@foreach(cat in cats)
   <h3>{{ cat.name }}</h3>
-  {% set subs = getProductCategories({ parent_id: cat.id }) %}
-  {% for sub in subs %}<span>{{ sub.name }}</span>{% endfor %}
-{% endfor %}
+  @set(subs = getProductCategories({ parent_id: cat.id }))
+  @foreach(sub in subs)<span>{{ sub.name }}</span>@endforeach
+@endforeach
 ```
 
 **Returns:** `CategoryObject[]`
@@ -333,10 +349,10 @@ Each item: `{ id, name, position, parent_id, depth? }`
 Flattens all downloadable files attached to a product into a single deduplicated array. Useful for rendering download lists on digital product pages.
 
 ```
-{% set files = productDownloads(product) %}
-{% for f in files %}
+@set(files = productDownloads(product))
+@foreach(f in files)
   <a href="{{ f.url }}">{{ f.title or f.extension | upper }} — {{ f.kind }}</a>
-{% endfor %}
+@endforeach
 ```
 
 Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary, sort_order }`
@@ -349,10 +365,10 @@ Each item: `{ url, title, kind, purpose, extension, mime_type, size, is_primary,
 Returns a structured savings breakdown comparing `retail_price` to `price`. Returns `null` if there is no saving.
 
 ```
-{% set savings = productSavings(product) %}
-{% if savings and savings.amount > 0 %}
+@set(savings = productSavings(product))
+@if(savings and savings.amount > 0)
   You save {{ savings.amountFormatted }} ({{ savings.percent }}% off)
-{% endif %}
+@endif
 ```
 
 **Returns:** `{ amount: number, percent: number, amountFormatted: string, percentFormatted: string } | null`
@@ -363,9 +379,9 @@ Returns a structured savings breakdown comparing `retail_price` to `price`. Retu
 Generates a human-readable billing summary string for a subscription product (e.g. `"7-day free trial · Every 1 month"`).
 
 ```
-{% if product.is_subscription %}
+@if(product.is_subscription)
   <p>{{ subscriptionSummary(product) }}</p>
-{% endif %}
+@endif
 ```
 
 **Returns:** `string`
@@ -391,12 +407,12 @@ Each item: `{ id, name, slug, type, applies_to, options, filterable, visible_on_
 Returns all attribute values for a product as a `{ slug: value }` map.
 
 ```
-{% set defs = getProductAttributes({ visible: true }) %}
-{% set vals = getProductAttributeValues(product) %}
-{% for attr in defs %}
+@set(defs = getProductAttributes({ visible: true }))
+@set(vals = getProductAttributeValues(product))
+@foreach(attr in defs)
   <dt>{{ attr.name }}</dt>
   <dd>{{ vals[attr.slug] }}</dd>
-{% endfor %}
+@endforeach
 ```
 
 **Returns:** `Record<string, string | number | boolean>`
@@ -489,7 +505,7 @@ Looks up the merchant-specific product identifier from `merchant_product_ids` (c
 Returns the value of a structured attribute by its slug. Only works on products loaded via `getProduct` (which pre-loads attribute values).
 
 ```
-{% set product = getProduct('MY-PRODUCT') %}
+@set(product = getProduct('MY-PRODUCT'))
 {{ product | attr:'material' }}
 {# → "Organic Cotton" #}
 ```
@@ -512,20 +528,20 @@ Returns the human-readable **label** (name) of a structured attribute definition
 `product.gallery` is a `string[]` — an array of CDN image URLs. It is always an array (never `null` or a JSON string). `product.has_gallery` is `true` when the array has at least one entry.
 
 ```html
-{% if product.has_gallery %}
+@if(product.has_gallery)
 <div class="product-gallery">
-  {% for url in product.gallery %}
+  @foreach(url in product.gallery)
   <img src="{{ url }}" alt="{{ product.title }}" />
-  {% endfor %}
+  @endforeach
 </div>
-{% endif %}
+@endif
 ```
 
 Show the primary image with gallery fallback:
 
 ```html
-{% set mainImage = product.image or (product.gallery[0] if product.has_gallery) %}
-{% if mainImage %}
+@set(mainImage = product.image or (product.gallery[0] if product.has_gallery))
+@if(mainImage)
 <img src="{{ mainImage }}" alt="{{ product.title }}" />
-{% endif %}
+@endif
 ```

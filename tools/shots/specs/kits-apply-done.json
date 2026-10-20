@@ -1,0 +1,69 @@
+{
+  "out": "images/template-kits/apply-done.png",
+  "alt": "The Kit added panel: the finished steps, the Open funnel button, the Created pages list with each page's URL, the summary of components and products, and See the prompts",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"apply-done\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 1039, y 270, 360 x 608",
+  "image": "tools/shots/source/kits-apply-done.png",
+  "imageSize": {
+    "w": 360,
+    "h": 608
+  },
+  "maxWidth": 560,
+  "calloutWidth": 230,
+  "annotations": [
+    {
+      "box": [
+        17,
+        13,
+        326,
+        23
+      ],
+      "title": "Kit added",
+      "text": "Everything arrives as drafts",
+      "side": "left"
+    },
+    {
+      "box": [
+        17,
+        189,
+        326,
+        36
+      ],
+      "title": "Open the funnel",
+      "text": "The funnel builder for the new funnel",
+      "side": "left"
+    },
+    {
+      "box": [
+        1,
+        225,
+        355,
+        33
+      ],
+      "title": "Created pages",
+      "text": "Click one to open it in the editor",
+      "side": "left"
+    },
+    {
+      "box": [
+        1,
+        512,
+        355,
+        39
+      ],
+      "title": "Summary",
+      "text": "Components, products, copies",
+      "side": "left"
+    },
+    {
+      "box": [
+        21,
+        580,
+        95,
+        18
+      ],
+      "title": "See the prompts",
+      "text": "Make the kit images for your product",
+      "side": "left"
+    }
+  ]
+}

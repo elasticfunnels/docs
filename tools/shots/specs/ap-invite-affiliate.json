@@ -1,0 +1,51 @@
+{
+  "out": "images/affiliate-portal/invite-affiliate.png",
+  "alt": "The Add affiliate modal with email, name and the portal's brands ticked",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.affiliates']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.affiliates']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.affiliates.add']"
+      },
+      {
+        "wait": 700
+      },
+      {
+        "fill": "input[type=email] >> nth=-1",
+        "value": "casey@example.com"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.invite-brands']",
+      "title": "Brands",
+      "text": "All portal brands ticked",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.invite-submit']",
+      "title": "Create and send",
+      "text": "Emails a temporary password",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

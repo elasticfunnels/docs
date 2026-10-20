@@ -1,5 +1,7 @@
 ---
 title: 'Showing Order Details'
+sidebarTitle: "Order details"
+icon: "receipt"
 description: 'Display order history, products, tracking, and shipping information in your members area'
 ---
 
@@ -223,7 +225,12 @@ Each order returned by `getOrders()` or `getOrder()` contains:
       price: 97.00,
       quantity: 1,
       currency_code: "USD",
-      is_bonus: false
+      is_bonus: false,
+      // Set when the buyer picked a variant (null / [] otherwise), see Product Variants.
+      variant_code: "KNS-3-GREEN-M12W13",
+      variant_title: "Green / M12/W13",
+      variant_label: "Color: Green, Size: M12/W13",
+      variant_options: [{ name: "Color", value: "Green" }, { name: "Size", value: "M12/W13" }]
     }
   ],
 
@@ -237,6 +244,8 @@ Each order returned by `getOrders()` or `getOrder()` contains:
   ]
 }
 ```
+
+Print the variant under the product name with `@if(line.variant_label)<span>{{ line.variant_label }}</span>@endif`. A full order summary is in [Product Variants](/products/variants#after-the-purchase-thank-you-page-members-area-order-views).
 
 ## Displaying Tracking Information
 {/* SCREENSHOT: Displaying Tracking Information · members area screen · desktop */}

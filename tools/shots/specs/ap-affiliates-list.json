@@ -1,0 +1,52 @@
+{
+  "out": "images/affiliate-portal/affiliates-list.png",
+  "alt": "The Affiliates tab listing affiliates with their brands count, payment method and status",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1680,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.affiliates']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.affiliates']"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 521,
+      "y": 195,
+      "width": 1159,
+      "height": 560
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.add']",
+      "title": "Add affiliate",
+      "text": "Invites someone by email",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.waiting'] >> nth=0",
+      "title": "Waiting for approval",
+      "text": "Brands listed on hover",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.list'] [data-testid='list.row'] >> nth=0 >> a >> nth=0",
+      "title": "Name",
+      "text": "Opens the affiliate",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

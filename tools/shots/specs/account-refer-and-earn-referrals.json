@@ -1,0 +1,64 @@
+{
+  "out": "images/account/refer-and-earn-referrals.png",
+  "alt": "The Referred Users tab in Refer and Earn: stage tabs with counts and an anonymised row per signup showing the code used, stage, plan, trial end, card on file and paying",
+  "capture": {
+    "path": "/{brand}/dashboard",
+    "viewport": {
+      "width": 1440,
+      "height": 1400
+    },
+    "fixtures": [
+      {
+        "url": "^/api/user/affiliate/summary",
+        "file": "tools/shots/fixtures/refer-and-earn/summary.json"
+      },
+      {
+        "url": "^/api/user/referral-usages",
+        "file": "tools/shots/fixtures/refer-and-earn/usages.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='nav.pane.referrals']"
+      },
+      {
+        "waitFor": "[data-testid='affiliate.overview.pipeline-details']"
+      },
+      {
+        "click": "[data-testid='affiliate.overview.pipeline-details']"
+      },
+      {
+        "waitFor": "[data-testid='affiliate.referrals'] [data-testid='list.row']"
+      },
+      {
+        "wait": 1800
+      }
+    ],
+    "crop": {
+      "x": 448,
+      "y": 340,
+      "width": 784,
+      "height": 720
+    }
+  },
+  "maxWidth": 900,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='affiliate.referrals'] [data-testid='list.tab.signed_up']",
+      "title": "Stage tabs",
+      "text": "Filter by where each signup stands"
+    },
+    {
+      "selector": "[data-testid='affiliate.referrals'] [data-testid='list.column.paying']",
+      "title": "Paying",
+      "text": "On a paid plan and charged"
+    },
+    {
+      "selector": "[data-testid='affiliate.referrals'] [data-testid='list.row'] >> nth=3 >> td >> nth=0",
+      "title": "One row per signup",
+      "text": "No name or email, just the stage",
+      "side": "left"
+    }
+  ]
+}

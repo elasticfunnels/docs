@@ -1,0 +1,11 @@
+{
+  "kind": "url",
+  "out": "images/template-kits/buy-link-code.png",
+  "alt": "A buy link on a kit page after apply: the kit's product code is replaced by the code you chose, sleep-gummies-1",
+  "segments": [
+    { "text": "<a href=\"" },
+    { "text": "[BUY=", "title": "Buy link", "desc": "Sends the visitor to checkout" },
+    { "text": "sleep-gummies-1", "title": "Your code", "desc": "Written in place of the kit's code" },
+    { "text": "]\">Order now</a>" }
+  ]
+}

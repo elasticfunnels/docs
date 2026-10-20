@@ -1,0 +1,25 @@
+{
+  "status": "approved",
+  "can_receive_payouts": true,
+  "code": "ACMEPARTNER",
+  "link": "https://elasticfunnels.io/r/ACMEPARTNER",
+  "commission_percent": 30,
+  "clicks": 412,
+  "signups": 9,
+  "paying_customers": 3,
+  "commission_pending": 88.2,
+  "commission_cleared": 59.1,
+  "commission_paid": 236.4,
+  "payout_threshold": 50,
+  "pipeline": {
+    "signups": 9,
+    "active": 6,
+    "on_trial": 4,
+    "card_on_file": 5,
+    "paying": 3,
+    "expected_to_pay": 2,
+    "churned": 2,
+    "paying_mrr": 491,
+    "expected_monthly_commission": 206.4
+  }
+}

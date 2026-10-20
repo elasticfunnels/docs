@@ -1,0 +1,34 @@
+{
+  "out": "images/merchants/jvzoo-buy-buttons.png",
+  "alt": "JVZoo Buy Buttons page, USE YOUR OWN BUTTON section with the tracking image and checkout link, both ending in funnel ID, product ID and 99",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-buy-buttons.png",
+  "imageSize": {
+    "w": 1140,
+    "h": 440
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        277,
+        215,
+        586,
+        50
+      ],
+      "title": "Tracking image",
+      "text": "i.jvzoo.com/funnel/product/99"
+    },
+    {
+      "box": [
+        277,
+        306,
+        586,
+        50
+      ],
+      "title": "Checkout link",
+      "text": "jvzoo.com/b/funnel/product/99"
+    }
+  ]
+}

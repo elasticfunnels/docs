@@ -1,0 +1,69 @@
+{
+  "out": "images/template-kits/ai-intake.png",
+  "alt": "The Your product section of a kit review: the brief box with an attached brief file, the Google Drive folder link, and a product photo tagged with its product and the role Packshot",
+  "_source": "elasticfunnels repo _dev/flows/kit-customize-intake/shots.mjs, shot \"ai-intake\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 289, y 477, 734 x 794",
+  "image": "tools/shots/source/kits-ai-intake.png",
+  "imageSize": {
+    "w": 734,
+    "h": 794
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        17,
+        131,
+        700,
+        116
+      ],
+      "title": "Brief",
+      "text": "Your offer, in your words",
+      "side": "left"
+    },
+    {
+      "box": [
+        17,
+        254,
+        144,
+        30
+      ],
+      "title": "Brief file",
+      "text": ".txt, .md, .pdf or .docx",
+      "side": "left"
+    },
+    {
+      "box": [
+        53,
+        372,
+        663,
+        34
+      ],
+      "title": "Drive folder",
+      "text": "Shared with anyone with the link",
+      "side": "right"
+    },
+    {
+      "box": [
+        424,
+        518,
+        152,
+        31
+      ],
+      "title": "Product and role",
+      "text": "Tag each picture",
+      "side": "right"
+    },
+    {
+      "box": [
+        17,
+        561,
+        169,
+        216
+      ],
+      "title": "Your picture",
+      "text": "Used before any generated image",
+      "side": "left"
+    }
+  ]
+}

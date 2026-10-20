@@ -1,0 +1,44 @@
+{
+  "out": "images/merchants/jvzoo-product-jvzipn.png",
+  "alt": "JVZoo product Advanced tab with JVZIPN enabled and the ElasticFunnels postback URL in the JVZIPNv2 URL(s) box",
+  "_source": "JVZoo seller account (app-access profile jvzoo), read-only capture 2026-10-20 at 2x; product, funnel and IDs replaced with fictional values",
+  "image": "tools/shots/source/merchants-jvzoo-product-jvzipn.png",
+  "imageSize": {
+    "w": 1348,
+    "h": 590
+  },
+  "maxWidth": 680,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        61,
+        26,
+        560,
+        28
+      ],
+      "title": "JVZIPN",
+      "text": "Tick to show the boxes"
+    },
+    {
+      "box": [
+        36,
+        146,
+        1276,
+        46
+      ],
+      "title": "JVZIPNv1 URL(s)",
+      "text": "Use if v2 is taken"
+    },
+    {
+      "box": [
+        36,
+        460,
+        1276,
+        46
+      ],
+      "title": "JVZIPNv2 URL(s)",
+      "text": "Paste the EF URL here"
+    }
+  ]
+}

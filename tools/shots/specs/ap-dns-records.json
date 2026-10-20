@@ -1,0 +1,50 @@
+{
+  "out": "images/affiliate-portal/dns-records.png",
+  "alt": "The portal's Overview tab while it is pending: hostname, Pending status and the TXT and CNAME records to add",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.overview']",
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/affiliate-portal(\\?|$)",
+        "file": "tools/shots/fixtures/affiliate-portal/portal-pending.json"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 257,
+      "y": 60,
+      "width": 1183,
+      "height": 640
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=TXT >> nth=0",
+      "title": "TXT",
+      "text": "Proves you own the domain",
+      "side": "left"
+    },
+    {
+      "selector": "text=CNAME >> nth=0",
+      "title": "CNAME",
+      "text": "Points the hostname at ElasticFunnels",
+      "side": "left"
+    },
+    {
+      "selector": "text=PENDING >> nth=0",
+      "title": "Pending",
+      "text": "Active once the records check out",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

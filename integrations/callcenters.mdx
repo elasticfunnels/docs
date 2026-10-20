@@ -1,5 +1,7 @@
 ---
 title: 'External Call Center Integrations'
+sidebarTitle: "Call centers"
+icon: "headset"
 description: 'Push abandoned cart, sales, failed payment, and subscription-lifecycle events to third-party call center providers'
 ---
 
@@ -122,6 +124,31 @@ Each integration exposes an **Events** table with one row per supported event ty
 | **Enabled** | Master on/off for this event on this integration. When off, no sends of this event will go to this provider — even if the merchant-level dunning gate fires. |
 | **Delay (seconds)** | How long to wait before actually sending the event. Lets counter-events (e.g. a successful sale) cancel the pending call. Default `60` for `abandon` / `failed_payment` / `subscription_failed`; `0` for immediate-fire events (`sale`, `subscription_cancel`, `subscription_winback`). |
 | **Decline-code filter** | Only applies to `failed_payment` and `subscription_failed`. A comma-separated list of decline codes combined with a **Whitelist** (only these) or **Blacklist** (skip these) mode. Lets you avoid calling customers whose card was declined for a reason they can't fix (e.g. `do_not_honor` hard fails) or only call for actionable decline reasons. |
+
+## Send from an automation
+{/* SCREENSHOT: Send to call center step in the automation builder · desktop */}
+
+Instead of the Events table, you can send leads from an automation. Use it when you want to choose which contacts go to which call center, test two call centers against each other, or add steps around the call (an email first, a wait, a condition).
+
+1. Open **Automations** and create an automation with one of these triggers: **On Abandoned Cart**, **On Failed Payment**, **On New Purchase**, **On Subscription Renewal Failed**, **On Subscription Cancelled** or **On Subscription Winback**.
+2. Add the **Send to call center** step and pick the call center.
+3. Optional: set a **Delay (minutes)**. Empty uses the delay from the call center's Events table.
+4. Optional, for failed payments and failed renewals: a **Decline codes** list and whether to send for those codes only or for every code except them. Empty uses the call center's own filter.
+5. Save and turn the automation on.
+
+The step sends the trigger's event with the same lead format the Events table uses: product names, commission, merchant and affiliate filters and the phone requirement all come from the call center's settings. A purchase still cancels a pending abandoned-cart or failed-payment call, a paused call center still sends nothing, and the provider must support the event (see the table above: Committed Coaches, SalesBound and Nuyu do not take abandoned carts). The builder will not save a step whose call center does not take the trigger's event: the error names the call center and the event, so pick another call center or another trigger. When a contact who got an abandoned-cart call buys, the call center gets its recovered notice as before.
+
+<Warning>
+One event never goes to the same call center twice. While an active automation sends an event to a call center, the Events table stops sending that event to that call center. This holds even when the step sits in one arm of a split test, so the other arm does not get the call through the Events table.
+</Warning>
+
+<Tip>
+To compare two call centers, put a **Split Test** step before two **Send to call center** steps. See [Automation Split Tests](/analytics/automation-split-tests) for how the arms are measured.
+</Tip>
+
+Two rules from the merchant still apply: a Test merchant sale is never sent, and **On Subscription Renewal Failed** only sends after the merchant's call-center escalation retry count is reached. A test run from the builder never sends.
+
+When the step does not send for a contact (the call center is paused or off, its merchant filter or phone rule leaves the contact out, the decline code is filtered, or a rule above applies), the reason is kept in the call center's dispatch log. In a split test the arm counts it as **not sent**, next to sent, cancelled and failed calls.
 
 ## Delays & Auto-Cancellation
 {/* SCREENSHOT: Delays & Auto-Cancellation · integration settings or log state · desktop */}

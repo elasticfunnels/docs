@@ -1,0 +1,80 @@
+{
+  "out": "images/products/variants-tab.png",
+  "alt": "A product's Variants tab: Color and Size options with their values, Create all combinations (9), Price for all, Fill empty codes, and the variant rows with Sells as and generated codes",
+  "_source": "elasticfunnels repo flow _dev/flows/product-variants step 14 (not saved), recorded at 1440x1400 (2x) on demo brand 899, cropped to CSS x 532, y 200, 888 x 880",
+  "image": "tools/shots/source/products-variants-tab.png",
+  "imageSize": {
+    "w": 888,
+    "h": 880
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        30,
+        98,
+        224,
+        38
+      ],
+      "title": "Option name",
+      "text": "Color, Size, Flavor...",
+      "side": "left"
+    },
+    {
+      "box": [
+        266,
+        98,
+        480,
+        40
+      ],
+      "title": "Values",
+      "text": "Type and press Enter, or paste a list",
+      "side": "right"
+    },
+    {
+      "box": [
+        13,
+        280,
+        100,
+        22
+      ],
+      "title": "Add option",
+      "text": "One per choice the buyer makes",
+      "side": "left"
+    },
+    {
+      "box": [
+        26,
+        531,
+        200,
+        35
+      ],
+      "title": "Create all combinations",
+      "text": "One variant per combination",
+      "side": "left"
+    },
+    {
+      "box": [
+        708,
+        531,
+        130,
+        35
+      ],
+      "title": "Fill empty codes",
+      "text": "Product code plus the values",
+      "side": "right"
+    },
+    {
+      "box": [
+        361,
+        691,
+        400,
+        33
+      ],
+      "title": "Sells as and code",
+      "text": "Own price, or another product",
+      "side": "right"
+    }
+  ]
+}

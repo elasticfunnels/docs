@@ -1,0 +1,15 @@
+{
+  "out": "images/products/upsell-form-summary.png",
+  "alt": "The upsell form summary: item, shipping and total, the recipient's ship-to address and Confirm and pay",
+  "_flow": "elasticfunnels repo _dev/flows/upsell-forms-live, step 25, cropped to the form",
+  "image": "tools/shots/source/upsell-form-summary.png",
+  "imageSize": { "w": 1040, "h": 880 },
+  "maxWidth": 600,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [80, 226, 880, 46], "title": "Shipping", "text": "From the product's shipping profile" },
+    { "box": [80, 296, 880, 46], "title": "Total", "text": "Item, shipping and tax" },
+    { "box": [80, 370, 880, 160], "title": "Ships to", "text": "The recipient; the buyer gets the receipt" },
+    { "box": [80, 594, 880, 88], "title": "Confirm and pay", "text": "Charges the first order's card once" }
+  ]
+}

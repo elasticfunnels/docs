@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/kit-card.png",
+  "alt": "One kit card: thumbnail, type, audience, niche, counts of pages, funnels, products and components, and the Preview and What's inside buttons",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"kit-card\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 840, y 270, 290 x 395",
+  "image": "tools/shots/source/kits-kit-card.png",
+  "imageSize": {
+    "w": 290,
+    "h": 395
+  },
+  "maxWidth": 620,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        13,
+        13,
+        264,
+        197
+      ],
+      "title": "Kit thumbnail",
+      "text": "A capture of the kit's first page",
+      "side": "left"
+    },
+    {
+      "box": [
+        27,
+        347,
+        62,
+        18
+      ],
+      "title": "Preview",
+      "text": "Opens the live kit in a new tab",
+      "side": "left"
+    },
+    {
+      "box": [
+        145,
+        342,
+        118,
+        28
+      ],
+      "title": "What's inside",
+      "text": "Opens the review: nothing is created yet",
+      "side": "right"
+    }
+  ]
+}

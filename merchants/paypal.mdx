@@ -1,5 +1,6 @@
 ---
 title: 'PayPal'
+icon: "paypal"
 description: 'Offer PayPal as a payment option next to the card form on your checkout, with one-click upsells and subscriptions when your PayPal app can vault buyer wallets.'
 ---
 
@@ -92,6 +93,20 @@ Vaulting is a feature PayPal enables on your app. ElasticFunnels checks it every
 - One-click upsells fall back to the PayPal approval page, and subscription renewals cannot be charged until vaulting is on.
 
 To enable it, open your app in the PayPal Developer Dashboard and turn on **Save payment methods** (PayPal's vault feature) under the app's features. On Live accounts PayPal may need to approve it. Then save the PayPal merchant again so the check runs again.
+
+---
+
+## Refunds
+
+Refund a PayPal order from ElasticFunnels the same way as a card order: open the order in **Conversions** and click **Refund**. ElasticFunnels sends the refund to PayPal and the money goes back to the buyer's PayPal account.
+
+- **Full or partial.** Enter any amount up to what is left to refund. You can refund one order several times until the full amount is back with the buyer.
+- **No voids.** PayPal takes the money when the buyer approves, so a PayPal payment cannot be voided, even minutes after the sale. The refund dialog says so, and the order is always refunded.
+- **Pending refunds.** When the original payment was funded by a bank transfer (eCheck), PayPal can accept the refund as pending and finish it later. The order shows as refunded right away.
+- **When PayPal refuses.** The message shows PayPal's reason, for example that the amount is more than what is left to refund. Nothing is recorded: the order keeps its refunded total and the buyer gets no refund email. Fix the cause or refund the buyer from your PayPal account, and the webhook records that refund.
+- **One refund at a time.** While a refund of an order is running, a second one on the same order is refused. Refunding the same amount again after a timeout does not refund twice: PayPal receives the same request and answers with the first refund.
+
+A refund you issue from your PayPal account instead also reaches ElasticFunnels through the webhook and is recorded on the order once.
 
 ---
 

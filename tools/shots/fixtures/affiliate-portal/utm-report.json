@@ -1,0 +1,35 @@
+{
+ "success": true,
+ "dimension": "utm_source",
+ "rows": [
+  {
+   "key": "facebook",
+   "clicks_unique_sessions": 2741,
+   "conversions": 70,
+   "sales_total": 6468.0,
+   "commission_total": 3039.96
+  },
+  {
+   "key": "google",
+   "clicks_unique_sessions": 1608,
+   "conversions": 39,
+   "sales_total": 3603.6,
+   "commission_total": 1693.69
+  },
+  {
+   "key": "newsletter",
+   "clicks_unique_sessions": 893,
+   "conversions": 19,
+   "sales_total": 1755.6,
+   "commission_total": 825.13
+  },
+  {
+   "key": "youtube",
+   "clicks_unique_sessions": 715,
+   "conversions": 17,
+   "sales_total": 1570.8,
+   "commission_total": 738.28
+  }
+ ],
+ "currency": "USD"
+}

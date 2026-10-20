@@ -1,0 +1,186 @@
+---
+title: 'Apply a kit'
+icon: "wand-magic-sparkles"
+description: 'Read the kit review, choose a folder, name your products and codes, and apply the kit to your project.'
+---
+
+The kit review shows everything a kit will add to your project and lets you decide where the pages go and which products they sell. Nothing is created until you click **Apply kit**.
+
+To open the review, find a kit in the library and click **What's inside** (see [Template kits](/template-kits/overview#choose-and-preview-a-kit)).
+
+## Read the review
+
+### 1. Check what the kit adds
+
+The header names the kit, its type, audience and niche, and counts what it adds: pages, funnel steps, event steps, components and products.
+
+1. Read the line under the kit name. It says what the kit adds and to which project.
+2. Click **Open live preview** if you want to see the kit as visitors see it.
+
+<img src="/images/template-kits/review-header.png" alt="The top of the kit review: back link, kit name with its type, audience and niche, what it adds to the project, Open live preview, and the counts of pages, funnel steps, event steps, components and products" />
+
+### 2. Follow the funnel journey
+
+The **Funnel journey** map shows the path a visitor takes: the landing pages, the checkout, then the upsell, downsell and thank-you pages along the **Yes** and **No** paths. Pages that are not part of the funnel, such as policy pages or a members area, sit below it under **Not in the funnel**.
+
+1. Drag the map or use the zoom buttons to see every step.
+
+<img src="/images/template-kits/review-journey.png" alt="The Funnel journey map: Visitors enter the landing pages, go to the checkout, then the upsell, downsell and thank-you pages along Yes and No paths, with the pages that are not in the funnel below" />
+
+### 3. Look at what already exists
+
+If your project already has some of what the kit brings, a box near the top lists it:
+
+- **Page URLs** that are already taken. The kit cannot create these pages until you pick a folder (step 5).
+- **Components** with the same code as one of yours. By default the kit uses yours.
+- **Variables** you already have. They keep their value.
+
+<img src="/images/template-kits/review-conflicts.png" alt="The box that lists what already exists in the project: page URLs that are taken, components that will use the project's own, and variables that keep their value" />
+
+### 4. Check the pages
+
+The **Pages** list shows each page with the URL it will get. Badges mark special pages:
+
+| Badge | Meaning |
+|---|---|
+| Layout | A layout page other pages are built on. It is not a page visitors open |
+| Checkout | The funnel's checkout page |
+| Members only | Visitors must log in to see it |
+| Endpoint | Receives a form or survey. There is nothing to see on it |
+
+A URL that is already taken shows **/url already exists** in orange. Click the preview icon on a row to open that page of the kit.
+
+<img src="/images/template-kits/review-pages.png" alt="The Pages list of the kit review: each page with its thumbnail, title, the URL it will get, badges such as Layout, Checkout and Members only, the Already exists mark and a preview link" />
+
+## Choose where the pages go
+
+### 5. Pick a folder
+
+The **Before you apply** panel decides where the pages live and what happens with things you already have.
+
+1. In **Folder (optional)**, leave the box empty to create the pages at the root of your project (`/vsl`), or type a folder (`joint` puts the page at `/joint/vsl`).
+2. Read the line under the box. It shows one page's final URL, and either **None of these page URLs exist yet** or how many are taken.
+3. If URLs are taken, click the suggested **Use /folder** button to pick a folder that is free.
+
+Letters are lowercased and spaces become dashes, so `Joint Care` becomes `/joint-care`. You can type more than one level (`offers/joint`).
+
+<img src="/images/template-kits/apply-options.png" alt="The Before you apply panel: Folder (optional) with the taken-URL warning and a suggested folder, the Reuse components I already have and Create the products switches, and the Apply kit button" />
+
+<Note>
+Pages you deleted no longer block a URL. If a URL is still reported as taken, a live page in the project uses it, either as its URL or as the URL of one of its variants.
+</Note>
+
+<Warning>
+If a kit has a home page and you leave the folder empty, it clashes with your project's current home page. Add a folder to keep your home page.
+</Warning>
+
+### 6. Decide about components
+
+**Reuse components I already have** is on by default. When it is on, kit pages use your component wherever the codes match, so your header and footer stay as they are. Turn it off to add the kit's components as copies under new codes; your own stay untouched.
+
+### 7. Decide about products
+
+**Create the N products** is on by default. Turn it off if you want the pages without products; the buy links then have nothing to sell until you add products yourself.
+
+## Set up the products
+
+<video autoPlay muted loop playsInline controls src="/images/template-kits/product-name-and-code.mp4" style={{ width: '100%', maxWidth: '680px', borderRadius: '12px' }} />
+
+Every product the kit sells has a row in **Products**. For each one you either create it new, with your own name and code, or point the kit at a product your project already sells.
+
+### 8. Name a new product
+
+1. Leave the row on **Create new**.
+2. In **Product name**, type the name your customers will see, for example `Acme Sleep Gummies, 1 bottle`.
+3. In **Product code**, type the code you want, for example `sleep-gummies-1`.
+
+<img src="/images/template-kits/products.png" alt="The Products list of the kit review: the first product set to Create new with the name Acme Sleep Gummies, 1 bottle and the code sleep-gummies-1, a free gift bonus below it, and the Map all button" />
+
+Rows marked **Free gift** are bonuses the kit gives away with an order. You name and code them the same way.
+
+A product code can use letters, numbers, dashes and underscores, up to 128 characters. A name can have up to 255 characters. If you leave a code as it is and your project already has a product with that code, the kit creates its product under a new code with `-2` at the end and the row says **Copied as** that code.
+
+### 9. Fix a code the review refuses
+
+If a code breaks a rule, the row shows why and **Apply kit** waits until it is fixed.
+
+1. Read the red line under the row.
+2. Change the code, for example replace spaces with dashes: `sleep-gummies-upsell`.
+
+<img src="/images/template-kits/product-code-error.png" alt="A product row whose code has spaces, with the message Use only letters, numbers, dashes and underscores under it" />
+
+| Message | Fix |
+|---|---|
+| Use only letters, numbers, dashes and underscores. | Remove spaces and other characters |
+| A product in this project already has this code. | Pick another code, or use that product instead (step 10) |
+| Another product in this kit gets this code. | Give each kit product its own code |
+| The name can have at most 255 characters. | Shorten the name |
+
+### 10. Use a product you already sell
+
+If your project already sells the product, point the kit at it instead of creating a copy.
+
+1. On the row, click **Use an existing product**.
+2. In the window, type part of the product's name or code in the search box.
+3. Click your product.
+4. Click **Done**.
+
+<img src="/images/template-kits/product-map.png" alt="The window Product for Joint Support Formula, 1 extra bottle (downsell): a search box, Create new, and the project's own products that match the search" />
+
+The row now says which product it **Uses**. Click **Change** to pick another one, or switch the row back to **Create new**.
+
+<img src="/images/template-kits/product-uses-existing.png" alt="A product row set to Use an existing product, showing which of the project's products it uses and a Change link" />
+
+If a kit product has the same code as one of yours, the row offers it with **Your project already has ... Use it**. Click **Use it** to link it in one step. **Map all** opens the same window for every product at once.
+
+### How your codes reach the pages
+
+Whatever you choose, the kit rewrites every place its pages refer to a product so they point at yours: buy links (`[BUY=...]`, `[UPSELL=...]`), checkout carts and order bumps, funnel steps that check a product, page events that set checkout bumps or bonuses, product bonuses, and product variants.
+
+<img src="/images/template-kits/buy-link-code.png" alt="A buy link on a kit page after apply: the kit's product code is replaced by the code you chose, sleep-gummies-1" />
+
+A product with variants (for example 1, 3 and 6 bottles of the same product) shows the variants under the main product. They follow the main product: if it is created new, the variants come with it.
+
+### 11. Check what else is added
+
+The **Also added** column lists the components, collections and forms, exit popups, backend scripts, layouts, variables and files the kit brings. **Uses yours** marks a component the kit takes from your project; **Kept** marks a variable that keeps your value.
+
+<img src="/images/template-kits/also-added.png" alt="The Also added column: components (some marked Uses yours), collections and forms, variables and files the kit brings" />
+
+## Apply the kit
+
+<video autoPlay muted loop playsInline controls src="/images/template-kits/apply-a-kit.mp4" style={{ width: '100%', maxWidth: '680px', borderRadius: '12px' }} />
+
+### 12. Click Apply kit
+
+1. Click **Apply kit**.
+
+The kit is added in the background, and you can leave the page while it runs. The panel moves through **Queued**, **Creating pages, funnel and products** and **Done**.
+
+It is all or nothing: if anything goes wrong, nothing is created and your project is as it was.
+
+### 13. Open what was created
+
+When it finishes, the panel says **Kit added** and **Everything is in this project as drafts.**
+
+1. Click **Open** and the funnel name to open the new funnel.
+2. Or click a page under **Created pages** to open it in the editor.
+3. Read the summary: how many components were created or reused, and how many products were created, copied under new codes or linked to yours.
+4. If the kit has images, click **See the prompts** to make your own versions (see [Kit images](/template-kits/kit-images)).
+
+<img src="/images/template-kits/apply-done.png" alt="The Kit added panel: the finished steps, the Open funnel button, the Created pages list with each page's URL, the summary of components and products, and See the prompts" />
+
+The kit's images and files are copied right after. If one could not be copied, the panel names it; the rest of the kit is already in place.
+
+If the panel shows **Check these before you publish**, the kit left something for you to set, such as a merchant or automation chosen in a page event step. Open those steps and pick your own.
+
+### If it did not finish
+
+The panel says **It did not finish** and shows the reason in a red box. Nothing was created.
+
+1. Read the reason. [Troubleshooting](/template-kits/troubleshooting) lists each one and what to do.
+2. Click **Back to review**, change what the reason names, and apply again.
+
+<img src="/images/template-kits/apply-failed.png" alt="The It did not finish panel with the reason in a red box and the Back to review button" />
+
+Next: [After applying](/template-kits/after-applying).

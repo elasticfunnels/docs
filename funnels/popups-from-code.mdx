@@ -1,0 +1,131 @@
+---
+title: 'Popups and interactions from code'
+sidebarTitle: "Popups from code"
+icon: "window-restore"
+description: 'Open a platform popup or an inline modal from any element, and run builder interactions from page code with ef.popup and ef.interactions.'
+---
+
+Pages built in the code editor, with the `ef` CLI or from a kit can open the same popups you build in **Pages → Advanced → Popups**, and run the same actions the page builder's **Interactions** panel offers. The store edits the popup in the app; the page only says when to open it.
+
+<Note>
+  `ef.popup` and `ef.interactions` ship with the current runtime release. Until it is live on your pages, `ef.popup` is undefined.
+</Note>
+
+## Which one to use
+
+| The popup appears... | Build it as | Open it with |
+|---|---|---|
+| on exit intent, after a delay, at a scroll depth, when an element comes into view, after a video moment, after a form or add to cart | a platform popup (Pages → Advanced → Popups) | the page's [page events](/funnels/page-events): trigger → **Has tag** → **Popup** (+ **Add tag** to show it once) |
+| when the visitor clicks something, and its content is copy the store should be able to edit | the same platform popup | `data-ef-popup="Popup name"` on the element |
+| when the visitor clicks something, and its content depends on what they did on this page (the pack they picked, their cart, quiz answers) | a `<dialog id="...">` in the page | `data-ef-popup="#dialog-id"` |
+| after a URL change | its own page | a link |
+
+## Open a popup on click
+
+Put `data-ef-popup` on any element. No script needed.
+
+```html
+<a href="#whats-inside" data-ef-popup="Free gifts">See the free gifts</a>
+```
+
+- The value is the popup's **name** as it appears in Pages → Advanced → Popups, or its numeric id. Use the name in templates and kits: ids change when a kit is installed in another brand, names don't.
+- On a link, the click is taken over and the popup opens. Without JavaScript, or if the popup was deleted or renamed, the link goes where its `href` says, so point it at something useful: an in-page section (`#whats-inside`) or a page.
+- Close buttons inside the popup: `data-ef-popup-close` (or the builder's close element). Escape and a click outside the popup's box (`data-modal-window="true"`) close it too.
+
+### Other triggers on an element
+
+```html
+<!-- opens the first time the pointer goes over it -->
+<span data-ef-popup="Size guide" data-ef-popup-trigger="hover">Size guide</span>
+
+<!-- opens when the element scrolls into view -->
+<div data-ef-popup="Reviews" data-ef-popup-trigger="in-view"></div>
+```
+
+Exit intent, timers and scroll depth belong in page events, where the store can see and change them.
+
+### Show it once
+
+```html
+<a href="#gifts" data-ef-popup="Free gifts" data-ef-popup-cap="saw-gifts:1440">See the gifts</a>
+```
+
+`data-ef-popup-cap="tag:minutes"` skips the popup while the visitor has the tag and adds the tag when it opens. It is the same tag the **Has tag** and **Add tag** nodes use, so a page event and a click can share one cap. Without minutes the tag lasts for the browser session.
+
+## Inline modals
+
+When the modal shows what the visitor chose on this page, keep it in the page and open it the same way:
+
+```html
+<button data-ef-popup="#size-guide">Size guide</button>
+
+<dialog id="size-guide" aria-labelledby="size-h">
+  <h2 id="size-h">Find your size</h2>
+  ...
+  <button data-ef-popup-close>Close</button>
+</dialog>
+```
+
+A `<dialog>` opens with `showModal()`, so the page behind is inert and Escape closes it. Any other element (for example a builder modal with `data-modal="true"`) is shown, gets `role="dialog"`, keeps focus inside and closes on Escape. Focus goes back to the button that opened it.
+
+## From JavaScript
+
+```js
+ef.popup.open('Free gifts');                       // a platform popup by name
+ef.popup.open(1234);                               // ...or by id
+ef.popup.open('#size-guide');                      // an inline <dialog> or modal
+ef.popup.open('Free gifts', { cap: 'saw-gifts:1440', trigger: 'pack-picked' });
+ef.popup.close();                                  // the popup on top
+ef.popup.isOpen('Free gifts');
+ef.popup.preload('Free gifts');                    // fetch it early so the first open is instant
+const off = ef.popup.on('close', (d) => console.log(d.name, d.via));
+```
+
+`open` returns a promise of `true` when the popup opened, `false` when it was capped, already open, another popup was open (pass `force: true` to stack it) or it does not exist.
+
+### Events
+
+| Event (on `window`) | `detail` |
+|---|---|
+| `ef:popup:open` | `ref`, `id`, `name`, `kind` (`platform` or `inline`), `trigger`, `element` |
+| `ef:popup:close` | the same, plus `via`: `button`, `escape`, `backdrop` or `api` |
+
+### Analytics
+
+Platform popups report `popup-show` (once per page view, with the trigger) and `popup-close` (with `dismissed_after_ms` and `via`), whether a page event or a click opened them. Inline modals report `modal-show` and `modal-close`.
+
+## Builder interactions from code
+
+`ef.interactions` runs the actions of the builder's Interactions panel.
+
+```js
+ef.interactions.run('show_popup', 'Free gifts');
+ef.interactions.run('track-event', 'Lead');
+ef.interactions.run('custom-event', 'saw-pricing');
+ef.interactions.run('animate-pulse', null, document.querySelector('.cta'));
+
+// bind one like the builder does: trigger + action on an element
+ef.interactions.add({ selector: '.reviews', type: 'in-view', action: 'custom-event', data: 'saw-reviews' });
+ef.interactions.list(); // the page's interactions
+```
+
+Or in markup, `trigger:action:value`, several separated by `;`:
+
+```html
+<button data-ef-interaction="click:track-event:Lead; hover:animate-pulse">Get started</button>
+<section data-ef-interaction="in-view:custom-event:saw-reviews">...</section>
+```
+
+Triggers: `click`, `hover`, `mouseenter`, `mouseleave`, `focus`, `blur`, `load`, `in-view`, `on-form-submit`, `on-form-success`, `on-form-error`.
+
+Actions: `show_popup`, `hide_popup`, `show_modal`, `hide_modal`, `show_element`, `hide_element`, `visibility-toggle`, `focus-on-element`, `track-event`, `custom-event`, `split-test-goal`, and the `animate-*` set (`animate-fade-in`, `animate-pulse`, `animate-shake`, ...).
+
+## Kits and templates
+
+A kit carries every popup its pages open, by name, in `kit.json` `exit_popups`, together with the page events that open them. When the kit is installed the popups are copied into the brand, page events point at the copies, and `data-ef-popup="Free gifts"` finds the copy by name. Building the kit warns when a page opens a popup by id or names one that doesn't exist.
+
+## Related
+
+- [Exit popups](/funnels/exit-popups): build a popup and open it on exit intent
+- [Page events](/funnels/page-events) and [nodes](/funnels/page-events-nodes)
+- [EF API (window.ef)](/funnels/ef-api): tags, visibility, timing

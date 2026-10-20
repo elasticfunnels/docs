@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/ai-toggle.png",
+  "alt": "The Customise with AI switch on the kit review, turned on, with the credit estimate as a range, the Balanced tier and the credits available",
+  "_source": "elasticfunnels repo _dev/flows/kit-customize-intake/shots.mjs, shot \"ai-toggle\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 1044, y 488, 350 x 187",
+  "image": "tools/shots/source/kits-ai-toggle.png",
+  "imageSize": {
+    "w": 350,
+    "h": 187
+  },
+  "maxWidth": 560,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        12,
+        31,
+        36,
+        20
+      ],
+      "title": "Customise with AI",
+      "text": "On once you give a brief",
+      "side": "left"
+    },
+    {
+      "box": [
+        60,
+        136,
+        166,
+        18
+      ],
+      "title": "Estimate",
+      "text": "A range in credits",
+      "side": "left"
+    },
+    {
+      "box": [
+        234,
+        135,
+        63,
+        21
+      ],
+      "title": "Tier",
+      "text": "Balanced by default",
+      "side": "right"
+    }
+  ]
+}

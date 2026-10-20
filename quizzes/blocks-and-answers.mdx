@@ -1,0 +1,78 @@
+---
+title: 'Quiz Blocks and Answers'
+sidebarTitle: "Blocks and answers"
+icon: "cubes"
+description: 'How quiz blocks time, store and validate answers, and how to print answers with variables.'
+---
+
+This page covers how the blocks on a quiz screen behave for the visitor: loader timing, height and weight answers, answer variables, validation, and what visitors do not see. To build and publish a quiz, see [Build and publish a quiz](/quizzes/build-and-publish).
+
+## Loader timing
+{/* SCREENSHOT: Loading block settings · Duration (sec), Start after (sec) · desktop */}
+
+The **Loading** block takes its timing in **seconds**:
+
+| Setting | Range |
+|---------|-------|
+| **Duration (sec)** | 1 to 60 seconds. A blank or 0 value runs for 1 second. |
+| **Start after (sec)** | 0 to 60 seconds. |
+
+A value of 1000 or more is read as milliseconds and converted (3000 runs for 3 seconds), so loaders set up in milliseconds keep working.
+
+## Height and weight answers
+{/* SCREENSHOT: Height and Weight blocks · unit switch · mobile */}
+
+The visitor can answer the **Height** block in feet and inches or in centimetres, and the **Weight** block in pounds or kilograms. Whatever unit they pick, the answer is stored as one number in metric units, rounded to one decimal:
+
+- height in **cm**;
+- weight in **kg**.
+
+So a visitor who enters 5'10" is stored as 177.8, and 180 lb as 81.6.
+
+The unit details are available as variables, where `<id>` is the block's ID:
+
+| Variable | Value |
+|----------|-------|
+| `<id>_unit` | The unit the visitor picked: `ft` or `cm` for height, `lb` or `kg` for weight |
+| `<id>_cm`, `<id>_in` | Height in centimetres and in total inches |
+| `<id>_ft`, `<id>_in_rem` | Height as feet plus remaining inches (when entered in feet and inches) |
+| `<id>_kg`, `<id>_lb` | Weight in kilograms and in pounds |
+
+The first Height block and the first Weight block with an answer can also be read as `height` and `weight`. Those are the names the default BMI formula uses, so this computed variable works whatever unit the visitor chose:
+
+```text
+weight / ((height/100) ** 2)
+```
+
+## Print an answer with a variable
+
+Put a block's ID in double square brackets to print the visitor's answer in any text, heading or option label:
+
+```text
+Your goal: [[goal]]
+```
+
+`[[goal]]` prints the plain answer (for example `lose`). `[[goal.value]]`, `[[goal.answer]]` and `[[ responses.goal ]]` keep working too. A visibility rule on the bare block ID compares that same plain answer.
+
+## Validation
+{/* SCREENSHOT: Quiz screen · validation message under a field · mobile */}
+
+The visitor cannot go on until the screen's answers pass these checks. The message shows under the block, in the page's language (English, Romanian or Portuguese).
+
+| Block | Setting | Check |
+|-------|---------|-------|
+| **Phone** (or a **Field** with type Phone) | | A phone number with 7 to 15 digits. Text such as `abc` is refused. |
+| **Field** with type Number | **Min (number)**, **Max (number)** | The number is within the range. |
+| **Age** | **Min age**, **Max age** | The age is within the range. |
+| **Multiple Choice** (or a choice block with **Allow multiple choice**) | **Minimum selections**, **Maximum selections** | The visitor picked at least the minimum and at most the maximum. 0 or blank means no limit. |
+
+Fields marked required must be filled in, and an email field needs a valid address.
+
+## What visitors do not see
+
+- **AI Generated Text block:** personalized AI text is not generated on live pages yet, so the block is hidden from visitors. In a preview it shows a note in its place, never the prompt.
+- **Blocks with template example values:** hidden on the live quiz until you edit them. See [Template example values](/quizzes/build-and-publish#template-example-values).
+
+## If the quiz is missing or empty
+
+A page set to show a quiz keeps its own HTML when the quiz cannot be shown: the quiz was deleted, it has no blocks, or it fails to load. Put fallback content in the page (for example a link to your offer) so visitors never land on a blank page.

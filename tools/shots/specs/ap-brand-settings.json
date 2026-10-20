@@ -1,0 +1,53 @@
+{
+  "out": "images/affiliate-portal/brand-settings.png",
+  "alt": "The Brand settings modal with the Status after sign-up select",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.brands']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.brands']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.brands.list'] [data-testid='row-actions-trigger'] >> nth=0"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.brands.settings'] >> nth=0"
+      },
+      {
+        "wait": 800
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.default-applicant-status']",
+      "title": "Status after sign-up",
+      "text": "Stricter of portal and brand wins",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.save-settings']",
+      "title": "Save",
+      "text": "Applies to new sign-ups only",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

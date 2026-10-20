@@ -1,0 +1,15 @@
+{
+  "out": "images/merchants/explodely-variant-ids.png",
+  "alt": "The variant rows of a product's Variants tab with the Explodely ID column: the 1 bottle row empty and showing the product's ID as Inherited, the 3 and 6 bottle rows with their own Explodely IDs",
+  "_source": "elasticfunnels repo flow _dev/flows/explodely-variant-id step 15 (not saved), recorded at 1800x1100 (2x) on demo brand 899 with a fictional Explodely merchant, cropped to CSS x 660, y 728, 990 x 207",
+  "image": "tools/shots/source/products-variant-explodely-id.png",
+  "imageSize": { "w": 990, "h": 207 },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [727, 15, 84, 22], "title": "Explodely ID", "text": "Shows when the brand uses Explodely", "side": "right" },
+    { "box": [731, 51, 144, 34], "title": "Left empty", "text": "Sells under the product's Explodely ID", "side": "right" },
+    { "box": [731, 102, 144, 34], "title": "Own ID", "text": "This pack's own Explodely product", "side": "right" },
+    { "box": [47, 102, 196, 34], "title": "Variant code", "text": "Use it in [BUY=...] for this pack", "side": "left" }
+  ]
+}

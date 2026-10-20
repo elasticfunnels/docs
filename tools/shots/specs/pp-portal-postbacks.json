@@ -1,0 +1,56 @@
+{
+  "out": "images/affiliate-portal/portal-postbacks.png",
+  "alt": "The Postbacks page on the portal: the signing secret with Reveal and Rotate, and endpoints for sale and refund events",
+  "capture": {
+    "path": "/affiliates/profile#postbacks",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "site": "portal",
+    "login": "jordan.lee@example.com",
+    "waitFor": "text=Signing secret",
+    "fixtures": [
+      {
+        "url": "^/affiliates/api/postbacks/logs",
+        "file": "tools/shots/fixtures/affiliate-portal/postback-logs.json"
+      },
+      {
+        "url": "^/affiliates/api/postbacks(\\?|$)",
+        "file": "tools/shots/fixtures/affiliate-portal/postbacks.json"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": {
+      "x": 380,
+      "y": 60,
+      "width": 940,
+      "height": 560
+    }
+  },
+  "annotations": [
+    {
+      "selector": "text=Rotate",
+      "title": "Rotate",
+      "text": "New secret, version goes up",
+      "side": "right"
+    },
+    {
+      "selector": "text=Add postback",
+      "title": "Add postback",
+      "text": "Event, URL and format",
+      "side": "right"
+    },
+    {
+      "selector": "text=SALE >> nth=0",
+      "title": "Endpoint",
+      "text": "One URL per event",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 860,
+  "calloutWidth": 230
+}

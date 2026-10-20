@@ -1,0 +1,47 @@
+{
+  "out": "images/merchants/explodely-products.png",
+  "alt": "Explodely Seller Hub Products list with the Pro. ID and Payment Link columns",
+  "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
+  "image": "tools/shots/source/merchants-explodely-products.png",
+  "imageSize": {
+    "w": 1340,
+    "h": 480
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        833,
+        57,
+        166,
+        40
+      ],
+      "title": "Seller Hub",
+      "text": "Then Products",
+      "side": "right"
+    },
+    {
+      "box": [
+        30,
+        346,
+        104,
+        32
+      ],
+      "title": "Pro. ID",
+      "text": "The Explodely product ID",
+      "side": "left"
+    },
+    {
+      "box": [
+        840,
+        346,
+        355,
+        32
+      ],
+      "title": "Payment Link",
+      "text": "The hosted checkout link",
+      "side": "right"
+    }
+  ]
+}

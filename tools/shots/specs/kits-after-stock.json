@@ -1,0 +1,36 @@
+{
+  "out": "images/template-kits/after-stock.png",
+  "alt": "The Inventory section of a product the kit created: Stock Quantity is blank, so the product sells without tracking stock",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"after-stock\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 520, y 495, 920 x 190",
+  "image": "tools/shots/source/kits-after-stock.png",
+  "imageSize": {
+    "w": 920,
+    "h": 190
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        25,
+        90,
+        277,
+        38
+      ],
+      "title": "Stock Quantity",
+      "text": "Blank: sells without counting stock",
+      "side": "left"
+    },
+    {
+      "box": [
+        318,
+        90,
+        277,
+        38
+      ],
+      "title": "Out-of-Stock Policy",
+      "text": "Used only once you type a quantity",
+      "side": "right"
+    }
+  ]
+}

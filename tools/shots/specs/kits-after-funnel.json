@@ -1,0 +1,58 @@
+{
+  "out": "images/template-kits/after-funnel.png",
+  "alt": "The funnel builder showing the funnel the kit created: Funnel Entry Point, the entry page group with the product page, On Purchase and the first upsell",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"after-funnel\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 257, y 61, 1183 x 520",
+  "image": "tools/shots/source/kits-after-funnel.png",
+  "imageSize": {
+    "w": 1183,
+    "h": 520
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        121,
+        91,
+        143,
+        23
+      ],
+      "title": "Entry point",
+      "text": "Where visitors come in",
+      "side": "left"
+    },
+    {
+      "box": [
+        421,
+        91,
+        303,
+        24
+      ],
+      "title": "Entry page",
+      "text": "The kit's landing or product page",
+      "side": "left"
+    },
+    {
+      "box": [
+        721,
+        91,
+        143,
+        24
+      ],
+      "title": "On Purchase",
+      "text": "After the checkout, to the upsell",
+      "side": "right"
+    },
+    {
+      "box": [
+        1072,
+        16,
+        82,
+        40
+      ],
+      "title": "Publish",
+      "text": "Saves the funnel when you are ready",
+      "side": "right"
+    }
+  ]
+}

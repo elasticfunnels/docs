@@ -1,0 +1,71 @@
+{
+  "out": "images/merchants/explodely-ef-setup-test.png",
+  "alt": "The Test step of Postback Setup for Explodely: the waiting status card and how to send a test",
+  "_source": "ElasticFunnels app (feat/explodely-one-copy), Postback Setup on a fictional Explodely merchant of the demo brand; the merchant list and the revealed URL are fixtures (postback code nwdemoexp01, secret DemoSecretForScreenshotsOnly..., neither real). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs explodely-ef-setup",
+  "capture": {
+    "path": "/{brand}/merchants",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-row-id=\"9101\"]",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/merchants/9101/postback-secret/reveal",
+        "method": "POST",
+        "file": "tools/shots/fixtures/explodely-one-copy/reveal.json"
+      },
+      {
+        "url": "/api/brands/\\d+/merchants/\\d+/wait-for-test",
+        "file": "tools/shots/fixtures/explodely-one-copy/not-verified.json"
+      },
+      {
+        "url": "/api/brands/\\d+/merchants(\\?|$)",
+        "file": "tools/shots/fixtures/explodely-one-copy/merchants-list.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-row-id=\"9101\"] [data-testid=\"merchants.list.postback-setup\"]"
+      },
+      {
+        "waitFor": "[data-testid=\"merchants.postback-setup.url\"][data-ready=\"true\"]"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-testid=\"merchants.postback-setup.next\"]"
+      },
+      {
+        "click": "[data-testid=\"merchants.postback-setup.next\"]"
+      },
+      {
+        "click": "[data-testid=\"merchants.postback-setup.next\"]"
+      },
+      {
+        "waitFor": "[data-testid=\"merchants.postback-setup.test-status\"]"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"merchants.postback-setup.test-status\"]",
+      "title": "Waiting",
+      "text": "Updates by itself, keep it open",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid=\"merchants.postback-setup.panel.test\"] ol",
+      "title": "How to send a test",
+      "text": "Try IPN Builder in Explodely",
+      "side": "right"
+    }
+  ]
+}

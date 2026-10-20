@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/library.png",
+  "alt": "The template library on the Kits tab with the search box, the audience chips, the type and niche filters and the kit cards",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"library\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 257, y 61, 1183 x 760",
+  "image": "tools/shots/source/kits-library.png",
+  "imageSize": {
+    "w": 1183,
+    "h": 760
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        37,
+        84,
+        395,
+        36
+      ],
+      "title": "Kits tab",
+      "text": "Next to Page templates and Checkouts",
+      "side": "left"
+    },
+    {
+      "box": [
+        32,
+        141,
+        288,
+        38
+      ],
+      "title": "Search kits",
+      "text": "By name or description",
+      "side": "left"
+    },
+    {
+      "box": [
+        328,
+        143,
+        814,
+        34
+      ],
+      "title": "Filters",
+      "text": "Audience, kit type and niche",
+      "side": "right"
+    }
+  ]
+}

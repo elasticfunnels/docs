@@ -1,0 +1,51 @@
+{
+  "out": "images/affiliates/portal-create.png",
+  "alt": "Creating an affiliate portal: a name and your own domain",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='org.affiliate-portal.create.name']",
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/affiliate-portal(\\?|$)",
+        "file": "tools/shots/fixtures/internal-affiliates/portal-none.json"
+      }
+    ],
+    "actions": [
+      {
+        "fill": "[data-testid='org.affiliate-portal.create.name']",
+        "value": "Acme Partners"
+      },
+      {
+        "fill": "[data-testid='org.affiliate-portal.create.domain']",
+        "value": "partners.example.com"
+      }
+    ],
+    "crop": "main"
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.create.name']",
+      "title": "Portal name",
+      "text": "Shown to affiliates and in emails",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.create.domain']",
+      "title": "Domain",
+      "text": "A subdomain of your own site",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.create.submit']",
+      "title": "Create portal",
+      "text": "Then add the DNS records shown",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

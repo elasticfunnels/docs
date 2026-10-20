@@ -1,0 +1,15 @@
+{
+  "out": "images/products/upsell-form-address.png",
+  "alt": "The upsell form's address step: recipient name, address, city, state, ZIP, country, optional phone and Continue",
+  "_flow": "elasticfunnels repo _dev/flows/upsell-forms-live, step 23 (before Continue), cropped to the form",
+  "image": "tools/shots/source/upsell-form-address.png",
+  "imageSize": { "w": 1000, "h": 1220 },
+  "maxWidth": 560,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [60, 168, 880, 78], "title": "Recipient name", "text": "Who the gift ships to" },
+    { "box": [510, 788, 430, 82], "title": "Country", "text": "Sets the shipping rate", "side": "right" },
+    { "box": [60, 956, 880, 78], "title": "Phone (optional)", "text": "Goes on the label for the courier" },
+    { "box": [60, 1062, 880, 88], "title": "Continue", "text": "Checks the address, then shows the total" }
+  ]
+}

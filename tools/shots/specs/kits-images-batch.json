@@ -1,0 +1,58 @@
+{
+  "out": "images/template-kits/images-batch.png",
+  "alt": "The Generate all window: the image slots to tick, Your pictures, Put each image on its pages when it is ready, the credit estimate and the Generate button",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"images-batch\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 384, y 56, 672 x 1288",
+  "image": "tools/shots/source/kits-images-batch.png",
+  "imageSize": {
+    "w": 672,
+    "h": 1288
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        33,
+        1119,
+        16,
+        16
+      ],
+      "title": "Images to make",
+      "text": "Tick the ones you want",
+      "side": "left"
+    },
+    {
+      "box": [
+        20,
+        1174,
+        632,
+        38
+      ],
+      "title": "Put on its pages",
+      "text": "Replaces the kit image when ready",
+      "side": "left"
+    },
+    {
+      "box": [
+        20,
+        1249,
+        223,
+        19
+      ],
+      "title": "Estimate",
+      "text": "Images x credits per image",
+      "side": "left"
+    },
+    {
+      "box": [
+        479,
+        1241,
+        173,
+        36
+      ],
+      "title": "Generate",
+      "text": "Asks you to confirm the credits",
+      "side": "right"
+    }
+  ]
+}

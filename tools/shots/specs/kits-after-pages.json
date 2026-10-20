@@ -1,0 +1,58 @@
+{
+  "out": "images/template-kits/after-pages.png",
+  "alt": "The Pages list after applying a kit: the kit pages at the top, each marked Draft, with the kit funnel in the Funnels column",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"after-pages\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 257, y 61, 1183 x 480",
+  "image": "tools/shots/source/kits-after-pages.png",
+  "imageSize": {
+    "w": 1183,
+    "h": 480
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        652,
+        189,
+        55,
+        24
+      ],
+      "title": "Draft",
+      "text": "Kit pages start as drafts",
+      "side": "right"
+    },
+    {
+      "box": [
+        231,
+        171,
+        183,
+        59
+      ],
+      "title": "Funnels",
+      "text": "The kit funnel that uses the page",
+      "side": "left"
+    },
+    {
+      "box": [
+        976,
+        191,
+        70,
+        20
+      ],
+      "title": "Code Editor",
+      "text": "Open the page to edit it",
+      "side": "right"
+    },
+    {
+      "box": [
+        1041,
+        12,
+        113,
+        36
+      ],
+      "title": "Create page",
+      "text": "Where the template library starts",
+      "side": "right"
+    }
+  ]
+}

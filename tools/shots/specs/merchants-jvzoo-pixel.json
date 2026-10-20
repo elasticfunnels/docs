@@ -1,0 +1,55 @@
+{
+  "out": "images/merchants/jvzoo-pixel.png",
+  "alt": "A new tracking script with the JVZoo template, Footer placement and the i.jvzoo.com image tag",
+  "_source": "elasticfunnels repo flow _dev/flows/jvzoo-merchant (read-only, recorded 2026-10-19 at 1440x900, scale 2, on demo brand 899 with the fictional JVZoo merchant fixtures in that flow: JVZoo funnel 120456, product 451020, button 99), step 29, cropped to CSS x 336, y 30, 768 x 830",
+  "image": "tools/shots/source/merchants-jvzoo-pixel.png",
+  "imageSize": {
+    "w": 768,
+    "h": 830
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        580,
+        96,
+        172,
+        50
+      ],
+      "title": "Placement",
+      "text": "Footer"
+    },
+    {
+      "box": [
+        16,
+        205,
+        360,
+        50
+      ],
+      "title": "Template",
+      "text": "JVZoo"
+    },
+    {
+      "box": [
+        16,
+        440,
+        736,
+        40
+      ],
+      "title": "Tracking script",
+      "text": "Filled in per page"
+    },
+    {
+      "box": [
+        678,
+        779,
+        66,
+        38
+      ],
+      "title": "Save",
+      "text": "Runs on all pages by default"
+    }
+  ],
+  "_todo": "Re-record after app ebf55e3ad is deployed: the JVZoo template's setup instructions now name JVZoo Funnel ID and JVZoo Button ID (the shot still shows the old 'Account ID' text) and gain a Footer line."
+}

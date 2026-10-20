@@ -1,5 +1,6 @@
 ---
 title: 'Subscriptions'
+icon: "arrows-rotate"
 description: 'Manage subscription lifecycle, analytics, and retention'
 ---
 
@@ -81,9 +82,9 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transac
 
 ---
 
-## Update Subscription Flag
+## Cancel Subscription
 
-Updates a keyed flag on the subscription conversion (for example `subscription_status`, `subscription_next_charge_at`). In practice, prefer the **dedicated POST endpoints** below for lifecycle actions; they perform validation and side effects. Use a generic flag update only when you need to align data with an external system and your deployment exposes this route.
+Cancels the subscription right away and stops future renewals. A `subscription_cancel` event is recorded with the reason.
 
 <ParamField path="brand" type="string" required>
   The brand/project ID
@@ -93,28 +94,148 @@ Updates a keyed flag on the subscription conversion (for example `subscription_s
   Subscription transaction ID
 </ParamField>
 
-<ParamField body="key" type="string" required>
-  Flag key (e.g. `subscription_status`, `subscription_next_charge_at`)
-</ParamField>
-
-<ParamField body="value" type="string" required>
-  New value for the flag
+<ParamField body="reason" type="string">
+  Cancellation reason, shown in the Cancel Reasons card (for example `too_expensive`)
 </ParamField>
 
 ```bash Request
-PATCH /api/brands/{brand}/subscriptions/{id}/flag
+POST /api/brands/{brand}/subscriptions/{id}/cancel
 ```
 
 ```bash cURL
-curl -X PATCH "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/flag" \
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/cancel" \
   -H "EF-Access-Key: your_api_key_here" \
   -H "Content-Type: application/json" \
-  -d '{"key":"subscription_status","value":"paused"}'
+  -d '{"reason":"too_expensive"}'
+```
+
+---
+
+## Pause Subscription
+
+Pauses billing until the subscription is resumed. It takes no resume date.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/pause
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/pause" \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+---
+
+## Resume Subscription
+
+Sets a paused subscription back to active. Billing continues from its next charge date.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/resume
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/resume" \
+  -H "EF-Access-Key: your_api_key_here"
 ```
 
 <Note>
-If this path returns 404, use **Pause**, **Resume**, **Reactivate**, **Change Next Bill Date**, and related POST routes in this reference instead.
+If the next charge date is already in the past, the subscription is charged on the next billing run. Use **Change Next Charge Date** first to pick a later date.
 </Note>
+
+---
+
+## Update Pricing
+
+Changes what the subscription charges from the next renewal on. Send only the fields you want to change.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+<ParamField body="amount" type="number">
+  Recurring charge per cycle
+</ParamField>
+
+<ParamField body="products" type="array">
+  Replacement product lines, each `{ "code": string, "price": number, "quantity": number }` (quantity at least 1)
+</ParamField>
+
+<ParamField body="shipping_amount" type="number">
+  Shipping charged per cycle
+</ParamField>
+
+<ParamField body="discount_type" type="string">
+  `percent` or `fixed`
+</ParamField>
+
+<ParamField body="discount_value" type="number">
+  The percentage or fixed amount of the discount
+</ParamField>
+
+<ParamField body="discount_amount" type="number">
+  The discount in money, if you calculate it yourself
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/update-pricing
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/update-pricing" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":29.99,"shipping_amount":0,"discount_type":"percent","discount_value":10}'
+```
+
+---
+
+## Swap Product
+
+Switches the subscription to another product from your catalog. Returns 404 if the product code does not exist.
+
+<ParamField path="brand" type="string" required>
+  The brand/project ID
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  Subscription transaction ID
+</ParamField>
+
+<ParamField body="new_product_code" type="string" required>
+  Code of the product to switch to (for example `sleep-gummies-3`)
+</ParamField>
+
+```bash Request
+POST /api/brands/{brand}/subscriptions/{id}/swap-product
+```
+
+```bash cURL
+curl -X POST "https://app.elasticfunnels.io/api/brands/{brand_id}/subscriptions/{transaction_id}/swap-product" \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"new_product_code":"sleep-gummies-3"}'
+```
 
 ---
 

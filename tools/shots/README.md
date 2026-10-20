@@ -37,6 +37,25 @@ Needs Node 18+ and Playwright. Nothing to install in this repo: it uses
 - Raw captures and the measured element boxes go to `tools/shots/raw/` (gitignored), so the
   composite can be re-rendered without the app.
 
+## Capture: the affiliate portal
+
+Specs with `"site": "portal"` capture the affiliate portal (the website runtime, `~/Work/website`) instead of
+the app. Run the runtime locally against the dev database, with a demo portal on a test hostname; the app repo's
+`_dev/affiliates/docs-demo-portal-seed.php` seeds one with fictional affiliates and payouts.
+
+| Env | What |
+|---|---|
+| `EF_PORTAL` | the portal origin, e.g. `http://partners.northwind.test:8093` |
+| `EF_PORTAL_RESOLVE` | the IP the portal hostname is mapped to in the browser (default `127.0.0.1`), so no DNS or hosts entry is needed |
+| `EF_PORTAL_PASSWORD` | the demo affiliate's password, for specs with `"login": "<email>"` |
+
+- `"login"` signs in on `/affiliates/login` before capture; that sign-in is the only write a portal spec makes.
+  `"passwordEnv": "EF_PORTAL_PASSWORD_PENDING"` reads a second affiliate's password from another variable.
+- Portal requests carry no access key. Stats come from fixtures (`tools/shots/fixtures/affiliate-portal/`), since
+  the local runtime has no click or conversion data.
+- A fixture with `"method": "POST"` answers a write with fictional JSON (the write never reaches the server),
+  e.g. the sign-up step that has to succeed before the verification screen shows.
+
 ## Spec: a UI screen
 
 `tools/shots/specs/emails-overview-list.json`:

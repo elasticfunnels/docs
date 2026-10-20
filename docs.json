@@ -14,115 +14,139 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Get started",
+            "icon": "rocket",
             "pages": [
               "index"
             ]
           },
           {
-            "group": "Essentials",
+            "group": "Build",
+            "icon": "hammer",
             "pages": [
-              "essentials/brand-actions",
-              "essentials/roles-permissions-metrics",
-              "essentials/permission-matrix",
-              "essentials/restricted-role-troubleshooting"
-            ]
-          },
-          {
-            "group": "Account & Security",
-            "pages": [
-              "account/two-factor-authentication",
-              "account/passkeys",
-              "account/cli-and-api-keys"
-            ]
-          },
-          {
-            "group": "Analytics & Metrics",
-            "pages": [
-              "analytics/custom-dashboards",
-              "analytics/audience-actions",
-              "analytics/split-test",
-              "analytics/conversions",
-              "analytics/ad-spend-metrics",
-              "analytics/video-metrics",
-              "analytics/tracking-metrics"
-            ]
-          },
-          {
-            "group": "Funnels",
-            "pages": [
-              "funnels/create-funnel",
-              "guides/how-to-design-a-checkout-page",
-              "checkouts/checkout-functionality-reference",
-              "checkouts/package-selector",
-              "funnels/checkout-redirect-behavior",
-              "funnels/trigger-pages",
-              "funnels/trigger-rules",
-              "funnels/funnel-split-testing"
-            ]
-          },
-          {
-            "group": "Page Events",
-            "pages": [
-              "funnels/page-events",
-              "funnels/page-events-nodes",
               {
-                "group": "Event Types",
+                "group": "Template kits",
+                "icon": "swatchbook",
                 "pages": [
-                  "funnels/script-rule",
-                  "funnels/window-api",
-                  "funnels/dynamic-content",
-                  "funnels/exit-popups"
+                  "template-kits/overview",
+                  "template-kits/apply-a-kit",
+                  "template-kits/after-applying",
+                  "template-kits/kit-images",
+                  "template-kits/ai-customise",
+                  "template-kits/troubleshooting",
+                  "template-kits/glossary"
                 ]
               },
               {
-                "group": "Routing & Testing",
+                "group": "Pages",
+                "icon": "file-lines",
                 "pages": [
-                  "funnels/split-testing",
-                  "funnels/query-parameters",
-                  "funnels/sequence-nodes"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Pages",
-            "pages": [
-              "pages/overview",
-              "pages/rendering-pipeline",
-              "pages/create-landing-page",
-              "pages/page-settings",
-              "pages/wildcard-routes",
-              "pages/seo",
-              "pages/privacy-consent",
-              {
-                "group": "Variants & Testing",
-                "pages": [
-                  "pages/page-variants",
-                  "pages/page-revisions",
-                  "pages/visitor-based-content"
+                  "pages/overview",
+                  "pages/create-landing-page",
+                  "pages/page-settings",
+                  "pages/wildcard-routes",
+                  "pages/seo",
+                  "pages/privacy-consent",
+                  "pages/rendering-pipeline",
+                  {
+                    "group": "Variants and revisions",
+                    "icon": "code-branch",
+                    "pages": [
+                      "pages/page-variants",
+                      "pages/page-revisions",
+                      "pages/visitor-based-content"
+                    ]
+                  },
+                  {
+                    "group": "Page elements",
+                    "icon": "shapes",
+                    "pages": [
+                      "pages/interactions-panel",
+                      "pages/containers",
+                      "pages/page-variables",
+                      "pages/internationalization"
+                    ]
+                  },
+                  {
+                    "group": "Store tags",
+                    "icon": "tags",
+                    "pages": [
+                      "pages/order-tag",
+                      "pages/product-item-tag",
+                      "pages/collection-item-tag",
+                      "pages/cart"
+                    ]
+                  }
                 ]
               },
               {
-                "group": "Page Elements",
+                "group": "Funnels",
+                "icon": "filter",
                 "pages": [
-                  "pages/interactions-panel",
-                  "pages/containers",
-                  "pages/page-variables",
-                  "pages/internationalization"
+                  "funnels/create-funnel",
+                  "funnels/trigger-pages",
+                  "funnels/trigger-rules",
+                  "funnels/checkout-redirect-behavior"
                 ]
               },
               {
-                "group": "eCommerce Tags",
+                "group": "Page events",
+                "icon": "diagram-project",
                 "pages": [
-                  "pages/order-tag",
-                  "pages/product-item-tag",
-                  "pages/collection-item-tag",
-                  "pages/cart"
+                  "funnels/page-events",
+                  "funnels/page-events-nodes",
+                  {
+                    "group": "Event types",
+                    "icon": "bolt",
+                    "pages": [
+                      "funnels/script-rule",
+                      "funnels/window-api",
+                      "funnels/dynamic-content",
+                      "funnels/exit-popups",
+                      "funnels/popups-from-code"
+                    ]
+                  },
+                  {
+                    "group": "Routing",
+                    "icon": "route",
+                    "pages": [
+                      "funnels/query-parameters",
+                      "funnels/sequence-nodes"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Quizzes",
+                "icon": "circle-question",
+                "pages": [
+                  "quizzes/build-and-publish",
+                  "quizzes/blocks-and-answers"
+                ]
+              },
+              {
+                "group": "Forms",
+                "icon": "clipboard-list",
+                "pages": [
+                  "forms/lead-capture",
+                  "forms/thank-you-pages",
+                  "forms/export-data"
+                ]
+              },
+              {
+                "group": "Members area",
+                "icon": "id-card",
+                "pages": [
+                  "members-area/overview",
+                  "members-area/login",
+                  "members-area/order-details",
+                  "members-area/subscription-management",
+                  "members-area/customer-care"
                 ]
               },
               {
                 "group": "Courses",
+                "icon": "graduation-cap",
                 "pages": [
                   "courses/overview",
                   "courses/student-pages",
@@ -133,248 +157,383 @@
             ]
           },
           {
-            "group": "Merchants",
+            "group": "Sell",
+            "icon": "cart-shopping",
             "pages": [
-              "guides/how-to-set-up-a-new-merchant",
-              "merchants/high-risk-and-merchant-accounts",
-              "merchants/postback-urls",
-              "merchants/test-merchant",
               {
-                "group": "Payment Processors",
+                "group": "Products",
+                "icon": "box",
                 "pages": [
-                  "merchants/clickbank",
-                  "merchants/buygoods",
-                  "merchants/digistore24",
-                  "merchants/jvzoo",
-                  "merchants/shopify-checkout"
+                  "products/product-management",
+                  "products/product-folders",
+                  "products/variants",
+                  "products/product-attributes",
+                  "products/custom-attributes",
+                  "products/buy-links",
+                  "products/advanced-purchase-links"
                 ]
               },
               {
-                "group": "Express Checkout",
+                "group": "Checkouts",
+                "icon": "credit-card",
                 "pages": [
-                  "merchants/shop-pay",
-                  "merchants/paypal",
-                  "merchants/apple-pay-google-pay"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Affiliates",
-            "pages": [
-              "affiliates/postback-urls"
-            ]
-          },
-          {
-            "group": "Integrations",
-            "pages": [
-              "integrations/connect",
-              "integrations/integration-health",
-              {
-                "group": "Ad Platforms",
-                "pages": [
-                  "integrations/meta-ads",
-                  "integrations/campaigns-management",
-                  "integrations/google-ads",
-                  "integrations/taboola"
+                  "guides/how-to-design-a-checkout-page",
+                  "checkouts/checkout-functionality-reference",
+                  "checkouts/package-selector"
                 ]
               },
               {
-                "group": "Affiliate Networks & Attribution",
+                "group": "Upsells",
+                "icon": "arrow-trend-up",
                 "pages": [
-                  "integrations/affiliate-tracking",
-                  "integrations/buygoods",
-                  "integrations/clickbank",
-                  "integrations/jvzoo",
-                  "integrations/everflow",
-                  "integrations/redtrack"
+                  "products/upsells",
+                  "products/subscription-upsells",
+                  "products/upsell-forms"
                 ]
               },
               {
-                "group": "Analytics & Tracking",
+                "group": "Merchants",
+                "icon": "building-columns",
                 "pages": [
-                  "integrations/google-analytics"
+                  "guides/how-to-set-up-a-new-merchant",
+                  "merchants/high-risk-and-merchant-accounts",
+                  "merchants/postback-urls",
+                  "merchants/test-merchant",
+                  {
+                    "group": "Merchant platforms",
+                    "icon": "store",
+                    "pages": [
+                      "merchants/clickbank",
+                      "merchants/buygoods",
+                      "merchants/digistore24",
+                      "merchants/jvzoo",
+                      "merchants/explodely",
+                      "merchants/shopify-checkout"
+                    ]
+                  },
+                  {
+                    "group": "Express checkout",
+                    "icon": "bolt",
+                    "pages": [
+                      "merchants/shop-pay",
+                      "merchants/paypal",
+                      "merchants/apple-pay-google-pay"
+                    ]
+                  }
                 ]
               },
               {
-                "group": "Email & CRM",
+                "group": "Subscriptions",
+                "icon": "arrows-rotate",
                 "pages": [
-                  "integrations/email-marketing",
-                  "integrations/crm"
+                  "subscriptions/overview",
+                  "subscriptions/emails-and-dunning",
+                  "subscriptions/analytics",
+                  "subscriptions/retention-offers"
                 ]
               },
               {
-                "group": "AI & Communications",
+                "group": "Orders and fulfillment",
+                "icon": "truck",
                 "pages": [
-                  "integrations/ai-providers",
-                  "integrations/twilio"
-                ]
-              },
-              {
-                "group": "eCommerce & Operations",
-                "pages": [
-                  "integrations/shopify-order-sync",
                   "integrations/fulfillment",
+                  "integrations/shopify-order-sync",
                   "integrations/tax",
-                  "integrations/google-sheets"
-                ]
-              },
-              {
-                "group": "Video Players",
-                "pages": [
-                  "integrations/trackplay"
-                ]
-              },
-              "integrations/callcenters",
-              "integrations/chargeback-management"
-            ]
-          },
-          {
-            "group": "Automations",
-            "pages": [
-              "automations/variables",
-              "automations/send-email",
-              "automations/run-history"
-            ]
-          },
-          {
-            "group": "Members Area",
-            "pages": [
-              "members-area/overview",
-              "members-area/login",
-              "members-area/order-details",
-              "members-area/subscription-management",
-              "members-area/customer-care"
-            ]
-          },
-          {
-            "group": "Forms & Data",
-            "pages": [
-              "forms/lead-capture",
-              "forms/thank-you-pages",
-              "forms/export-data"
-            ]
-          },
-          {
-            "group": "Subscriptions",
-            "pages": [
-              "subscriptions/overview",
-              "subscriptions/emails-and-dunning",
-              "subscriptions/analytics",
-              "subscriptions/retention-offers"
-            ]
-          },
-          {
-            "group": "Emails",
-            "pages": [
-              "emails/overview",
-              "emails/builder",
-              "emails/sending-setup",
-              "emails/sending-accounts",
-              "emails/delivery-events",
-              "emails/template-variables",
-              "emails/order-emails",
-              "emails/subscription-emails",
-              "emails/dunning",
-              "emails/course-emails",
-              "emails/login-emails",
-              "emails/troubleshooting"
-            ]
-          },
-          {
-            "group": "Products & Sales",
-            "pages": [
-              "products/product-management",
-              "products/buy-links",
-              "products/upsells",
-              "products/subscription-upsells",
-              "products/custom-attributes",
-              "products/product-attributes",
-              "products/variants",
-              "products/advanced-purchase-links"
-            ]
-          },
-          {
-            "group": "Domains & Customization",
-            "pages": [
-              "domains/custom-domains",
-              "domains/customization",
-              "domains/whitelisting",
-              "domains/recaptcha-setup"
-            ]
-          },
-          {
-            "group": "Development & Debugging",
-            "pages": [
-              "debugging/overview",
-              "debugging/debug-window"
-            ]
-          },
-          {
-            "group": "Frontend Template Engine",
-            "pages": [
-              "frontend-template-engine/overview",
-              "frontend-template-engine/syntax",
-              {
-                "group": "Data & Bindings",
-                "pages": [
-                  "frontend-template-engine/scope-and-data",
-                  "frontend-template-engine/bindings-forms-events",
-                  "frontend-template-engine/built-in-functions"
-                ]
-              },
-              {
-                "group": "eCommerce",
-                "pages": [
-                  "frontend-template-engine/cart",
-                  "frontend-template-engine/checkout"
-                ]
-              },
-              {
-                "group": "Advanced",
-                "pages": [
-                  "frontend-template-engine/limitations-pitfalls",
-                  "frontend-template-engine/debugging"
+                  "integrations/callcenters",
+                  "integrations/chargeback-management"
                 ]
               }
             ]
           },
           {
-            "group": "Backend Template Engine",
+            "group": "Grow and track",
+            "icon": "chart-line",
             "pages": [
-              "backend-template-engine/overview",
-              "backend-template-engine/directives",
-              "backend-template-engine/variables-and-filters",
-              "backend-template-engine/products-and-shipping"
-            ]
-          },
-          {
-            "group": "CRM",
-            "pages": [
-              "crm/overview",
-              "crm/post-workflow"
-            ]
-          },
-          {
-            "group": "Backend Scripts",
-            "pages": [
-              "backend-scripts/overview",
-              "backend-scripts/imports",
               {
-                "group": "Reference",
+                "group": "Analytics",
+                "icon": "chart-pie",
                 "pages": [
-                  "backend-scripts/context",
-                  "backend-scripts/actions",
-                  "backend-scripts/tags",
-                  "backend-scripts/data-functions",
-                  "backend-scripts/validation",
-                  "backend-scripts/http",
-                  "backend-scripts/cache",
-                  "backend-scripts/queue",
-                  "backend-scripts/storage"
+                  "analytics/custom-dashboards",
+                  "analytics/conversions",
+                  "analytics/ad-spend-metrics",
+                  "analytics/tracking-metrics",
+                  "analytics/video-metrics"
                 ]
               },
-              "backend-scripts/examples"
+              {
+                "group": "Split testing",
+                "icon": "flask",
+                "pages": [
+                  "funnels/funnel-split-testing",
+                  "funnels/split-testing",
+                  "analytics/split-test",
+                  "analytics/automation-split-tests"
+                ]
+              },
+              {
+                "group": "Audiences",
+                "icon": "users",
+                "pages": [
+                  "analytics/audience-actions"
+                ]
+              },
+              {
+                "group": "Affiliates",
+                "icon": "handshake",
+                "pages": [
+                  "affiliates/internal-affiliates",
+                  "affiliates/postback-urls",
+                  {
+                    "group": "Affiliate portal",
+                    "icon": "door-open",
+                    "pages": [
+                      "affiliate-portal/overview",
+                      "affiliate-portal/set-up",
+                      "affiliate-portal/brands",
+                      "affiliate-portal/affiliates",
+                      "affiliate-portal/payouts",
+                      "affiliate-portal/assets",
+                      "affiliate-portal/branding",
+                      "affiliate-portal/permissions",
+                      {
+                        "group": "What affiliates see",
+                        "icon": "eye",
+                        "pages": [
+                          "affiliate-portal/affiliate-sign-up",
+                          "affiliate-portal/affiliate-dashboard",
+                          "affiliate-portal/affiliate-links",
+                          "affiliate-portal/affiliate-payouts",
+                          "affiliate-portal/affiliate-tracking"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Emails",
+                "icon": "envelope",
+                "pages": [
+                  "emails/overview",
+                  "emails/builder",
+                  "emails/template-variables",
+                  {
+                    "group": "Sending",
+                    "icon": "paper-plane",
+                    "pages": [
+                      "emails/sending-setup",
+                      "emails/sending-accounts",
+                      "emails/delivery-events",
+                      "emails/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "Automatic emails",
+                    "icon": "envelopes-bulk",
+                    "pages": [
+                      "emails/order-emails",
+                      "emails/subscription-emails",
+                      "emails/dunning",
+                      "emails/course-emails",
+                      "emails/login-emails"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Automations",
+                "icon": "robot",
+                "pages": [
+                  "automations/variables",
+                  "automations/send-email",
+                  "automations/run-history"
+                ]
+              },
+              {
+                "group": "Integrations",
+                "icon": "plug",
+                "pages": [
+                  "integrations/connect",
+                  "integrations/integration-health",
+                  {
+                    "group": "Ad platforms",
+                    "icon": "bullhorn",
+                    "pages": [
+                      "integrations/meta-ads",
+                      "integrations/campaigns-management",
+                      "integrations/google-ads",
+                      "integrations/taboola"
+                    ]
+                  },
+                  {
+                    "group": "Affiliate networks and attribution",
+                    "icon": "share-nodes",
+                    "pages": [
+                      "integrations/affiliate-tracking",
+                      "integrations/buygoods",
+                      "integrations/clickbank",
+                      "integrations/jvzoo",
+                      "integrations/everflow",
+                      "integrations/redtrack"
+                    ]
+                  },
+                  {
+                    "group": "Email and CRM",
+                    "icon": "address-book",
+                    "pages": [
+                      "integrations/email-marketing",
+                      "integrations/maropost",
+                      "integrations/crm"
+                    ]
+                  },
+                  {
+                    "group": "AI and messaging",
+                    "icon": "comments",
+                    "pages": [
+                      "integrations/ai-providers",
+                      "integrations/twilio",
+                      "integrations/slicktext",
+                      "integrations/attentive"
+                    ]
+                  },
+                  {
+                    "group": "Data and video",
+                    "icon": "database",
+                    "pages": [
+                      "integrations/google-analytics",
+                      "integrations/google-sheets",
+                      "integrations/trackplay"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Manage",
+            "icon": "gear",
+            "pages": [
+              "essentials/brand-actions",
+              "essentials/alerts",
+              {
+                "group": "Account and security",
+                "icon": "shield-halved",
+                "pages": [
+                  "account/two-factor-authentication",
+                  "account/passkeys",
+                  "account/cli-and-api-keys",
+                  "account/refer-and-earn",
+                  "account/ai-credits"
+                ]
+              },
+              {
+                "group": "Team and permissions",
+                "icon": "user-shield",
+                "pages": [
+                  "essentials/roles-permissions-metrics",
+                  "essentials/permission-matrix",
+                  "essentials/restricted-role-troubleshooting"
+                ]
+              },
+              {
+                "group": "Domains",
+                "icon": "globe",
+                "pages": [
+                  "domains/custom-domains",
+                  "domains/customization",
+                  "domains/whitelisting",
+                  "domains/recaptcha-setup"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Developers",
+            "icon": "code",
+            "pages": [
+              {
+                "group": "Debugging",
+                "icon": "bug",
+                "pages": [
+                  "debugging/overview",
+                  "debugging/debug-window"
+                ]
+              },
+              {
+                "group": "Frontend template engine",
+                "icon": "brackets-curly",
+                "pages": [
+                  "frontend-template-engine/overview",
+                  "frontend-template-engine/syntax",
+                  {
+                    "group": "Data and bindings",
+                    "icon": "database",
+                    "pages": [
+                      "frontend-template-engine/scope-and-data",
+                      "frontend-template-engine/bindings-forms-events",
+                      "frontend-template-engine/built-in-functions"
+                    ]
+                  },
+                  {
+                    "group": "Store",
+                    "icon": "cart-shopping",
+                    "pages": [
+                      "frontend-template-engine/cart",
+                      "frontend-template-engine/checkout"
+                    ]
+                  },
+                  {
+                    "group": "Advanced",
+                    "icon": "screwdriver-wrench",
+                    "pages": [
+                      "frontend-template-engine/limitations-pitfalls",
+                      "frontend-template-engine/debugging"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Backend template engine",
+                "icon": "server",
+                "pages": [
+                  "backend-template-engine/overview",
+                  "backend-template-engine/directives",
+                  "backend-template-engine/variables-and-filters",
+                  "backend-template-engine/products-and-shipping"
+                ]
+              },
+              {
+                "group": "Backend scripts",
+                "icon": "terminal",
+                "pages": [
+                  "backend-scripts/overview",
+                  "backend-scripts/imports",
+                  {
+                    "group": "Reference",
+                    "icon": "book",
+                    "pages": [
+                      "backend-scripts/context",
+                      "backend-scripts/actions",
+                      "backend-scripts/tags",
+                      "backend-scripts/data-functions",
+                      "backend-scripts/validation",
+                      "backend-scripts/http",
+                      "backend-scripts/cache",
+                      "backend-scripts/queue",
+                      "backend-scripts/storage"
+                    ]
+                  },
+                  "backend-scripts/examples"
+                ]
+              },
+              {
+                "group": "Custom CRM data",
+                "icon": "address-book",
+                "pages": [
+                  "crm/overview",
+                  "crm/post-workflow"
+                ]
+              }
             ]
           }
         ]
@@ -383,7 +542,8 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Getting started",
+            "icon": "key",
             "pages": [
               "api-reference/introduction",
               "api-reference/quick-start",
@@ -392,30 +552,49 @@
             ]
           },
           {
-            "group": "Endpoints",
+            "group": "Site and content",
+            "icon": "file-lines",
             "pages": [
               "api-reference/endpoints/brands",
               "api-reference/endpoints/pages",
               "api-reference/endpoints/components",
               "api-reference/endpoints/file-manager",
-              "api-reference/endpoints/products",
-              "api-reference/endpoints/collections",
-              "api-reference/endpoints/customers",
-              "api-reference/endpoints/funnels",
-              "api-reference/endpoints/conversions",
-              "api-reference/endpoints/subscriptions",
-              "api-reference/endpoints/analytics",
-              "api-reference/endpoints/split-tests",
-              "api-reference/endpoints/crm",
-              "api-reference/endpoints/tickets",
-              "api-reference/endpoints/automations",
-              "api-reference/endpoints/domains",
-              "api-reference/endpoints/affiliates",
               "api-reference/endpoints/blogs",
               "api-reference/endpoints/courses",
+              "api-reference/endpoints/quizzes"
+            ]
+          },
+          {
+            "group": "Store and orders",
+            "icon": "cart-shopping",
+            "pages": [
+              "api-reference/endpoints/products",
+              "api-reference/endpoints/collections",
+              "api-reference/endpoints/funnels",
+              "api-reference/endpoints/customers",
+              "api-reference/endpoints/conversions",
+              "api-reference/endpoints/subscriptions"
+            ]
+          },
+          {
+            "group": "Marketing and data",
+            "icon": "chart-line",
+            "pages": [
+              "api-reference/endpoints/analytics",
+              "api-reference/endpoints/split-tests",
+              "api-reference/endpoints/tracking",
               "api-reference/endpoints/emails",
-              "api-reference/endpoints/quizzes",
-              "api-reference/endpoints/tracking"
+              "api-reference/endpoints/automations",
+              "api-reference/endpoints/affiliates",
+              "api-reference/endpoints/crm",
+              "api-reference/endpoints/tickets"
+            ]
+          },
+          {
+            "group": "Account",
+            "icon": "gear",
+            "pages": [
+              "api-reference/endpoints/domains"
             ]
           }
         ]
@@ -436,6 +615,10 @@
     "dark": "/logo/light.svg"
   },
   "redirects": [
+    {
+      "source": "/products/quickbuy",
+      "destination": "/products/buy-links"
+    },
     {
       "source": "/analytics/audience-destinations",
       "destination": "/analytics/audience-actions"

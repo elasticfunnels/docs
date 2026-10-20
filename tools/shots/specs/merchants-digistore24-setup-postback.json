@@ -1,0 +1,41 @@
+{
+  "out": "images/merchants/digistore24-setup-postback.png",
+  "alt": "The Postback URL step of the guided Digistore24 setup: the postback URL with Copy and the steps for the IPN connection in Digistore24",
+  "_source": "elasticfunnels app origin/main b6082460d on a local server (EF_APP=http://127.0.0.1:8031), demo brand 899, fictional merchant 199 created and taken to the Postback URL step by the app flow _dev/flows/merchant-wizard-shots (JVZoo 192: _dev/flows/merchant-wizard); the local origin in the URL is shown as app.elasticfunnels.io. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs merchants-digistore24-setup",
+  "capture": {
+    "path": "/{brand}/merchants/199/setup",
+    "viewport": {
+      "width": 1200,
+      "height": 1100
+    },
+    "waitFor": "[data-testid='merchants.wizard.panel.postback']",
+    "actions": [
+      {
+        "wait": 800
+      },
+      {
+        "eval": "(() => { const o = location.origin; const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.nodeValue.includes(o)) n.nodeValue = n.nodeValue.split(o).join('https://app.elasticfunnels.io'); })()"
+      }
+    ],
+    "crop": "[data-testid='merchants.wizard']",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid='merchants.wizard.configure.copy']",
+      "title": "Copy",
+      "text": "Paste it in the IPN connection"
+    },
+    {
+      "selector": "[data-testid='merchants.wizard.continue']",
+      "title": "Continue",
+      "text": "After Test IPN in Digistore24"
+    }
+  ]
+}

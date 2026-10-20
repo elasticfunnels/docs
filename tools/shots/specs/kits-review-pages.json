@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/review-pages.png",
+  "alt": "The Pages list of the kit review: each page with its thumbnail, title, the URL it will get, badges such as Layout, Checkout and Members only, the Already exists mark and a preview link",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"review-pages\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 289, y 690, 734 x 560",
+  "image": "tools/shots/source/kits-review-pages.png",
+  "imageSize": {
+    "w": 734,
+    "h": 560
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        18,
+        61,
+        62,
+        46
+      ],
+      "title": "Page",
+      "text": "Title and the URL it will get",
+      "side": "left"
+    },
+    {
+      "box": [
+        534,
+        350,
+        139,
+        21
+      ],
+      "title": "Already exists",
+      "text": "This URL is taken in your project",
+      "side": "right"
+    },
+    {
+      "box": [
+        685,
+        68,
+        32,
+        32
+      ],
+      "title": "Preview",
+      "text": "This page in the live kit",
+      "side": "right"
+    }
+  ]
+}

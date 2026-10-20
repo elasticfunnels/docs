@@ -1,0 +1,61 @@
+{
+  "out": "images/affiliate-portal/commission-group-form.png",
+  "alt": "The New commission group form: name, brand, commission type and a 40% rate",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='sidebar.commission-groups']",
+    "actions": [
+      {
+        "click": "[data-testid='sidebar.commission-groups']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "text=Add New Group >> visible=true"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "fill": ".ant-modal-content input >> nth=0",
+        "value": "Launch partners"
+      },
+      {
+        "fill": ".ant-modal-content input[type=number] >> nth=0",
+        "value": "40"
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "text=All brands (organization-wide) >> visible=true",
+      "title": "Brand",
+      "text": "Empty: every brand can use it",
+      "side": "right"
+    },
+    {
+      "selector": "text=Fixed amount (CPA) >> visible=true",
+      "title": "Commission type",
+      "text": "Revenue share or fixed amount",
+      "side": "right"
+    },
+    {
+      "selector": ".ant-modal-content input[type=number] >> nth=0",
+      "title": "Rate",
+      "text": "Percent of the sale",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 860,
+  "calloutWidth": 230
+}

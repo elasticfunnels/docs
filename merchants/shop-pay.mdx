@@ -1,5 +1,6 @@
 ---
 title: 'Shop Pay'
+icon: "shopify"
 description: 'Set up Shop Pay (Shopify draft order checkout) as a merchant, assign to a domain, and map products to Shopify variant IDs'
 ---
 
@@ -72,7 +73,7 @@ When a visitor clicks a buy link on your funnel:
 - There are no one-click upsells: payment happens on Shopify, so each purchase goes through Shopify checkout
 - These orders already exist in Shopify, so [Shopify Order Sync](/integrations/shopify-order-sync) does not send them again
 
-There is no “decline” link; if the customer does not complete checkout, they simply leave. Use the **Setup** modal in the **Merchants** list for postback configuration and validation.
+There is no “decline” link; if the customer does not complete checkout, they simply leave. Use **Postback Setup** on the merchant's row in **Settings** → **Merchants** for postback configuration and validation.
 
 ## Links and Funnels
 {/* SCREENSHOT: Links and Funnels · merchant setup screen or postback state · desktop */}
@@ -86,7 +87,7 @@ Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain an
 ## Postbacks
 {/* SCREENSHOT: Postbacks · merchant setup screen or postback state · desktop */}
 
-Use the **Setup** modal in the **Merchants** list for step-by-step postback instructions and your unique URL. After you configure the postback and trigger a test (or complete a test purchase), the modal will automatically mark the connection as validated once the webhook is received.
+Click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for Shopify, then **Test**. After you configure the postback and trigger a test (or complete a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
 
 ## Troubleshooting
 {/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
