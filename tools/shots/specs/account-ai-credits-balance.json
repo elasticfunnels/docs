@@ -1,0 +1,53 @@
+{
+  "out": "images/account/ai-credits-balance.png",
+  "alt": "The AI credits tab in Billing: credits remaining, split into the monthly allowance and purchased credits, credits used this period, and the Purchase more credits button",
+  "capture": {
+    "path": "/org/northwind-demo/billing?tab=ai_credits",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='billing.ai-credits.monthly']"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": "[data-testid='billing.ai-credits.used'] >> xpath=ancestor::dl[1]/..",
+    "cropPad": 12
+  },
+  "maxWidth": 720,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='billing.ai-credits.remaining']",
+      "title": "Remaining credits",
+      "text": "Monthly and purchased credits together",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='billing.ai-credits.purchase-button']",
+      "title": "Purchase more credits",
+      "text": "Buy a pack, charged to your card"
+    },
+    {
+      "selector": "[data-testid='billing.ai-credits.monthly'] >> xpath=..",
+      "title": "Monthly plan credits",
+      "text": "Spent first, reset every billing period",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='billing.ai-credits.purchased'] >> xpath=..",
+      "title": "Purchased credits",
+      "text": "Never expire, used after the allowance"
+    },
+    {
+      "selector": "[data-testid='billing.ai-credits.used'] >> xpath=..",
+      "title": "Used this period",
+      "text": "Credits spent since the period started",
+      "side": "left"
+    }
+  ]
+}

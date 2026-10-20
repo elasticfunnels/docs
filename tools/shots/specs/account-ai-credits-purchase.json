@@ -1,0 +1,62 @@
+{
+  "out": "images/account/ai-credits-purchase.png",
+  "alt": "The Purchase AI credits window with the four credit packs and their prices, the card that will be charged, and the Purchase button",
+  "capture": {
+    "path": "/org/northwind-demo/billing?tab=ai_credits",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='billing.ai-credits.purchase-button']"
+      },
+      {
+        "click": "[data-testid='billing.ai-credits.purchase-button']"
+      },
+      {
+        "waitFor": "[data-testid='organization.ai-credits-purchase.pack-5000']"
+      },
+      {
+        "click": "[data-testid='organization.ai-credits-purchase.pack-5000']"
+      },
+      {
+        "wait": 700
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0,
+    "fixtures": [
+      {
+        "url": "^/api/organizations/\\d+/payment-cards",
+        "file": "tools/shots/fixtures/ai-credits/payment-cards.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='organization.ai-credits-purchase.pack-1000']",
+      "title": "Credit packs",
+      "text": "Fixed sizes, one price each",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='organization.ai-credits-purchase.pack-5000']",
+      "title": "Selected pack",
+      "text": "Credits and the price you pay"
+    },
+    {
+      "selector": "[data-testid='organization.ai-credits-purchase.payment-method']",
+      "title": "Payment method",
+      "text": "The saved card that gets charged",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='organization.ai-credits-purchase.submit']",
+      "title": "Purchase",
+      "text": "Charges the card, adds the credits"
+    }
+  ]
+}
