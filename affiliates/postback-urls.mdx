@@ -33,7 +33,7 @@ The system documented here is **additive**:
 | Auth | None | HMAC `X-EF-Signature` (+ optional Bearer token) |
 | Retries | Best-effort, no log | Queued + exponential backoff + delivery log |
 | Events | Purchase only | Purchase, refund, chargeback, renewal, cancel |
-| Affiliate types | `affcenter` only | All affiliate types |
+| Affiliate types | Internal affiliates (type `affcenter`) only | All affiliate types |
 
 You can use either, both, or neither.
 

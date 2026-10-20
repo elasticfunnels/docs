@@ -1,0 +1,52 @@
+{
+  "out": "images/affiliates/internal-brand-not-on-portal.png",
+  "alt": "The Create a new affiliate dialog with Internal selected, explaining that this brand is not on the affiliate portal yet, with a link to the portal's Brands tab",
+  "capture": {
+    "path": "/{brand}/affiliates",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='list.new-button']",
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/affiliates/internal-status",
+        "file": "tools/shots/fixtures/internal-affiliates/status-not-on-portal.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/affiliates/organization-affiliates-options",
+        "file": "tools/shots/fixtures/internal-affiliates/portal-affiliate-options.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='list.new-button']"
+      },
+      {
+        "waitFor": "[data-testid='affiliates.form.internal-empty']"
+      }
+    ],
+    "crop": {
+      "x": 336,
+      "y": 30,
+      "width": 768,
+      "height": 585
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='affiliates.form.internal-empty']",
+      "title": "Not on the portal",
+      "text": "Says why there is no one to pick",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='affiliates.form.internal-empty-link']",
+      "title": "Portal link",
+      "text": "Opens the portal's Brands tab",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

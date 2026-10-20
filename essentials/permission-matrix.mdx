@@ -44,12 +44,13 @@ This matrix is designed for brand owners and organization admins who need to bui
 | Open Billing | `billing.invoices.view`, `billing.cards.view` | Billing checks use the `.view` form. |
 | See plans and pricing on the organization's Brands page | `organization.settings.view` | Other members see the brand list without plan and pricing columns. |
 | Open the Affiliate portal | any `organization.affiliate_portal*.view` | The portal shows only the tabs the role has. A role with none of these does not see Affiliate Portal in the organization menu. |
-| Change portal domain, branding, emails, payout schedule, brands and offers | `organization.affiliate_portal.update` | Removing the portal needs `organization.affiliate_portal.delete`. |
+| Change portal domain, branding, emails, payout schedule and brands (with each brand's status after sign-up) | `organization.affiliate_portal.update` | Removing the portal needs `organization.affiliate_portal.delete`. |
 | See, invite and edit portal affiliates | `organization.affiliate_portal_affiliates.view`, `.create`, `.update` | Update also covers disabling an affiliate, resetting a password and linking brands. |
 | See or change payouts, invoices and affiliate billing details | `organization.affiliate_portal_payouts.view`, `.update` | Billing details and payout methods sit here, not under affiliates. |
 | Manage portal assets (banners, swipes, landing pages) | `organization.affiliate_portal_assets.view`, `.create`, `.update`, `.delete` | |
 | Manage commission groups | `organization.affiliate_portal_commission_groups.view`, `.create`, `.update`, `.delete` | |
 | Pick a portal affiliate when adding an internal affiliate on a brand | `affiliates.organization_affiliates.view` | Together with `affiliates.create` or `affiliates.update` on that brand. |
+| Invite a new portal affiliate from a brand's Add affiliate form | `affiliates.create` on the brand, `affiliates.organization_affiliates.view` and `organization.affiliate_portal_affiliates.create` | Without the portal permission the form still lets you pick existing portal affiliates. |
 
 ## Metrics access matrix
 {/* SCREENSHOT: Metrics access matrix · relevant screen or example output · desktop */}

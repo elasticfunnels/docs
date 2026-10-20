@@ -1,0 +1,56 @@
+{
+  "out": "images/affiliates/portal-invite.png",
+  "alt": "The affiliate portal's Affiliates section with the invite form open and every portal brand ticked",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal?tab=affiliates",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='org.affiliate-portal.affiliates.add']",
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/brands",
+        "file": "tools/shots/fixtures/internal-affiliates/org-brands.json"
+      },
+      {
+        "url": "^/api/organizations/798/affiliate-portal/affiliates",
+        "file": "tools/shots/fixtures/internal-affiliates/portal-affiliates.json"
+      },
+      {
+        "url": "^/api/organizations/798/affiliate-portal(\\?|$)",
+        "file": "tools/shots/fixtures/internal-affiliates/portal.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='org.affiliate-portal.affiliates.add']"
+      },
+      {
+        "waitFor": "[data-testid='org.affiliate-portal.affiliates.invite-brands']"
+      }
+    ],
+    "crop": {
+      "x": 300,
+      "y": 0,
+      "width": 840,
+      "height": 520
+    }
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.invite-brands']",
+      "title": "Brands",
+      "text": "All portal brands are ticked to start",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliates.invite-submit']",
+      "title": "Invite",
+      "text": "Creates the login and emails a password",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}

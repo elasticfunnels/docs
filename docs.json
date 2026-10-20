@@ -279,6 +279,7 @@
                 "group": "Affiliates",
                 "icon": "handshake",
                 "pages": [
+                  "affiliates/internal-affiliates",
                   "affiliates/postback-urls"
                 ]
               },

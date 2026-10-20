@@ -1,0 +1,28 @@
+{
+  "out": "images/affiliates/add-internal-affiliate.png",
+  "alt": "The Create a new affiliate dialog with Internal selected: the portal affiliate picker and the invite box with an email filled in",
+  "capture": {
+    "path": "/{brand}/affiliates",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid='list.new-button']",
+    "fixtures": [
+      { "url": "^/api/brands/{brand}/affiliates/internal-status", "file": "tools/shots/fixtures/internal-affiliates/status-ready.json" },
+      { "url": "^/api/brands/{brand}/affiliates/organization-affiliates-options", "file": "tools/shots/fixtures/internal-affiliates/portal-affiliate-options.json" }
+    ],
+    "actions": [
+      { "click": "[data-testid='list.new-button']" },
+      { "waitFor": "[data-testid='affiliates.form.portal-affiliate']" },
+      { "click": "[data-testid='affiliates.form.invite-open']" },
+      { "fill": "[data-testid='affiliates.form.invite-email']", "value": "partner@example.com" }
+    ],
+    "crop": { "x": 336, "y": 30, "width": 768, "height": 670 }
+  },
+  "annotations": [
+    { "selector": "[data-testid='affiliates.form.type']", "title": "Internal / External", "text": "Internal affiliates log in to your portal", "side": "left" },
+    { "selector": "[data-testid='affiliates.form.portal-affiliate']", "title": "Portal affiliate", "text": "Pick someone who already has a login", "side": "left" },
+    { "selector": "[data-testid='affiliates.form.invite-email']", "title": "Affiliate email", "text": "Invite someone new to the portal", "side": "left" },
+    { "selector": "[data-testid='affiliates.form.invite-send']", "title": "Send invite", "text": "Creates the login and emails a password", "side": "right" }
+  ],
+  "maxWidth": 900,
+  "calloutWidth": 230
+}
