@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/ai-status.png",
+  "alt": "After applying with Customise with AI on: the AI job running with an Open in the AI editor button, and the Still missing list of product images, kit images and facts",
+  "_source": "elasticfunnels repo _dev/flows/kit-customize-intake/shots.mjs, shot \"ai-status\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 1027, y 461, 384 x 451",
+  "image": "tools/shots/source/kits-ai-status.png",
+  "imageSize": {
+    "w": 384,
+    "h": 451
+  },
+  "maxWidth": 560,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        69,
+        94,
+        167,
+        31
+      ],
+      "title": "Open in the AI editor",
+      "text": "Watch the job work",
+      "side": "left"
+    },
+    {
+      "box": [
+        13,
+        208,
+        358,
+        111
+      ],
+      "title": "Still missing",
+      "text": "What the AI does not have",
+      "side": "left"
+    },
+    {
+      "box": [
+        327,
+        167,
+        28,
+        28
+      ],
+      "title": "Reload",
+      "text": "After you add something",
+      "side": "right"
+    }
+  ]
+}
