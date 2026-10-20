@@ -101,12 +101,9 @@ In the templates, the plans card is centred on the pricing screen, and the scree
 
 ## Back button and page navigation
 
-A screen shows a Back button only when both of these are on:
+The setting on the screen wins. A screen with **Allow to go back** turned on shows a Back button, even when **Show page navigation**, the quiz-wide switch in the layout settings, is off.
 
-- **Show page navigation**, the quiz-wide switch in the layout settings;
-- **Allow to go back** on that screen.
-
-With **Show page navigation** off, no screen shows Back, even a screen set to **Allow to go back**. This matches what the builder preview shows. New quizzes start with the switch off, so turn it on if you want visitors to step back. Quizzes saved before the switch existed keep following each screen's own setting.
+**Show page navigation** only sets the default for screens where **Allow to go back** was never changed: with the switch on, those screens show Back, except the first screen, where there is nothing to go back to. With the switch off, they show none. The builder preview follows the same rule.
 
 When there is no Back button, the progress bar fills the header. A logo set to the right stays at the right edge, and a logo image that fails to load is left out of the header.
 
