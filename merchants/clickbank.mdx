@@ -120,6 +120,8 @@ Purchase links automatically use the funnel's CBFID:
 - **With parameters**: `[BUY=product_code extra=campaign_data]`
 - **No manual CBFID**: System automatically adds the funnel's pitch flow ID
 
+A ClickBank pay link pasted into the page (`https://<account>.pay.clickbank.net/?cbitems=...`) gets the visitor's click code as `__click_id` when the page renders, so the sale is matched to its visit. A `__click_id` you set yourself is kept. To leave pasted links exactly as written, turn off **Add click tracking to pasted buy links** in the merchant's **Settings**.
+
 ### Upsell Configuration
 1. **Create upsell nodes** in your funnel
 2. **Connect to purchase nodes** for the main product
