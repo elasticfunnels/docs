@@ -187,7 +187,8 @@
                 "icon": "arrow-trend-up",
                 "pages": [
                   "products/upsells",
-                  "products/subscription-upsells"
+                  "products/subscription-upsells",
+                  "products/upsell-forms"
                 ]
               },
               {
