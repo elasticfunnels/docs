@@ -95,6 +95,16 @@ Click **Show input and output** on a step to see the data the step received and 
 Click **Hide input and output** to close it again. At the bottom of the drawer, **Trigger payload**
 opens the data the trigger received, such as the order and customer fields of a purchase.
 
+**Input (values sent)** holds the values the step was actually given, with every variable filled in.
+A field mapped to a variable, such as `{a1b2c3.customer_emailaddress}`, shows the customer's real email
+address there. Below it, **Configured as** lists those mapped fields the way they are set up in the
+builder, so you can see which variable each one came from. API keys, tokens and webhook URLs are masked
+in both.
+
+Older runs kept only the step as it was configured. On those, the block is labelled
+**Configured input (variables not resolved in this log)** and still shows the variables, not the values
+that were sent. Check the step's **Output** to see what came back.
+
 ## When a condition stops the run
 
 A **Continue If** step ends the run when its condition is not met. The run is still **Completed**,
