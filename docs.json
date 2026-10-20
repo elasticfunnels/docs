@@ -385,6 +385,7 @@
             "icon": "gear",
             "pages": [
               "essentials/brand-actions",
+              "essentials/alerts",
               {
                 "group": "Account and security",
                 "icon": "shield-halved",

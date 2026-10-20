@@ -1,0 +1,94 @@
+---
+title: "Alerts"
+sidebarTitle: "Alerts"
+icon: "triangle-exclamation"
+description: "Problems on your brand that keep happening: how often, how serious, who gets emailed, and how to acknowledge or resolve them"
+---
+
+Alerts collect the problems on a brand that cost sales or data, such as a merchant postback that is not set up or a checkout that keeps failing. Each problem is one issue that counts every time it happens again, so you see one line with a count instead of a pile of repeated notifications.
+
+Open them from **Settings > Alerts**.
+
+<img src="/images/alerts/alerts-list.png" alt="The Alerts page: open issues with severity, how many times each happened, when it was last seen and the last event" />
+
+## What an issue shows
+
+| Column | Meaning |
+|---|---|
+| Severity | Warning, Escalating or Critical. Hover the badge to see what each level means. |
+| Issue | What is wrong. |
+| Count | How many times it has happened since the issue opened. |
+| Last seen | When it last happened. |
+| Last event | The most recent occurrence, with the likely cause. |
+
+The **Open**, **Acknowledged** and **Resolved** tabs split issues by state. Filter by severity or type with **Severity** and **Type**.
+
+Click an issue to see the full details, a button that takes you to the screen where you fix it (for example the merchant's postback setup), and the **History** tab with every escalation, email, acknowledgement and resolution.
+
+<img src="/images/alerts/alerts-detail.png" alt="One alert issue: what it means, its count, first and last seen, the last event, and the Acknowledge and Resolve buttons" />
+
+## Alert types
+
+| Type | When it opens |
+|---|---|
+| Shoppers add to cart but no sales come in | Shoppers add to cart or open the checkout and no purchase is recorded. See below. |
+| Merchant postbacks are being rejected | A merchant sends sales and ElasticFunnels rejects them because a setting is missing. |
+| Checkout is failing for shoppers | Checkout submissions fail and the failures are growing, or the payment processor refuses them. |
+| Sales arrive for a product code you do not have | A merchant sends a sale for a product code that is not in your products. |
+| Postbacks arrive for a different merchant account | A postback names an account that does not match your merchant. |
+| An integration keeps failing / has gone quiet | An integration fails most of its attempts, or stops doing anything for days. |
+| An ad account lost access | ElasticFunnels can no longer read the ad account, so spend stops importing. |
+| The tax provider keeps failing | Tax calculation keeps failing at checkout for a merchant. |
+
+### Shoppers add to cart but no sales come in
+
+This check runs every 15 minutes over the last 6 hours. It opens an issue when all of these are true:
+
+- at least 25 add to carts or checkout starts in those 6 hours, and no purchase;
+- and either your sales rate over the last 14 days predicts at least 3 sales in that time, or a merchant used on those carts is still in **Needs Setup** (no postback has ever reached ElasticFunnels).
+
+A brand with no sales in the last 14 days gets the alert when it has at least 50 carts in 24 hours and no sale.
+
+The message names the cause when it can (for example, the merchant that is still in Needs Setup) and links to that merchant's postback setup. The issue resolves itself as soon as a purchase arrives.
+
+## Severity
+
+Every issue starts as a **Warning**. It becomes:
+
+- **Escalating** after 10 occurrences or 24 hours;
+- **Critical** after 50 occurrences or 72 hours.
+
+Problems that lose sales directly (no sales on carts, rejected postbacks, failing checkouts) become Critical after 6 hours.
+
+## Emails
+
+Emails go to the brand's owners and admins, in each person's language:
+
+- **No email** on the first occurrence. A one-off does not need you.
+- **One email** when an issue becomes Escalating.
+- **An immediate email** when an issue becomes Critical, and a reminder once a day while it keeps happening.
+- At most one email per issue per 24 hours, and at most 3 alert emails per brand per day. Critical emails are always sent.
+
+**Daily summary.** Once a day you get one email listing the open warnings. Turn it off for yourself with the **Daily summary email** checkbox on the Alerts page, or with the link at the bottom of the email.
+
+## Acknowledge and resolve
+
+Brand owners and admins can act on an issue from its row menu or its detail page.
+
+**Acknowledge** says "we know, we are on it". The issue stops sending emails but keeps counting. It comes back to Open and emails again when:
+
+- the same problem shows up with a new cause or on another item (for example a second merchant);
+- the count doubles since you acknowledged it;
+- it is still happening 7 days after you acknowledged it.
+
+**Resolve** closes the issue. If the problem happens again later, a new issue opens. Issues also resolve on their own:
+
+- when the clearing event happens (a purchase arrives, the merchant postback works, the product is added);
+- after 24 hours with no new occurrence (7 days for integrations, ad accounts and the tax provider, which fail less often).
+
+Every acknowledge and resolve is recorded in **History** with who did it and when.
+
+## Related
+
+- [Brand actions and alerts](/essentials/brand-actions) for suggestions you can preview and apply.
+- [Postback URLs](/merchants/postback-urls) for setting up a merchant postback.
