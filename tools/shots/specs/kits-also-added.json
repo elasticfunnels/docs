@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/also-added.png",
+  "alt": "The Also added column: components (some marked Uses yours), collections and forms, variables and files the kit brings",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"also-added\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 1037, y 501, 364 x 899",
+  "image": "tools/shots/source/kits-also-added.png",
+  "imageSize": {
+    "w": 364,
+    "h": 899
+  },
+  "maxWidth": 560,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        19,
+        212,
+        326,
+        27
+      ],
+      "title": "Uses yours",
+      "text": "You already have this component",
+      "side": "left"
+    },
+    {
+      "box": [
+        3,
+        546,
+        357,
+        74
+      ],
+      "title": "Collections and forms",
+      "text": "Where the kit's forms save",
+      "side": "left"
+    },
+    {
+      "box": [
+        19,
+        372,
+        326,
+        27
+      ],
+      "title": "New component",
+      "text": "Created in your project",
+      "side": "left"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "out": "images/template-kits/product-code-error.png",
+  "alt": "A product row whose code has spaces, with the message Use only letters, numbers, dashes and underscores under it",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"product-code-error\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 286, y 1120, 740 x 181",
+  "image": "tools/shots/source/kits-product-code-error.png",
+  "imageSize": {
+    "w": 740,
+    "h": 181
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        544,
+        107,
+        176,
+        33
+      ],
+      "title": "Product code",
+      "text": "Spaces are not allowed",
+      "side": "right"
+    },
+    {
+      "box": [
+        20,
+        148,
+        700,
+        18
+      ],
+      "title": "Why",
+      "text": "Apply waits until it is fixed",
+      "side": "left"
+    }
+  ]
+}

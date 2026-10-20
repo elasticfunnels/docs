@@ -1,0 +1,69 @@
+{
+  "out": "images/template-kits/review-header.png",
+  "alt": "The top of the kit review: back link, kit name with its type, audience and niche, what it adds to the project, Open live preview, and the counts of pages, funnel steps, event steps, components and products",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"review-header\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 277, y 122, 1134 x 336",
+  "image": "tools/shots/source/kits-review-header.png",
+  "imageSize": {
+    "w": 1134,
+    "h": 336
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        12,
+        15,
+        61,
+        20
+      ],
+      "title": "All kits",
+      "text": "Back to the library",
+      "side": "left"
+    },
+    {
+      "box": [
+        209,
+        102,
+        892,
+        28
+      ],
+      "title": "Kit",
+      "text": "Type, audience and niche above it",
+      "side": "right"
+    },
+    {
+      "box": [
+        603,
+        177,
+        209,
+        16
+      ],
+      "title": "What it adds",
+      "text": "Nothing is created until you apply",
+      "side": "right"
+    },
+    {
+      "box": [
+        209,
+        206,
+        123,
+        19
+      ],
+      "title": "Open live preview",
+      "text": "The kit as visitors see it",
+      "side": "left"
+    },
+    {
+      "box": [
+        12,
+        258,
+        1110,
+        74
+      ],
+      "title": "Counts",
+      "text": "Pages, steps, events, components, products",
+      "side": "left"
+    }
+  ]
+}

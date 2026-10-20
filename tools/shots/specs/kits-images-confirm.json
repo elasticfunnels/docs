@@ -1,0 +1,58 @@
+{
+  "out": "images/template-kits/images-confirm.png",
+  "alt": "The confirm window before generating images: number of images, credits per image, your balance, the total and the balance after",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"images-confirm\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 496, y 507, 448 x 387",
+  "image": "tools/shots/source/kits-images-confirm.png",
+  "imageSize": {
+    "w": 448,
+    "h": 387
+  },
+  "maxWidth": 600,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        35,
+        117,
+        62,
+        20
+      ],
+      "title": "Per image",
+      "text": "The fixed price of one image",
+      "side": "left"
+    },
+    {
+      "box": [
+        329,
+        192,
+        84,
+        20
+      ],
+      "title": "Total",
+      "text": "Taken when you confirm",
+      "side": "right"
+    },
+    {
+      "box": [
+        310,
+        230,
+        103,
+        20
+      ],
+      "title": "Balance after",
+      "text": "What is left in your credits",
+      "side": "right"
+    },
+    {
+      "box": [
+        261,
+        337,
+        167,
+        38
+      ],
+      "title": "Generate",
+      "text": "A failed image gives its credits back",
+      "side": "right"
+    }
+  ]
+}

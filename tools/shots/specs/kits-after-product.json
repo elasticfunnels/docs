@@ -1,0 +1,58 @@
+{
+  "out": "images/template-kits/after-product.png",
+  "alt": "A product the kit created: its Code and Title are the ones typed on the review, and the Checkout Title still holds the kit's wording",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"after-product\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 520, y 61, 920 x 560",
+  "image": "tools/shots/source/kits-after-product.png",
+  "imageSize": {
+    "w": 920,
+    "h": 560
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        245,
+        162,
+        204,
+        38
+      ],
+      "title": "Code",
+      "text": "The code you typed on the review",
+      "side": "left"
+    },
+    {
+      "box": [
+        25,
+        494,
+        423,
+        38
+      ],
+      "title": "Title",
+      "text": "The name you typed",
+      "side": "left"
+    },
+    {
+      "box": [
+        464,
+        494,
+        423,
+        38
+      ],
+      "title": "Checkout Title",
+      "text": "Still the kit's: change it",
+      "side": "right"
+    },
+    {
+      "box": [
+        822,
+        12,
+        65,
+        36
+      ],
+      "title": "Save",
+      "text": "Saves the product",
+      "side": "right"
+    }
+  ]
+}

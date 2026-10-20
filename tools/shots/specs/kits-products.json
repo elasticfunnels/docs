@@ -1,0 +1,80 @@
+{
+  "out": "images/template-kits/products.png",
+  "alt": "The Products list of the kit review: the first product set to Create new with the name Acme Sleep Gummies, 1 bottle and the code sleep-gummies-1, a free gift bonus below it, and the Map all button",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"products\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 288, y 597, 736 x 520",
+  "image": "tools/shots/source/kits-products.png",
+  "imageSize": {
+    "w": 736,
+    "h": 520
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        635,
+        15,
+        83,
+        28
+      ],
+      "title": "Map all",
+      "text": "Pick your products for every row",
+      "side": "right"
+    },
+    {
+      "box": [
+        21,
+        99,
+        82,
+        22
+      ],
+      "title": "Create new",
+      "text": "The kit creates this product",
+      "side": "left"
+    },
+    {
+      "box": [
+        103,
+        99,
+        150,
+        22
+      ],
+      "title": "Use an existing product",
+      "text": "Sell one you already have",
+      "side": "right"
+    },
+    {
+      "box": [
+        18,
+        158,
+        516,
+        34
+      ],
+      "title": "Product name",
+      "text": "What buyers and orders show",
+      "side": "left"
+    },
+    {
+      "box": [
+        542,
+        158,
+        176,
+        33
+      ],
+      "title": "Product code",
+      "text": "Buy links and steps follow it",
+      "side": "right"
+    },
+    {
+      "box": [
+        667,
+        216,
+        51,
+        20
+      ],
+      "title": "Free gift",
+      "text": "A bonus another product gives",
+      "side": "right"
+    }
+  ]
+}

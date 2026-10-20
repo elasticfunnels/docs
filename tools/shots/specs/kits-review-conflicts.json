@@ -1,0 +1,47 @@
+{
+  "out": "images/template-kits/review-conflicts.png",
+  "alt": "The box that lists what already exists in the project: page URLs that are taken, components that will use the project's own, and variables that keep their value",
+  "_source": "elasticfunnels repo _dev/flows/docs-template-kits/shots.mjs, shot \"review-conflicts\": local app on demo brand 899, 1440x1400 at 2x, cropped to CSS x 279, y 1191, 754 x 132",
+  "image": "tools/shots/source/kits-review-conflicts.png",
+  "imageSize": {
+    "w": 754,
+    "h": 132
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        55,
+        23,
+        533,
+        20
+      ],
+      "title": "Already exists",
+      "text": "How many things clash with yours",
+      "side": "left"
+    },
+    {
+      "box": [
+        55,
+        47,
+        533,
+        20
+      ],
+      "title": "Page URLs",
+      "text": "Add a folder so nothing is overwritten",
+      "side": "left"
+    },
+    {
+      "box": [
+        55,
+        68,
+        533,
+        20
+      ],
+      "title": "Components",
+      "text": "Reuses yours, or adds a copy",
+      "side": "left"
+    }
+  ]
+}
