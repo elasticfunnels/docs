@@ -5,7 +5,7 @@ icon: "cubes"
 description: 'How quiz blocks time, store and validate answers, and how to print answers with variables.'
 ---
 
-This page covers how the blocks on a quiz screen behave for the visitor: loader timing, height and weight answers, answer variables, validation, and what visitors do not see. To build and publish a quiz, see [Build and publish a quiz](/quizzes/build-and-publish).
+This page covers how the blocks on a quiz screen behave for the visitor: loader timing, height and weight answers, answer variables, validation, pricing plans, the Back button, colours, and what visitors do not see. To build and publish a quiz, see [Build and publish a quiz](/quizzes/build-and-publish).
 
 ## Loader timing
 {/* SCREENSHOT: Loading block settings · Duration (sec), Start after (sec) · desktop */}
@@ -77,6 +77,54 @@ Fields marked required must be filled in, and an email field needs a valid addre
 **Answers shown back.** When a variable such as `[[goal]]` or `{{ name }}` prints what a visitor typed, it shows as plain text. HTML a visitor types is shown as text, never run.
 
 **Your own HTML.** Text and HTML blocks keep their formatting (bold, links, lists, colours, fonts, alignment). Scripts, `on...` event attributes and styles that pin an element over the page (`position`, `z-index`, `top`, `left` and similar) are removed when the quiz shows.
+
+## Pricing plans
+{/* SCREENSHOT: Price block with the Plans layout · plan settings open · desktop */}
+
+A **Price** block set to show plans lists each plan as a card with a radio button. Visitors can tap a card, or press Tab to reach the plans and pick one with the arrow keys or Space. Screen readers announce which plan is selected.
+
+Each plan has these settings in the builder:
+
+| Setting | What it does |
+|---------|--------------|
+| **Plan name** | The name on the card, for example `4-week plan`. |
+| **Price**, **Old price** | The price, and the crossed-out price shown next to it. |
+| **Plan length (days)** | How many days the plan covers. The per-day price is worked out from it. |
+| **Per day** | Your own per-day text. It is used only when the plan has no length. |
+| **Checkout product code** | The product code of the plan in your checkout. |
+
+**Per-day price.** When a plan has a length, the card shows the price divided by the number of days, for example `$19.99` over 30 days shows `$0.67 / day`. If you leave **Plan length (days)** empty, the length is read from the plan name when it says one (`7-day`, `4-week`, `3-month`, `monthly`, `yearly`). With no length at all, the card shows your **Per day** text, unless that text is higher than the plan's price.
+
+**Plan to checkout.** When the visitor leaves the pricing screen through a link to your checkout, the chosen plan goes with it as `?p=<checkout product code>`, so the checkout opens on that product. If the visitor does not pick a plan, the plan marked **Selected** goes, or the first plan when none is marked. A plan with no product code leaves the link as it is.
+
+In the templates, the plans card is centred on the pricing screen, and the screen's own button takes the visitor on.
+
+## Back button and page navigation
+
+A screen shows a Back button only when both of these are on:
+
+- **Show page navigation**, the quiz-wide switch in the layout settings;
+- **Allow to go back** on that screen.
+
+With **Show page navigation** off, no screen shows Back, even a screen set to **Allow to go back**. This matches what the builder preview shows. New quizzes start with the switch off, so turn it on if you want visitors to step back. Quizzes saved before the switch existed keep following each screen's own setting.
+
+When there is no Back button, the progress bar fills the header. A logo set to the right stays at the right edge, and a logo image that fails to load is left out of the header.
+
+## Colours and readable text
+{/* SCREENSHOT: Quiz screen · selected option on a dark primary colour · mobile */}
+
+The templates and the builder's default and preset themes use darker shades of their primary, success and warning colours, so text on them meets the WCAG AA contrast level. For example the weight-loss green is now `#15803d` (was `#22c55e`) and the default red is `#ce4145` (was `#e5484d`).
+
+Quizzes saved with the old builder defaults (`#e5484d`, `#16a34a`, `#f59e0b`) show the darker shades automatically. Colours you picked yourself are kept as you set them.
+
+Text on a coloured fill is picked to stay readable on that colour: white on dark fills, dark text on light fills. This applies to buttons, selected options in single and multiple choice, badges and the unit switch on height and weight. On range charts, the segment labels use a darker shade of the bar colour so they can be read, and the bars keep their colour.
+
+## Keyboard and screen readers
+
+- Single choice, multiple choice and rating questions work as radio and checkbox groups. Press Tab to reach the group, use the arrow keys to move, and Space or Enter to pick. A focus ring shows where you are.
+- On each new screen, focus moves to its heading and screen readers hear "Step 2 of 8" (with the real numbers). The progress bar is announced too, and the Back button is read as "Go back".
+- Lead fields are a real form with labels, so browsers can fill in name, email and phone, and Enter submits the screen. When a field has an error, the error is announced and focus moves to the first field to fix.
+- Age, height and weight show their error message under the picker when Continue fails (for example "Age must be at least 16.").
 
 ## What visitors do not see
 
