@@ -391,7 +391,8 @@
                 "pages": [
                   "account/two-factor-authentication",
                   "account/passkeys",
-                  "account/cli-and-api-keys"
+                  "account/cli-and-api-keys",
+                  "account/refer-and-earn"
                 ]
               },
               {
