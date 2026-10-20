@@ -346,6 +346,7 @@
                 "pages": [
                   "automations/variables",
                   "automations/send-email",
+                  "automations/send-sms",
                   "automations/run-history"
                 ]
               },
@@ -392,6 +393,7 @@
                     "pages": [
                       "integrations/ai-providers",
                       "integrations/twilio",
+                      "settings/sms",
                       "integrations/slicktext",
                       "integrations/attentive"
                     ]

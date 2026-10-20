@@ -1,0 +1,4 @@
+{"data":[
+ {"id":31,"integration_id":9301,"integration_name":"Twilio: Northwind main","provider":"twilio","sender_type":"long_code","sender_value":"+12125550100","country":"US","registration_status":"approved","registration_checked_at":"2026-10-20T09:12:00+00:00","is_default":true,"status":"active","provider_replies":false,"webhooks_configured_at":"2026-10-20T09:10:00+00:00"},
+ {"id":32,"integration_id":9301,"integration_name":"Twilio: Northwind main","provider":"twilio","sender_type":"toll_free","sender_value":"+18885550123","country":"US","registration_status":"pending","registration_checked_at":"2026-10-20T09:12:00+00:00","is_default":false,"status":"active","provider_replies":true,"webhooks_configured_at":null}
+],"total":2}

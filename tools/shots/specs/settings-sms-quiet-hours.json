@@ -1,0 +1,49 @@
+{
+  "out": "images/settings/sms-quiet-hours.png",
+  "alt": "Quiet hours on the Compliance tab, the optional send window and the frequency caps",
+  "_source": "demo brand 899 (Northwind Supplements), local app with SMS P1 (elasticfunnels 27a13dfe9); fictional 555-01xx numbers in fixtures/sms",
+  "capture": {
+    "path": "/{brand}/sms",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid=\"settings.sms.compliance\"]",
+    "crop": {
+      "x": 257,
+      "y": 61,
+      "width": 1183,
+      "height": 769
+    },
+    "actions": [
+      {
+        "wait": 800
+      },
+      {
+        "scroll": "[data-testid=\"settings.sms.window.from\"]"
+      },
+      {
+        "wait": 400
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Hold texts during quiet hours",
+      "title": "Quiet hours",
+      "text": "On by default for marketing texts"
+    },
+    {
+      "selector": "[data-testid=\"settings.sms.window.from\"]",
+      "title": "Send window",
+      "text": "Optional: narrow the hours and days"
+    },
+    {
+      "selector": "text=Per day",
+      "title": "Frequency caps",
+      "text": "Marketing texts per person"
+    }
+  ]
+}

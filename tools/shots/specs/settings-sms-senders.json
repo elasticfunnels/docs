@@ -1,0 +1,56 @@
+{
+  "out": "images/settings/sms-senders.png",
+  "alt": "The Senders tab with a default local number and a toll-free number, their registration and who answers STOP and HELP",
+  "_source": "demo brand 899 (Northwind Supplements), local app with SMS P1 (elasticfunnels 27a13dfe9); fictional 555-01xx numbers in fixtures/sms",
+  "capture": {
+    "path": "/{brand}/sms",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid=\"settings.sms.compliance\"]",
+    "crop": {
+      "x": 257,
+      "y": 61,
+      "width": 1183,
+      "height": 769
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"tab.senders\"]"
+      },
+      {
+        "waitFor": "text=+18885550123"
+      },
+      {
+        "wait": 500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/senders(\\?|$)",
+        "file": "tools/shots/fixtures/sms/senders.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"settings.sms.senders.add\"]",
+      "title": "Add sender",
+      "text": "A number from your Twilio account"
+    },
+    {
+      "selector": "text=Registration >> visible=true >> nth=0",
+      "title": "Registration",
+      "text": "10DLC or toll-free status from Twilio",
+      "side": "left"
+    },
+    {
+      "selector": "text=STOP/HELP replies >> visible=true >> nth=0",
+      "title": "STOP/HELP replies",
+      "text": "Who answers, and Configure webhooks"
+    }
+  ]
+}

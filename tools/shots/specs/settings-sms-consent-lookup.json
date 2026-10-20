@@ -1,0 +1,66 @@
+{
+  "out": "images/settings/sms-consent-lookup.png",
+  "alt": "Consent lookup for one number: its state, suppression status, the consent record with the checkbox wording and page URL, and the texts it got",
+  "_source": "demo brand 899 (Northwind Supplements), local app with SMS P1 (elasticfunnels 27a13dfe9); fictional 555-01xx numbers in fixtures/sms",
+  "capture": {
+    "path": "/{brand}/sms",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid=\"settings.sms.compliance\"]",
+    "crop": {
+      "x": 257,
+      "y": 61,
+      "width": 1183,
+      "height": 769
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"tab.lookup\"]"
+      },
+      {
+        "fill": "[data-testid=\"settings.sms.lookup.phone\"]",
+        "value": "+13055550187"
+      },
+      {
+        "click": "[data-testid=\"settings.sms.lookup.search\"]"
+      },
+      {
+        "waitFor": "[data-testid=\"settings.sms.lookup.result\"]"
+      },
+      {
+        "wait": 500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/consents/lookup",
+        "file": "tools/shots/fixtures/sms/lookup.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/senders(\\?|$)",
+        "file": "tools/shots/fixtures/sms/senders.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"settings.sms.lookup.export\"]",
+      "title": "Export JSON",
+      "text": "Everything held on the number"
+    },
+    {
+      "selector": "text=Yes, text me offers",
+      "title": "Wording shown",
+      "text": "The checkbox text the person ticked"
+    },
+    {
+      "selector": "text=https://shop.example.com/checkout >> nth=0",
+      "title": "Page URL",
+      "text": "Where they ticked it"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "out": "images/settings/sms-log-replies.png",
+  "alt": "The Replies view of the SMS log: a STOP reply and a question from a customer",
+  "_source": "demo brand 899 (Northwind Supplements), local app with SMS P1 (elasticfunnels 27a13dfe9); fictional 555-01xx numbers in fixtures/sms",
+  "capture": {
+    "path": "/{brand}/logs?tab=sms",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "body",
+    "crop": {
+      "x": 257,
+      "y": 61,
+      "width": 1183,
+      "height": 769
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"tab.sms\"]"
+      },
+      {
+        "click": "[data-testid=\"settings.logs.sms.view-inbound\"]"
+      },
+      {
+        "waitFor": "text=capsules"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "/logs/sms-inbound",
+        "file": "tools/shots/fixtures/sms/log-inbound.json"
+      },
+      {
+        "url": "/logs/sms",
+        "file": "tools/shots/fixtures/sms/log-messages.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Replies >> nth=0",
+      "title": "Replies",
+      "text": "Every text sent back to your numbers"
+    },
+    {
+      "selector": "th:has-text(\"Keyword\")",
+      "title": "Keyword",
+      "text": "STOP, HELP and START are answered for you"
+    }
+  ]
+}

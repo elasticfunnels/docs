@@ -1,0 +1,10 @@
+{"phone_e164":"+13055550187","place":{"country":"US","regions":["US-FL"],"source":"area_code"},"suppression":null,
+"consents":[
+ {"id":501,"status":"opted_in","purpose":"marketing","source":"checkout","source_ref":"NW-10482","consent_text":"Yes, text me offers and order updates. Msg & data rates may apply. Reply STOP to opt out.","page_url":"https://shop.example.com/checkout","keyword":null,"geo_region":"US-FL","recorded_at":"2026-10-18T15:42:00+00:00","created_at":"2026-10-18T15:42:00+00:00"},
+ {"id":502,"status":"opted_in","purpose":"transactional","source":"checkout","source_ref":"NW-10482","consent_text":null,"page_url":"https://shop.example.com/checkout","keyword":null,"geo_region":"US-FL","recorded_at":"2026-10-18T15:42:00+00:00","created_at":"2026-10-18T15:42:00+00:00"}
+],
+"messages":[
+ {"id":1211,"status":"delivered","purpose":"transactional","source_type":"automation","body":"Northwind: Your order NW-10482 has shipped. Track it here: https://shop.example.com/t/10482","skip_reason":null,"warnings":[],"created_at":"2026-10-19T14:05:00+00:00"},
+ {"id":1188,"status":"delivered","purpose":"marketing","source_type":"automation","body":"Northwind: Thanks for your order! Here is 10% off your next one: https://shop.example.com/r/NW10. Reply STOP to opt out","skip_reason":null,"warnings":[],"created_at":"2026-10-18T16:00:00+00:00"}
+],
+"inbound":[]}

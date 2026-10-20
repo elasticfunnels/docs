@@ -1,0 +1,56 @@
+{
+  "out": "images/settings/sms-suppression-list.png",
+  "alt": "The Suppression list with a number that replied STOP, a carrier opt-out and one added by hand",
+  "_source": "demo brand 899 (Northwind Supplements), local app with SMS P1 (elasticfunnels 27a13dfe9); fictional 555-01xx numbers in fixtures/sms",
+  "capture": {
+    "path": "/{brand}/sms",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid=\"settings.sms.compliance\"]",
+    "crop": {
+      "x": 257,
+      "y": 61,
+      "width": 1183,
+      "height": 769
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"tab.suppressions\"]"
+      },
+      {
+        "waitFor": "text=+12065550118"
+      },
+      {
+        "wait": 500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/suppressions",
+        "file": "tools/shots/fixtures/sms/suppressions.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"settings.sms.suppressions.add\"]",
+      "title": "Add number",
+      "text": "Block a number by hand"
+    },
+    {
+      "selector": "text=Replied STOP",
+      "title": "Reason",
+      "text": "STOP, carrier opt-out or by hand",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=\"settings.sms.suppressions.lift\"] >> nth=0",
+      "title": "Lift",
+      "text": "Lets the number get texts again"
+    }
+  ]
+}

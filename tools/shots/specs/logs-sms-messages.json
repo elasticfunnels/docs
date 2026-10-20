@@ -1,0 +1,61 @@
+{
+  "out": "images/settings/sms-log-messages.png",
+  "alt": "Settings, Logs, SMS: a text waiting for quiet hours, one skipped because the number is suppressed, and delivered texts with a warning",
+  "_source": "demo brand 899 (Northwind Supplements), local app with SMS P1 (elasticfunnels 27a13dfe9); fictional 555-01xx numbers in fixtures/sms",
+  "capture": {
+    "path": "/{brand}/logs?tab=sms",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "body",
+    "crop": {
+      "x": 257,
+      "y": 61,
+      "width": 1183,
+      "height": 769
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"tab.sms\"]"
+      },
+      {
+        "waitFor": "text=+14155550163"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "/logs/sms-inbound",
+        "file": "tools/shots/fixtures/sms/log-inbound.json"
+      },
+      {
+        "url": "/logs/sms",
+        "file": "tools/shots/fixtures/sms/log-messages.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Waiting >> nth=1",
+      "title": "Waiting",
+      "text": "Held for quiet hours, sends later",
+      "side": "left"
+    },
+    {
+      "selector": "text=Skipped >> nth=1",
+      "title": "Skipped",
+      "text": "With the reason, here a suppressed number",
+      "side": "left"
+    },
+    {
+      "selector": "text=1 warning >> nth=0",
+      "title": "Warnings",
+      "text": "Logged in warn mode; the text still went"
+    }
+  ]
+}

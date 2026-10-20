@@ -1,0 +1,256 @@
+---
+title: "SMS Compliance"
+sidebarTitle: "SMS compliance"
+icon: "shield-check"
+description: "Every text your brand sends goes through one set of checks: STOP, HELP and START, the suppression list, quiet hours, consent and state rules. Set them up in Settings -> SMS."
+---
+
+Every text your brand sends takes the same path: the **Send SMS** step in an automation, the automatic
+replies to STOP, HELP and START, and test sends from settings. First the compliance checks run, then the
+text goes out from your own Twilio account. Every attempt is logged, sent or not, with the reason.
+
+You set the checks up in **Settings** -> **SMS**. The page has five tabs: **Compliance**, **Senders**,
+**Suppression list**, **Consent lookup** and **Test send**.
+
+<Warning>
+ElasticFunnels does not give legal advice. Complying with the TCPA and state texting laws is your
+brand's responsibility. The checks below help you catch common problems; they cannot tell whether a
+person really agreed to your texts.
+</Warning>
+
+## Before your first text
+
+<Steps>
+  <Step title="Connect Twilio">
+    Connect your Twilio account in **Integrations**. See [Twilio](/integrations/twilio).
+  </Step>
+  <Step title="Add a sender">
+    In **Settings** -> **SMS** -> **Senders**, click **Add sender** and pick a number or messaging
+    service from your Twilio account. Then click **Configure webhooks**. See [Senders](#senders).
+  </Step>
+  <Step title="Accept the marketing consent statement">
+    On the **Compliance** tab, read the statement and accept it. Until someone on the brand does,
+    marketing texts are skipped. Transactional texts are not affected.
+  </Step>
+  <Step title="Send yourself a test">
+    On the **Test send** tab, text your own number and check the result. See [Test send](#test-send).
+  </Step>
+</Steps>
+
+## What happens to each text
+
+A text ends in one of three ways, and the log shows which:
+
+| Result | What it means |
+|---|---|
+| Sent | It passed the checks and went to Twilio. The log then shows **Sent**, **Delivered**, **Undelivered** or **Failed** as Twilio reports back. |
+| Waiting | Quiet hours hold it. It goes out at the next time the recipient's local hours allow. |
+| Skipped | A check stopped it. The log shows why. |
+
+A skipped text is a normal result. In an automation, the run goes on to the next step.
+
+## Compliance tab
+
+<img src="/images/settings/sms-compliance.png" alt="Settings, SMS, Compliance tab: the always-enforced checks, Warn or Strict, and the marketing consent statement" />
+
+### Always enforced
+
+These checks run on every text, in warn mode and in strict mode. You cannot turn them off.
+
+- **STOP, HELP and START.** A reply of STOP suppresses the number, records the opt-out and sends one
+  confirmation (only the first time). START lifts the suppression. HELP gets your help reply.
+- **The suppression list.** A number on it gets no texts at all, transactional ones included.
+- **Opt-outs reported by Twilio.** When Twilio refuses a text because the person opted out with the
+  carrier (error 21610, for example), the number goes on the suppression list.
+- **Invalid numbers** are skipped.
+- **States you excluded** under **Where you send** get no marketing texts.
+- **A sender must be set up.** Without one, nothing is sent.
+
+The words that count as each keyword:
+
+| Keyword | Also matches |
+|---|---|
+| STOP | STOPALL, UNSUBSCRIBE, UNSUB, CANCEL, END, QUIT, REVOKE, OPT OUT |
+| HELP | INFO |
+| START | UNSTOP, YES, Y |
+
+### Warn or strict
+
+Consent, state rules, frequency caps, message content and sender registration are checked on every
+text too. **When a check finds a problem** decides what happens next:
+
+| | Warn (default) | Strict |
+|---|---|---|
+| A problem is found | Logged as a warning, and the text still sends | The text is skipped, with the reason |
+| The frequency cap is reached | Logged as a warning, and the text still sends | The text waits for the next allowed time |
+
+What these checks look at:
+
+- **Consent:** whether the number has an SMS consent record. A purchase records consent for
+  transactional texts. A ticked SMS box on a checkout records consent for marketing texts (see
+  [Consent from your checkout](#consent-from-your-checkout)).
+- **State rules:** extra rules in the recipient's state, for example Florida needs written consent.
+- **Frequency caps:** by default, at most 3 marketing texts per person in 24 hours. A state limit
+  applies when it is lower.
+- **Content:** restricted topics carriers filter (such as cannabis or CBD, gambling, alcohol), public link
+  shorteners like bit.ly, too many capital letters, long messages, special characters that raise the
+  cost, and promotional words in a transactional text.
+- **Sender registration:** whether the sender has 10DLC or toll-free registration.
+- **Country:** only US numbers can be texted for now.
+
+### Marketing consent statement
+
+In both modes, marketing texts are skipped until someone with access to the brand accepts the
+statement. It says the brand only texts people who agreed to it, in writing where state law requires
+it, and honors every opt-out. The tab shows who accepted it and when. **Withdraw** turns marketing
+texts off again.
+
+### Quiet hours
+
+<img src="/images/settings/sms-quiet-hours.png" alt="Quiet hours on the Compliance tab, the optional send window and the frequency caps" />
+
+**Hold texts during quiet hours** is on by default and applies to marketing texts.
+
+- Texts go out between 8am and 8pm in the recipient's local time, read from the number's area code.
+- Pennsylvania: 9am to 7pm, and no texts on Sundays or federal holidays. Connecticut: 9am to 8pm.
+- When the state is unknown, the text waits until those hours are open in every mainland US time
+  zone.
+- A held text goes out at the next open time, in 15-minute steps. If it is still held when it expires
+  (48 hours by default), it is skipped with **Quiet hours lasted past the send deadline**.
+
+You can turn quiet hours off. Texts then go out at any hour with a warning in the log, and keeping to
+state texting hours is up to you.
+
+**Your own send window** narrows the hours further, for example 10am to 6pm on weekdays. Leave it
+empty to use quiet hours alone. No days selected means every day.
+
+**Frequency caps** set the most marketing texts one person gets: **Per day** (3 by default) and an
+optional **Per week**.
+
+### Automatic replies
+
+The texts sent back for STOP, HELP and an opt-in. Leave a field empty to use the default:
+
+| Field | Default |
+|---|---|
+| **Brand name in replies** | Your brand name. Carriers expect every text to say who it is from. |
+| **STOP reply** | `{brand}: You are unsubscribed and will receive no more texts. Reply START to resubscribe.` |
+| **HELP reply** | `{brand}: For help, contact us. Msg & data rates may apply. Reply STOP to cancel.` |
+| **Opt-in confirmation** | Sent when someone replies START: `{brand}: You are subscribed to texts again. Msg frequency varies. Msg & data rates may apply. Reply HELP for help, STOP to cancel.` |
+
+### Where you send and state texting rules
+
+**Where you send** lets you exclude states you do not want to text at all. Excluded states get no
+marketing texts, in both modes. The quick presets add the **Strictest**, **Strict** or **Moderate**
+states to the list; save to apply. **Skip numbers when we cannot tell the state** is off by default.
+
+**State texting rules** lists what is checked for each state: its strictness level, hours and daily
+limits, and what it requires (written consent, seller registration, an existing relationship). Tick
+**Registered** once you have registered where a state requires it, or **Exclude** to stop texting it.
+
+### Webhook addresses
+
+The **Status** and **Replies** addresses Twilio calls to report delivery and pass on replies. Each
+brand has its own address with a secret token in it. **Configure webhooks** on the Senders tab sets
+them on your Twilio number for you; they are shown here so you can check by hand.
+
+Calls without the right token are refused. When the Twilio integration also holds your account's Auth
+Token, each call is checked against Twilio's signature as well.
+
+## Senders
+
+<img src="/images/settings/sms-senders.png" alt="The Senders tab with a default local number and a toll-free number, their registration and who answers STOP and HELP" />
+
+The numbers this brand texts from, on your own Twilio account.
+
+1. Click **Add sender**, choose the **Twilio account** (a Twilio integration connected to the brand)
+   and a **Number**. The list shows the numbers and messaging services on that account.
+2. Turn on **Default sender** for the one used when a step does not pick a sender.
+3. Turn on **Twilio already answers STOP/HELP for this number** only if Twilio Advanced Opt-Out is set
+   up for it. ElasticFunnels then records the reply and the opt-out without sending its own reply.
+4. Save, then click **Configure webhooks** so replies and delivery reports reach ElasticFunnels.
+
+**Registration** shows the 10DLC or toll-free status Twilio reports: **Registered**, **Pending**,
+**Rejected**, **Not required** or **Unknown**. Click **Refresh** to ask Twilio again. Carriers block or
+filter texts from unregistered numbers, so register in the Twilio Console before you send real
+traffic.
+
+A paused sender is not used for any text.
+
+## Suppression list
+
+<img src="/images/settings/sms-suppression-list.png" alt="The Suppression list with a number that replied STOP, a carrier opt-out and one added by hand" />
+
+Numbers this brand never texts, transactional texts included. A number lands here when the person
+replies STOP, when Twilio reports a carrier opt-out, or when you add it.
+
+- **Add number** blocks a number by hand, with the reason **Added by hand** or **Complaint**. Include
+  the country code, for example +1 for the US.
+- **Lift** lets the number get texts again. A person who texts START lifts it too.
+- Search by number, and switch to **All, with lifted** to see past entries.
+
+## Consent lookup
+
+<img src="/images/settings/sms-consent-lookup.png" alt="Consent lookup for one number: its state, suppression status, the consent record with the checkbox wording and page URL, and the texts it got" />
+
+Type a phone number and click **Look up** to see everything the brand holds about it:
+
+- the state it was placed in, and whether it is suppressed,
+- each consent record: opted in or out, marketing or transactional, where it came from, the wording the
+  person saw and the page URL,
+- the texts sent to it and the replies from it.
+
+**Export JSON** downloads all of it as one file, for a carrier or legal request.
+
+## Test send
+
+<img src="/images/settings/sms-test-send.png" alt="The Test send tab: your number, sender, type and message, with the segment count" />
+
+Sends one text through the same checks as a real send and shows what they decided: sent, waiting or
+skipped, with the reason and any warnings. The text is real and goes out from your Twilio account, so
+only send to a number you own. Under the message you see the character count, the number of segments
+and the encoding.
+
+A marketing test is skipped while the consent statement is not accepted.
+
+## The SMS log
+
+<img src="/images/settings/sms-log-messages.png" alt="Settings, Logs, SMS: a text waiting for quiet hours, one skipped because the number is suppressed, and delivered texts with a warning" />
+
+**Settings** -> **Logs** -> **SMS** lists every text the brand sent or tried to send: its status, type,
+source, what the checks decided, and when. Click a row to see the full text, the segments, the reason
+it was skipped, any warnings and Twilio's error.
+
+<img src="/images/settings/sms-log-replies.png" alt="The Replies view of the SMS log: a STOP reply and a question from a customer" />
+
+Switch to **Replies** to see the texts people sent back to your numbers, with the keyword when it was
+STOP, HELP or START.
+
+### Why a text was skipped
+
+| Reason | What to do |
+|---|---|
+| Number is on the suppression list | The person replied STOP, Twilio reported an opt-out, or someone added the number. Only the person texting START, or a lift, changes it. |
+| Marketing statement not accepted | Accept the statement on the Compliance tab. |
+| No active sender | Add a sender on the Senders tab. |
+| Invalid phone number | The number is not a valid mobile number. Check the variable the step uses. |
+| State excluded in your settings | You chose not to text that state under **Where you send**. |
+| Quiet hours lasted past the send deadline | The text waited too long for open hours. |
+| Twilio reports the number opted out | The person opted out with their carrier. The number is now suppressed. |
+| Twilio refused the message | The error code in the log shows why. |
+
+In strict mode, the warning reasons (no consent, state rule, content, sender registration, country) also
+skip the text.
+
+## Consent from your checkout
+
+When a shopper ticks the SMS opt-in box (`allow_sms`) on a checkout or upsell page, the order stores
+marketing consent together with the wording next to the box and the page URL. Both show in
+**Consent lookup**. A purchase records consent for transactional texts. See
+[SMS and email opt-in boxes](/pages/privacy-consent#sms-and-email-opt-in-boxes-on-checkout-and-upsell-pages).
+
+## Related docs
+
+- [Send SMS step](/automations/send-sms): text customers from an automation
+- [Twilio](/integrations/twilio): connect the account your texts go out from
+- [Privacy and consent](/pages/privacy-consent): opt-in boxes on checkout pages

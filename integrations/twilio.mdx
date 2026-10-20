@@ -2,20 +2,20 @@
 title: 'Twilio Integration'
 sidebarTitle: "Twilio"
 icon: "comment-sms"
-description: 'Send SMS, run voice flows, and verify phone numbers from automations using your Twilio account.'
+description: 'Send SMS through the SMS compliance checks, run voice flows, and verify phone numbers from automations using your Twilio account.'
 ---
 
 ## Overview
 {/* SCREENSHOT: Overview · integration form · desktop */}
 
-The Twilio integration lets your ElasticFunnels automations send SMS / MMS messages, place outbound voice calls with TwiML instructions, start phone-verification flows, and check verification codes. The same Twilio account you connect here also powers the **call center** module's outbound dialing.
+The Twilio integration lets your ElasticFunnels automations send SMS and MMS messages, place outbound voice calls with TwiML instructions, start phone-verification flows, and check verification codes. The same Twilio account you connect here also powers the **call center** module's outbound dialing.
 
 ## What you get
 {/* SCREENSHOT: Capabilities · automation builder · desktop */}
 
 | Action | What it does |
 |--------|--------------|
-| Send SMS / MMS | Sends a message from one of your purchased Twilio numbers |
+| Send SMS | Sends a text from one of your senders in Settings -> SMS, after the [compliance checks](/settings/sms) |
 | Make voice call | Dials an outbound number and plays / interacts via a TwiML URL |
 | Start verification | Sends a one-time SMS / call code through Twilio Verify |
 | Check verification code | Validates the code the user submitted |
@@ -29,7 +29,7 @@ The form dynamically lists the phone numbers and Verify services on your Twilio 
 
 <Steps>
   <Step title="Create an API key in Twilio">
-    Log into the [Twilio Console](https://console.twilio.com). Open **Settings** → **API keys & tokens** → **Create API key** (Standard type). Copy the **Key SID** and **Secret** immediately — the secret is only shown once.
+    Log into the [Twilio Console](https://console.twilio.com). Open **Settings** → **API keys & tokens** → **Create API key** (Standard type). Copy the **Key SID** and **Secret** immediately: the secret is only shown once.
   </Step>
   <Step title="Copy your Account SID">
     From the Twilio Console homepage, copy the **Account SID**.
@@ -37,31 +37,44 @@ The form dynamically lists the phone numbers and Verify services on your Twilio 
   <Step title="Activate the integration in EF">
     Go to **Integrations** → **Communications** → **Twilio**. Paste **Account SID**, **API Key**, and **API Secret**. Save.
   </Step>
-  <Step title="(Voice) Buy a phone number">
+  <Step title="(SMS and voice) Buy a phone number">
     In Twilio: **Phone Numbers** → **Manage** → **Buy a number**. Numbers purchased here automatically appear in EF's number picker.
   </Step>
   <Step title="(Verification) Create a Verify service">
     In Twilio: **Verify** → **Services** → **Create Service**. Set the friendly name and channels (SMS, voice, email). The service shows up in EF's automation actions for `Start Verification` / `Check Verification`.
   </Step>
+  <Step title="(SMS) Add a sender">
+    Open **Settings** -> **SMS** -> **Senders**, click **Add sender**, pick this Twilio account and one of its numbers or messaging services, then click **Configure webhooks**. Accept the marketing consent statement on the **Compliance** tab before sending marketing texts. See [SMS compliance](/settings/sms).
+  </Step>
   <Step title="Use it in automations">
-    Open **Automations**, drop a `Twilio: Send SMS` (or any other Twilio action) into a flow, and pick the from-number, message body, and optional media URL. Map ElasticFunnels variables like `{{customer.phone}}` into the to-number field.
+    Open **Automations** and add a **Send SMS** step (or any other Twilio action) to a flow. For SMS, set the phone number (a variable such as `{trigger.customer_phone}`), the type (Marketing or Transactional) and the message. See [Send SMS step](/automations/send-sms).
   </Step>
 </Steps>
+
+## SMS compliance
+
+Every text from the **Send SMS** step, the automatic STOP, HELP and START replies, and test sends goes
+through the checks in **Settings** -> **SMS** before Twilio sends it: the suppression list, quiet hours,
+consent, state rules, frequency caps and content checks. Every attempt is logged in **Settings** ->
+**Logs** -> **SMS**, with the reason when a text was skipped. Replies and delivery reports come back
+through webhooks with a per-brand secret token. See [SMS compliance](/settings/sms).
+
+<img src="/images/settings/sms-senders.png" alt="The Senders tab with a default local number and a toll-free number, their registration and who answers STOP and HELP" />
 
 ## Common patterns
 {/* SCREENSHOT: Patterns · automation builder · desktop */}
 
 ### Order receipt SMS
 
-Trigger: `Conversion: purchase` → Action: `Twilio: Send SMS` to the customer phone with order number and tracking link.
+Trigger: a purchase. Step: **Send SMS**, type Transactional, to the customer's phone with the order number and tracking link.
 
 ### Two-factor login
 
-Trigger: `Form: submitted` (login form) → Action: `Twilio: Start Verification` → Wait for user input on the next page → Action: `Twilio: Check Verification Code`.
+Trigger: `Form: submitted` (login form), then `Twilio: Start Verification`, then wait for the user's input on the next page, then `Twilio: Check Verification Code`.
 
 ### Abandoned cart SMS
 
-Trigger: `Cart abandoned (2h)` → Condition: `customer.phone is not empty` → Action: `Twilio: Send SMS` with a recovery link.
+Trigger: a cart abandon. Condition: the customer's phone is not empty. Step: **Send SMS**, type Marketing, with a recovery link. Quiet hours hold it until the recipient's morning when it fires at night.
 
 ### Outbound voice (call center)
 
@@ -73,11 +86,14 @@ The Organization Callcenter integration uses your Twilio credentials to place ou
 You pay Twilio directly for messages, calls, and verifications based on their per-segment / per-minute pricing. ElasticFunnels does not mark up Twilio usage.
 
 ## Troubleshooting
-{/* SCREENSHOT: Troubleshooting · automation logs · desktop */}
+<img src="/images/settings/sms-log-messages.png" alt="Settings, Logs, SMS: a text waiting for quiet hours, one skipped because the number is suppressed, and delivered texts with a warning" />
 
 <AccordionGroup>
   <Accordion title="Messages not delivering to US numbers">
-    US carriers require **A2P 10DLC registration** for application-to-person traffic. Register your brand and campaign inside the Twilio Console (**Messaging** → **Regulatory Compliance** → **A2P 10DLC**) before sending production traffic.
+    US carriers require **A2P 10DLC registration** for application-to-person traffic. Register your brand and campaign inside the Twilio Console (**Messaging** -> **Regulatory Compliance** -> **A2P 10DLC**) before sending production traffic. The **Registration** column in Settings -> SMS -> Senders shows the status Twilio reports; click **Refresh** after a change.
+  </Accordion>
+  <Accordion title="A text was not sent">
+    Open **Settings** -> **Logs** -> **SMS** and click the text. **Why it was skipped** names the check that stopped it, for example a number on the suppression list or the marketing consent statement not accepted yet. See [Why a text was skipped](/settings/sms#why-a-text-was-skipped).
   </Accordion>
   <Accordion title="Verification codes never arrive">
     Check the Verify service has the right channels enabled, the destination country isn't blocked in your Twilio geo permissions, and your account isn't in trial mode (trial accounts can only message verified numbers).
