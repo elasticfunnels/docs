@@ -46,6 +46,7 @@ When you click **Publish**, the builder checks the quiz and refuses to publish w
 | *Question has no answer options.* | Add at least one answer option to the question, or delete the block. |
 | *Answer option N has no label.* | Give that option a label or an image. |
 | *Score range needs an outcome screen.* / *Score range min (...) must be less than or equal to max (...).* / *Score range ...-... overlaps range ...-...; a score in both always gets the first outcome.* | Fix the score ranges in the outcome settings: each range needs an outcome screen, a numeric min and max, and no overlap with another range. |
+| *This link or media address is not allowed: .... Use an http or https address (links may also use mailto: or tel:).* | A button link, redirect, image or video field holds an address that starts with something other than `http://` or `https://` (for example `javascript:` or `data:`). Replace it with a web address. Links may also be `mailto:`, `tel:` or a path on your own domain such as `/thank-you`. See [Videos, links and HTML](/quizzes/blocks-and-answers#videos-links-and-html). |
 
 ### Score ranges apply only to score-based outcomes
 

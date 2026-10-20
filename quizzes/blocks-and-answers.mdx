@@ -68,6 +68,16 @@ The visitor cannot go on until the screen's answers pass these checks. The messa
 
 Fields marked required must be filled in, and an email field needs a valid address.
 
+## Videos, links and HTML
+
+**Videos.** A video block, or an intro video on a question, plays inside the quiz only when its address comes from a known video player: YouTube, Vimeo, Wistia, Loom, Vidalytics, VTurb (ConverteAI), Bunny Stream (`iframe.mediadelivery.net`), JW Player, Vidyard, Dailymotion, TrackPlay, Cloudflare Stream, Streamable, Facebook video and TikTok. Use the player's embed or share link over `https`. Any other address, including a file URL on a Bunny pull zone (`*.b-cdn.net`), is not embedded; use the Bunny Stream player link instead.
+
+**Links and redirects.** Buttons, outcome redirects and other link fields accept `http://` and `https://` addresses, `mailto:`, `tel:` and paths on your own domain (`/thank-you`). Publish refuses any other kind of address. See [Publish checks](/quizzes/build-and-publish#publish-checks).
+
+**Answers shown back.** When a variable such as `[[goal]]` or `{{ name }}` prints what a visitor typed, it shows as plain text. HTML a visitor types is shown as text, never run.
+
+**Your own HTML.** Text and HTML blocks keep their formatting (bold, links, lists, colours, fonts, alignment). Scripts, `on...` event attributes and styles that pin an element over the page (`position`, `z-index`, `top`, `left` and similar) are removed when the quiz shows.
+
 ## What visitors do not see
 
 - **AI Generated Text block:** personalized AI text is not generated on live pages yet, so the block is hidden from visitors. In a preview it shows a note in its place, never the prompt.
