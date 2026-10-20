@@ -63,12 +63,13 @@ async function capture(browser, spec, ctx) {
   // so a stray click can never save, delete or send anything.
   const allowPost = (c.allowPost || []).map((r) => new RegExp(r));
   // Fixtures: a GET whose path+query matches answers with fictional JSON, for screens the demo seed has no data for.
-  const fixtures = (c.fixtures || []).map((f) => ({ re: new RegExp(fill(f.url, ctx)), body: fs.readFileSync(path.resolve(ROOT, f.file), "utf8") }));
+  // `"method": "POST"` answers a read-only lookup the app sends as a POST (it never reaches the app).
+  const fixtures = (c.fixtures || []).map((f) => ({ re: new RegExp(fill(f.url, ctx)), method: (f.method || "GET").toUpperCase(), body: fs.readFileSync(path.resolve(ROOT, f.file), "utf8") }));
   await context.route("**/*", (route) => {
     const req = route.request();
     if (new URL(req.url()).origin !== origin) return route.continue();
     const u = new URL(req.url());
-    const fx = req.method() === "GET" && fixtures.find((f) => f.re.test(u.pathname + u.search));
+    const fx = fixtures.find((f) => f.method === req.method() && f.re.test(u.pathname + u.search));
     if (fx) return route.fulfill({ status: 200, contentType: "application/json", body: fx.body });
     if (req.method() !== "GET" && req.method() !== "HEAD" && !allowPost.some((r) => r.test(req.url()))) {
       console.warn(`  blocked ${req.method()} ${req.url().replace(origin, "")}`);

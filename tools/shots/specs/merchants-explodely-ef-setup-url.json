@@ -1,66 +1,62 @@
 {
   "out": "images/merchants/explodely-ef-setup-url.png",
-  "alt": "The Postback Setup dialog for Explodely on its first step: the steps list, the postback URL with Copy, and the callback secret note",
-  "_source": "ElasticFunnels app on prod (app 47daabe38), Postback Setup on an Explodely merchant, captured 2026-10-20 at 1492x812; account details replaced in the page with generic values (Acme Health, Alex Morgan, postback code AbC123xYz) before capture; cropped to the dialog.",
-  "image": "tools/shots/source/merchants-explodely-ef-setup-url.png",
-  "imageSize": {
-    "w": 774,
-    "h": 577
+  "alt": "The Postback Setup dialog for Explodely on its first step: the steps list, the complete postback URL with Copy, and the note that it already carries its secret",
+  "_source": "ElasticFunnels app (feat/explodely-one-copy), Postback Setup on a fictional Explodely merchant of the demo brand; the merchant list and the revealed URL are fixtures (postback code nwdemoexp01, secret DemoSecretForScreenshotsOnly..., neither real). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs explodely-ef-setup",
+  "capture": {
+    "path": "/{brand}/merchants",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-row-id=\"9101\"]",
+    "fixtures": [
+      {
+        "url": "/api/brands/\\d+/merchants/9101/postback-secret/reveal",
+        "method": "POST",
+        "file": "tools/shots/fixtures/explodely-one-copy/reveal.json"
+      },
+      {
+        "url": "/api/brands/\\d+/merchants/\\d+/wait-for-test",
+        "file": "tools/shots/fixtures/explodely-one-copy/not-verified.json"
+      },
+      {
+        "url": "/api/brands/\\d+/merchants(\\?|$)",
+        "file": "tools/shots/fixtures/explodely-one-copy/merchants-list.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-row-id=\"9101\"] [data-testid=\"merchants.list.postback-setup\"]"
+      },
+      {
+        "waitFor": "[data-testid=\"merchants.postback-setup.url\"][data-ready=\"true\"]"
+      },
+      {
+        "wait": 500
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".vue-notification-group"
+    ]
   },
   "maxWidth": 760,
   "calloutWidth": 210,
   "annotations": [
     {
-      "box": [
-        24,
-        71,
-        208,
-        140
-      ],
-      "title": "Steps",
-      "text": "Postback URL, Seller IPN, Webhooks, Test",
-      "side": "left"
-    },
-    {
-      "box": [
-        189,
-        14,
-        100,
-        17
-      ],
-      "title": "Waiting for a test",
-      "text": "Changes when a postback arrives",
+      "selector": "[data-testid=\"merchants.postback-setup.copy\"]",
+      "title": "Copy",
+      "text": "The whole URL, secret included",
       "side": "right"
     },
     {
-      "box": [
-        263,
-        161,
-        494,
-        52
-      ],
-      "title": "Postback URL",
-      "text": "Copy it, then add your secret",
+      "selector": "[data-testid=\"merchants.postback-setup.explodely-url-note\"]",
+      "title": "Secret",
+      "text": "Already at the end of the URL",
       "side": "right"
     },
     {
-      "box": [
-        263,
-        259,
-        494,
-        80
-      ],
-      "title": "Callback secret",
-      "text": "Replace the placeholder with it",
-      "side": "right"
-    },
-    {
-      "box": [
-        637,
-        532,
-        116,
-        35
-      ],
+      "selector": "[data-testid=\"merchants.postback-setup.next\"]",
       "title": "Next",
       "text": "Goes to Seller IPN",
       "side": "right"
