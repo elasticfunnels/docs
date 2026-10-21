@@ -5,7 +5,7 @@ icon: "cubes"
 description: 'How quiz blocks time, store and validate answers, and how to print answers with variables.'
 ---
 
-This page covers how the blocks on a quiz screen behave for the visitor: loader timing, height and weight answers, answer variables, validation, pricing plans, the Back button, colours, and what visitors do not see. To build and publish a quiz, see [Build and publish a quiz](/quizzes/build-and-publish).
+This page covers how the blocks on a quiz screen behave for the visitor: loader timing, answer icons and descriptions, the header and progress bar, height and weight answers, answer variables, validation, pricing plans, the Back button, colours, and what visitors do not see. To build and publish a quiz, see [Build and publish a quiz](/quizzes/build-and-publish).
 
 ## Loader timing
 {/* SCREENSHOT: Loading block settings · Duration (sec), Start after (sec) · desktop */}
@@ -18,6 +18,10 @@ The **Loading** block takes its timing in **seconds**:
 | **Start after (sec)** | 0 to 60 seconds. |
 
 A value of 1000 or more is read as milliseconds and converted (3000 runs for 3 seconds), so loaders set up in milliseconds keep working.
+
+### Ring loader
+
+Set the Loading block's **Template** to **Ring** for an "analyzing your answers" screen. The block shows a ring that fills with the percent in the middle, and a checklist made from its timed messages: each message is a step, ticked when its time has passed, with a spinner on the current one. Up to five steps show. The ring uses the quiz's primary colour.
 
 ## Height and weight answers
 {/* SCREENSHOT: Height and Weight blocks · unit switch · mobile */}
@@ -98,6 +102,27 @@ Each plan has these settings in the builder:
 **Plan to checkout.** When the visitor leaves the pricing screen through a link to your checkout, the chosen plan goes with it as `?p=<checkout product code>`, so the checkout opens on that product. If the visitor does not pick a plan, the plan marked **Selected** goes, or the first plan when none is marked. A plan with no product code leaves the link as it is.
 
 In the templates, the plans card is centred on the pricing screen, and the screen's own button takes the visitor on.
+
+## Answer options: icons and descriptions
+{/* SCREENSHOT: Single choice with icons and descriptions · selected answer · mobile */}
+
+Single choice answers show a round radio dot and multiple choice answers a square checkbox, so visitors can tell whether they can pick one answer or several. The selected answer is tinted with the quiz's primary colour and its dot or box fills in.
+
+Each answer can carry:
+
+- an **image or emoji**, set with the picture button next to the answer's text;
+- a **Description**, one short line under the answer's text. Open the answer's settings (the gear) to fill it in. It shows on Single Choice and Multiple Choice blocks.
+
+## Header: brand name and progress bar
+{/* SCREENSHOT: Design tab · Brand name, Progress bar style, Show Step 2 of 6 · desktop */}
+
+In the builder's **Design** tab:
+
+- **Brand name** is shown next to the logo in the quiz header, or on its own when there is no logo.
+- **Progress bar style** offers **Default**, **Minimal** and **Marker**. Marker adds a dot at the end of the filled part of the bar.
+- **Show "Step 2 of 6"** prints the step count next to the bar (with the visitor's real numbers).
+
+The progress bar fills along the path the visitor is actually taking, and these settings only change how it looks.
 
 ## Back button and page navigation
 

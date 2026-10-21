@@ -51,6 +51,26 @@ An answer that is not connected to any screen still moves the visitor on. The qu
 
 The builder lists these answers above the canvas and the flow view under **Answers with no next screen**, with where each one will go. Click a row to select the question. Publishing is not blocked, but the builder shows a reminder with the count. To send an answer somewhere else, connect it in the flow view.
 
+## Start a screen from a template
+{/* SCREENSHOT: Choose a screen template dialog · rich intros and analyzing · desktop */}
+
+When you add a screen, the builder asks you to **Choose a screen template**. Each template is a set of ordinary blocks, so you can change or delete any of them afterwards. Besides **Blank screen** and the hero layouts, there are:
+
+| Template | What it puts on the screen |
+|----------|----------------------------|
+| **Rich intro, centered** | Headline, start button, a line with the time it takes and a privacy note, a rating, three benefits and one customer review. |
+| **Rich intro, two columns** | Headline, start button and rating on the left; three benefits and a review on the right. On phones the columns stack. |
+| **Intro with the first question** | A dark intro that asks the first question straight away, with an icon and a one-line description on each answer. |
+| **Analyzing your answers** | A **Loading** block with the **Ring** template (a percent ring and a checklist of steps), a social proof line and a review. It moves on by itself when the ring is full. |
+| **Fact interstitial** | A study fact chart with a short explanation and a **Continue** button. |
+| **Testimonial interstitial** | A customer review, a people ratio and a **Continue** button. |
+
+The intro templates fill the screen on a phone and on a desktop, so there is no empty half page. Replace the example copy, rating and review with your own before you publish.
+
+### Show an interstitial for one answer only
+
+A fact or testimonial screen works best right after the answer it speaks to. In the question's answer options, open the settings of that answer and set its **Destination** to the interstitial screen, then connect the interstitial's **Continue** button to the next question. Visitors who pick other answers skip it.
+
 ## Publish checks
 {/* SCREENSHOT: Publish refused · error list · desktop */}
 
@@ -82,4 +102,4 @@ To clear the mark, edit the block's content (replace the numbers with your own, 
 
 ## Related
 
-- [Quiz blocks and answers](/quizzes/blocks-and-answers): loader timing, height and weight, variables, validation, pricing plans, the Back button and colours.
+- [Quiz blocks and answers](/quizzes/blocks-and-answers): loader timing, answer icons and descriptions, the header and progress bar, height and weight, variables, validation, pricing plans, the Back button and colours.
