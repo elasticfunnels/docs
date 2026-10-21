@@ -4,7 +4,7 @@ description: 'One record per person in your brand: buyers and leads, their email
 ---
 
 <Note>
-Contacts is switched on for your brand. The sidebar entry is still called **Customers**; the screen it opens is titled **Contacts**. If your Customers screen still shows one row per email address, your brand has not been moved yet and the old screen works as before.
+If your **Contacts** screen still shows one row per email address, your brand has not been moved to Contacts yet and the old screen works as before.
 </Note>
 
 A contact is one person in your brand. Every order, abandoned checkout and form fill is matched to a contact, so a buyer who used two email addresses or later added a phone number stays one record instead of two.
@@ -12,7 +12,7 @@ A contact is one person in your brand. Every order, abandoned checkout and form 
 ## The Contacts list
 {/* SCREENSHOT: Contacts list with the All, Customers and Leads tabs · desktop */}
 
-Open **Customers** in the sidebar. The list shows one row per contact with their email, name, phone, country, orders, revenue and last order date.
+Open **Contacts** in the sidebar. The list shows one row per contact with their email, name, phone, country, orders, revenue and last order date.
 
 - **Tabs.** **All contacts**, **Customers** (anyone who has paid) and **Leads** (people who gave you their details but have not bought yet).
 - **Search.** Type a name or an email address and press Enter.
@@ -56,6 +56,22 @@ Seeing a contact's email, phone, name and postal code in full needs the **See un
 - For any other role, tick **See unmasked** on the **Contact details** row in **Organization → Roles**.
 
 Editing names or postal codes also needs this permission, so nobody overwrites a value they cannot see.
+
+## From the ef CLI
+
+The [`ef` CLI](/account/cli-and-api-keys) reads contacts too, so you or an AI agent can look someone up without opening the app:
+
+```bash
+ef contacts list --lifecycle lead --limit 20
+ef contacts search jane@example.com
+ef contacts list --phone 4155550101 --json
+ef contacts get 01J9Z6X3M1Q2R4S5T6V7W8X9Y0
+```
+
+- `list` takes the same filters as the screen: `--lifecycle`, `--tag`, `--email-status`, `--sms-status` and `--sort`. `--all` fetches every match.
+- The table never prints emails, phones, names or postal codes. `--json` leaves them out too unless you add `--include-pii`.
+- Even with `--include-pii`, they come back masked unless your user has the **See unmasked** permission described above.
+- The CLI only reads contacts. Edit and merge them in the app.
 
 ## Related
 
