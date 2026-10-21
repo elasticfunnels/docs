@@ -58,6 +58,49 @@ Paste this on the upsell page. The button opens the gift form, the note rides al
 <a href="[UPSELL_DECLINE]">No thanks, show me my order</a>
 ```
 
+### Change the form's text, colors and fields
+
+The built-in form takes a few more options on the same tag. `[UPSELL=]`, `[DOWNSELL=]` and `[QUICKBUY=]` all accept them:
+
+```
+[UPSELL=sleep-gummies-1 form=gift-address title='Send one to someone you love' intro='We ship it to their door with your message on the slip.' button='Send the gift for {total}' color='#c2185b' fields='phone,message']
+```
+
+Inside an `href="..."`, wrap each value in single quotes, as above. A value with no spaces needs no quotes.
+
+| Option | What it changes | Default |
+|--------|-----------------|---------|
+| `title` | The heading of the form (up to 120 characters) | "Where should we send the gift?" for `gift-address`, "Where should we send it?" for `address`, in the visitor's language |
+| `intro` | A short line under the heading, also shown on the summary (up to 400 characters) | None |
+| `button` | The confirm button on the summary (up to 60 characters). `{total}` is replaced with the total, shipping and tax included | "Confirm and pay $X" |
+| `color` | The button and focus color: a hex code (`#c2185b`), `rgb()`, `hsl()` or a color name | Green |
+| `text-color` | The button's text color, same formats | White |
+| `fields` | Which optional fields show, comma separated: `address2`, `phone`, `message`. `fields=none` shows only the required ones | `address2,phone` |
+
+`message` adds a **Gift message** box (up to 300 characters). The message shows on the summary and is saved on the order as the `gift_message` flag.
+
+Text from these options is shown as plain text, so HTML in it is displayed as typed and never runs. A color that is not a valid color is ignored and the default is used.
+
+**Fields that are always there.** Recipient first and last name, address, city and country are always asked for, plus the ZIP or postal code (except in countries that have none, such as Hong Kong or the UAE) and the state for the US, Canada and Australia. `fields=` can't remove them: naming one of them, or a name that isn't a field, is ignored with a warning in the browser console and the form still opens.
+
+**What is checked.** The form checks each field before **Continue**, and ElasticFunnels checks the same rules again on the server before any charge, so a page script that skips the form can't place an order with a missing or invalid field. A refused field gets its own error under it:
+
+- every required field must be filled in;
+- the phone, when given, may only hold digits, spaces and `+ ( ) - .`, with at least 6 digits;
+- names and address lines up to 100 characters, the city up to 50, the gift message up to 300.
+
+To restyle the form from your page's CSS instead, set these variables (a `color` option on the tag takes priority):
+
+```css
+:root {
+  --ef-upsell-form-accent: #c2185b;      /* button and focus color */
+  --ef-upsell-form-accent-text: #fff;    /* button text */
+  --ef-upsell-form-bg: #fffaf5;          /* form background */
+  --ef-upsell-form-text: #2b211b;        /* form text */
+  --ef-upsell-form-radius: 18px;         /* corner radius */
+}
+```
+
 ## Option 2: your own form, call `ef.quickBuy`
 
 If the page already has its own gift form, pass what it collected to `ef.quickBuy`. ElasticFunnels validates it, shows the summary with shipping, and charges on confirm.
@@ -91,6 +134,8 @@ The address keys also accept the names most page forms already use: `address1`, 
 | `fields` | Up to 20 custom fields. Keys are lower-case letters, digits and `_`; values up to 500 characters. |
 | `confirm` | `false` skips the summary and charges straight away. The address is still checked first. |
 | `redirect` | `true` goes to the next funnel step after a successful charge. |
+| `form` | Opens the built-in form instead of passing `ship_to`: `{ name: 'gift-address', title, intro, button, color, text_color, fields }`. Takes the same options as the tag, for example `fields: 'phone,message'`. |
+| `gift_message` | A gift message to save with the order (up to 300 characters). |
 
 To get the price with shipping without charging (for example to show it in your own layout), call `ef.quickBuy.quote(code, { ship_to })`.
 

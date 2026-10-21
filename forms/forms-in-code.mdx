@@ -74,6 +74,8 @@ Two limits:
 - It is skipped when the page contains template syntax anywhere (`{{ }}`, `@if`, `@foreach`, `@set`, `@extends`). Use the route above for those pages.
 - Any form with a non-empty `action` that is not `/api/collection/.../store` is left alone. Use that for search boxes or forms that post somewhere else.
 
+A form with `data-collection="COLLECTION_CODE"` gets the same treatment: `COLLECTION_CODE` is the placeholder the CLI's guidance writes, and `ef push` swaps it for a new collection, with the same two limits.
+
 ## Full example: a form that collects phone numbers
 
 One phone field and a checkbox that starts unticked. Hidden fields keep the exact wording shown next to the box, the page address and the time the visitor submitted. Tested on a live demo page.
