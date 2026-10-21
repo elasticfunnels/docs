@@ -42,6 +42,27 @@ There is no "send a text" step. SlickText's API sends campaigns to lists and seg
 
 You can also start from a preset: on the SlickText integration page, the **Presets** tab creates "On New Customer", "On New Purchase" or "On Collection Entry" automations that save the person as a SlickText contact. Before you save the connection, the page already lists these presets with a preview of each one; you can create them once the connection is saved.
 
+## Older SlickText accounts (legacy)
+
+SlickText accounts created before 22 January 2025 run on SlickText's older system. You can tell by the menu: it shows **Textwords**, and there is no **API & Webhooks** page. These accounts have no single API key. They have a **Public Key** and a **Private Key**, and ElasticFunnels supports them in the same integration.
+
+<Steps>
+  <Step title="Copy both keys">
+    In SlickText, open **Account Settings** → **API**. If no keys are shown, click **Generate API Keys**.
+  </Step>
+  <Step title="Paste them in ElasticFunnels">
+    Paste the **Public Key** (it starts with `pub_`) into **API key**. A **Private key** field appears: paste the **Private Key** there. The SlickText Brand ID field is not used. Save. Both keys are checked with SlickText when you save.
+  </Step>
+</Steps>
+
+What changes on a legacy account:
+
+- **Lists are your textwords.** The list picker shows them as `#WORD`.
+- **Adding someone to a textword subscribes them.** On the older system, being on a textword is the subscription, so **Create or Update Contact** with a textword chosen subscribes a new contact, unless the step sets **Not subscribed** or **Unsubscribed**. Only add people who agreed to receive texts from you. **Ask new contacts to confirm by text** sends SlickText's double opt-in text instead.
+- **A new contact needs a textword.** The older system keeps contacts per textword, so the step fails for a number that is not in SlickText yet if no textword is chosen. Existing contacts are updated either way.
+- **Remove Contact from Lists** takes the number off those textwords. It does not opt the person out, so they can be added again later.
+- **Find Contact** also returns `textword_ids`, the textwords the number is on.
+
 ## Opt-in status and consent
 {/* SCREENSHOT: Opt-in · automation builder · desktop */}
 
@@ -69,6 +90,12 @@ Values can use variables from earlier steps, the same way as the other fields. A
 <AccordionGroup>
   <Accordion title="Saving the integration says SlickText rejected the API key">
     The key was deleted or disabled in SlickText, or it was copied incompletely. Create a new key under **Settings** → **API & Webhooks** and paste it again.
+  </Accordion>
+  <Accordion title="Saving says this is a Public Key from a legacy SlickText account">
+    Your account is on SlickText's older system. Paste the **Private Key** from **Account Settings** → **API** in the **Private key** field. See [Older SlickText accounts](#older-slicktext-accounts-legacy).
+  </Accordion>
+  <Accordion title="Saving says SlickText rejected these keys">
+    The Public Key and Private Key do not match, or were regenerated in SlickText. Copy both again from **Account Settings** → **API**.
   </Accordion>
   <Accordion title="The key belongs to a different brand">
     You filled in a SlickText Brand ID that is not the brand of this key. Clear the SlickText Brand ID field, or use the key created in that brand.
