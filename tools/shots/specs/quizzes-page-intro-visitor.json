@@ -1,0 +1,35 @@
+{
+  "out": "images/quizzes/page-intro-visitor.png",
+  "alt": "The quiz page on a phone: the designed intro with three goal buttons that start the quiz",
+  "_source": "elasticfunnels repo flow _dev/flows/quiz-page-intro walk at 390x844 on the local website runtime, demo brand 899, step 5, cropped to the top 560 px",
+  "image": "tools/shots/source/quizzes-page-intro-visitor.png",
+  "imageSize": {
+    "w": 390,
+    "h": 560
+  },
+  "maxWidth": 560,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        24,
+        153,
+        342,
+        52
+      ],
+      "title": "Quiz start button",
+      "text": "Opens the quiz on the next question"
+    },
+    {
+      "box": [
+        40,
+        385,
+        310,
+        100
+      ],
+      "title": "Your page",
+      "text": "Built in the page editor",
+      "side": "left"
+    }
+  ]
+}

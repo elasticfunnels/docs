@@ -1,0 +1,46 @@
+{
+  "out": "images/quizzes/page-intro-elements.png",
+  "alt": "The page editor's Elements panel on a quiz page, with the Quiz and Quiz start button elements under Quiz",
+  "_source": "elasticfunnels repo flow _dev/flows/quiz-page-intro (branch feat/quiz-page-intro), recorded at 1440x900 on demo brand 899, build step 4, cropped to CSS x 0, y 60, 1150 x 500",
+  "image": "tools/shots/source/quizzes-page-intro-elements.png",
+  "imageSize": {
+    "w": 1150,
+    "h": 500
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        6,
+        271,
+        47,
+        44
+      ],
+      "title": "Elements",
+      "text": "Opens the list of elements",
+      "side": "left"
+    },
+    {
+      "box": [
+        72,
+        390,
+        143,
+        58
+      ],
+      "title": "Quiz",
+      "text": "Where the quiz shows",
+      "side": "left"
+    },
+    {
+      "box": [
+        223,
+        390,
+        143,
+        58
+      ],
+      "title": "Quiz start button",
+      "text": "Starts the quiz, can pick an answer"
+    }
+  ]
+}

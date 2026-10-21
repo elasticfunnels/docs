@@ -121,7 +121,8 @@
                 "icon": "circle-question",
                 "pages": [
                   "quizzes/build-and-publish",
-                  "quizzes/blocks-and-answers"
+                  "quizzes/blocks-and-answers",
+                  "quizzes/page-intro"
                 ]
               },
               {

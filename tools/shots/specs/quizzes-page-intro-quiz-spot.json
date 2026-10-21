@@ -1,0 +1,35 @@
+{
+  "out": "images/quizzes/page-intro-quiz-spot.png",
+  "alt": "The Quiz element on the page with its When the quiz starts setting",
+  "_source": "elasticfunnels repo flow _dev/flows/quiz-page-intro (branch feat/quiz-page-intro), recorded at 1440x900 on demo brand 899, build step 14, cropped to CSS x 60, y 60, 1380 x 560",
+  "image": "tools/shots/source/quizzes-page-intro-quiz-spot.png",
+  "imageSize": {
+    "w": 1380,
+    "h": 560
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        20,
+        416,
+        1050,
+        100
+      ],
+      "title": "Quiz",
+      "text": "Placeholder; the quiz shows here live",
+      "side": "left"
+    },
+    {
+      "box": [
+        1107,
+        191,
+        257,
+        33
+      ],
+      "title": "When the quiz starts",
+      "text": "Replace the page or stay inside it"
+    }
+  ]
+}

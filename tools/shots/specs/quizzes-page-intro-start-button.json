@@ -1,0 +1,65 @@
+{
+  "out": "images/quizzes/page-intro-start-button.png",
+  "alt": "A Quiz start button selected in the page editor, with its question, answer, next screen and start link in the settings panel",
+  "_source": "elasticfunnels repo flow _dev/flows/quiz-page-intro (branch feat/quiz-page-intro), recorded at 1440x900 on demo brand 899, build step 10, cropped to CSS x 380, y 60, 1060 x 580",
+  "image": "tools/shots/source/quizzes-page-intro-start-button.png",
+  "imageSize": {
+    "w": 1060,
+    "h": 580
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        15,
+        236,
+        420,
+        49
+      ],
+      "title": "Quiz start button",
+      "text": "Styled like any other button",
+      "side": "left"
+    },
+    {
+      "box": [
+        787,
+        293,
+        257,
+        33
+      ],
+      "title": "Question it answers",
+      "text": "Any question with answers"
+    },
+    {
+      "box": [
+        787,
+        358,
+        257,
+        33
+      ],
+      "title": "Answer",
+      "text": "Saved as if the visitor tapped it"
+    },
+    {
+      "box": [
+        787,
+        423,
+        257,
+        33
+      ],
+      "title": "Then go to",
+      "text": "Optional: jump to a screen"
+    },
+    {
+      "box": [
+        787,
+        468,
+        257,
+        86
+      ],
+      "title": "Start link",
+      "text": "The same start for ads and emails"
+    }
+  ]
+}
