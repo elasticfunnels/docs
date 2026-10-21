@@ -30,10 +30,11 @@ The record has these tabs:
 
 | Tab | What it shows |
 |-----|---------------|
-| **Overview** | Lifetime stats, orders and transactions, as before. |
+| **Overview** | Lifetime stats, orders and transactions. The **Sales & Refunds** and **Transactions** tabs show 25 rows per page with a pager. |
 | **Contact** | Name, location, timezone, every email and phone the contact has used (the primary one is marked), tags, and where the contact first came from. |
 | **Consent** | The email and SMS marketing status, and the history of opt-ins and opt-outs with their source. |
 | **Merges** | Every contact merged into this one, with an **Undo** button while undo is still possible. |
+| **Timeline** | Every change to the record and the contact's site activity, newest first. See [The timeline](#the-timeline). |
 
 ## Editing a contact
 {/* SCREENSHOT: Edit contact drawer · desktop */}
@@ -44,7 +45,37 @@ A field you edit by hand is **locked**: new orders and imports no longer overwri
 
 If someone else changed the contact while you were editing, saving tells you so; reload the record and edit again.
 
-Email addresses and phone numbers are not edited here. They come from the contact's orders and forms.
+Email addresses and phone numbers are not changed in this drawer. New ones arrive with the contact's orders and forms, and you can add or remove them by hand as shown below.
+
+## Adding and removing emails and phones
+{/* SCREENSHOT: Contact tab, Emails list with Add email and the Make primary / Remove actions · desktop */}
+
+On the **Contact** tab, the **Emails** and **Phones** lists each have their own button: **Add email** or **Add phone**.
+
+1. Click **Add email** (or **Add phone**) and type the address. A phone number without a country code is read for the contact's country, or as a US number if the contact has no country.
+2. Tick **Make this the primary address** if messages should go to it from now on.
+3. Click **Add**.
+
+Every address that is not the primary one has two actions in the list:
+
+- **Make primary** moves the contact's main email or phone to it. The field is then locked, so later orders and imports do not switch it back.
+- **Remove** takes the address off the contact. Its consent history is kept. The primary address cannot be removed; make another one primary first.
+
+If another contact already has that address, the app does not add it and shows **Open that contact**. When the two records are the same person, [merge them](/contacts/merge-and-duplicates) instead.
+
+Each change is saved in **Settings → Logs** with your name. Adding, changing or removing an address needs the **See unmasked** permission on the **Contact details** row, the same as seeing addresses in full.
+
+## The timeline
+{/* SCREENSHOT: Timeline tab with record changes and site events · desktop */}
+
+The **Timeline** tab lists everything that happened to the contact, newest first:
+
+- record changes: contact created, became a customer, first and latest purchase, each email and phone added, consent changes, merges and their undo, and visitor profiles linked to the contact;
+- site activity: the page events of every visitor profile linked to the contact, so visits from before and after a merge appear in one list.
+
+The list shows 25 entries per page. Use the reload button at the right of the toolbar to fetch new activity. If site activity cannot be loaded at that moment, the tab says so and shows only the record changes.
+
+Without the **See unmasked** permission, addresses in the timeline are masked, event text is hidden and page addresses are shown without their query string.
 
 ## Who sees emails and phone numbers
 {/* SCREENSHOT: Contacts list with masked emails · desktop */}
