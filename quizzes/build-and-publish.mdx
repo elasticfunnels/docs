@@ -45,6 +45,12 @@ The flow view shows each screen and the connections (edges) between them. Click 
 
 A single-choice question moves the visitor on as soon as they pick an answer. A question with **Allow multiple choice** turned on does not: the visitor picks several answers, then needs a button to go on. Every multiple-choice screen therefore needs a button (for example **Continue**) connected to the next screen. The quiz templates already have one on every multiple-choice screen.
 
+### Answers with no next screen
+
+An answer that is not connected to any screen still moves the visitor on. The quiz sends them to the screen most of the other answers in the same question lead to (on a tie, the first one in the list). If no other answer is connected, it goes to the next screen in screen order, and from the last screen it ends the quiz (the outcome or the thank-you message). A **Next** button that is not connected works the same way, except on the last screen, where it restarts the quiz. When an answer's connections all have conditions and none of them matches, the same rule applies.
+
+The builder lists these answers above the canvas and the flow view under **Answers with no next screen**, with where each one will go. Click a row to select the question. Publishing is not blocked, but the builder shows a reminder with the count. To send an answer somewhere else, connect it in the flow view.
+
 ## Publish checks
 {/* SCREENSHOT: Publish refused · error list · desktop */}
 
