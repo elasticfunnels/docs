@@ -1,0 +1,63 @@
+---
+title: 'Contacts'
+description: 'One record per person in your brand: buyers and leads, their emails and phones, consent, and merge history.'
+---
+
+<Note>
+Contacts is switched on for your brand. The sidebar entry is still called **Customers**; the screen it opens is titled **Contacts**. If your Customers screen still shows one row per email address, your brand has not been moved yet and the old screen works as before.
+</Note>
+
+A contact is one person in your brand. Every order, abandoned checkout and form fill is matched to a contact, so a buyer who used two email addresses or later added a phone number stays one record instead of two.
+
+## The Contacts list
+{/* SCREENSHOT: Contacts list with the All, Customers and Leads tabs · desktop */}
+
+Open **Customers** in the sidebar. The list shows one row per contact with their email, name, phone, country, orders, revenue and last order date.
+
+- **Tabs.** **All contacts**, **Customers** (anyone who has paid) and **Leads** (people who gave you their details but have not bought yet).
+- **Search.** Type a name or an email address and press Enter.
+- **Sort.** Newest or oldest order, highest or lowest revenue, most or fewest orders, newest or oldest contact.
+- **Reload.** The reload button at the right of the search box fetches the list again, so a contact created a moment ago shows up without refreshing the page.
+
+Click a contact's email to open their record.
+
+## A contact's record
+{/* SCREENSHOT: Contact record with the Contact tab open · desktop */}
+
+Each contact has its own address in the app (`/customers/<contact id>`), which keeps working if you change the contact's email. Older links that open a customer by email still work and move to the contact's address.
+
+The record has these tabs:
+
+| Tab | What it shows |
+|-----|---------------|
+| **Overview** | Lifetime stats, orders and transactions, as before. |
+| **Contact** | Name, location, timezone, every email and phone the contact has used (the primary one is marked), tags, and where the contact first came from. |
+| **Consent** | The email and SMS marketing status, and the history of opt-ins and opt-outs with their source. |
+| **Merges** | Every contact merged into this one, with an **Undo** button while undo is still possible. |
+
+## Editing a contact
+{/* SCREENSHOT: Edit contact drawer · desktop */}
+
+On the **Contact** tab, click **Edit** to change the first name, last name, country, region, postal code, timezone and tags.
+
+A field you edit by hand is **locked**: new orders and imports no longer overwrite it, and it shows a **Locked** badge. To let incoming data update it again, hover the **Locked** badge and click **Unlock**.
+
+If someone else changed the contact while you were editing, saving tells you so; reload the record and edit again.
+
+Email addresses and phone numbers are not edited here. They come from the contact's orders and forms.
+
+## Who sees emails and phone numbers
+{/* SCREENSHOT: Contacts list with masked emails · desktop */}
+
+Seeing a contact's email, phone, name and postal code in full needs the **See unmasked** permission on the **Contact details** row of a role. Without it the Contacts screens mask them (`j***@g***.com`, `***4567`, `J***`), and the order tabs that are looked up by email stay hidden.
+
+- Brand owners always have it.
+- Organization admins who could already see customers get it automatically.
+- For any other role, tick **See unmasked** on the **Contact details** row in **Organization → Roles**.
+
+Editing names or postal codes also needs this permission, so nobody overwrites a value they cannot see.
+
+## Related
+
+- [Merging and duplicates](/contacts/merge-and-duplicates)
+- [Customers API](/api-reference/endpoints/customers)

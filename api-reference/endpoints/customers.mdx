@@ -1,14 +1,23 @@
 ---
 title: 'Customers'
 icon: "users"
-description: 'List, search, and export customer records'
+description: 'List, search, edit, merge and export customer and contact records'
 ---
 
 <Note>
   Customer endpoints sit under `/api/brands/{brand}/customers/` with `moduleAccess:customers` middleware. Authenticate with `EF-Access-Key`.
 </Note>
 
-Customer records are built from conversion and tracking events (purchases, abandoned carts, chargebacks). They are stored in Elasticsearch and cannot be created via API directly — they are created automatically when conversions are recorded.
+Customer records are built from conversion and tracking events (purchases, abandoned carts, chargebacks, form fills). They cannot be created via API directly; they are created automatically when conversions are recorded.
+
+<Info>
+**Contacts.** Brands now use [Contacts](/contacts/overview) instead of email-based customer records: one record per person, with a stable 26-character `public_id`. A brand that has not been moved yet keeps the email-based behaviour described below. On a brand that uses Contacts:
+
+- `GET customers` returns one row per contact, adds `public_id`, `lifecycle` (`customer` or `lead`), `email_status`, `sms_status`, `tags` and `"source": "mysql"`, and filters with `lifecycle=customer|lead` (`type=abandon` still works and means `lead`). `q` matches names and emails.
+- `GET customers/{key}/details` accepts a `public_id` as well as an email, and adds a `contact` object.
+- Emails, phones, names and postal codes are masked unless the API key's user has the `contacts.view_pii` permission (`j***@g***.com`, `***4567`, `J***`). Responses carry `can_view_pii`.
+- The `contacts` endpoints below become available. Before the switch they answer `404` with `{"error": "contacts_not_enabled"}`.
+</Info>
 
 ---
 
@@ -84,7 +93,7 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/customers?sort=total_r
 
 ## Quick Access Stats
 
-Returns customer counts by type — useful for dashboard badges.
+Returns customer counts by type, useful for dashboard badges.
 
 ```
 GET /api/brands/{brand}/customers/quick-access
@@ -111,7 +120,7 @@ curl https://app.elasticfunnels.io/api/brands/{brand_id}/customers/quick-access 
 
 ## Get Customer Details
 
-Retrieve the full profile for a single customer by email address — includes lifetime stats, order history, subscriptions, and notes.
+Retrieve the full profile for a single customer by email address. Includes lifetime stats, order history, subscriptions, and notes.
 
 ```
 GET /api/brands/{brand}/customers/{customerEmail}/details
@@ -237,11 +246,121 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/customers/expor
 
 ---
 
+## Contacts endpoints
+
+Available once the brand uses Contacts. Reading needs `customers.view`; editing, merging and undoing need `customers.update`.
+
+### List contacts
+
+```
+GET /api/brands/{brand}/contacts
+```
+
+<ParamField query="lifecycle" type="string">
+  `customer` or `lead`
+</ParamField>
+
+<ParamField query="q" type="string">
+  Search names and emails
+</ParamField>
+
+<ParamField query="tag" type="string">
+  Only contacts with this tag
+</ParamField>
+
+<ParamField query="email_status" type="string">
+  `unknown`, `subscribed`, `unsubscribed` or `suppressed`
+</ParamField>
+
+<ParamField query="sms_status" type="string">
+  `unknown`, `subscribed` or `unsubscribed`
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `newest` (default), `oldest`, `revenue_high`, `revenue_low`, `orders_high`, `orders_low`, `created_new`, `created_old`
+</ParamField>
+
+<ParamField query="page" type="number">
+  Page number (offset paging, with `total` and `last_page` in the response)
+</ParamField>
+
+<ParamField query="per_page" type="number">
+  Results per page
+</ParamField>
+
+`GET /api/brands/{brand}/contacts/counts` returns `{"all": 1842, "customer": 1205, "lead": 637}` for the same filters.
+
+### Get a contact
+
+```
+GET /api/brands/{brand}/contacts/{publicId}
+```
+
+Returns `{"contact": {...}}` with the contact's fields, `emails`, `phones`, `consent`, `merges`, `field_locks`, `version` and `can_view_pii`. If `publicId` belongs to a contact that was merged away, the response adds `redirect_public_id` (the contact it was merged into) and returns that contact.
+
+```bash cURL
+curl https://app.elasticfunnels.io/api/brands/{brand_id}/contacts/01J9Z6X3M1Q2R4S5T6V7W8X9Y0 \
+  -H "EF-Access-Key: your_api_key_here"
+```
+
+### Update a contact
+
+```
+PATCH /api/brands/{brand}/contacts/{publicId}
+```
+
+<ParamField body="first_name" type="string">First name (needs `contacts.view_pii`)</ParamField>
+<ParamField body="last_name" type="string">Last name (needs `contacts.view_pii`)</ParamField>
+<ParamField body="country" type="string">Two-letter country code</ParamField>
+<ParamField body="region" type="string">State or region</ParamField>
+<ParamField body="postal_code" type="string">Postal code (needs `contacts.view_pii`)</ParamField>
+<ParamField body="timezone" type="string">IANA timezone, for example `America/New_York`</ParamField>
+<ParamField body="tags" type="array">Replaces the contact's tags</ParamField>
+<ParamField body="unlock" type="array">Field names to unlock, so incoming orders and imports may update them again</ParamField>
+<ParamField body="version" type="number">The `version` you read; a newer one on the server answers `409 version_conflict`</ParamField>
+
+Every field you set is locked (listed in `field_locks`) so later orders and imports do not overwrite it. Emails and phones are not editable here.
+
+```bash cURL
+curl -X PATCH https://app.elasticfunnels.io/api/brands/{brand_id}/contacts/01J9Z6X3M1Q2R4S5T6V7W8X9Y0 \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"first_name": "Jane", "timezone": "America/New_York", "version": 4}'
+```
+
+Errors: `403 pii_permission_required`, `409 version_conflict`, `409 contact_merged` (with `redirect_public_id`), `422 invalid_country`.
+
+### Merge two contacts
+
+```
+POST /api/brands/{brand}/contacts/{publicId}/merge
+```
+
+<ParamField body="absorbed" type="string" required>
+  The `public_id` of the contact to merge into `{publicId}`
+</ParamField>
+
+`{publicId}` survives. Its own values are kept; empty fields are filled from the absorbed contact, and the absorbed contact's emails, phones, consent records and tags move to it. Returns `{"merge_id": 812, "contact": {...}}`.
+
+Errors: `404 absorbed_not_found`, `422 same_contact`, `422 merge_failed`.
+
+### Undo a merge
+
+```
+POST /api/brands/{brand}/contacts/merges/{mergeId}/undo
+```
+
+Splits the two contacts again. Allowed for 180 days after the merge. Returns `{"undone": true, "survivor_public_id": "...", "absorbed_public_id": "..."}`.
+
+Errors: `404 merge_not_found`, `422 undo_failed`.
+
+---
+
 ## Notes
 
 <Info>
-  - Customer records are read-only — they are created automatically from conversion events
+  - Customer records are created automatically from conversion events; on brands using Contacts, only the fields listed under Update a contact can be changed
   - The `{customerEmail}` path parameter should be URL-encoded
-  - Sorting and filtering use Elasticsearch under the hood; large result sets may be slightly delayed
+  - Before a brand uses Contacts, sorting and filtering use Elasticsearch under the hood; large result sets may be slightly delayed
   - The `columns` parameter controls both what is fetched and what is returned, reducing response size for large lists
 </Info>

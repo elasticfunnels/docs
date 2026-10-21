@@ -272,6 +272,14 @@
                 ]
               },
               {
+                "group": "Contacts",
+                "icon": "address-book",
+                "pages": [
+                  "contacts/overview",
+                  "contacts/merge-and-duplicates"
+                ]
+              },
+              {
                 "group": "Audiences",
                 "icon": "users",
                 "pages": [
