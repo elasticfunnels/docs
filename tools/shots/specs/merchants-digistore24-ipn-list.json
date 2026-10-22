@@ -1,0 +1,58 @@
+{
+  "out": "images/merchants/digistore24-ipn-list.png",
+  "alt": "Digistore24 Settings, Integrations (IPN) configuration with Add new connection and an active ElasticFunnels connection",
+  "_source": "Real Digistore24 vendor account (digistore24-app.com), captured 2026-10-22 read-only (nothing saved or tested); product names, connection names and the avatar replaced in the page with generic values (Acme Health, Acme Sleep Gummies, postback code aB3dE5fG7hJ9kL2m) before capture, then cropped. Re-shoot: ~/scratchpad/elasticfunnels/merchant-docs/cap/capture-ds.cjs (app-access profile digistore24-vendor).",
+  "image": "tools/shots/source/merchants-digistore24-ipn-list.png",
+  "imageSize": {
+    "w": 1440,
+    "h": 640
+  },
+  "maxWidth": 900,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        30,
+        553,
+        248,
+        36
+      ],
+      "title": "Integrations (IPN)",
+      "text": "Under Settings",
+      "side": "left"
+    },
+    {
+      "box": [
+        342,
+        97,
+        159,
+        36
+      ],
+      "title": "Add new connection",
+      "text": "Starts a new IPN",
+      "side": "right"
+    },
+    {
+      "box": [
+        378,
+        511,
+        61,
+        22
+      ],
+      "title": "Edit",
+      "text": "Opens an existing connection",
+      "side": "left"
+    },
+    {
+      "box": [
+        860,
+        446,
+        61,
+        101
+      ],
+      "title": "Active",
+      "text": "Must show a green tick",
+      "side": "right"
+    }
+  ]
+}

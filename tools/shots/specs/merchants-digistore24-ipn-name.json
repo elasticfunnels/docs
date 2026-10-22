@@ -1,0 +1,36 @@
+{
+  "out": "images/merchants/digistore24-ipn-name.png",
+  "alt": "Digistore24 Generic connection with the name ElasticFunnels and For products set to all",
+  "_source": "Real Digistore24 vendor account (digistore24-app.com), captured 2026-10-22 read-only (nothing saved or tested); product names, connection names and the avatar replaced in the page with generic values (Acme Health, Acme Sleep Gummies, postback code aB3dE5fG7hJ9kL2m) before capture, then cropped. Re-shoot: ~/scratchpad/elasticfunnels/merchant-docs/cap/capture-ds.cjs (app-access profile digistore24-vendor).",
+  "image": "tools/shots/source/merchants-digistore24-ipn-name.png",
+  "imageSize": {
+    "w": 915,
+    "h": 459
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        206,
+        70,
+        628,
+        33
+      ],
+      "title": "Name",
+      "text": "Any name, for example ElasticFunnels",
+      "side": "right"
+    },
+    {
+      "box": [
+        214,
+        140,
+        44,
+        26
+      ],
+      "title": "all",
+      "text": "Sends every product",
+      "side": "right"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "out": "images/merchants/digistore24-ipn-url.png",
+  "alt": "Digistore24 Generic connection with the ElasticFunnels IPN URL, IPN password, Active, Save and Test connection",
+  "_source": "Real Digistore24 vendor account (digistore24-app.com), captured 2026-10-22 read-only (nothing saved or tested); product names, connection names and the avatar replaced in the page with generic values (Acme Health, Acme Sleep Gummies, postback code aB3dE5fG7hJ9kL2m) before capture, then cropped. Re-shoot: ~/scratchpad/elasticfunnels/merchant-docs/cap/capture-ds.cjs (app-access profile digistore24-vendor).",
+  "image": "tools/shots/source/merchants-digistore24-ipn-url.png",
+  "imageSize": {
+    "w": 915,
+    "h": 880
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        206,
+        30,
+        629,
+        33
+      ],
+      "title": "IPN URL",
+      "text": "Paste the ElasticFunnels URL",
+      "side": "right"
+    },
+    {
+      "box": [
+        206,
+        192,
+        629,
+        33
+      ],
+      "title": "IPN password",
+      "text": "Optional, must match ElasticFunnels",
+      "side": "right"
+    },
+    {
+      "box": [
+        206,
+        498,
+        104,
+        36
+      ],
+      "title": "Active",
+      "text": "Set to Yes",
+      "side": "right"
+    },
+    {
+      "box": [
+        319,
+        814,
+        62,
+        36
+      ],
+      "title": "Save",
+      "text": "Saves the connection",
+      "side": "left"
+    },
+    {
+      "box": [
+        385,
+        814,
+        131,
+        36
+      ],
+      "title": "Test connection",
+      "text": "Sends a test IPN",
+      "side": "right"
+    }
+  ]
+}

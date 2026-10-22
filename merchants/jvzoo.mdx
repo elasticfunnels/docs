@@ -345,6 +345,9 @@ JVZoo's team reviews your sales and upsell pages before the funnel goes live, an
   <Accordion title="The merchant still says Needs Setup">
     No JVZIPN has arrived yet. Check that the merchant's URL from **Postback Setup** is in a JVZIPN box of the product you bought, then place a test purchase. With **Accept postbacks without verifying the key** off, a missing or wrong secret key also refuses every JVZIPN.
   </Accordion>
+  <Accordion title="Sales stopped showing up, but the merchant still says Verified">
+    **Verified** is set by the first JVZIPN and does not turn off when notifications stop, so it cannot tell you that sales are flowing. Open **Settings** → **Logs** → **Merchant Postbacks** and look for the last JVZoo entry. If nothing arrived after a certain date, check that the merchant's URL is still in a JVZIPN box of every product in JVZoo. If entries arrive with an error code, click **Show Details** to read why they were refused.
+  </Accordion>
   <Accordion title="Sales stopped after I changed something in JVZoo">
     If you clicked **Generate New** on your JVZIPN code, the key on the merchant no longer matches. Paste the new key into **JVZIPN Secret Key**, or turn **Accept postbacks without verifying the key** on while you do.
   </Accordion>

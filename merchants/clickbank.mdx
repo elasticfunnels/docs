@@ -1,7 +1,7 @@
 ---
 title: 'ClickBank'
 icon: "store"
-description: 'Set up ClickBank as a merchant, including pitch flow and domain assignment'
+description: 'Set up ClickBank as a merchant: pitch flow, domain, the INS URL and secret key, testing and what to check when sales stop'
 ---
 
 This guide covers setting up ClickBank as a merchant to sell your products through the ClickBank marketplace, including pitch flow configuration and merchant setup.
@@ -9,7 +9,6 @@ This guide covers setting up ClickBank as a merchant to sell your products throu
 <Note>This is for merchants selling through ClickBank. If you're an affiliate promoting ClickBank products, see the [ClickBank Affiliate Integration](/integrations/clickbank) instead.</Note>
 
 ## Prerequisites
-{/* SCREENSHOT: Prerequisites · merchant setup screen or postback state · desktop */}
 
 - Active ClickBank account with vendor access (ClickBank term)
 - Approved products in ClickBank marketplace
@@ -44,7 +43,6 @@ For postback configuration, click **Postback Setup** on the merchant's row in **
 </Note>
 
 ## Step 2: Configure Domain-Merchant Assignment
-{/* SCREENSHOT: Step 2: Configure Domain-Merchant Assignment · merchant setup screen or postback state · desktop */}
 
 ### Assign Merchant to Domain
 1. Go to **Settings** → **Domains** → **Edit Domain**
@@ -54,7 +52,6 @@ For postback configuration, click **Postback Setup** on the merchant's row in **
 This ensures all funnels on this domain use ClickBank for payments.
 
 ## Step 3: Set Up ClickBank Pitch Flow
-{/* SCREENSHOT: Step 3: Set Up ClickBank Pitch Flow · merchant setup screen or postback state · desktop */}
 
 ### Create Pitch Flow in ClickBank
 1. Log into your ClickBank account
@@ -83,7 +80,6 @@ This decouples ClickBank from individual page URLs. You can later split test or 
 - **Document variants**: Keep track of which IDs correspond to which products
 
 ## Step 4: Configure Funnel Integration
-{/* SCREENSHOT: Step 4: Configure Funnel Integration · merchant setup screen or postback state · desktop */}
 
 ### Set Funnel Pitch Flow ID
 1. Go to **Funnels** → **Edit Funnel**
@@ -96,16 +92,47 @@ This decouples ClickBank from individual page URLs. You can later split test or 
 - **Make funnel default**: Check this option if you want this funnel to handle all traffic to the domain without the `f=` parameter
 - **URL access**: Visitors can access via `domain.com` or `domain.com?f=funnel_id`
 
-## Postbacks
+## Step 5: Send orders to ElasticFunnels (INS)
 
-In the guided setup, this is the **Postback URL** step. Copy the URL and paste it into ClickBank as the **Instant Notification URL**, pick **Version 8.0**, then click **Test & Save** in ClickBank and **I pasted it, continue** in ElasticFunnels.
+ClickBank tells ElasticFunnels about each sale, rebill, refund and chargeback through its Instant Notification Service (INS). Until the INS URL is set, no ClickBank sale shows up in your reports.
+
+In the guided setup, this is the **Postback URL** step.
 
 <img src="/images/merchants/clickbank-setup-postback.png" alt="The Postback URL step of the guided ClickBank setup: the postback URL with Copy and the seven steps in ClickBank, ending with Version 8.0 and Test & Save" />
 
-Later, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for ClickBank, then **Test**. After you configure ClickBank and click **Test & Save** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
+You can open the same URL later: click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. It looks like `https://app.elasticfunnels.io/postback/vendor/<your code>/clickbank`.
+
+In ClickBank, logged in to your vendor account:
+
+1. Go to **Account Settings** → **My Site**
+2. Open **Advanced Tools**
+3. Check **Secret Key**. It must be the same value as **ClickBank secret key** on the merchant in ElasticFunnels (see [About the secret key](#about-the-secret-key)).
+4. In the **Instant Notification Service** section, paste the URL into an **Instant Notification URL** field
+5. Pick **Version 8.0**
+6. Click **Test & Save**. ClickBank sends a test notification to the URL.
+
+<Note>
+Each ClickBank vendor account has its own INS settings, so a second account needs its own merchant and URL.
+</Note>
+
+## Step 6: Test and check that it arrived
+
+1. In ElasticFunnels, click **Postback Setup** on the merchant's row and go to **Test**. Keep the window open.
+2. In ClickBank, click **Test & Save** next to the URL
+3. Within a few seconds the window shows **Merchant verified**. If it shows **No test postback yet** after 2 minutes, check the URL and click **Check again**.
+4. Open **Settings** → **Logs** → **Merchant Postbacks**. The test is listed with merchant ClickBank. Click **Show Details** to see the notification, decrypted with your secret key.
+
+The ClickBank test (buyer testuser@somesite.com) marks the merchant verified but is not added to your reports as an order. For an end-to-end check, place a test purchase from your live page using ClickBank's test payment details.
+
+## Sales stopped showing up
+
+Start at **Settings** → **Logs** → **Merchant Postbacks**, filtered to ClickBank.
+
+- **Nothing from ClickBank since a certain date**: the INS URL was removed or replaced in ClickBank. Check **Account Settings** → **My Site** → **Advanced Tools**. The merchant keeps saying **Verified** in ElasticFunnels: that badge is set by the first postback and does not turn off when postbacks stop.
+- **Notifications arrive but no orders**: open one with **Show Details**. If it could not be decrypted, the secret key in ClickBank and the one on the merchant differ, usually because one of them was changed. Make them the same; ClickBank does not resend notifications that already went out.
+- **Orders arrive without a page or ad**: the pay link had no click ID. Use `[BUY]` tags; pasted pay links get `__click_id` added unless **Add click tracking to pasted buy links** is off (see [Custom Purchase Links](#custom-purchase-links)).
 
 ## Advanced Configuration
-{/* SCREENSHOT: Advanced Configuration · merchant setup screen or postback state · desktop */}
 
 ### Multiple Product Testing
 When split testing different products:
@@ -133,14 +160,10 @@ A ClickBank pay link pasted into the page (`https://<account>.pay.clickbank.net/
 If you sell recurring products, you can upgrade or cancel a customer's existing subscription mid-funnel using `[UPSELL_UPGRADE=old_sku, new_sku]` and `[UPSELL_CANCEL]` tags. This requires a **Developer API Key** (different from the encryption key) - see [Subscription Upsells](/products/subscription-upsells) for full setup instructions.
 
 ## Troubleshooting
-{/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
 
 ### Common Issues
 
-**Postback not working:**
-- Verify encryption key matches in both systems
-- Check postback URL is correctly entered in ClickBank
-- Ensure merchant is properly assigned to domain
+**Postback not working:** see [Sales stopped showing up](#sales-stopped-showing-up).
 
 **Purchase links not working:**
 - Verify funnel has correct CBFID
@@ -153,13 +176,9 @@ If you sell recurring products, you can upgrade or cancel a customer's existing 
 - Ensure domain-merchant assignment is correct
 
 ### Testing Your Setup
-1. **Use ClickBank's test mode** for initial testing
-2. **Verify postback reception** in ElasticFunnels
-3. **Test purchase flow** end-to-end
-4. **Check conversion tracking** in both systems
+See [Step 6: Test and check that it arrived](#step-6-test-and-check-that-it-arrived).
 
 ## Security Best Practices
-{/* SCREENSHOT: Security Best Practices · merchant setup screen or postback state · desktop */}
 
 - **Keep encryption keys secure** - don't share them
 - **Use strong, unique keys** - avoid simple passwords

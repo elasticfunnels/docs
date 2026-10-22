@@ -1,0 +1,36 @@
+{
+  "out": "images/merchants/buygoods-customer-ipn.png",
+  "alt": "BuyGoods Customers, Settings with the Registration Webhook URL in Fire this IPN for each NEW customer",
+  "_source": "Real BuyGoods vendor admin (admin.buygoods.com), captured 2026-10-22 read-only (no setting saved); account name, avatar and the real postback URLs replaced in the page with generic values (Acme Health, postback code aB3dE5fG7hJ9kL2m) before capture, extra non-ElasticFunnels IPN rows removed, Send test revealed as on hover, then cropped. Re-shoot: ~/scratchpad/elasticfunnels/merchant-docs/cap/capture-bg.cjs (app-access profile buygoods-vendor).",
+  "image": "tools/shots/source/merchants-buygoods-customer-ipn.png",
+  "imageSize": {
+    "w": 1130,
+    "h": 490
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        469,
+        268,
+        348,
+        39
+      ],
+      "title": "NEW customer IPN",
+      "text": "Abandons only; hover it for Send test",
+      "side": "right"
+    },
+    {
+      "box": [
+        979,
+        440,
+        119,
+        40
+      ],
+      "title": "Save changes",
+      "text": "Saves the customer IPN",
+      "side": "right"
+    }
+  ]
+}

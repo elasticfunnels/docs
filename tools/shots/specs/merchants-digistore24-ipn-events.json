@@ -1,0 +1,47 @@
+{
+  "out": "images/merchants/digistore24-ipn-events.png",
+  "alt": "Digistore24 Send notifications for and For order event with payment, refund and chargeback ticked",
+  "_source": "Real Digistore24 vendor account (digistore24-app.com), captured 2026-10-22 read-only (nothing saved or tested); product names, connection names and the avatar replaced in the page with generic values (Acme Health, Acme Sleep Gummies, postback code aB3dE5fG7hJ9kL2m) before capture, then cropped. Re-shoot: ~/scratchpad/elasticfunnels/merchant-docs/cap/capture-ds.cjs (app-access profile digistore24-vendor).",
+  "image": "tools/shots/source/merchants-digistore24-ipn-events.png",
+  "imageSize": {
+    "w": 915,
+    "h": 490
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        212,
+        22,
+        176,
+        28
+      ],
+      "title": "Orders by customers",
+      "text": "Keep it ticked",
+      "side": "right"
+    },
+    {
+      "box": [
+        212,
+        236,
+        112,
+        84
+      ],
+      "title": "payment, refund, chargeback",
+      "text": "Sales, refunds and chargebacks",
+      "side": "right"
+    },
+    {
+      "box": [
+        212,
+        440,
+        160,
+        28
+      ],
+      "title": "end of paid period",
+      "text": "Untick it",
+      "side": "right"
+    }
+  ]
+}

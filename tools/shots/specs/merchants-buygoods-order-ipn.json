@@ -1,0 +1,58 @@
+{
+  "out": "images/merchants/buygoods-order-ipn.png",
+  "alt": "BuyGoods Products, Settings, Global IPNs with the ElasticFunnels postback URL in New order URL, Order refund URL and Order chargeback URL",
+  "_source": "Real BuyGoods vendor admin (admin.buygoods.com), captured 2026-10-22 read-only (no setting saved); account name, avatar and the real postback URLs replaced in the page with generic values (Acme Health, postback code aB3dE5fG7hJ9kL2m) before capture, extra non-ElasticFunnels IPN rows removed, Send test revealed as on hover, then cropped. Re-shoot: ~/scratchpad/elasticfunnels/merchant-docs/cap/capture-bg.cjs (app-access profile buygoods-vendor).",
+  "image": "tools/shots/source/merchants-buygoods-order-ipn.png",
+  "imageSize": {
+    "w": 790,
+    "h": 615
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        290,
+        38,
+        464,
+        41
+      ],
+      "title": "New order URL",
+      "text": "Records sales; hover it for Send test",
+      "side": "right"
+    },
+    {
+      "box": [
+        290,
+        243,
+        464,
+        41
+      ],
+      "title": "Order refund URL",
+      "text": "Same URL",
+      "side": "right"
+    },
+    {
+      "box": [
+        290,
+        373,
+        464,
+        40
+      ],
+      "title": "Order chargeback URL",
+      "text": "Same URL",
+      "side": "right"
+    },
+    {
+      "box": [
+        635,
+        545,
+        119,
+        41
+      ],
+      "title": "Save changes",
+      "text": "Saves the three URLs",
+      "side": "right"
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 ---
-title: 'Buygoods'
+title: 'BuyGoods'
 sidebarTitle: "BuyGoods"
 icon: "store"
-description: 'Set up Buygoods as a merchant, assign to a domain, and map products'
+description: 'Set up BuyGoods as a merchant: domain, products, the order IPN, testing and what to check when sales stop'
 ---
 
-This guide explains how to set up Buygoods as a merchant. The overall flow matches the generic merchant setup; use this page for Buygoods-specific notes.
+This guide explains how to set up BuyGoods as a merchant. The overall flow matches the generic merchant setup; use this page for BuyGoods-specific notes.
 
-## Step 1: Create Buygoods Merchant
+## Step 1: Create the BuyGoods merchant
 
 <Note>
 Creating a BuyGoods merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below follow the guided setup. In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
@@ -22,42 +22,89 @@ Creating a BuyGoods merchant opens a guided setup: account details, product IDs,
 <img src="/images/merchants/buygoods-setup-account.png" alt="The guided setup of a BuyGoods merchant on Account details: the BuyGoods account ID field with where to find it" />
 
 ## Step 2: Assign Merchant to Domain
-{/* SCREENSHOT: Step 2: Assign Merchant to Domain · merchant setup screen or postback state · desktop */}
 
 1. Go to **Settings** → **Domains** → **Edit Domain**
-2. Select your Buygoods merchant
+2. Select your BuyGoods merchant
 3. Save
 
 ## Step 3: Map Products
-{/* SCREENSHOT: Step 3: Map Products · merchant setup screen or postback state · desktop */}
 
 1. Go to **Settings** → **Products** → **Edit**
 2. Open the **Merchant information** tab
-3. Enter the **Buygoods Product ID** for this product
+3. Enter the **BuyGoods Product ID** for this product
 4. Save
 
 ## Links and Funnels
-{/* SCREENSHOT: Links and Funnels · merchant setup screen or postback state · desktop */}
 
-Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded Buygoods checkout URLs.
+Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded BuyGoods checkout URLs.
 
 - See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant)
 - See [Buy Links](/products/buy-links)
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
 
-## Postbacks
+## Step 4: Send orders to ElasticFunnels (order IPN)
 
-In the guided setup, this is the **Postback URL** step: the postback URL with **Copy**, and where to paste it in BuyGoods (the **New order**, **Order refund** and **Order chargeback** URLs).
+BuyGoods tells ElasticFunnels about each sale, refund and chargeback through its **Global IPNs**. Until these are set, no BuyGoods sale shows up in your reports, even if the merchant, the domain and the products are all set up.
+
+In the guided setup, this is the **Postback URL** step: the postback URL with **Copy**, and where to paste it in BuyGoods.
 
 <img src="/images/merchants/buygoods-setup-postback.png" alt="The Postback URL step of the guided BuyGoods setup: the postback URL with Copy and the steps to paste it as the New order, Order refund and Order chargeback URL" />
 
-Later, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for BuyGoods, then **Test**. After you configure the URLs in BuyGoods and send a test (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
+You can open the same URL later: click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. It looks like `https://app.elasticfunnels.io/postback/vendor/<your code>/buygoods`.
 
-## Troubleshooting
-{/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
+In BuyGoods:
 
-- Wrong gateway on checkout: Verify the domain is assigned to Buygoods
-- Link not working: Ensure product mapping has the correct Buygoods Product ID
+1. Go to **Products** → **Settings**
+2. Under **Global IPNs**, paste the URL into **New order URL**
+3. Paste the same URL into **Order refund URL** and **Order chargeback URL**
+4. Leave the other fields as they are, or empty
+5. Click **Save changes**
+
+<img src="/images/merchants/buygoods-order-ipn.png" alt="BuyGoods Products, Settings, Global IPNs with the ElasticFunnels postback URL in New order URL, Order refund URL and Order chargeback URL" />
+
+<Warning>
+**New order URL** is the field that records sales. BuyGoods has a second IPN under **Customers** → **Settings** that fires when a buyer enters their email at checkout. That one is for abandoned checkouts only (Step 5). If only the customer IPN is set, ElasticFunnels sees checkouts start but never records a sale.
+</Warning>
+
+If a field already holds another tool's URL, hover the field and click **+** to add a second URL instead of replacing it.
+
+## Step 5 (optional): Abandoned checkouts (customer IPN)
+
+Skip this step unless you want abandoned checkouts sent to a call center or a follow-up flow.
+
+1. In ElasticFunnels, open the merchant's **BuyGoods Abandon** tab and copy the **Registration Webhook URL**. It ends in `/buygoods-customer`, not `/buygoods`.
+2. In BuyGoods, go to **Customers** → **Settings**
+3. Paste it into **Fire this IPN for each NEW customer**, and click **Save changes**
+4. Leave **Fire this IPN for each Abandoned customer** empty
+
+<img src="/images/merchants/buygoods-customer-ipn.png" alt="BuyGoods Customers, Settings with the Registration Webhook URL in Fire this IPN for each NEW customer" />
+
+When a buyer enters their email, ElasticFunnels waits for the **Abandon Window** (10 minutes by default). If no order arrives in that time, the checkout counts as abandoned. This IPN never records a sale; the order IPN from Step 4 still has to be set.
+
+## Step 6: Test and check that it arrived
+
+1. In ElasticFunnels, click **Postback Setup** on the merchant's row and go to **Test**. Keep the window open.
+2. In BuyGoods, on **Products** → **Settings**, hover **New order URL** and click **Send test**
+3. Within a few seconds the window shows **Merchant verified**. If it shows **No test postback yet** after 2 minutes, check the URL and click **Check again**.
+4. Open **Settings** → **Logs** → **Merchant Postbacks**. The test is listed with merchant BuyGoods and **Response Code** 200. Click **Show Details** to see what BuyGoods sent.
+
+The BuyGoods test (buyer John Doe) marks the merchant verified but is not added to your reports as an order. To see a real order go through, buy from your live page and refund it.
+
+## Sales stopped showing up
+
+Start at **Settings** → **Logs** → **Merchant Postbacks**, filtered to BuyGoods.
+
+- **Nothing from BuyGoods since a certain date**: the IPN was removed or changed in BuyGoods. Check **Products** → **Settings** → **New order URL**. The merchant keeps saying **Verified** in ElasticFunnels: that badge is set by the first postback and does not turn off when postbacks stop.
+- **Only abandon or customer postbacks arrive**: only the customer IPN is set. Add the order IPN (Step 4).
+- **Postbacks arrive with an error code**: click **Show Details** to read the response. A URL with another merchant's code, or from another brand, sends orders to the wrong place: copy it again from **Postback Setup**.
+- **Orders arrive without a page or ad**: the buy link had no click ID. Use `[BUY]` tags. A BuyGoods checkout, order or upsell link pasted into a page also gets the visitor's click ID (`vid1` and `external_order_id`) added when the page loads.
+
+## Other problems
+
+- Wrong gateway on checkout: Verify the domain is assigned to BuyGoods
+- Link not working: Ensure product mapping has the correct BuyGoods Product ID
 - Missing affiliate data: Confirm affiliate sync settings and use adaptive tags
 
-
+<Note>
+Promoting BuyGoods offers as an affiliate? See the [BuyGoods affiliate integration](/integrations/buygoods) instead.
+</Note>

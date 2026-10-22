@@ -1,12 +1,12 @@
 ---
 title: 'Digistore24'
 icon: "store"
-description: 'Set up Digistore24 as a merchant, assign to a domain, and map products'
+description: 'Set up Digistore24 as a merchant: domain, products, the IPN connection, testing and what to check when sales stop'
 ---
 
 This guide explains how to set up Digistore24 as a merchant. The overall flow matches the generic merchant setup; use this page for platform-specific notes.
 
-## Step 1: Create Digistore24 Merchant
+## Step 1: Create the Digistore24 merchant
 
 <Note>
 Creating a Digistore24 merchant opens a guided setup: account details, product IDs, the postback URL and a live test, one step at a time. You can stop and come back: **Continue setup** on the merchant's row resumes it. See [Guided setup](/guides/how-to-set-up-a-new-merchant#guided-setup-for-jvzoo-clickbank-digistore24-buygoods-and-explodely). The steps below follow the guided setup. In the merchant's full editor (**Open full editor**) the same fields are on **General information**.
@@ -16,20 +16,18 @@ Creating a Digistore24 merchant opens a guided setup: account details, product I
 1. Go to **Settings** → **Merchants** and click **Create Merchant**
 2. Pick **Digistore24** as the **Gateway**, type a **Name**, and click **Create & Configure**
 3. **Digistore24 vendor ID**: your Digistore24 user name or vendor ID, at the top right once you log in to Digistore24
-4. **IPN passphrase (optional)**: the SHA passphrase on your Digistore24 IPN connection, under **Settings** → **IPN Settings**. It must match exactly for signed postbacks to be accepted. Leave it empty if your connection has none.
+4. **IPN passphrase (optional)**: the **IPN password** on your Digistore24 IPN connection, under **Settings** → **Integrations (IPN) configuration**. It must match exactly. Leave it empty if your connection has none (see Step 4).
 5. Click **Save and continue**. **Products** opens next.
 
 <img src="/images/merchants/digistore24-setup-account.png" alt="The guided setup of a Digistore24 merchant on Account details: the Digistore24 vendor ID and the optional IPN passphrase, each with where to find it" />
 
 ## Step 2: Assign Merchant to Domain
-{/* SCREENSHOT: Step 2: Assign Merchant to Domain · merchant setup screen or postback state · desktop */}
 
 1. Go to **Settings** → **Domains** → **Edit Domain**
 2. Select your Digistore24 merchant
 3. Save
 
 ## Step 3: Map Products
-{/* SCREENSHOT: Step 3: Map Products · merchant setup screen or postback state · desktop */}
 
 1. Go to **Settings** → **Products** → **Edit**
 2. Open the **Merchant information** tab
@@ -37,7 +35,6 @@ Creating a Digistore24 merchant opens a guided setup: account details, product I
 4. Save
 
 ## Links and Funnels
-{/* SCREENSHOT: Links and Funnels · merchant setup screen or postback state · desktop */}
 
 Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded Digistore24 checkout URLs.
 
@@ -45,19 +42,70 @@ Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain an
 - See [Buy Links](/products/buy-links)
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
 
-## Postbacks
+## Step 4: Send orders to ElasticFunnels (IPN connection)
 
-In the guided setup, this is the **Postback URL** step: the postback URL with **Copy**, and the steps to add it as an IPN connection in Digistore24.
+Digistore24 tells ElasticFunnels about each sale, refund and chargeback through an IPN connection. Until one is set up and active, no Digistore24 sale shows up in your reports.
+
+In the guided setup, this is the **Postback URL** step: the postback URL with **Copy**, and the steps for Digistore24.
 
 <img src="/images/merchants/digistore24-setup-postback.png" alt="The Postback URL step of the guided Digistore24 setup: the postback URL with Copy and the steps for the IPN connection in Digistore24" />
 
-Later, click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. Its steps are listed on the left: **Postback URL** (your unique URL, with **Copy**), then the setup steps for Digistore24, then **Test**. After you configure the URL in Digistore24 and click **Test IPN** (or run a test purchase), keep it open on **Test**: it checks for the postback every 5 seconds for 2 minutes and marks the merchant verified as soon as the first one arrives.
+You can open the same URL later: click **Postback Setup** on the merchant's row in **Settings** → **Merchants**. It looks like `https://app.elasticfunnels.io/postback/vendor/<your code>/digistore24`.
 
-## Troubleshooting
-{/* SCREENSHOT: Troubleshooting · merchant setup screen or postback state · desktop */}
+In Digistore24:
+
+1. Go to **Settings** → **Integrations (IPN) configuration** and click **Add new connection**. If an ElasticFunnels connection is already listed, click its pencil icon to edit it instead.
+
+<img src="/images/merchants/digistore24-ipn-list.png" alt="Digistore24 Settings, Integrations (IPN) configuration with Add new connection and an active ElasticFunnels connection" />
+
+2. Scroll to **For pros**, at the bottom of the list, and pick **Generic**
+
+<img src="/images/merchants/digistore24-ipn-generic.png" alt="Digistore24 connection types with Generic under For pros" />
+
+3. **Name**: anything you will recognize, for example ElasticFunnels. **For products**: tick **all**, or every product you sell through ElasticFunnels.
+
+<img src="/images/merchants/digistore24-ipn-name.png" alt="Digistore24 Generic connection with the name ElasticFunnels and For products set to all" />
+
+4. **Send notifications for**: keep **Orders by customers** ticked
+5. **For order event**: tick **payment**, **refund** and **chargeback**. If you sell subscriptions, also tick **missed recurring payment**, **rebilling canceled** and **rebilling resumed**. Untick **end of paid period**: ElasticFunnels does not use it and answers it with an error, which Digistore24 reports as a failed IPN.
+
+<img src="/images/merchants/digistore24-ipn-events.png" alt="Digistore24 Send notifications for and For order event with payment, refund and chargeback ticked" />
+
+6. **IPN URL**: paste the ElasticFunnels URL. Keep **Request method** on POST and **Success validation** on the default (expects text: OK).
+7. **IPN password**: optional. If you set one here, type the same value into **IPN passphrase** on the merchant in ElasticFunnels. If you set one in ElasticFunnels only, every IPN is refused.
+8. **Active**: **Yes**
+9. **Email address for error notifications**: your email, so Digistore24 tells you when an IPN fails
+10. Click **Save**
+
+<img src="/images/merchants/digistore24-ipn-url.png" alt="Digistore24 Generic connection with the ElasticFunnels IPN URL, IPN password, Active, Save and Test connection" />
+
+Back on **Integrations (IPN) configuration**, the connection must show a green tick under **Active**.
+
+<Note>
+The steps inside ElasticFunnels call this page **IPN Settings** and the test button **Test IPN**. In Digistore24 they are labeled **Integrations (IPN) configuration** and **Test connection**.
+</Note>
+
+## Step 5: Test and check that it arrived
+
+1. In ElasticFunnels, click **Postback Setup** on the merchant's row and go to **Test**. Keep the window open.
+2. In Digistore24, open the connection and click **Test connection**
+3. Within a few seconds the window shows **Merchant verified**, and Digistore24 reports the test as successful. If ElasticFunnels shows **No test postback yet** after 2 minutes, check the URL and click **Check again**.
+4. Open **Settings** → **Logs** → **Merchant Postbacks**. The test is listed with merchant Digistore24 and **Response Code** 200. Click **Show Details** to see what Digistore24 sent.
+
+The connection test marks the merchant verified but adds no order to your reports. To see a real order go through, buy from your live page and refund it.
+
+## Sales stopped showing up
+
+Start at **Settings** → **Logs** → **Merchant Postbacks**, filtered to Digistore24.
+
+- **Nothing from Digistore24 since a certain date**: the connection was switched off, deleted or changed. In Digistore24, check that it is listed under **Integrations (IPN) configuration** with a green tick under **Active**, and that its IPN URL matches **Postback Setup**. The merchant keeps saying **Verified** in ElasticFunnels: that badge is set by the first postback and does not turn off when postbacks stop.
+- **Response Code 400, "Invalid Digistore24 signature"**: the **IPN password** in Digistore24 and the **IPN passphrase** on the merchant differ. Make them the same, or clear both.
+- **Response Code 400, "Unhandled event type"**: the connection sends an event ElasticFunnels does not use, usually **end of paid period**. Untick it. Sales on the same connection are not affected.
+- **Only some products arrive**: **For products** is not set to **all** and a product is missing from the list.
+- **Orders arrive without a page or ad**: the buy link had no click ID. Use `[BUY]` tags. A Digistore24 `/product/` link pasted into a page also gets the visitor's click ID (`ds24tr`) added when the page loads.
+
+## Other problems
 
 - Wrong gateway on checkout: Verify the domain is assigned to Digistore24
 - Link not working: Ensure product mapping has the correct Digistore24 Product ID
 - Missing affiliate data: Confirm affiliate sync settings and use adaptive tags
-
-
