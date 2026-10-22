@@ -33,3 +33,7 @@ If nothing there needed changing, say so in the commit message ("agent rules che
 - Facts come from the code or `.ef-docs/documentation for pitch decks etc/FEATURES_MASTER.md` in the
   app repo; never describe a feature that is not live as if it were.
 - Brand name is ElasticFunnels, one word.
+
+# Tasks
+
+`TASKS.md` at the repo root is the single list of docs work.
