@@ -1,0 +1,86 @@
+---
+title: "Audiences and campaigns from the ef CLI"
+sidebarTitle: "CLI: audiences and campaigns"
+icon: "terminal"
+description: "Build SegQL audiences, then create, test, schedule and launch email and SMS campaigns from the ef command-line tool or an AI agent."
+---
+
+The `ef` CLI can build audiences from a SegQL query and run [email](/campaigns/email-campaigns) and [SMS campaigns](/campaigns/sms-campaigns) to them. It calls the same API as the app, so the same permissions, consent rules, suppressions and quiet hours apply. Nothing here can switch them off.
+
+## Before you start
+
+- Connect the CLI to your project: [Connect the ef CLI](/account/cli-and-api-keys).
+- Audiences need the analytics permission and the segment permissions. Campaigns need the email permissions, and SMS needs the SMS integration permissions.
+- Contact details in samples and recipient lists come back masked (`j***@g***.com`, `***0123`) unless your user has the **View contact PII** permission.
+- `ef claude` installs two skills for Claude Code: `ef-segql` (how to write audiences) and `ef-campaigns` (how to send safely).
+
+## Audiences
+
+Write the query in a file, check it, count it, then save it.
+
+```bash
+ef audiences validate --file skippers.segql      # parse and check only, nothing runs
+ef audiences count --file skippers.segql         # how many people match now, with a sample
+ef audiences create --name "Upsell skippers 30d" --file skippers.segql
+ef audiences list
+ef audiences count 42                            # size of a saved audience
+ef audiences update 42 --file skippers.segql     # change the query (recomputes)
+ef audiences delete 42 --yes
+ef audiences schema                              # sources, columns, operators and functions
+```
+
+An example query, buyers who skipped every upsell in the last 30 days:
+
+```
+FROM conversions WHERE HAS conversion(type = "purchase" AND sale_type = "main")
+  AND NOT HAS conversion(type = "purchase" AND sale_type IN ("upsell", "downsell", "bump"))
+  WITHIN 30d IDENTIFY BY email
+```
+
+<Tip>
+A misspelled column is an error, but a value that does not exist (an event name, a product code) just matches nobody. When `count` says 0, check the values before you save.
+</Tip>
+
+Use `IDENTIFY BY email` for any audience you plan to email or text.
+
+## Email campaigns
+
+```bash
+ef campaigns email create --name "October restock" --subject "Time to restock?" \
+  --from-name "Acme Health" --from-email hello@example.com --audience 42
+ef campaigns email set 17 --html-file email.html
+ef campaigns email audience-preview 17
+ef campaigns email test 17 --to you@example.com
+ef campaigns email schedule 17 --at 2026-11-03T15:00:00Z --yes
+ef campaigns email launch 17 --yes
+ef campaigns email stats 17
+```
+
+- **Audience:** `--audience <id>`, `--all-customers`, `--emails a@example.com,b@example.com`, `--emails-file list.txt` or `--crm-entity <id>`.
+- **Who is left out:** `audience-preview` shows how many people will receive it and how many are excluded as suppressed (bounced, complained, unsubscribed), without consent (recorded as "no" at opt-in) or duplicates.
+- **Test first:** launch refuses until a test was sent. Tests go to one address and never touch the audience.
+- **Confirmation:** `launch` and `schedule` print the number of people who will receive it and stop. Run them again with `--yes` to send. In a terminal you can type the confirmation instead.
+- `ef campaigns email get 17` lists anything that still blocks sending, such as a missing sending account or marketing address.
+- `unschedule` puts a scheduled campaign back to draft. `cancel` stops one that is scheduled or sending.
+
+## SMS campaigns
+
+```bash
+ef campaigns sms create --name "Flash sale" \
+  --body "Hi {first_name|there}, 20% off today: https://example.com/sale" --audience 42
+ef campaigns sms preview 9              # rendered text, characters, segments
+ef campaigns sms audience-preview 9     # reachable phones and why others are skipped
+ef campaigns sms test 9 --phone +14155550123
+ef campaigns sms launch 9 --yes
+ef campaigns sms pause 9
+ef campaigns sms stats 9
+```
+
+- `--audience` and `--exclude` take audience ids. `--exclude-regions US-FL,US-OK` skips those places.
+- The opt-out footer ("Reply STOP to opt out") is added to every marketing text. A custom `--footer` must contain STOP.
+- The SMS test goes through your SMS provider, so it costs one message.
+- Quiet hours and the frequency cap from [SMS campaigns](/campaigns/sms-campaigns) apply to every send.
+
+## Output for scripts and agents
+
+Commands that print data take `--json`; `get` always prints JSON. Errors exit with a non-zero code: 2 for a SegQL or validation error, 3 for a permission problem, 4 for a conflict (for example editing a campaign that is no longer a draft), 7 when something is not found.

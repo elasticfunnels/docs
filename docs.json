@@ -468,6 +468,7 @@
                   "account/two-factor-authentication",
                   "account/passkeys",
                   "account/cli-and-api-keys",
+                  "account/cli-audiences-and-campaigns",
                   "account/refer-and-earn",
                   "account/ai-credits"
                 ]
