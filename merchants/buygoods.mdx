@@ -38,6 +38,8 @@ Creating a BuyGoods merchant opens a guided setup: account details, product IDs,
 
 Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded BuyGoods checkout URLs.
 
+If you do paste a BuyGoods checkout, order or upsell link, ElasticFunnels adds the visitor's click ID (`vid1` and `external_order_id`) when the page loads, so the sale still matches its visit. Values you set yourself are kept. To leave pasted links exactly as written, turn off **Add click tracking to pasted buy links** in the merchant's **Settings**.
+
 - See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant)
 - See [Buy Links](/products/buy-links)
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
@@ -94,10 +96,10 @@ The BuyGoods test (buyer John Doe) marks the merchant verified but is not added 
 
 Start at **Settings** → **Logs** → **Merchant Postbacks**, filtered to BuyGoods.
 
-- **Nothing from BuyGoods since a certain date**: the IPN was removed or changed in BuyGoods. Check **Products** → **Settings** → **New order URL**. The merchant keeps saying **Verified** in ElasticFunnels: that badge is set by the first postback and does not turn off when postbacks stop.
+- **Nothing from BuyGoods since a certain date**: the IPN was removed or changed in BuyGoods. Check **Products** → **Settings** → **New order URL**. The merchant still says **Verified**, because that badge only records the first postback. When the daily check sees buy clicks but no sales, it adds an amber **No sales reported since** warning next to the merchant in **Merchants**; hover it to see the clicks and sales it counted. The warning clears with the next postback that arrives.
 - **Only abandon or customer postbacks arrive**: only the customer IPN is set. Add the order IPN (Step 4).
 - **Postbacks arrive with an error code**: click **Show Details** to read the response. A URL with another merchant's code, or from another brand, sends orders to the wrong place: copy it again from **Postback Setup**.
-- **Orders arrive without a page or ad**: the buy link had no click ID. Use `[BUY]` tags. A BuyGoods checkout, order or upsell link pasted into a page also gets the visitor's click ID (`vid1` and `external_order_id`) added when the page loads.
+- **Orders arrive without a page or ad**: the buy link had no click ID. Use `[BUY]` tags. A BuyGoods checkout, order or upsell link pasted into a page also gets the visitor's click ID (`vid1` and `external_order_id`) added when the page loads, unless **Add click tracking to pasted buy links** is off in the merchant's **Settings**.
 
 ## Other problems
 

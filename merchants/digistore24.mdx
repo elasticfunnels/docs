@@ -38,6 +38,8 @@ Creating a Digistore24 merchant opens a guided setup: account details, product I
 
 Use `[BUY]`, `[UPSELL]`, and `[DOWNSELL]` tags so links auto-adapt per domain and merchant. Avoid pasting hardcoded Digistore24 checkout URLs.
 
+If you do paste a Digistore24 `/product/` link, ElasticFunnels adds the visitor's click ID (`ds24tr`) when the page loads, so the sale still matches its visit. A `ds24tr` you set yourself is kept. To leave pasted links exactly as written, turn off **Add click tracking to pasted buy links** in the merchant's **Settings**.
+
 - See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant)
 - See [Buy Links](/products/buy-links)
 - See [Advanced Purchase Links](/products/advanced-purchase-links)
@@ -67,7 +69,7 @@ In Digistore24:
 <img src="/images/merchants/digistore24-ipn-name.png" alt="Digistore24 Generic connection with the name ElasticFunnels and For products set to all" />
 
 4. **Send notifications for**: keep **Orders by customers** ticked
-5. **For order event**: tick **payment**, **refund** and **chargeback**. If you sell subscriptions, also tick **missed recurring payment**, **rebilling canceled** and **rebilling resumed**. Untick **end of paid period**: ElasticFunnels does not use it and answers it with an error, which Digistore24 reports as a failed IPN.
+5. **For order event**: tick **payment**, **refund** and **chargeback**. If you sell subscriptions, also tick **missed recurring payment**, **rebilling canceled** and **rebilling resumed**. You can leave **end of paid period** ticked or untick it: ElasticFunnels answers it with OK and does not record it.
 
 <img src="/images/merchants/digistore24-ipn-events.png" alt="Digistore24 Send notifications for and For order event with payment, refund and chargeback ticked" />
 
@@ -81,9 +83,6 @@ In Digistore24:
 
 Back on **Integrations (IPN) configuration**, the connection must show a green tick under **Active**.
 
-<Note>
-The steps inside ElasticFunnels call this page **IPN Settings** and the test button **Test IPN**. In Digistore24 they are labeled **Integrations (IPN) configuration** and **Test connection**.
-</Note>
 
 ## Step 5: Test and check that it arrived
 
@@ -98,11 +97,10 @@ The connection test marks the merchant verified but adds no order to your report
 
 Start at **Settings** → **Logs** → **Merchant Postbacks**, filtered to Digistore24.
 
-- **Nothing from Digistore24 since a certain date**: the connection was switched off, deleted or changed. In Digistore24, check that it is listed under **Integrations (IPN) configuration** with a green tick under **Active**, and that its IPN URL matches **Postback Setup**. The merchant keeps saying **Verified** in ElasticFunnels: that badge is set by the first postback and does not turn off when postbacks stop.
+- **Nothing from Digistore24 since a certain date**: the connection was switched off, deleted or changed. In Digistore24, check that it is listed under **Integrations (IPN) configuration** with a green tick under **Active**, and that its IPN URL matches **Postback Setup**. The merchant still says **Verified**, because that badge only records the first postback. When the daily check sees buy clicks but no sales, it adds an amber **No sales reported since** warning next to the merchant in **Merchants**; hover it to see the clicks and sales it counted. The warning clears with the next postback that arrives.
 - **Response Code 400, "Invalid Digistore24 signature"**: the **IPN password** in Digistore24 and the **IPN passphrase** on the merchant differ. Make them the same, or clear both.
-- **Response Code 400, "Unhandled event type"**: the connection sends an event ElasticFunnels does not use, usually **end of paid period**. Untick it. Sales on the same connection are not affected.
 - **Only some products arrive**: **For products** is not set to **all** and a product is missing from the list.
-- **Orders arrive without a page or ad**: the buy link had no click ID. Use `[BUY]` tags. A Digistore24 `/product/` link pasted into a page also gets the visitor's click ID (`ds24tr`) added when the page loads.
+- **Orders arrive without a page or ad**: the buy link had no click ID. Use `[BUY]` tags. A Digistore24 `/product/` link pasted into a page also gets the visitor's click ID (`ds24tr`) added when the page loads, unless **Add click tracking to pasted buy links** is off in the merchant's **Settings**.
 
 ## Other problems
 
