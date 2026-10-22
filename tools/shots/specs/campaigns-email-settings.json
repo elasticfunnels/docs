@@ -1,0 +1,65 @@
+{
+  "out": "images/campaigns/email-settings-step.png",
+  "alt": "Email campaign, Settings step: sending account, sender fields, subject and preview text",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/11/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaign-composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 940
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"composer-step-settings\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/email-campaign-11.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/email-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11/preview",
+        "file": "tools/shots/fixtures/campaigns/email-preview-11.json",
+        "method": "POST"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"sender-mailgun-41\"]",
+      "title": "Send through",
+      "text": "One of your brand's own sending accounts",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=\"settings-from-email\"]",
+      "title": "From address",
+      "text": "Empty uses the account's sender",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid=\"settings-subject\"]",
+      "title": "Subject",
+      "text": "Insert first name, full name or brand name",
+      "side": "left"
+    }
+  ]
+}

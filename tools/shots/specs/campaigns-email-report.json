@@ -1,0 +1,60 @@
+{
+  "out": "images/campaigns/email-report.png",
+  "alt": "Email campaign report: recipients, sent, opened, clicked, bounced and unsubscribed, with most clicked links and the recipient list",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/12",
+    "viewport": {
+      "width": 1440,
+      "height": 1400
+    },
+    "waitFor": "text=Most clicked links",
+    "crop": {
+      "x": 502,
+      "y": 61,
+      "width": 938,
+      "height": 1000
+    },
+    "actions": [
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/12/report",
+        "file": "tools/shots/fixtures/campaigns/email-report-12.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/12/recipients",
+        "file": "tools/shots/fixtures/campaigns/email-recipients-12.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Open send logs",
+      "title": "Send logs",
+      "text": "Each email's delivery record"
+    },
+    {
+      "selector": "text=Left out at send time",
+      "title": "Left out",
+      "text": "Rechecked at send time",
+      "side": "left"
+    },
+    {
+      "selector": "text=Most clicked links",
+      "title": "Links",
+      "text": "Top links by clicks",
+      "side": "left"
+    },
+    {
+      "selector": "[placeholder=\"Search recipients\"]",
+      "title": "Recipients",
+      "text": "Filter by opened, clicked, bounced and more"
+    }
+  ]
+}

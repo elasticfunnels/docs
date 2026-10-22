@@ -1,0 +1,44 @@
+{
+  "out": "images/campaigns/email-sending-accounts.png",
+  "alt": "Campaign settings: sending accounts with stats status, and the postal address",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/settings",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "text=Campaign settings",
+    "crop": {
+      "x": 502,
+      "y": 61,
+      "width": 938,
+      "height": 640
+    },
+    "actions": [
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": []
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Set up stats",
+      "title": "Set up stats",
+      "text": "Connects opens, clicks and bounces"
+    },
+    {
+      "selector": "text=No delivery stats from this account",
+      "title": "No stats",
+      "text": "Sends, but opens and clicks are not counted"
+    },
+    {
+      "selector": "text=Add a postal address",
+      "title": "Postal address",
+      "text": "Printed in every campaign footer"
+    }
+  ]
+}

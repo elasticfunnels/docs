@@ -1,0 +1,73 @@
+{
+  "out": "images/campaigns/sms-audience.png",
+  "alt": "SMS campaign, Audience step: segments to include and leave out, skipped states, and the count who will get the text",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/campaigns/sms/2/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1200
+    },
+    "waitFor": "[data-testid=\"campaigns.sms.composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 900
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"campaigns.sms.composer.step.audience\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/options",
+        "file": "tools/shots/fixtures/campaigns/sms-options.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/sms-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/preview",
+        "file": "tools/shots/fixtures/campaigns/sms-preview.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/sms-campaign-2.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Send to >> nth=0",
+      "title": "Send to",
+      "text": "Saved segments of contacts",
+      "side": "left"
+    },
+    {
+      "selector": "text=Skip by risk level",
+      "title": "Skip states",
+      "text": "By risk level or one by one",
+      "side": "left"
+    },
+    {
+      "selector": "text=Will get the text",
+      "title": "Will get the text",
+      "text": "Reachable people after every skip"
+    },
+    {
+      "selector": "text=96 people have consent",
+      "title": "Unconfirmed consent",
+      "text": "Warn mode counts them, with a warning"
+    }
+  ]
+}

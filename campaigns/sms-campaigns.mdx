@@ -1,0 +1,186 @@
+---
+title: "SMS Campaigns"
+sidebarTitle: "SMS campaigns"
+icon: "comment-sms"
+description: "Text a segment of your contacts from your own Twilio, Plivo or Telnyx number. Every text passes your SMS compliance checks, and the report shows clicks and the revenue they brought in."
+---
+
+An SMS campaign sends one text to everyone in the segments you pick. It goes out from a number on your own
+Twilio, Plivo or Telnyx account, and each text passes the same checks as every other text your brand sends:
+STOP replies, the suppression list, consent, quiet hours and the states you skip.
+
+Open **Campaigns** in the sidebar, click **New campaign**, then **SMS broadcast** ("Text a segment of contacts
+who agreed to get SMS."). The composer has five steps: **Setup**, **Audience**, **Message**, **Schedule** and
+**Review**. Your draft saves as you go.
+
+<Note>
+SMS campaigns are for US numbers at launch. The brand's allowed countries are set to the US. In **Warn** mode a
+number outside the US is still texted and flagged with a warning; in **Strict** mode it is skipped.
+</Note>
+
+## Before your first campaign
+
+Set these up in **Settings → SMS** (the **SMS** group in the Campaigns menu links to each tab). Full details are
+on [SMS compliance](/settings/sms).
+
+1. **SMS on for the brand.** Until it is, you can write a campaign but it cannot go out.
+2. **A sender.** Connect your [Twilio](/integrations/twilio), [Plivo](/integrations/plivo) or
+   [Telnyx](/integrations/telnyx) account and add a number under **Senders**.
+3. **The marketing consent statement.** On the **Compliance** tab, tick "I have read this statement and accept
+   it for this brand." and click **Accept statement**. Without it, every marketing text is skipped, whichever
+   mode you use.
+4. **A link domain**, if your texts have links. Links are blocked until the brand has one.
+5. **Contacts.** The audience comes from Analytics segments of your contacts, so contacts must be set up for the
+   brand.
+
+## 1. Setup
+
+- **Campaign name**: only you see it.
+- **Send from**: pick one of your senders. The default active sender is picked for you.
+- **Compliance** shows the mode your brand uses:
+  - **Strict mode**: texts that break a rule are not sent.
+  - **Warning mode**: texts that break a rule are sent and flagged.
+
+  Change the mode with **Open SMS settings**.
+
+## 2. Audience
+
+<img src="/images/campaigns/sms-audience.png" alt="SMS campaign, Audience step: segments to send to, states to skip and how many people will get the text" />
+
+| Field | What it does |
+|---|---|
+| **Send to** | Everyone in these segments who has a phone number. **Add a segment** (up to 20). |
+| **Leave out** | People in these segments never get this text, even if a segment above includes them. |
+| **Skip states** | Leave out states with strict texting laws: **Skip by risk level** (**Very high risk**, **High risk**, **Moderate risk** or **None**), or **Skip a state** one by one. Skipped states lock once the campaign starts sending. |
+
+Only contacts who have not opted out of SMS are listed. The **Will get the text** card counts who is left after
+ElasticFunnels removes people with no phone number, the same number twice, numbers on the suppression list and
+numbers in a skipped state.
+
+How consent is counted depends on your mode:
+
+- **Warn**: people whose consent could not be confirmed are counted as reachable, with a note saying how many.
+  Their texts go out with a warning.
+- **Strict**: they are left out as **No SMS consent**.
+
+Contacts who opted out, said the number is not theirs, or are suppressed are always left out.
+
+## 3. Message
+
+<img src="/images/campaigns/sms-message.png" alt="SMS campaign, Message step: text, character and part count, opt-out line, variants and phone preview" />
+
+Write the text in **Message** (up to 1,600 characters). Use `{first_name|there}` to add the person's first
+name, with "there" when it is missing.
+
+The counter under the box shows characters and parts. One part holds 160 standard characters, or 153 each when
+the text runs to several parts. An emoji or special character switches the text to **Unicode**, which cuts each
+part to 70 characters (67 when split), so the text costs more.
+
+**Add opt-out line** is on by default and adds the **Footer** ("Reply STOP to opt out") on a new line after
+every text. You can change the wording, up to 80 characters, but it must keep the word STOP. If your message
+already says STOP, the footer is not added twice. Turn the switch off and the review step warns that carriers
+may filter the texts more often; you can still send.
+
+**Links.** Each link in the text becomes a short link on your link domain (`https://your-domain/s/code`), one per
+person, tagged with `utm_source=sms`, `utm_medium=sms` and `utm_campaign=sms-(campaign id)`. That is how the
+report ties clicks and orders to the campaign. Under **Link preview**, set the **Preview title** and **Preview
+image URL** that phones show for the link.
+
+**Variants.** Click **Add a variant** to test up to four more wordings. **Test group size (%)** (20% by default)
+gets all the versions; after **Pick the winner after** (60 minutes by default), the winner goes to everyone
+else. How the winner is scored: [A/B testing a campaign](/campaigns/ab-testing).
+
+**Send a test to** a phone number and click **Send test**. The test passes the same compliance checks as the
+real send.
+
+## 4. Schedule
+
+<img src="/images/campaigns/sms-schedule.png" alt="SMS campaign, Schedule step: send time, spreading the sends, days and hours, and the quiet hours note" />
+
+| Setting | What it does |
+|---|---|
+| **When** | **Send now**, or **Send later** with a date and time |
+| **Spread the sends over** | **Send all at once** (the default), or spread evenly over 30 minutes, 1, 2, 4 or 8 hours |
+| **Days and hours** | Texts only go out on these days, between **From** and **To** in each person's time zone. Outside these hours the text waits. |
+
+Quiet hours from your SMS settings apply on top of the campaign's own hours. With them on, a text that falls
+outside the allowed window waits until the morning in the person's time zone (8am to 8pm by default, with
+stricter rules in states such as Pennsylvania and Connecticut). A text that has waited 48 hours is skipped. With
+quiet hours off, the text goes out and is flagged with a warning.
+
+## 5. Review
+
+<img src="/images/campaigns/sms-review.png" alt="SMS campaign, Review step: summary, the before you send checklist and the Launch button" />
+
+**Summary** repeats the sender, audience, message and schedule, each with **Edit**. **Before you send** checks:
+
+- SMS is on for this brand
+- An active sender is picked
+- The audience has people to text
+- The message is written
+- Links have a link domain
+- The send time is valid
+
+Click **Launch** (or **Schedule**) and confirm. The dialog says how many people will get the text. Texts cannot
+be unsent.
+
+<Warning>
+In **Warn** mode the checklist does not list the marketing consent statement, but launch still fails without
+it. Accept the statement in **Settings → SMS → Compliance** before you launch.
+</Warning>
+
+## The report
+
+<img src="/images/campaigns/sms-report.png" alt="SMS campaign report, Overview: recipients, sent, delivered, failed, clicked and revenue, with skipped and warnings" />
+
+The report refreshes on its own while the campaign is scheduled or sending. The cards show **Recipients**,
+**Sent**, **Delivered**, **Failed**, **Clicked** (unique clicks) and **Revenue**. The tabs:
+
+| Tab | What it shows |
+|---|---|
+| **Overview** | The texts that were **Skipped** and the **Warnings**, each with the reason, and the message |
+| **Recipients** | Each person (phone number masked), status, state, test group, clicks and send time |
+| **Variants** | Each version's sends, clicks, orders and revenue, and the **Winner** |
+| **Links** | Each link and its clicks |
+| **Revenue** | Revenue, cost and return |
+
+<img src="/images/campaigns/sms-report-revenue.png" alt="SMS campaign report, Revenue tab: revenue from clicks, orders after the send, cost and return" />
+
+Revenue is counted two ways and kept apart:
+
+- **From clicks**: orders by people who clicked a link in this text in the 7 days before they bought, or orders
+  that carry the campaign's `utm_campaign`.
+- **After the send**: orders within 24 hours of the text by people who did not click. Other channels may also
+  have reached them, so this is never added to **From clicks**.
+
+Both are net of refunds and chargebacks. **Cost** is what your provider reports for the texts, in USD, and
+**Return** compares revenue with it. There is no cost estimate before you launch.
+
+<img src="/images/campaigns/sms-report-variants.png" alt="SMS campaign report, Variants tab: each text with sends, clicks, click rate, orders and revenue, and the winner" />
+
+### Pause, stop and duplicate
+
+| Button | When | What it does |
+|---|---|---|
+| **Edit** | Draft or scheduled | Opens the composer |
+| **Unschedule** | Scheduled | Turns it back into a draft |
+| **Pause** / **Resume** | Sending or paused | **Pause** holds the texts not sent yet; **Resume** sends them |
+| **Stop sending** | Scheduled, sending or paused | Texts not sent yet will not go out. Texts already sent stay sent. |
+| **Duplicate** | Any time | Opens a copy in the composer |
+
+A sending campaign pauses on its own after 10 carrier rejections in a row or an error from your provider
+account. Check your sender and provider, then click **Resume**.
+
+## STOP and opt-outs
+
+When someone replies STOP (or STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT and similar words), their number goes on
+the brand's SMS suppression list, the opt-out is logged, and they get one confirmation reply. START takes them
+off the list. Suppressed numbers are left out when the campaign starts and checked again as each text goes out.
+More on the automatic replies: [SMS compliance](/settings/sms#automatic-replies).
+
+## Related docs
+
+- [SMS compliance](/settings/sms): senders, consent, quiet hours, state rules and the SMS log
+- [A/B testing a campaign](/campaigns/ab-testing): how SMS variants are scored
+- [Email campaigns](/campaigns/email-campaigns): send an email to customers or an audience
+- [Send SMS step](/automations/send-sms): text one person from an automation

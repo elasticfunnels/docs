@@ -1,0 +1,62 @@
+{
+  "out": "images/campaigns/sms-report-revenue.png",
+  "alt": "SMS campaign report, Revenue tab: revenue from clicks, orders after the send, cost and return",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/campaigns/sms/2",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaigns.sms.detail\"]",
+    "crop": {
+      "x": 502,
+      "y": 61,
+      "width": 938,
+      "height": 640
+    },
+    "actions": [
+      {
+        "click": "role=tab[name=\"Revenue\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/report",
+        "file": "tools/shots/fixtures/campaigns/sms-report-2.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/recipients",
+        "file": "tools/shots/fixtures/campaigns/sms-recipients-2.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/sms-campaign-2-sent.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=From clicks",
+      "title": "From clicks",
+      "text": "Clicked within 7 days, then ordered",
+      "side": "left"
+    },
+    {
+      "selector": "text=After the send",
+      "title": "After the send",
+      "text": "No click, ordered within 24 hours. Kept apart"
+    },
+    {
+      "selector": "text=Cost >> nth=0",
+      "title": "Cost",
+      "text": "What the provider charged",
+      "side": "left"
+    }
+  ]
+}

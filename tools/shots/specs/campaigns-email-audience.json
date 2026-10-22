@@ -1,0 +1,61 @@
+{
+  "out": "images/campaigns/email-audience.png",
+  "alt": "Email campaign, Audience step: who gets it, and the count of people who will receive it after consent and suppression checks",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/11/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaign-composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 520
+    },
+    "actions": [
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/email-campaign-11.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/email-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11/preview",
+        "file": "tools/shots/fixtures/campaigns/email-preview-11.json",
+        "method": "POST"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Who gets this campaign",
+      "title": "Who gets it",
+      "text": "All customers, an audience, a list, or pasted addresses",
+      "side": "left"
+    },
+    {
+      "selector": "text=Will receive this campaign",
+      "title": "Will receive",
+      "text": "The real count after everyone left out"
+    },
+    {
+      "selector": "text=Everyone is included unless",
+      "title": "Consent rule",
+      "text": "Who is left out automatically",
+      "side": "left"
+    }
+  ]
+}

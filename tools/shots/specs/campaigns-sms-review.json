@@ -1,0 +1,68 @@
+{
+  "out": "images/campaigns/sms-review.png",
+  "alt": "SMS campaign, Review step: summary, the before you send checklist and the Launch button",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/campaigns/sms/2/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaigns.sms.composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 640
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"campaigns.sms.composer.step.review\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/options",
+        "file": "tools/shots/fixtures/campaigns/sms-options.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/sms-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/preview",
+        "file": "tools/shots/fixtures/campaigns/sms-preview.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/sms-campaign-2.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Summary >> nth=0",
+      "title": "Summary",
+      "text": "Each part links back to its step",
+      "side": "left"
+    },
+    {
+      "selector": "text=Before you send",
+      "title": "Checklist",
+      "text": "What must be true before launch",
+      "side": "left"
+    },
+    {
+      "selector": "role=button[name=\"Launch\"]",
+      "title": "Launch",
+      "text": "Asks you to confirm first"
+    }
+  ]
+}

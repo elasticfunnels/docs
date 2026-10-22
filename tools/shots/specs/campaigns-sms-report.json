@@ -1,0 +1,58 @@
+{
+  "out": "images/campaigns/sms-report.png",
+  "alt": "SMS campaign report, Overview: recipients, sent, delivered, failed, clicked and revenue, with skipped and warnings",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/campaigns/sms/2",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaigns.sms.detail\"]",
+    "crop": {
+      "x": 502,
+      "y": 61,
+      "width": 938,
+      "height": 640
+    },
+    "actions": [
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/report",
+        "file": "tools/shots/fixtures/campaigns/sms-report-2.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/recipients",
+        "file": "tools/shots/fixtures/campaigns/sms-recipients-2.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/sms-campaign-2-sent.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Revenue >> nth=1",
+      "title": "Revenue",
+      "text": "Orders from people who clicked"
+    },
+    {
+      "selector": "text=Quiet hours lasted past the send deadline",
+      "title": "Skipped",
+      "text": "Texts that never went, with the reason",
+      "side": "left"
+    },
+    {
+      "selector": "text=Warnings >> nth=0",
+      "title": "Warnings",
+      "text": "Sent in warn mode, flagged"
+    }
+  ]
+}

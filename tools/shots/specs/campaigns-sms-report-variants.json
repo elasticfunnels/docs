@@ -1,0 +1,57 @@
+{
+  "out": "images/campaigns/sms-report-variants.png",
+  "alt": "SMS campaign report, Variants tab: each text with sends, clicks, click rate, orders and revenue, and the winner",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/campaigns/sms/2",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaigns.sms.detail\"]",
+    "crop": {
+      "x": 502,
+      "y": 61,
+      "width": 938,
+      "height": 520
+    },
+    "actions": [
+      {
+        "click": "role=tab[name=\"Variants\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/report",
+        "file": "tools/shots/fixtures/campaigns/sms-report-2.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/recipients",
+        "file": "tools/shots/fixtures/campaigns/sms-recipients-2.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/sms-campaign-2-sent.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=20% got the test",
+      "title": "Test group",
+      "text": "Share of people in the test, and the wait",
+      "side": "left"
+    },
+    {
+      "selector": "text=\"Winner\"",
+      "title": "Winner",
+      "text": "Went to everyone else",
+      "side": "left"
+    }
+  ]
+}

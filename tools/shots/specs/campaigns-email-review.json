@@ -1,0 +1,68 @@
+{
+  "out": "images/campaigns/email-review.png",
+  "alt": "Email campaign, Review and send: summary, postal address warning, test send and schedule",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/11/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaign-composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 620
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"composer-step-review\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/email-campaign-11.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/email-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11/preview",
+        "file": "tools/shots/fixtures/campaigns/email-preview-11.json",
+        "method": "POST"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid=\"emails.campaign-review.address-warning\"]",
+      "title": "Postal address",
+      "text": "A warning only; the campaign still sends",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid=\"review-test\"]",
+      "title": "Test",
+      "text": "Send yourself a copy first"
+    },
+    {
+      "selector": "[data-testid=\"review-when\"]",
+      "title": "When",
+      "text": "Send now or schedule for later"
+    },
+    {
+      "selector": "[data-testid=\"review-launch\"]",
+      "title": "Launch",
+      "text": "Starts the send, or schedules it"
+    }
+  ]
+}

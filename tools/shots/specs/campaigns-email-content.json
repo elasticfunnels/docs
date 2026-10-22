@@ -1,0 +1,58 @@
+{
+  "out": "images/campaigns/email-content.png",
+  "alt": "Email campaign, Content step: the email preview with the unsubscribe footer",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/11/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid=\"campaign-composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 860
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"composer-step-content\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/email-campaign-11.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/email-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/email-campaigns/11/preview",
+        "file": "tools/shots/fixtures/campaigns/email-preview-11.json",
+        "method": "POST"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Replace content",
+      "title": "Edit",
+      "text": "Builder, HTML, or start over"
+    },
+    {
+      "selector": "[data-testid=\"content-frame\"]",
+      "title": "Preview",
+      "text": "As recipients see it, footer included",
+      "side": "left"
+    }
+  ]
+}

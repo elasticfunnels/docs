@@ -1,0 +1,7 @@
+{
+ "subject": "Spring sale: 20% off Acme Sleep Gummies",
+ "preview_text": "Three days only, ends Sunday",
+ "from_name": "Northwind",
+ "from_email": "hello@example.com",
+ "html": "<!doctype html><html><body style=\"margin:0;background:#f4f4f5;font-family:Helvetica,Arial,sans-serif;color:#18181b\">\n<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\"><tr><td align=\"center\" style=\"padding:24px 12px\">\n<table width=\"560\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#fff;border-radius:12px\">\n<tr><td style=\"padding:28px 32px 8px;font-size:20px;font-weight:700\">Northwind Supplements</td></tr>\n<tr><td style=\"padding:8px 32px;font-size:15px;line-height:1.6\">Hi Jordan,<br><br>Our spring sale starts today. Take 20% off Acme Sleep Gummies until Sunday night.</td></tr>\n<tr><td style=\"padding:16px 32px\"><a href=\"https://example.com/sleep-gummies\" style=\"background:#18181b;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:600\">Shop the sale</a></td></tr>\n<tr><td style=\"padding:24px 32px 28px;font-size:12px;color:#71717a;border-top:1px solid #e4e4e7\">100 Example Street, Springfield, IL 62701<br>You are receiving this because you signed up for emails from Northwind Supplements.<br><a href=\"#\" style=\"color:#71717a\">Unsubscribe</a></td></tr>\n</table></td></tr></table></body></html>"
+}

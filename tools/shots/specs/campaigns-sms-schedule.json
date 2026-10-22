@@ -1,0 +1,74 @@
+{
+  "out": "images/campaigns/sms-schedule.png",
+  "alt": "SMS campaign, Schedule step: when to send, spread the sends, days and hours, quiet hours",
+  "_source": "demo brand 899 (Northwind Supplements), local app; fictional campaign data in fixtures/campaigns",
+  "capture": {
+    "path": "/{brand}/campaigns/sms/2/edit",
+    "viewport": {
+      "width": 1440,
+      "height": 1100
+    },
+    "waitFor": "[data-testid=\"campaigns.sms.composer\"]",
+    "crop": {
+      "x": 248,
+      "y": 61,
+      "width": 1192,
+      "height": 620
+    },
+    "actions": [
+      {
+        "click": "[data-testid=\"campaigns.sms.composer.step.schedule\"]"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/options",
+        "file": "tools/shots/fixtures/campaigns/sms-options.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/preview-audience",
+        "file": "tools/shots/fixtures/campaigns/sms-preview-audience.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2/preview",
+        "file": "tools/shots/fixtures/campaigns/sms-preview.json",
+        "method": "POST"
+      },
+      {
+        "url": "^/api/brands/{brand}/sms/campaigns/2(\\?|$)",
+        "file": "tools/shots/fixtures/campaigns/sms-campaign-2.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "text=Send later",
+      "title": "When",
+      "text": "Now, or a date and time",
+      "side": "left"
+    },
+    {
+      "selector": "text=Spread the sends over",
+      "title": "Spread",
+      "text": "Over 30 minutes up to 8 hours",
+      "side": "left"
+    },
+    {
+      "selector": "text=In each person's time zone",
+      "title": "Hours",
+      "text": "Texts outside these hours wait",
+      "side": "left"
+    },
+    {
+      "selector": "text=Quiet hours >> nth=0",
+      "title": "Quiet hours",
+      "text": "State rules always apply"
+    }
+  ]
+}

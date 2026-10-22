@@ -1,0 +1,33 @@
+{
+ "total": 4960,
+ "eligible": 4812,
+ "exact": true,
+ "scanned": 4960,
+ "excluded": {
+  "no_consent": 88,
+  "suppressed": 46,
+  "duplicates": 14
+ },
+ "sample": [
+  {
+   "name": "Jordan Lee",
+   "email": "jordan.lee@example.com"
+  },
+  {
+   "name": "Priya Shah",
+   "email": "priya.shah@example.com"
+  },
+  {
+   "name": null,
+   "email": "sam.k@example.com"
+  },
+  {
+   "name": "Maria Costa",
+   "email": "maria.costa@example.com"
+  },
+  {
+   "name": "Ben Ortiz",
+   "email": "ben.ortiz@example.com"
+  }
+ ]
+}

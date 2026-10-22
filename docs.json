@@ -274,6 +274,14 @@
                 ]
               },
               {
+                "group": "Campaigns",
+                "icon": "bullhorn",
+                "pages": [
+                  "campaigns/email-campaigns",
+                  "campaigns/sms-campaigns"
+                ]
+              },
+              {
                 "group": "Contacts",
                 "icon": "address-book",
                 "pages": [

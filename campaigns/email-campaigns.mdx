@@ -1,0 +1,197 @@
+---
+title: "Email Campaigns"
+sidebarTitle: "Email campaigns"
+icon: "envelope"
+description: "Send a newsletter or promotion to your customers, an audience, a form collection or a pasted list, through your own sending account. Test it, send it now or schedule it, then read the report."
+---
+
+An email campaign is one email sent to many people at once: a newsletter, a launch, a sale. It goes out through
+a sending account your brand owns, and every copy carries an unsubscribe link.
+
+Open **Campaigns** in the sidebar. The list shows email and SMS campaigns together, with tabs for **Drafts**,
+**Scheduled**, **Sending**, **Sent** and **Failed or canceled**. Click **New campaign**, then **Email broadcast**.
+If SMS is not on for your brand, the email composer opens straight away.
+
+The composer has four steps: **Audience**, **Content**, **Settings** and **Review and send**. Your draft saves
+as you go.
+
+## Before your first campaign
+
+- **A sending account.** Campaigns only go out through an account you own: Amazon SES, Postmark, Brevo,
+  Resend, Mailgun, SendGrid, Mailrelay, or your own SMTP server from **Settings → Emailing**. ElasticFunnels
+  never falls back to its own servers for a campaign. See [Email Sending Accounts](/emails/sending-accounts).
+- **Delivery stats (optional).** Opens, clicks and bounces are counted only when the account reports them back.
+  See [Delivery stats](#delivery-stats-and-the-campaign-settings-page) below.
+- **Your postal address (recommended).** It goes in the footer of every campaign email.
+
+## 1. Audience
+
+<img src="/images/campaigns/email-audience.png" alt="Email campaign, Audience step: who gets the campaign, the consent rule and the count of people who will receive it" />
+
+Under **Who gets this campaign**, pick one:
+
+| Option | Who it reaches |
+|---|---|
+| **All customers** | Everyone who has bought from this brand |
+| **An audience** | People in one of your saved [Audiences](/analytics/audience-actions), as of its last refresh |
+| **A collection or CRM list** | Leads from a form collection or a CRM entity, using the entry's email field |
+| **A list of addresses** | Addresses you paste, one per line or separated by commas (up to 10,000) |
+
+The **Will receive this campaign** card counts who is left once ElasticFunnels removes:
+
+- **Left out: said no to emails**: people who saw the email opt-in box at checkout and left it unticked.
+- **Left out: unsubscribed or bounced**: everyone on your [suppression list](#suppression-list).
+- **Duplicates removed**: the same address twice.
+
+Everyone else is included, as the step says: "Everyone is included unless they unticked the email opt-in box
+at checkout, unsubscribed, bounced or complained." Buyers with no opt-in record, such as sales from BuyGoods or
+ClickBank or checkouts without the box, count as included. You are responsible for having permission to email
+the people you send to. How the box is recorded: [Privacy & consent](/pages/privacy-consent#checkout-email-opt-in).
+
+<Note>
+The suppression list and the opt-in record are checked again for each person at the moment their email goes
+out, so someone who unsubscribes from an earlier email after you launch is still skipped.
+</Note>
+
+## 2. Content
+
+<img src="/images/campaigns/email-content.png" alt="Email campaign, Content step: the email preview with the automatic footer, and the edit buttons" />
+
+Start from **The default layout**, **A template** or **An earlier campaign**. Then use **Edit design** for the
+drag-and-drop builder, **Edit HTML** for the code, or **Replace content** to start again. The preview shows the
+email as it is sent, with your name in place of the recipient's, on **Desktop** or **Mobile**.
+
+Editing campaign content is covered in [Building an email](/emails/builder#emails-that-belong-to-a-campaign).
+
+### The footer and unsubscribe link
+
+ElasticFunnels adds a footer to every campaign email with your postal address, the line "You are receiving this
+because you signed up for emails from (your brand)." and an **Unsubscribe** link. It is left out only when your
+template already prints both the unsubscribe link and the postal address.
+
+Every email also carries the `List-Unsubscribe` and one-click `List-Unsubscribe-Post` headers, so Gmail, Apple
+Mail and other inboxes can show their own unsubscribe button.
+
+The link opens a page in your brand's colour with one confirm button. Opening the page changes nothing; the
+person is unsubscribed when they confirm (or when their inbox uses one-click unsubscribe). From then on they get
+no campaigns and no marketing automations from your brand. Receipts and other transactional emails still go out.
+
+## 3. Settings
+
+<img src="/images/campaigns/email-settings-step.png" alt="Email campaign, Settings step: sending account, sender fields, subject and preview text" />
+
+| Field | What to enter |
+|---|---|
+| **Send through** | The sending account. New campaigns start with your default account. |
+| **From name** | The name inboxes show |
+| **From address** | Leave empty to use the account's sender. The domain must be verified with your sending account. |
+| **Reply-to address** | Where replies go, if not to the from address |
+| **Subject** | Use **Insert:** to add **First name**, **Full name** or **Brand name** |
+| **Preview text** | Shown after the subject in most inboxes |
+
+The same step holds the optional **A/B test** panel, which sends several subjects or versions to a test group
+and the best one to everyone else. See [A/B testing a campaign](/campaigns/ab-testing).
+
+## 4. Review and send
+
+<img src="/images/campaigns/email-review.png" alt="Email campaign, Review and send: summary, postal address warning, test send and schedule" />
+
+1. Fix anything the step lists as missing: a subject, the content, an audience, a sending account, or a from
+   address when the account has no default sender.
+2. Under **Send a test**, enter one address (yours is filled in) and click **Send test**. The test is the real
+   email, footer included. Clicking its unsubscribe link changes nothing. You can send 10 tests per campaign
+   per hour.
+3. Under **When**, pick **Send now**, or **Schedule for later** with a date and time in the brand's time zone.
+   The time must be at least a minute ahead.
+4. Click **Send to (number) people** and confirm.
+
+If you have not sent yourself a test, ElasticFunnels asks first: "You have not sent yourself a test of this
+campaign." Choose **Send it without a test** to go ahead anyway.
+
+**Recommended: add your postal address** shows when the brand has none. Anti-spam laws (CAN-SPAM in the US, for
+example) require one in marketing emails. The campaign still goes out without it, and the footer leaves the line
+out.
+
+<Warning>
+Once a campaign starts, you can stop the rest with **Stop sending**, but emails already sent stay sent. A
+scheduled campaign can be moved back to a draft with **Unschedule** until its send time.
+</Warning>
+
+### How fast it sends
+
+Recipients go out in batches of 250, paced to your sending account's limit per minute:
+
+| Sending account | Emails per minute |
+|---|---|
+| Amazon SES, Postmark, Brevo, Mailgun, SendGrid | 300 |
+| Resend | 100 |
+| Mailrelay, your SMTP server | 60 |
+
+## The report
+
+<img src="/images/campaigns/email-report.png" alt="Email campaign report: stats, people left out, most clicked links and the recipients list" />
+
+Click a sent or sending campaign in the list to open its report.
+
+| Card | What it counts |
+|---|---|
+| **Recipients** | People the campaign was sent to, with how many failed |
+| **Sent** | Emails handed to your sending account, with how many were delivered |
+| **Opened** | Share of recipients who opened it |
+| **Clicked** | Share of recipients who clicked a link |
+| **Bounced** | Bounces, with spam complaints counted underneath |
+| **Unsubscribed** | People who unsubscribed from this campaign |
+
+Below the cards you see who was left out and why, the **Most clicked links** (top 10) and the recipients list.
+Filter recipients by **All**, **Opened**, **Clicked**, **Bounced**, **Unsubscribed** or **Failed**, or search
+for an address. **Open send logs** shows the delivery log for each email. **Duplicate** copies the campaign
+into a new draft.
+
+The email report does not show revenue. To see sales from a campaign, add UTM tags to its links and read them
+in your analytics.
+
+### Delivery stats and the campaign settings page
+
+<img src="/images/campaigns/email-sending-accounts.png" alt="Campaign settings: sending accounts with stats status, and the postal address" />
+
+Opened, clicked, bounced and unsubscribed come from your sending account's webhook. Campaigns send without it,
+but those numbers stay at zero. Open **Settings** under **Email** in the Campaigns menu:
+
+- **Sending accounts** lists each account. **Make default** sets the one new campaigns start with.
+- **Set up stats** on Mailgun and SendGrid connects the webhook for you, or lets you paste the key by hand.
+  Postmark, Resend, Brevo and Amazon SES get their webhook when you save the account.
+- Mailrelay and SMTP servers show **No delivery stats from this account**: emails go out, but opens and clicks
+  are not counted.
+- **Postal address** is printed in the footer of every campaign email.
+
+More on webhooks: [Delivery events](/emails/delivery-events).
+
+## Suppression list
+
+Open **Suppression list** under **Email** in the Campaigns menu. No campaign is ever sent to these addresses.
+
+| Tab | How addresses get there | Can you remove them? |
+|---|---|---|
+| **Unsubscribed** | The unsubscribe link, one-click unsubscribe, or an unsubscribe your sending account reports | No, they show as **Kept** |
+| **Bounced** | Hard bounces your sending account reports | Yes |
+| **Spam complaint** | Complaints your sending account reports | No |
+| **Added by you** | **Add addresses**: one per line, or separated by commas | Yes |
+
+The list covers the whole brand, so it also keeps these people out of marketing automations.
+
+## Statuses
+
+| Status | Meaning |
+|---|---|
+| **Draft** | Not launched. You can edit it. |
+| **Scheduled** | Waiting for its send time. **Unschedule** turns it back into a draft. |
+| **Sending** | Going out now. **Stop sending** cancels the rest. |
+| **Sent** | Finished |
+| **Failed** / **Canceled** | Stopped by a problem, or by you. Both show under **Failed or canceled**. |
+
+## Related docs
+
+- [SMS campaigns](/campaigns/sms-campaigns): text a segment from your own Twilio, Plivo or Telnyx number
+- [A/B testing a campaign](/campaigns/ab-testing): test subjects or versions on a small group first
+- [Email Sending Accounts](/emails/sending-accounts): connect the account campaigns go out through
+- [Emails overview](/emails/overview): transactional emails, templates and who sends what
