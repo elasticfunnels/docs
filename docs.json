@@ -403,6 +403,8 @@
                     "pages": [
                       "integrations/ai-providers",
                       "integrations/twilio",
+                      "integrations/plivo",
+                      "integrations/telnyx",
                       "settings/sms",
                       "integrations/slicktext",
                       "integrations/attentive"

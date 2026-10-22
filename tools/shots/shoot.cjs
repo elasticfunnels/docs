@@ -32,7 +32,11 @@ function loadPlaywright() {
 async function launch(chromium) {
   // The portal runs on a test hostname: point it at the local runtime instead of DNS.
   const portal = process.env.EF_PORTAL ? new URL(process.env.EF_PORTAL).hostname : null;
-  const opts = portal ? { args: [`--host-resolver-rules=MAP ${portal} ${process.env.EF_PORTAL_RESOLVE || "127.0.0.1"}`] } : {};
+  const args = portal ? [`--host-resolver-rules=MAP ${portal} ${process.env.EF_PORTAL_RESOLVE || "127.0.0.1"}`] : [];
+  // Pages are fulfilled by route.fetch, so Chrome treats them as public and blocks the local Vite dev
+  // server (CORS "loopback address space"). Turn those checks off; the shots only ever hit local apps.
+  args.push("--disable-features=PrivateNetworkAccessSendPreflights,PrivateNetworkAccessRespectPreflightResults,BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks");
+  const opts = { args };
   try { return await chromium.launch(opts); } catch (e) {
     const root = path.join(os.homedir(), "Library/Caches/ms-playwright");
     const dirs = fs.existsSync(root) ? fs.readdirSync(root).filter((d) => /^chromium_headless_shell-\d+$/.test(d)).sort((a, b) => +b.split("-")[1] - +a.split("-")[1]) : [];

@@ -7,7 +7,7 @@ description: "Every text your brand sends goes through one set of checks: STOP, 
 
 Every text your brand sends takes the same path: the **Send SMS** step in an automation, the automatic
 replies to STOP, HELP and START, and test sends from settings. First the compliance checks run, then the
-text goes out from your own Twilio account. Every attempt is logged, sent or not, with the reason.
+text goes out from your own Twilio, Plivo or Telnyx account. Every attempt is logged, sent or not, with the reason.
 
 You set the checks up in **Settings** -> **SMS**. The page has five tabs: **Compliance**, **Senders**,
 **Suppression list**, **Consent lookup** and **Test send**.
@@ -21,12 +21,13 @@ person really agreed to your texts.
 ## Before your first text
 
 <Steps>
-  <Step title="Connect Twilio">
-    Connect your Twilio account in **Integrations**. See [Twilio](/integrations/twilio).
+  <Step title="Connect your SMS provider">
+    Connect your Twilio, Plivo or Telnyx account in **Integrations**. See [Twilio](/integrations/twilio),
+    [Plivo](/integrations/plivo) or [Telnyx](/integrations/telnyx).
   </Step>
   <Step title="Add a sender">
     In **Settings** -> **SMS** -> **Senders**, click **Add sender** and pick a number or messaging
-    service from your Twilio account. Then click **Configure webhooks**. See [Senders](#senders).
+    service from your provider account. Then click **Configure webhooks**. See [Senders](#senders).
   </Step>
   <Step title="Accept the marketing consent statement">
     On the **Compliance** tab, read the statement and accept it. Until someone on the brand does,
@@ -60,8 +61,8 @@ These checks run on every text, in warn mode and in strict mode. You cannot turn
 - **STOP, HELP and START.** A reply of STOP suppresses the number, records the opt-out and sends one
   confirmation (only the first time). START lifts the suppression. HELP gets your help reply.
 - **The suppression list.** A number on it gets no texts at all, transactional ones included.
-- **Opt-outs reported by Twilio.** When Twilio refuses a text because the person opted out with the
-  carrier (error 21610, for example), the number goes on the suppression list.
+- **Opt-outs reported by your provider.** When the provider refuses a text because the person opted out
+  (Twilio error 21610, Plivo 200, Telnyx 40300), the number goes on the suppression list.
 - **Invalid numbers** are skipped.
 - **States you excluded** under **Where you send** get no marketing texts.
 - **A sender must be set up.** Without one, nothing is sent.
@@ -157,11 +158,17 @@ them on your Twilio number for you; they are shown here so you can check by hand
 Calls without the right token are refused. When the Twilio integration also holds your account's Auth
 Token, each call is checked against Twilio's signature as well.
 
+The addresses shown are the Twilio ones. For a Plivo or Telnyx sender, **Configure webhooks** sets that
+provider's own address, and every call is checked against the provider's signature (the Plivo Auth Token
+or the Telnyx public key). See [Plivo](/integrations/plivo#replies-and-delivery-reports) and
+[Telnyx](/integrations/telnyx#replies-and-delivery-reports).
+
 ## Senders
 
 <img src="/images/settings/sms-senders.png" alt="The Senders tab with a default local number and a toll-free number, their registration and who answers STOP and HELP" />
 
-The numbers this brand texts from, on your own Twilio account.
+The numbers this brand texts from, on your own Twilio, Plivo or Telnyx account. Plivo Powerpacks and Telnyx
+messaging profiles can be senders too, next to Twilio messaging services.
 
 1. Click **Add sender**, choose the **Twilio account** (a Twilio integration connected to the brand)
    and a **Number**. The list shows the numbers and messaging services on that account.
@@ -252,5 +259,5 @@ marketing consent together with the wording next to the box and the page URL. Bo
 ## Related docs
 
 - [Send SMS step](/automations/send-sms): text customers from an automation
-- [Twilio](/integrations/twilio): connect the account your texts go out from
+- [Twilio](/integrations/twilio), [Plivo](/integrations/plivo), [Telnyx](/integrations/telnyx): connect the account your texts go out from
 - [Privacy and consent](/pages/privacy-consent): opt-in boxes on checkout pages

@@ -1,0 +1,166 @@
+---
+title: 'Plivo Integration'
+sidebarTitle: "Plivo"
+icon: "comment-sms"
+description: 'Send your brand''s texts from your own Plivo numbers or Powerpacks, with replies and delivery reports coming back to ElasticFunnels.'
+---
+
+## Overview
+
+Plivo can be the carrier behind your brand's texts. Once you connect a Plivo account and add one of its
+numbers as a sender, texts from the [Send SMS step](/automations/send-sms), test sends and the automatic
+STOP, HELP and START replies go out through Plivo. They pass the same checks as every other text first
+(suppression list, quiet hours, consent, state rules), set up in [Settings -> SMS](/settings/sms).
+
+Plivo has no automation steps of its own. It is a sender, like a Twilio number. You pay Plivo directly
+for every text, and ElasticFunnels adds nothing on top.
+
+Only US numbers can be texted for now.
+
+## What you need in Plivo
+
+- **A Plivo account** with credit on it. A Plivo trial account can only text numbers you have verified in
+  the Plivo console.
+- **A number that can send SMS, or a Powerpack.** You can use any of these:
+
+| Sender | What Plivo needs before carriers accept your texts |
+|---|---|
+| Local number (10DLC) | Your brand and a 10DLC campaign registered in Plivo, with the number linked to the campaign |
+| Toll-free number | Toll-free verification approved in Plivo |
+| Powerpack (a pool of numbers) | The numbers in it registered as above |
+
+- **Your Auth ID and Auth Token.** Both are on the overview page of the
+  [Plivo console](https://console.plivo.com/dashboard/). The Auth ID is 20 characters and starts with `MA`
+  (or `SA` for a subaccount).
+
+## Connect Plivo
+
+<Steps>
+  <Step title="Open Plivo in Integrations">
+    Go to **Apps** -> **Integrations** and open **Plivo**. Click **Add connection**.
+
+    <img src="/images/integrations/plivo-connect.png" alt="The Plivo connection form: Name, Auth ID and Auth Token, with where to find them in the Plivo console" />
+  </Step>
+  <Step title="Paste your credentials">
+    Give the connection a **Name** (for example "Plivo main account"), then paste the **Auth ID** and the
+    **Auth Token** from the Plivo console. Save.
+
+    The Auth Token is stored encrypted. ElasticFunnels also uses it to check that replies and delivery
+    reports really come from Plivo, so keep it current here if you ever change it in Plivo.
+  </Step>
+  <Step title="Add a sender">
+    Open **Settings** -> **SMS** -> **Senders** and click **Add sender**. Choose your Plivo connection under
+    **SMS provider account**, then pick a **Number**. The list shows the SMS-enabled numbers and the
+    Powerpacks on that account; a Powerpack shows as a messaging service.
+
+    Turn on **Default sender** if this is the number a step should use when it does not pick one. Save.
+  </Step>
+  <Step title="Click Configure webhooks">
+    In the sender's row, click **Configure webhooks**. ElasticFunnels sets up Plivo to send replies to it.
+    See [Replies and delivery reports](#replies-and-delivery-reports) for what this changes in your Plivo
+    account.
+  </Step>
+  <Step title="Check the registration">
+    Click **Refresh** in the **Registration** column. ElasticFunnels reads the 10DLC status (local numbers)
+    or the toll-free verification status from Plivo and shows **Registered**, **Pending**, **Rejected** or
+    **Unknown**. A Powerpack stays at **Unknown**, so check its numbers in Plivo.
+  </Step>
+  <Step title="Accept the consent statement">
+    On the **Compliance** tab, accept the marketing consent statement. Marketing texts are skipped until
+    someone on the brand does. See [SMS compliance](/settings/sms#marketing-consent-statement).
+  </Step>
+</Steps>
+
+The sender form has a switch labelled **Twilio already answers STOP/HELP for this number**. For a Plivo
+number it means Plivo: turn it on only if your Plivo account already sends its own STOP and HELP replies for
+that number, so the person does not get two replies. ElasticFunnels then records the reply and the
+opt-out without sending its own.
+
+## Replies and delivery reports
+
+There is no URL to copy into Plivo. **Configure webhooks** does it for you:
+
+- **Replies (STOP, HELP, START and anything else people text back).** ElasticFunnels creates a Plivo
+  application named `elasticfunnels-brand-<your brand ID>` whose message URL points at your brand's
+  ElasticFunnels address (it contains `/api/webhook/sms/plivo/`), and attaches it to the number or
+  Powerpack. Clicking it again later reuses the same application.
+- **Delivery reports.** Every text ElasticFunnels sends carries its own report address, so nothing needs
+  to be set in Plivo for them.
+
+<Warning>
+Plivo allows one application per number. If the number was attached to another application (for
+example one that answers voice calls), **Configure webhooks** replaces it. Use a number that is only for
+texting, or check its application in the Plivo console afterwards.
+</Warning>
+
+Plivo signs every request it sends with your Auth Token. ElasticFunnels refuses any request that is
+unsigned or signed with a different token, and the address also carries a secret token for your brand.
+
+A text's status in **Settings** -> **Logs** -> **SMS** follows what Plivo reports: **Sent**, then
+**Delivered**, **Undelivered** or **Failed**. Plivo's "rejected" shows as **Failed**, and "read" as
+**Delivered**.
+
+## Send a test
+
+1. Open **Settings** -> **SMS** -> **Test send**.
+2. Enter a number you own, pick the Plivo sender, choose the type and write a short message.
+3. Send. The tab shows what the checks decided: sent, waiting or skipped, with the reason.
+4. Open **Settings** -> **Logs** -> **SMS**. The text should move from **Sent** to **Delivered** within a
+   minute or so.
+5. Reply **STOP** from your phone. It shows under **Replies**, your number lands on the
+   **Suppression list**, and you get the STOP reply. Text **START** to lift it again.
+
+If step 4 stays on **Sent** and step 5 shows nothing, Plivo's requests are not reaching ElasticFunnels:
+see the first item under Troubleshooting.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No replies and no delivery reports">
+    Click **Configure webhooks** (or **Set again**) on the sender. If you changed the Auth Token in Plivo,
+    paste the new one into the Plivo integration first: requests signed with a token ElasticFunnels does
+    not have are refused. Also check in the Plivo console that the number still uses the
+    `elasticfunnels-brand-...` application.
+  </Accordion>
+  <Accordion title='"This number is not in the connected Plivo account"'>
+    The number was released or moved to another Plivo account or subaccount. Remove the sender and add a
+    number from the account the integration uses.
+  </Accordion>
+  <Accordion title='"Could not reach Plivo" or the number list is empty'>
+    The Auth ID or Auth Token is wrong, or Plivo did not answer. Check both on the Plivo console overview
+    page and save the integration again. The list shows the first 20 numbers and the first 20 Powerpacks
+    on the account, and leaves out numbers without SMS.
+  </Accordion>
+  <Accordion title="Auth ID is refused when saving">
+    The Auth ID is exactly 20 letters and digits, starting with MA or SA. Copy it from the console
+    overview, not the Auth Token.
+  </Accordion>
+  <Accordion title="A text failed: what the Plivo error means">
+    Click the text in **Settings** -> **Logs** -> **SMS** to see Plivo's error code and its meaning.
+
+    | Code | Meaning | What ElasticFunnels does |
+    |---|---|---|
+    | 200 | The person replied STOP to Plivo | Adds the number to the suppression list |
+    | 50, 70 | Invalid number, or no longer in service | Adds the number to the suppression list as invalid |
+    | 40 | Invalid sending number | Logs it as a provider error. Check the sender |
+    | 900 | Plivo account out of credit | Logs it as a provider error. Top up in Plivo |
+    | 910 | Plivo account disabled | Logs it as a provider error. Contact Plivo |
+    | 420 | Expired in Plivo's queue | Usually the number is not linked to a 10DLC campaign |
+    | 960 | Toll-free number not verified | Finish toll-free verification in Plivo |
+    | 30 | Carrier spam filter | Change the wording; see the content warnings in the log |
+    | 450 | Country disabled in Plivo | Turn the country on in Plivo's settings |
+    | 401 | Plivo refused the credentials | Update the Auth ID and Auth Token |
+
+    A number on the suppression list gets no more texts until the person texts START or you lift it.
+  </Accordion>
+  <Accordion title="The log says Twilio for a Plivo text">
+    Some reasons in the log are still worded for Twilio, for example "Twilio rejected the text". For a
+    Plivo sender they mean Plivo. The error code next to them is Plivo's.
+  </Accordion>
+</AccordionGroup>
+
+## Related docs
+
+- [SMS compliance](/settings/sms): the checks every text passes, senders and the SMS log
+- [Send SMS step](/automations/send-sms): text customers from an automation
+- [Telnyx](/integrations/telnyx) and [Twilio](/integrations/twilio): the other providers you can send through

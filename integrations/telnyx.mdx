@@ -1,0 +1,168 @@
+---
+title: 'Telnyx Integration'
+sidebarTitle: "Telnyx"
+icon: "comment-sms"
+description: 'Send your brand''s texts from your own Telnyx numbers or messaging profiles, with replies and delivery reports coming back to ElasticFunnels.'
+---
+
+## Overview
+
+Telnyx can be the carrier behind your brand's texts. Connect a Telnyx account, add one of its numbers as a
+sender, and texts from the [Send SMS step](/automations/send-sms), test sends and the automatic STOP, HELP
+and START replies go out through Telnyx. Each text passes the checks in [Settings -> SMS](/settings/sms)
+before it leaves: suppression list, quiet hours, consent and state rules.
+
+Telnyx has no automation steps of its own; it works as a sender, the same way a Twilio number does. Telnyx
+bills you directly for each text, with no ElasticFunnels markup.
+
+Only US numbers can be texted for now.
+
+## What you need in Telnyx
+
+- **A Telnyx account** with a balance, and messaging turned on for it.
+- **A number with messaging, or a messaging profile.** Carriers filter texts from senders that are not
+  registered:
+
+| Sender | Registration Telnyx needs |
+|---|---|
+| Local number (10DLC) | A 10DLC brand and campaign in Telnyx, with the number assigned to the campaign |
+| Toll-free number | Toll-free verification approved in Telnyx |
+| Messaging profile | Sends from the profile's numbers through Telnyx's number pool, so set the pool up on the profile and register its numbers as above |
+
+- **An API key and your public key**, both under **Keys & Credentials** in the
+  [Telnyx portal](https://portal.telnyx.com/#/api-keys):
+  - **API key:** on the **API Keys** tab, create a key and copy it. It starts with `KEY`.
+  - **Public key:** on the **Public Key** tab. Telnyx signs every webhook it sends, and ElasticFunnels
+    uses this key to check the signature. It is a 44-character code ending in `=`.
+
+## Connect Telnyx
+
+<Steps>
+  <Step title="Open Telnyx in Integrations">
+    Go to **Apps** -> **Integrations** and open **Telnyx**. Click **Add connection**.
+
+    <img src="/images/integrations/telnyx-connect.png" alt="The Telnyx connection form: Name, API key and Webhook public key, with where to find them in the Telnyx portal" />
+  </Step>
+  <Step title="Paste the keys">
+    Give the connection a **Name** (for example "Telnyx main account"), paste the **API key** and the
+    **Webhook public key**, and save. Both are required. The API key is stored encrypted.
+  </Step>
+  <Step title="Add a sender">
+    In **Settings** -> **SMS** -> **Senders**, click **Add sender**. Under **SMS provider account** choose
+    the Telnyx connection, then pick a **Number**. The list has your Telnyx numbers and your messaging
+    profiles (shown as messaging services). A number marked **(no messaging profile)** is not on a profile
+    yet; the next step fixes that.
+
+    Turn on **Default sender** if steps that do not pick a sender should use this one, then save.
+  </Step>
+  <Step title="Click Configure webhooks">
+    Click **Configure webhooks** in the sender's row so Telnyx sends replies to ElasticFunnels. The next
+    section says what it changes in Telnyx.
+  </Step>
+  <Step title="Check the registration">
+    Click **Refresh** in the **Registration** column. For a local number ElasticFunnels asks Telnyx whether
+    it is assigned to a 10DLC campaign; for a toll-free number, whether its verification is approved. You
+    see **Registered**, **Pending**, **Rejected** or **Unknown**. A messaging profile stays at **Unknown**.
+  </Step>
+  <Step title="Accept the consent statement">
+    On the **Compliance** tab, accept the marketing consent statement. Until then, marketing texts are
+    skipped. See [SMS compliance](/settings/sms#marketing-consent-statement).
+  </Step>
+</Steps>
+
+Leave **Twilio already answers STOP/HELP for this number** off unless your Telnyx setup already replies
+to STOP and HELP for that number. The switch is labelled for Twilio but applies to any provider: when it
+is on, ElasticFunnels records the reply and the opt-out and does not send a reply of its own.
+
+## Replies and delivery reports
+
+You do not paste a webhook URL into Telnyx. **Configure webhooks** sets it:
+
+- **Replies.** Telnyx sends incoming texts to the webhook URL of the number's messaging profile.
+  ElasticFunnels sets that URL (API version 2) to your brand's address, which contains
+  `/api/webhook/sms/telnyx/`. A number with no messaging profile gets a new profile named
+  `ElasticFunnels brand <your brand ID>`, and the number is moved onto it.
+- **Delivery reports.** Each text ElasticFunnels sends names its own report address and tells Telnyx to
+  skip the profile's, so reports arrive even if the profile's URL changes later.
+
+<Warning>
+The webhook URL belongs to the messaging profile, not the number. Every number on that profile sends its
+replies to ElasticFunnels afterwards. If another tool reads replies from the same profile, give the
+ElasticFunnels numbers their own profile in Telnyx first.
+</Warning>
+
+Telnyx signs each webhook, and ElasticFunnels checks the signature with the public key you saved. A webhook
+with no signature, a wrong one, or a timestamp more than 5 minutes off is refused. The address also carries
+a secret token for your brand.
+
+In **Settings** -> **Logs** -> **SMS**, a Telnyx text shows **Sent**, then **Delivered**, **Undelivered**
+or **Failed**:
+
+| Telnyx status | Shown as |
+|---|---|
+| delivered | Delivered |
+| delivery_failed, expired | Undelivered |
+| sending_failed | Failed |
+| delivery_unconfirmed | Sent. The carrier sent no receipt, and the text may well have arrived |
+
+## Send a test
+
+1. Go to **Settings** -> **SMS** -> **Test send**.
+2. Use a number you own, choose the Telnyx sender, a type and a short message, and send. The tab shows
+   whether the text was sent, is waiting or was skipped, and why.
+3. In **Settings** -> **Logs** -> **SMS** the text should reach **Delivered** within a minute or so.
+4. Text **STOP** back from your phone. The reply appears under **Replies**, your number goes on the
+   **Suppression list** and you get the STOP reply. **START** lifts it.
+
+A text that never leaves **Sent**, with no reply showing either, means Telnyx's webhooks are being refused
+or are going somewhere else. Start with the first item below.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No replies and no delivery reports">
+    Check the **Webhook public key** in the integration against **Keys & Credentials** -> **Public Key**
+    in Telnyx; a key from a different Telnyx account fails every check. Then click **Set again** on the
+    sender, and confirm in Telnyx that the number's messaging profile has the ElasticFunnels webhook URL.
+  </Accordion>
+  <Accordion title="The integration will not save">
+    The API key must be a V2 key starting with `KEY`. The public key is the base64 key from the
+    **Public Key** tab (44 characters, ending in `=`), not the API key.
+  </Accordion>
+  <Accordion title='"This number is not in the connected Telnyx account"'>
+    The number was released or belongs to another Telnyx account. Remove the sender and add a number from
+    the account this integration uses.
+  </Accordion>
+  <Accordion title='"Could not reach Telnyx" or the number list is empty'>
+    Telnyx refused the API key or did not answer. Create a new key in Telnyx and save it in the integration.
+    The list shows up to 100 numbers and 50 messaging profiles.
+  </Accordion>
+  <Accordion title="A text failed: what the Telnyx error means">
+    Click the text in **Settings** -> **Logs** -> **SMS** to see Telnyx's error code and what it means.
+
+    | Code | Meaning | What ElasticFunnels does |
+    |---|---|---|
+    | 40300 | The person replied STOP to Telnyx | Adds the number to the suppression list |
+    | 40012, 40310 | Invalid destination number | Adds the number to the suppression list as invalid |
+    | 40010 | Number not registered for 10DLC | Logs it as a provider error. Assign the number to a campaign |
+    | 40329, 40330 | Toll-free number not verified or not set up | Finish toll-free verification in Telnyx |
+    | 40013, 40305 | Invalid sending number | Logs it as a provider error. Check the sender |
+    | 40312, 40314 | Messaging profile, or messaging on the account, is turned off | Logs it as a provider error. Turn it on in Telnyx |
+    | 40333 | Telnyx spend limit reached | Logs it as a provider error. Raise the limit in Telnyx |
+    | 10009 | Telnyx refused the API key | Save a new API key |
+    | 40002, 40003, 40015 | Spam filter at the carrier or at Telnyx | Change the wording; see the content warnings in the log |
+    | 40016 | T-Mobile sending limit | Wait, or ask Telnyx about your campaign's limits |
+
+    A suppressed number gets no texts until the person texts START or you lift it.
+  </Accordion>
+  <Accordion title="The log says Twilio for a Telnyx text">
+    A few reasons in the log are still worded for Twilio, for example "Twilio rejected the text". For a
+    Telnyx sender they mean Telnyx, and the error code shown with them is Telnyx's.
+  </Accordion>
+</AccordionGroup>
+
+## Related docs
+
+- [SMS compliance](/settings/sms): the checks every text passes, senders and the SMS log
+- [Send SMS step](/automations/send-sms): text customers from an automation
+- [Plivo](/integrations/plivo) and [Twilio](/integrations/twilio): the other providers you can send through

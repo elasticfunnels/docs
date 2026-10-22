@@ -1,0 +1,22 @@
+{
+  "out": "images/integrations/plivo-connect.png",
+  "alt": "The Plivo connection form: Name, Auth ID and Auth Token, with where to find them in the Plivo console",
+  "_source": "demo brand 899 (Northwind Supplements), local app at elasticfunnels origin/main 29b3afb27",
+  "capture": {
+    "path": "/{brand}/integrations/plivo",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid=\"integration-add-connection-header\"]",
+    "actions": [
+      { "click": "[data-testid=\"integration-add-connection-header\"]" },
+      { "waitFor": "text=Where to find these" },
+      { "wait": 600 }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "text=Auth ID >> visible=true >> nth=0", "title": "Auth ID", "text": "20 characters, from the console overview" },
+    { "selector": "text=Auth Token >> visible=true >> nth=0", "title": "Auth Token", "text": "Also checks Plivo's signed callbacks" },
+    { "selector": "text=Where to find these", "title": "Where to find these", "text": "Links to the Plivo console" }
+  ]
+}

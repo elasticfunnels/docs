@@ -2,10 +2,10 @@
 title: "Send SMS Step"
 sidebarTitle: "Send SMS step"
 icon: "comment-sms"
-description: "Text a customer from an automation. Every text goes through the checks in Settings -> SMS and out from your brand's own Twilio sender."
+description: "Text a customer from an automation. Every text goes through the checks in Settings -> SMS and out from your brand's own Twilio, Plivo or Telnyx sender."
 ---
 
-**Send SMS** texts a customer from an automation. Find it in the step list under **Twilio**.
+**Send SMS** texts a customer from an automation. Find it in the step list under **Twilio**, also when your senders are on Plivo or Telnyx.
 
 The step does not talk to Twilio by itself. It hands the text to your brand's SMS settings, which run the
 compliance checks (STOP list, quiet hours, consent, state rules) and then send it from one of your
@@ -68,6 +68,6 @@ public shorteners like bit.ly get a content warning, and carriers often filter t
 ## Related docs
 
 - [SMS compliance](/settings/sms): the checks, senders, suppression list and SMS log
-- [Twilio](/integrations/twilio): connect the account your texts go out from
+- [Twilio](/integrations/twilio), [Plivo](/integrations/plivo), [Telnyx](/integrations/telnyx): connect the account your texts go out from
 - [Variables](/automations/variables): insert values from the trigger and earlier steps
 - [Run history](/automations/run-history): see what each run did
