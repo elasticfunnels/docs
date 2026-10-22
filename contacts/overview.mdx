@@ -34,6 +34,37 @@ The record has these tabs:
 | **Contact** | Name, location, timezone, every email and phone the contact has used (the primary one is marked), tags, and where the contact first came from. |
 | **Consent** | The email and SMS marketing status, and the history of opt-ins and opt-outs with their source. |
 | **Merges** | Every contact merged into this one, with an **Undo** button while undo is still possible. |
+| **Sales & Refunds**, **Products** | The contact's orders, refunds and the products they bought. |
+| **Sessions** | The visits that led to an order. See [Sessions](#sessions) below. |
+| **Subscriptions** | The contact's subscriptions, for users who may view orders. |
+| **Transactions** | Gateway attempts, statuses and amounts. |
+| **CRM** | CRM entries linked to the contact. |
+
+The order tabs are looked up by the contact's email, so they show only to users who can see emails in full (see [Who sees emails and phone numbers](#who-sees-emails-and-phone-numbers)).
+
+## Sessions
+{/* SCREENSHOT: Contact record with the Sessions tab open · desktop */}
+
+The **Sessions** tab lists the visits that led to an order, newest first. Each row shows:
+
+- **Started**: the date and time the visit began, in your own timezone.
+- **Session**: the funnel name, or the landing page name when the visit was not in a funnel, with the session code underneath. Click it to open the session with every page and event in a new tab.
+- **Traffic source**: the ad platform, UTM source or referring site, with the campaign underneath. A tracked visit with no source shows **Direct**.
+- **Device**: mobile, desktop or tablet, and the visitor's country.
+- **Activity**: how many pages the visit viewed and how long it lasted. **Not tracked** means no page views were recorded for that visit.
+- **Session value**, **Products** and **Orders** for the visit.
+
+Click the **Started**, **Activity**, **Session value**, **Products** or **Orders** heading to sort by it.
+
+## Activity and lifetime value
+{/* SCREENSHOT: Contact record side panel with the lifetime value and Timeline · desktop */}
+
+The side panel of the record shows the contact's **LTV** (lifetime value) and their activity.
+
+- **LTV** is the total of the contact's real orders across every email and visitor profile linked to them: purchases minus refunds and chargebacks. Test orders are not counted.
+- **Timeline** lists what the contact did, newest first, in plain words such as **Became a known contact**, **Viewed a page**, **Opened the checkout**, **Purchased** or **Accepted an upsell**, each with one short detail line. Switch between **Brand TZ** and **My TZ** to read the times in the brand's timezone or yours.
+- Your team opening a contact's record is not recorded as activity, so the timeline and the first and last seen dates show only what the contact did.
+- **Touchpoints** shows the first and last ad platform, campaign and UTM source that brought the contact in.
 
 ## Editing a contact
 {/* SCREENSHOT: Edit contact drawer · desktop */}
