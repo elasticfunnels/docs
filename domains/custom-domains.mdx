@@ -67,6 +67,19 @@ If you switch the records to DNS only (grey cloud), no Cloudflare SSL setting ap
 - **User Trust**: Browsers show security indicators
 - **Conversion Boost**: Users more likely to purchase on secure sites
 
+## Moving a Domain to Another Project
+You can hand a domain to another project in the same organization without setting it up again. DNS records, SSL and the validated status carry over, so there is nothing to re-verify.
+
+1. Go to **Domains**, open the options menu on the domain's row and choose **Move to another project**
+2. Pick the target project. Only projects in your organization are listed, and you need permission to manage domains in both projects
+3. Read the preview. It lists what in the current project stops using the domain: funnel links, blogs, courses, the courses domain setting and tracking scripts. If the domain's merchant belongs to the current project, the domain is moved without a merchant; assign one in the new project afterwards
+4. Choose what happens to the pages on the domain. By default they stay in the current project without a domain. You can move them along with the domain instead, which runs in the background
+5. Confirm. A domain moved without its pages switches over right away
+
+Projects that are not part of an organization can move domains between each other only when they have the same owner.
+
+From the command line: `ef domains move shop.example.com --to-brand "Main Store"` shows the same preview and asks before moving. Add `--with-pages` to move the pages too, or `--dry-run` to only see the preview.
+
 ## Troubleshooting Common Issues
 {/* SCREENSHOT: Troubleshooting Common Issues · domain settings or DNS setup screen · desktop */}
 
