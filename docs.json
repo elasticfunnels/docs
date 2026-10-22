@@ -294,7 +294,8 @@
                 "group": "Audiences",
                 "icon": "users",
                 "pages": [
-                  "analytics/audience-actions"
+                  "analytics/audience-actions",
+                  "analytics/audience-identity-matches"
                 ]
               },
               {

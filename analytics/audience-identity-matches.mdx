@@ -1,0 +1,48 @@
+---
+title: "Audiences: identity match rules"
+description: "Build an audience from how your contacts match each other: possible duplicates, recent merges, and people who are also contacts in your other brands."
+---
+
+## At a glance
+
+The audience builder has an **Identity match** rule. It groups contacts by what the [Matches block](/contacts/merge-and-duplicates) on a contact page shows: possible duplicates in this brand, recent merges, and the same person in other brands of your organization.
+
+Open it from **Reports → Audiences → New audience**, then **Add rule → Identity match**.
+
+<Note>
+Identity match rules need contacts. If your brand is not on contacts yet, the builder tells you so and the rule is not offered.
+</Note>
+
+## The conditions
+
+Each rule reads **Is** or **Is not**, followed by one of these:
+
+| Condition | Who it matches |
+|-----------|----------------|
+| a possible duplicate in this brand | Contacts with an open "possible duplicate" suggestion that nobody has merged or dismissed yet. |
+| also a contact in another brand | The same email or phone is a contact in another brand of your organization. Leave the brand on "any brand of this organization", or pick one brand. |
+| a contact in at least N other brands | The number of other brands of your organization that have a contact with the same email or phone is N or more. |
+| merged with another contact in the last N days | Contacts that absorbed another contact through a merge that was not undone, within the last N days. |
+| seen with the same browser on another brand | The same browser was seen on another brand of your organization. This signal is in a pilot, so you only see it where it is switched on, and its data starts on October 22, 2026. |
+
+Hover the help icon next to the rule to read the same explanation in the app.
+
+**Is not** works for every condition except "merged in the last N days" and a rule that names one specific brand.
+
+## Which brands you can pick
+
+The brand list holds only the other brands of your organization that you can open yourself. A brand you are locked out of, or a brand from another organization, cannot be named in a rule: the preview, validation and save all refuse it.
+
+"Any brand of this organization" counts every other brand of the organization, including ones you cannot open, but it never shows you anything from them except that the person is there.
+
+## Examples
+
+- **Clean up duplicates before a send.** "Identity match is a possible duplicate in this brand", then open each contact and merge or dismiss the suggestion.
+- **Cross-sell to existing buyers of a sister brand.** "Identity match is also a contact in another brand", with that brand picked.
+- **Your best repeat customers across the group.** "Identity match is a contact in at least 3 other brands".
+
+## How it stays current
+
+The audience reads matches again on every refresh, so a merge, a dismissed suggestion or a new contact in another brand shows up at the next refresh.
+
+Contacts whose only orders are test orders are left out of audiences, the same as for every other rule.
