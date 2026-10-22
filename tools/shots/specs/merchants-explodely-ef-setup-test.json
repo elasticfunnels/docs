@@ -64,7 +64,7 @@
     {
       "selector": "[data-testid=\"merchants.postback-setup.panel.test\"] ol",
       "title": "How to send a test",
-      "text": "Try IPN Builder in Explodely",
+      "text": "A test sale with ?testmode=yes",
       "side": "right"
     }
   ]

@@ -14,7 +14,7 @@ Follow the steps in order. Each one links to the section that explains it.
 2. [In ElasticFunnels: the Explodely merchant](#step-1-create-the-explodely-merchant) with your username
 3. [Your products in ElasticFunnels](#step-2-create-your-products-and-enter-their-explodely-ids), each with its Explodely product ID (and each variant with its own, if it has one)
 4. [Postbacks in Explodely](#step-3-set-up-postbacks-in-explodely): the Global IPN plus three webhooks
-5. [A test](#step-4-test-the-connection): **Try IPN Builder** until the merchant shows **Verified**, then one `?testmode=yes` sale
+5. [A test sale](#step-4-test-the-connection) with `?testmode=yes`, until the merchant shows **Verified**
 6. [Buy links on your funnel pages](#step-5-put-the-buy-links-on-your-pages)
 
 Everything in your Explodely account used below sits under **Seller Hub** in the top menu: **Products**, **Settings** and **Integrations**.
@@ -141,15 +141,13 @@ Explodely webhooks carry no event name, which is why each one needs its own `?ev
 ## Step 4: Test the connection
 
 1. In ElasticFunnels, open the **Test** step of **Postback Setup** and leave it open. It shows **Waiting for a test postback** and checks every 5 seconds for 2 minutes.
-2. In Explodely, go back to **Seller Hub** → **Settings** → **Global IPN** and click **Try IPN Builder**
-3. Paste the IPN URL you copied into **Enter IPN URL**, pick any fields and click **Submit**. Explodely sends a sample IPN to that URL.
-4. The first postback that reaches ElasticFunnels with the right secret marks the merchant verified, even a sample like this one. The status next to the dialog's title changes to **Verified** and **Needs Setup** clears from the merchant's row. If nothing arrives in 2 minutes, it shows **No test yet** with **Check again**.
+2. Open one of your Explodely payment links with `?testmode=yes` added (for example `https://explodely.com/p/<product id>?testmode=yes`) and complete the order.
+3. Explodely sends the IPN for that order, and the first one that reaches ElasticFunnels with the right secret marks the merchant verified. The status next to the dialog's title changes to **Verified** and **Needs Setup** clears from the merchant's row. If nothing arrives in 2 minutes, it shows **No test yet** with **Check again**.
+4. Check the sale under **Reports** → **Conversions**.
 
-<img src="/images/merchants/explodely-ipn-builder.png" alt="The Try IPN Builder dialog in Explodely with the IPN URL field, the field chips and Submit" />
-
-<img src="/images/merchants/explodely-ef-setup-test.png" alt="The Test step of Postback Setup for Explodely: the waiting status card and how to send a test" />
-
-Then place a real test sale: open one of your payment links with `?testmode=yes` added, complete the order, and check it under **Reports** → **Conversions**.
+<Note>
+  **Try IPN Builder** in Explodely's Global IPN section does not send anything to your URL, so it cannot verify the merchant. Its field buttons also append placeholders such as `[orderid]` straight onto the URL, which breaks the secret at the end. Leave the IPN URL exactly as copied from **Postback Setup**.
+</Note>
 
 ## Step 5: Put the buy links on your pages
 
@@ -197,7 +195,7 @@ A payment link you paste by hand (`https://explodely.com/p/...`) gets `custom1` 
     The URL in Explodely is cut short or out of date (for example after **Make a new URL**). Copy each URL again from **Postback Setup** and paste it over the old one in Explodely, the IPN and all three webhooks.
   </Accordion>
   <Accordion title="The merchant still says Needs Setup">
-    No postback with the right secret has reached ElasticFunnels yet. Check that **Send IPN** is Yes and the IPN URL is the one copied from **Postback Setup**, then send a sample with **Try IPN Builder**.
+    No postback with the right secret has reached ElasticFunnels yet. Check that **Send IPN** is Yes and the IPN URL is the one copied from **Postback Setup**, then place a test sale with `?testmode=yes`. **Try IPN Builder** does not send a postback.
   </Accordion>
   <Accordion title="Every refund appears twice">
     A refund webhook was added in Seller Hub as well as the IPN. Remove the webhook: refunds come through the IPN.
