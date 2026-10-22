@@ -1,0 +1,36 @@
+{
+  "out": "images/pages/list-link-warnings.png",
+  "alt": "The Pages list: a red warning triangle beside a page title and its hover card listing a buy link to another ClickBank account and a product code with no product",
+  "_source": "elasticfunnels repo flow _dev/flows/page-link-warnings step 8, recorded at 1440x900 (2x) on demo brand 899, cropped to CSS x 260, y 230, 570 x 260",
+  "image": "tools/shots/source/pages-list-link-warnings.png",
+  "imageSize": {
+    "w": 570,
+    "h": 260
+  },
+  "maxWidth": 620,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        12,
+        21,
+        205,
+        20
+      ],
+      "title": "Warning triangle",
+      "text": "Red: sales at risk. Amber: a hint",
+      "side": "left"
+    },
+    {
+      "box": [
+        199,
+        49,
+        360,
+        201
+      ],
+      "title": "What we noticed",
+      "text": "Every problem found on the page",
+      "side": "right"
+    }
+  ]
+}

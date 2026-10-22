@@ -65,6 +65,20 @@ Pages support dynamic content that changes based on:
 - **Preview a page**: hover its row (or move to it with the keyboard) and click the eye icon beside the title. If the page has several versions or your project has several domains, pick one in the **Preview on** dialog. **View page** in the row's menu opens the same dialog.
 - **Offline and draft pages**: they are not served on any domain yet, so the eye icon and **View page** are greyed out. Hover the icon to see why, then publish the page to preview it.
 
+#### Link warnings
+
+<img src="/images/pages/list-link-warnings.png" alt="The Pages list: a red warning triangle beside a page title and its hover card listing a buy link to another ClickBank account and a product code with no product" />
+
+A warning triangle beside a page title means we found a problem with the buy links on that page. Hover it (or tap it) to see the list.
+
+- **Red: sales at risk.**
+  - A buy link to a merchant account this brand does not have, for example a ClickBank pay link for another vendor, or a BuyGoods checkout link with another `account_id`. Those sales land on that account and never reach ElasticFunnels. We only say this when the account can be read from the link (ClickBank vendor, BuyGoods `account_id`) or when the brand has no merchant at all on that platform. JVZoo, Digistore24 and Explodely links do not name the account, so they never raise it on their own.
+  - A pasted buy link while **Add click tracking to pasted buy links** is off on that merchant, so the sale cannot be matched to its visit.
+  - A product code (`[BUY=CODE]`, `[UPSELL=CODE]` and the like) that matches no product in the brand, so its buy link shows nothing. Add the product or fix the code.
+- **Amber: a hint.** A BuyGoods, Digistore24, ClickBank, JVZoo or Explodely buy link pasted straight into the page. It is still tracked, but a `[BUY=CODE]` tag is better: the product, price and funnel next step then come from ElasticFunnels. See [Order Tags](#order-tags).
+
+Warnings are checked when you save the page, when a component it uses changes, and when you change the brand's merchants or products. Links inside HTML comments are ignored because visitors never see them. `ef push` prints the same warnings after it saves a page.
+
 <CardGroup cols={2}>
   <Card title="Create Landing Page" icon="file-plus" href="/pages/create-landing-page">
     Choose AI, templates, drag-and-drop, code, or checkout when your brand supports it
