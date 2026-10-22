@@ -269,7 +269,8 @@
                   "funnels/funnel-split-testing",
                   "funnels/split-testing",
                   "analytics/split-test",
-                  "analytics/automation-split-tests"
+                  "analytics/automation-split-tests",
+                  "campaigns/ab-testing"
                 ]
               },
               {
@@ -277,7 +278,8 @@
                 "icon": "address-book",
                 "pages": [
                   "contacts/overview",
-                  "contacts/merge-and-duplicates"
+                  "contacts/merge-and-duplicates",
+                  "contacts/import"
                 ]
               },
               {

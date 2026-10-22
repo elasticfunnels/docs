@@ -1,0 +1,121 @@
+---
+title: "A/B Testing a Campaign"
+sidebarTitle: "Campaign A/B tests"
+icon: "envelope-open-text"
+description: "Send two or more versions of an email or SMS campaign to a small test group, wait, and let the version that did best go to everyone else."
+---
+
+An email or SMS campaign can carry extra versions. A test group gets all of them, split evenly. After a wait,
+ElasticFunnels scores each version on that group and sends the winner to the rest of the audience on its own.
+
+<Note>
+Email and SMS campaigns are in early access. They show only for brands that have campaigns turned on, under
+**Campaigns** in the sidebar. SMS campaigns also need SMS turned on for the brand.
+</Note>
+
+## How the winner is picked
+
+| | Email campaign | SMS campaign |
+|---|---|---|
+| **Versions** | Version A is the campaign's own subject and content. Add up to four more (B to E). | The **Message** is the first variant. Add up to four more (**Variant 2** to **Variant 5**). |
+| **What a version changes** | Subject and preview text, and its own content if you give it some | The text |
+| **Test group** | 20% of the audience by default, up to 50% | 20% of the audience by default, up to 50% |
+| **Wait** | 4 hours by default (1, 2, 4, 8 or 24 hours) | 60 minutes by default (30 minutes to 8 hours) |
+| **Winner metric** | **Clicks** (the default) or **Opens** | Clicks |
+| **Counts against a version** | Unsubscribes and spam complaints | STOP replies and carrier opt-outs |
+| **Pick a winner by hand** | Yes, from the report | No |
+
+Each version's score is its click rate (or open rate) in the test group, minus three times its rate of
+unsubscribes and complaints (for texts, opt-outs). The highest score wins. A tie goes to version A, or to the
+SMS campaign's main **Message**.
+
+A version that gets more clicks but drives people to unsubscribe can lose to a calmer one. That is what the
+penalty is for.
+
+Everyone outside the test group waits and gets only the winning version.
+
+## Email campaigns
+
+### Set up the test
+
+<img src="/images/campaigns/email-ab-panel.png" alt="The A/B test panel on the Settings step of an email campaign: Version B with its own subject, Add version C, Test group 20%, Then wait 4 hours and Pick the winner by Clicks" />
+
+1. Open the campaign and go to the **Settings** step. Fill in the **Subject** and **Preview text** as usual:
+   that is version A.
+2. Under **A/B test**, click **Add version B**.
+3. Give version B its own **Subject**, **Preview text**, or both. An empty field shows version A's text as a
+   hint.
+4. To test different content, click **Give it its own content**. The email builder opens with a copy of
+   version A's content for you to change (version A needs content first). **Use version A content** drops the
+   copy again.
+5. Set the **Test group (%)**, how long to **Then wait**, and **Pick the winner by**.
+6. Continue to **Review and send** and send or schedule the campaign as usual.
+
+Untick **Include** to keep a version without sending it. The cross next to it removes it.
+
+The campaign cannot go out while a version has neither a subject nor its own content (**Give every A/B
+version a subject or its own content.**), or while its own content is empty.
+
+### Clicks or opens
+
+Pick **Clicks** unless you have a reason not to. The **?** next to **Pick the winner by** explains why: Apple
+Mail Privacy Protection loads every email in the background, so many opens are counted for people who never
+read it. Clicks show who acted. Unsubscribes and complaints count against a version with either metric.
+
+### Follow the test on the report
+
+<img src="/images/campaigns/email-ab-report.png" alt="The A/B test table on an email campaign report: versions A and B with sent, open rate, click rate and unsubscribes, a Send this to the rest button on each row, and the note that the numbers are from the test group only" />
+
+Open the campaign from **Campaigns** to see its report. The **A/B test** table lists each version with
+**Sent**, **Open rate**, **Click rate** and **Unsubscribes**, counted in the test group only. The line above it
+says where the test is:
+
+- **Sending the versions to the test group** while the test group goes out.
+- **The winner by Clicks is chosen at** a set time, while the campaign waits.
+- **Version B won and was sent to the rest.** once the winner is picked. The winning row has a **Winner** tag.
+- **The test stopped before a winner was picked.** when the campaign was stopped during the test.
+
+A version with its own content has an **Own content** tag. A version you left out shows **Off**.
+
+### Send a version to the rest yourself
+
+While the test is running or waiting, every row has **Send this to the rest**. Click it and confirm with
+**Send now**: everyone who has not received the email yet gets that version straight away, and the wait is
+skipped. Use it when one version is clearly ahead and you do not want to wait.
+
+## SMS campaigns
+
+1. In the campaign's **Message** step, write the main text in **Message**.
+2. Under **Variants**, click **Add a variant**. It starts as a copy of the main text; change the wording.
+3. Set the **Test group size (%)** and **Pick the winner after**. Clicks are counted until then.
+4. Untick **On** to keep a variant without sending it.
+
+The main **Message** is sent and scored like every other variant. A test with one added variant compares the
+main text with that variant.
+
+After the wait, the variant with the best score goes to the rest of the audience on its own. Opt-outs are
+STOP replies and carrier opt-outs from people in the test group since the campaign started. The report's
+**Variants** tab lists each text with **Sent**, **Delivered**, **Clicks**, **Click rate**, **Orders** and
+**Revenue**, and marks the **Winner**.
+
+## Campaign tests on the Split Tests page
+
+<img src="/images/campaigns/split-tests-list-campaigns.png" alt="The Split Tests list showing two email campaign tests and an SMS campaign test, each with its type tag, the Email campaign or SMS campaign location and the number of variants, next to an automation test" />
+
+Campaign A/B tests also show on **Split Tests**, next to page, component and automation tests:
+
+- Each one has an **Email campaign** or **SMS campaign** tag, with the number of versions under **Variants**.
+  Once a winner is picked, **Winner:** and the version follow (**Winner: B**, or a variant number for SMS).
+- Click the row or its location to open the campaign report, where the test is run and decided.
+- The **Type** filter has **Email campaign A/B test** and **SMS campaign A/B test**, shown only when the brand
+  has that channel turned on.
+- A sending campaign counts as **Running**, a sent one as **Finalized**, and a stopped or failed one as
+  **Not running** with the status **Stopped**. Drafts and scheduled campaigns are under **All**.
+- Campaign rows cannot be deleted from Split Tests. Delete the campaign itself instead.
+
+## Related docs
+
+- [Split test results](/analytics/split-test): page and funnel tests
+- [Automation split tests](/analytics/automation-split-tests): split an automation's contacts between paths
+- [Emails overview](/emails/overview): templates, campaigns and where Emails sits
+- [SMS compliance](/settings/sms): the checks every text goes through, campaigns included

@@ -5,8 +5,8 @@ icon: "shield-check"
 description: "Every text your brand sends goes through one set of checks: STOP, HELP and START, the suppression list, quiet hours, consent and state rules. Set them up in Settings -> SMS."
 ---
 
-Every text your brand sends takes the same path: the **Send SMS** step in an automation, the automatic
-replies to STOP, HELP and START, and test sends from settings. First the compliance checks run, then the
+Every text your brand sends takes the same path: the **Send SMS** step in an automation, SMS campaigns, the
+automatic replies to STOP, HELP and START, and test sends from settings. First the compliance checks run, then the
 text goes out from your own Twilio, Plivo or Telnyx account. Every attempt is logged, sent or not, with the reason.
 
 You set the checks up in **Settings** -> **SMS**. The page has five tabs: **Compliance**, **Senders**,
@@ -44,7 +44,7 @@ A text ends in one of three ways, and the log shows which:
 
 | Result | What it means |
 |---|---|
-| Sent | It passed the checks and went to Twilio. The log then shows **Sent**, **Delivered**, **Undelivered** or **Failed** as Twilio reports back. |
+| Sent | It passed the checks and went to your SMS provider. The log then shows **Sent**, **Delivered**, **Undelivered** or **Failed** as the provider reports back. |
 | Waiting | Quiet hours hold it. It goes out at the next time the recipient's local hours allow. |
 | Skipped | A check stopped it. The log shows why. |
 
@@ -134,7 +134,7 @@ The texts sent back for STOP, HELP and an opt-in. Leave a field empty to use the
 
 | Field | Default |
 |---|---|
-| **Brand name in replies** | Your brand name. Carriers expect every text to say who it is from. |
+| **Brand name in replies** | Your brand name. Used only in the HELP and STOP replies. Campaign and automation texts go out exactly as written, so put your brand name in those yourself. |
 | **STOP reply** | `{brand}: You are unsubscribed and will receive no more texts. Reply START to resubscribe.` |
 | **HELP reply** | `{brand}: For help, contact us. Msg & data rates may apply. Reply STOP to cancel.` |
 | **Opt-in confirmation** | Sent when someone replies START: `{brand}: You are subscribed to texts again. Msg frequency varies. Msg & data rates may apply. Reply HELP for help, STOP to cancel.` |
@@ -151,30 +151,29 @@ limits, and what it requires (written consent, seller registration, an existing 
 
 ### Webhook addresses
 
-The **Status** and **Replies** addresses Twilio calls to report delivery and pass on replies. Each
-brand has its own address with a secret token in it. **Configure webhooks** on the Senders tab sets
-them on your Twilio number for you; they are shown here so you can check by hand.
+The **Status** and **Replies** addresses your SMS provider calls to report delivery and pass on
+replies. Each provider has its own pair, and each brand has its own addresses with a secret token in
+them. The tab lists a pair for every provider the brand has an account or a sender on, or for all three
+(Twilio, Plivo and Telnyx) before it has any. **Configure webhooks** on the Senders tab sets them on your
+sender's number for you; they are shown here so you can check by hand.
 
-Calls without the right token are refused. When the Twilio integration also holds your account's Auth
-Token, each call is checked against Twilio's signature as well.
-
-The addresses shown are the Twilio ones. For a Plivo or Telnyx sender, **Configure webhooks** sets that
-provider's own address, and every call is checked against the provider's signature (the Plivo Auth Token
-or the Telnyx public key). See [Plivo](/integrations/plivo#replies-and-delivery-reports) and
+Calls without the right token are refused. Twilio calls are also checked against Twilio's signature when
+the Twilio integration holds your account's Auth Token. Plivo and Telnyx calls are always checked against
+the provider's signature (the Plivo Auth Token or the Telnyx public key). See [Plivo](/integrations/plivo#replies-and-delivery-reports) and
 [Telnyx](/integrations/telnyx#replies-and-delivery-reports).
 
 ## Senders
 
 <img src="/images/settings/sms-senders.png" alt="The Senders tab with a default local number and a toll-free number, their registration and who answers STOP and HELP" />
 
-The numbers this brand texts from, on your own Twilio, Plivo or Telnyx account. Plivo Powerpacks and Telnyx
+The numbers this brand texts from, on your own SMS provider account (Twilio, Plivo or Telnyx). Plivo Powerpacks and Telnyx
 messaging profiles can be senders too, next to Twilio messaging services.
 
-1. Click **Add sender**, choose the **Twilio account** (a Twilio integration connected to the brand)
+1. Click **Add sender**, choose the **SMS provider account** (an integration connected to the brand)
    and a **Number**. The list shows the numbers and messaging services on that account.
 2. Turn on **Default sender** for the one used when a step does not pick a sender.
-3. Turn on **Twilio already answers STOP/HELP for this number** only if Twilio Advanced Opt-Out is set
-   up for it. ElasticFunnels then records the reply and the opt-out without sending its own reply.
+3. Turn on **Twilio already answers STOP/HELP for this number** (the name follows your provider) only if
+   the provider answers those replies itself, for example with Twilio Advanced Opt-Out. ElasticFunnels then records the reply and the opt-out without sending its own reply.
 4. Save, then click **Configure webhooks** so replies and delivery reports reach ElasticFunnels.
 
 **Registration** shows the 10DLC or toll-free status Twilio reports: **Registered**, **Pending**,
@@ -189,7 +188,7 @@ A paused sender is not used for any text.
 <img src="/images/settings/sms-suppression-list.png" alt="The Suppression list with a number that replied STOP, a carrier opt-out and one added by hand" />
 
 Numbers this brand never texts, transactional texts included. A number lands here when the person
-replies STOP, when Twilio reports a carrier opt-out, or when you add it.
+replies STOP, when your SMS provider reports a carrier opt-out, or when you add it.
 
 - **Add number** blocks a number by hand, with the reason **Added by hand** or **Complaint**. Include
   the country code, for example +1 for the US.
@@ -214,7 +213,7 @@ Type a phone number and click **Look up** to see everything the brand holds abou
 <img src="/images/settings/sms-test-send.png" alt="The Test send tab: your number, sender, type and message, with the segment count" />
 
 Sends one text through the same checks as a real send and shows what they decided: sent, waiting or
-skipped, with the reason and any warnings. The text is real and goes out from your Twilio account, so
+skipped, with the reason and any warnings. The text is real and goes out from your SMS provider account, so
 only send to a number you own. Under the message you see the character count, the number of segments
 and the encoding.
 
@@ -226,7 +225,7 @@ A marketing test is skipped while the consent statement is not accepted.
 
 **Settings** -> **Logs** -> **SMS** lists every text the brand sent or tried to send: its status, type,
 source, what the checks decided, and when. Click a row to see the full text, the segments, the reason
-it was skipped, any warnings and Twilio's error.
+it was skipped, any warnings and the provider's error.
 
 <img src="/images/settings/sms-log-replies.png" alt="The Replies view of the SMS log: a STOP reply and a question from a customer" />
 
@@ -237,14 +236,14 @@ STOP, HELP or START.
 
 | Reason | What to do |
 |---|---|
-| Number is on the suppression list | The person replied STOP, Twilio reported an opt-out, or someone added the number. Only the person texting START, or a lift, changes it. |
+| Number is on the suppression list | The person replied STOP, the SMS provider reported an opt-out, or someone added the number. Only the person texting START, or a lift, changes it. |
 | Marketing statement not accepted | Accept the statement on the Compliance tab. |
 | No active sender | Add a sender on the Senders tab. |
 | Invalid phone number | The number is not a valid mobile number. Check the variable the step uses. |
 | State excluded in your settings | You chose not to text that state under **Where you send**. |
 | Quiet hours lasted past the send deadline | The text waited too long for open hours. |
-| Twilio reports the number opted out | The person opted out with their carrier. The number is now suppressed. |
-| Twilio refused the message | The error code in the log shows why. |
+| The SMS provider reports the number opted out | The person opted out with their carrier. The number is now suppressed. |
+| The SMS provider refused the message | The error code in the log shows why. |
 
 In strict mode, the warning reasons (no consent, state rule, content, sender registration, country) also
 skip the text.
@@ -259,5 +258,6 @@ marketing consent together with the wording next to the box and the page URL. Bo
 ## Related docs
 
 - [Send SMS step](/automations/send-sms): text customers from an automation
+- [A/B testing a campaign](/campaigns/ab-testing): test versions of an SMS campaign on a small group first
 - [Twilio](/integrations/twilio), [Plivo](/integrations/plivo), [Telnyx](/integrations/telnyx): connect the account your texts go out from
 - [Privacy and consent](/pages/privacy-consent): opt-in boxes on checkout pages

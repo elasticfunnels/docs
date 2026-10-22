@@ -223,6 +223,7 @@ The current renderer does not read this flag. Component split tests already allo
 - Testing a **whole page layout**? Build the alternative as a page variant and select it with **Load Another Page**. To split traffic between variants, put a **Split Test** node in front and hang a **Load Another Page** under each Traffic Distribution node.
 - Need the variants to have **their own page events**? Turn on **Load & Override Page Events** on the Load Another Page node. Left off, the variant inherits the primary page's events.
 - Testing **different steps of a funnel** rather than different renderings of one step? That is [Funnel Split Testing](/funnels/funnel-split-testing).
+- Testing **an email or SMS campaign**? Add versions to the campaign itself. See [A/B testing a campaign](/campaigns/ab-testing).
 
 <Warning>
 Do not stack a component split test and a page-variant test on the same page at the same time unless you want a factorial design. Two overlapping tests make each one's numbers much harder to read.
@@ -354,4 +355,5 @@ The `variant_code` is an internal identifier (`v0`, `v1`, …) that maps back to
   <Card title="Page Variants" href="/pages/page-variants" />
   <Card title="Funnel Split Testing" href="/funnels/funnel-split-testing" />
   <Card title="Split Test Analytics" href="/analytics/split-test" />
+  <Card title="Campaign A/B Tests" href="/campaigns/ab-testing" />
 </CardGroup>

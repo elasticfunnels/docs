@@ -1,0 +1,94 @@
+---
+title: "Importing Contacts"
+sidebarTitle: "Import contacts"
+icon: "file-import"
+description: "Bring a CSV of customers into Contacts, with their SMS and email consent, and see what will happen before anything is saved."
+---
+
+Import a CSV file to add people to **Contacts** or update the ones you already have. You check the
+columns and the consent first, see what the import will do, and only then start it. Nothing is saved until
+you click the final button.
+
+Open the [Contacts list](/contacts/overview#the-contacts-list) and click **Import contacts**. The **Contact imports** page lists every file imported
+into the brand, newest first, 25 to a page: the file, its status (**Queued**, **Running**, **Done** or
+**Failed**), **Rows done**, **New contacts** and when it started. Click **New import** to add a file.
+
+<Note>
+Imports need contacts switched on for the brand. Until they are, the page says **Imports are off for this
+brand** and **New import** does nothing. Imports made earlier stay listed. Contact support to switch contacts
+on.
+</Note>
+
+## 1. File
+
+Choose a CSV with a header row and one contact per row: up to 50 MB and 200,000 rows. Split a bigger file
+into several. ElasticFunnels reads the file first. If the same file was imported before, it says so and
+links to that import.
+
+## 2. Columns
+
+Your columns are matched to the contact fields: **Email**, **Phone**, **First name**, **Last name**,
+**Country**, **State or region**, **Postal code**, **Time zone**, **Tags**, **SMS consent**, **SMS consent
+date**, **SMS consent source**, **Email consent** and **Email consent date**. Check each one and fix any
+that are wrong. Pick **Not in this file** for a field the file does not have.
+
+Every row needs an email or a phone. Rows with neither are skipped.
+
+## 3. Consent and defaults
+
+Only import opt-ins you can prove. People without consent are still added as contacts, but they get no
+marketing. Set **SMS consent** and **Email consent** separately:
+
+| Option | What happens |
+|---|---|
+| **Do not import consent** | Contacts are added with no opt-in. |
+| **Everyone in the file opted in** | Every row with a phone (for SMS) or an email (for email) is marked as opted in. |
+| **Read it from a column** | Each row's value in the consent column decides. |
+
+How a consent column is read:
+
+| Value in the cell | Result |
+|---|---|
+| `yes`, `y`, `true`, `1`, `x`, `on`, `subscribed`, `opted_in` (also `da`, `sim`) | Opted in |
+| `opted_out`, `unsubscribed`, `stop`, `stopped`, `opt-out`, `optout` | Opted out |
+| `no`, `n`, `false`, `0`, `off`, `not subscribed` (also `nu`, `nao`) | No consent is recorded either way. The person is not opted in and not marked as opted out. |
+| Empty | No consent is recorded |
+
+When you import opt-ins, fill in **Where consent was collected** (for example *Website signup form*). It is
+saved with each opt-in as proof of where it came from.
+
+**Default country** is the two-letter country used for phone numbers written without a country code.
+**Tags** are optional, separated by commas, and added to every imported contact.
+
+## 4. What will happen
+
+<img src="/images/contacts/import-what-will-happen.png" alt="The What will happen step of a contact import: rows, will import, new contacts and already contacts, with the counts of emails, phones and opt-ins" />
+
+Before anything is saved, the import shows how many **Rows** the file has, how many **Will import**, how
+many are **New contacts** and how many are **Already contacts**. Under that it counts the rows **With an
+email** and **With a phone**, the SMS and email opt-ins and opt-outs, and the people with no consent.
+
+Rows marked no in a consent column have their own lines: **Phones marked no for SMS (nothing recorded)**
+and **Emails marked no for email (nothing recorded)**. Skipped rows and warnings are listed with a few
+example rows, such as an email or phone that is not valid. Change a setting and click **Check again** to
+see the new numbers.
+
+## 5. Import
+
+If you import opt-ins, confirm the consent statement with **I confirm the statement above is true.**
+Then click **Import {n} contacts**.
+
+The import runs in the background. Its page has two tabs: **Progress**, which updates by itself while the
+import runs and shows every count (new, updated, unchanged, skipped and why), and **Settings**, with the
+choices you made. If an import stops before the end, the rows done so far are kept. Start the same file
+again to resume it.
+
+A row that matches an existing contact updates it and counts as **Updated** or **Unchanged**. A person who opted out earlier is not opted
+in again by an import: the count shows **SMS consent not saved: opted out earlier** (or the email
+equivalent).
+
+## Related
+
+- [Contacts](/contacts/overview): the Contacts list and a contact's record
+- [Merge and duplicates](/contacts/merge-and-duplicates): how matching contacts are joined
+- [SMS compliance](/settings/sms): the consent checks every text goes through

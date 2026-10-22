@@ -5,11 +5,14 @@ icon: "comment-sms"
 description: "Text a customer from an automation. Every text goes through the checks in Settings -> SMS and out from your brand's own Twilio, Plivo or Telnyx sender."
 ---
 
-**Send SMS** texts a customer from an automation. Find it in the step list under **Twilio**, also when your senders are on Plivo or Telnyx.
+**Send SMS** texts a customer from an automation. Find it in the step list under **SMS**, whichever provider your senders are on.
 
 The step does not talk to Twilio by itself. It hands the text to your brand's SMS settings, which run the
 compliance checks (STOP list, quiet hours, consent, state rules) and then send it from one of your
 senders in **Settings** -> **SMS**. Set those up first: see [SMS compliance](/settings/sms).
+
+The text goes out exactly as you write it: no brand name is added in front. A **Marketing** text gets
+`Reply STOP to opt out` added at the end, unless the message already mentions STOP.
 
 ## The fields
 
@@ -62,7 +65,7 @@ Marketing and a message such as:
 Northwind: You left something in your cart. Finish your order here: https://shop.example.com/cart Reply STOP to opt out
 ```
 
-Start the text with your brand name and end it with how to opt out. Use your own domain for the link:
+Start the text with your brand name, since nothing adds it for you. The STOP line is already in this example, so nothing is added to it. Use your own domain for the link:
 public shorteners like bit.ly get a content warning, and carriers often filter them.
 
 ## Related docs
