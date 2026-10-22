@@ -34,18 +34,33 @@ A merge can be undone for 180 days. After that the **Undo** button is gone and t
 ## See who a contact matches
 {/* SCREENSHOT: Matches block in the contact side panel · desktop */}
 
-The **Matches** block in a contact's side panel lists the records tied to that person. The same block appears in an order's details, under **Customer information**, for the person who placed the order.
+The **Matches** block lists the records tied to one person, and why. It appears in three places: a contact's side panel, an order's details under **Customer information**, and a session page (**Reports → Clicks → a session**), under the customer details. Every link in the block opens in a new tab, so you keep your place.
 
+- **Recognised as** (session page): the contact this visit belongs to, and how the link was made: an order, a form, a members login, an import or a merge.
 - **Merged contacts**: how many contacts were merged into this one and when the latest merge happened. **View merges** opens the Merges tab, where each merge can be undone.
-- **Possible duplicates**: contacts in this brand that look like the same person, with the reason (same phone, same visitor profile, a shared order). Click **Open** to check one, then merge it from the Merges tab if it is the same person.
-- **Other brands**: contacts with the same email address or phone number in other brands of your organization. Seeing a match here merges nothing.
+- **Possible duplicates**: contacts in this brand that look like the same person, each with its reason (the same phone, the same browser and visitor profile, a shared order) and when it was first seen. Several suggestions with the same name are grouped, and each shows its email so you can tell them apart.
+- **Other brands**: contacts with the same email address or phone number in other brands of your organization, with that brand's order count and revenue. **Open** shows the contact in that brand. Each brand keeps its own contacts, consent and lists, so contacts are never merged across brands.
 
 Each line has a label. **Confirmed** means the same email or phone, or a merge someone on your team made. **Likely** means a hint that a person should check before merging. Hover a label to see what it means.
 
 Matches only look inside your organization. Brands of another organization are never checked, even when they belong to the same person. If the match is in a brand of your organization that you can't open, you see only a count, with no brand name, contact or link. Contact names from another brand are masked unless you can see unmasked contact details in that brand.
 
+## Act on a possible duplicate
+{/* SCREENSHOT: Possible duplicates with Merge and Not the same person · desktop */}
+
+Each possible duplicate has two actions:
+
+- **Merge** asks once, then merges that contact into the one you are on. You can undo it from the **Merges** tab for 180 days.
+- **Not the same person** closes the suggestion for good. It is recorded with your name and does not come back.
+
+The **Merges** tab also lists every open suggestion under **Suggested duplicates**, with the same two actions. **Review in the Merges tab** in the Matches block takes you there.
+
+## Same-browser hint
+
+On a contact page and a session page, **Check other brands** looks for the same browser on other brands of your organization. A shared or family device looks the same, so this is always labelled **Likely**: it shows the brand and how many visitor profiles, never a person, and a brand you can't open is only counted. This signal is in a pilot, so you only see the button where it is switched on.
+
 To build an audience from these matches (open duplicates, recent merges, people who are also contacts in your other brands), use the [identity match rule](/analytics/audience-identity-matches).
 
 ## Who can merge
 
-Merging and undoing need permission to edit customers. To see the emails of the contacts you are merging, you also need the **See unmasked** permission on the **Contact details** row; without it the search results are masked.
+Merging, undoing and **Not the same person** need permission to edit customers. To see the emails of the contacts you are merging, you also need the **See unmasked** permission on the **Contact details** row; without it the search results are masked.
