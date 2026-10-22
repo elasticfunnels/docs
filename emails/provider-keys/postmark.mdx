@@ -1,0 +1,34 @@
+---
+title: "Where to find your Postmark server API token"
+sidebarTitle: "Postmark"
+description: "Find the Postmark server API token and the message stream names ElasticFunnels asks for."
+---
+
+A Postmark sending account asks for a **Server API token**, a **Transactional stream** and a **Broadcast
+stream**. Keys you save are stored encrypted and never shown again.
+
+## Server API token
+
+<Steps>
+  <Step title="Open your server">
+    Log in to [Postmark](https://account.postmarkapp.com) and open the server you send from under
+    **Servers**.
+  </Step>
+  <Step title="Copy the token">
+    Go to the **API Tokens** tab and copy the **Server API token**. Use the server token, not the account
+    token.
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    Paste it into **Server API token**. It is checked with Postmark when you save.
+  </Step>
+</Steps>
+
+Postmark's own guide: [API overview](https://postmarkapp.com/developer/api/overview).
+
+## Message streams
+
+Each Postmark server has message streams, listed on the server's **Message Streams** tab. Order and
+subscription emails go through the **Transactional stream** (`outbound` by default). Campaigns go through
+the **Broadcast stream**, so create one in Postmark if the server has none and enter its ID.
+
+See also [Connect Postmark](/emails/sending-accounts#connect-postmark).

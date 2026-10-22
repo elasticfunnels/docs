@@ -334,7 +334,19 @@
                       "emails/sending-setup",
                       "emails/sending-accounts",
                       "emails/delivery-events",
-                      "emails/troubleshooting"
+                      "emails/troubleshooting",
+                      {
+                        "group": "Provider keys",
+                        "pages": [
+                          "emails/provider-keys/mailgun",
+                          "emails/provider-keys/sendgrid",
+                          "emails/provider-keys/amazon-ses",
+                          "emails/provider-keys/postmark",
+                          "emails/provider-keys/brevo",
+                          "emails/provider-keys/resend",
+                          "emails/provider-keys/mailrelay"
+                        ]
+                      }
                     ]
                   },
                   {
@@ -406,6 +418,15 @@
                       "integrations/plivo",
                       "integrations/telnyx",
                       "settings/sms",
+                      {
+                        "group": "SMS provider keys",
+                        "pages": [
+                          "emails/provider-keys/twilio",
+                          "emails/provider-keys/plivo",
+                          "emails/provider-keys/telnyx",
+                          "emails/provider-keys/slicktext"
+                        ]
+                      },
                       "integrations/slicktext",
                       "integrations/attentive"
                     ]

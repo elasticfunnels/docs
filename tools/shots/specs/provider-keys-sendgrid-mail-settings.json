@@ -1,0 +1,13 @@
+{
+  "out": "images/emails/provider-keys/sendgrid-mail-settings.png",
+  "alt": "SendGrid's Mail Settings page with the Event Webhooks entry under Webhook Settings",
+  "_source": "Claude in Chrome on the owner's SendGrid account, read-only, API key name and ID blurred, trial banners hidden",
+  "image": "tools/shots/source/sendgrid-mail-settings.png",
+  "imageSize": { "w": 1456, "h": 756 },
+  "maxWidth": 900,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [6, 632, 76, 22], "title": "1. Mail Settings", "text": "Under Settings", "side": "left" },
+    { "box": [182, 179, 1244, 49], "title": "2. Event Webhooks", "text": "Where the verification key lives" }
+  ]
+}

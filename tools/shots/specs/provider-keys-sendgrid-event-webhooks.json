@@ -1,0 +1,12 @@
+{
+  "out": "images/emails/provider-keys/sendgrid-event-webhooks.png",
+  "alt": "SendGrid's Event Webhook page with no webhooks yet and the Create new webhook button",
+  "_source": "Claude in Chrome on the owner's SendGrid account, read-only, API key name and ID blurred, trial banners hidden",
+  "image": "tools/shots/source/sendgrid-event-webhooks.png",
+  "imageSize": { "w": 1304, "h": 520 },
+  "maxWidth": 860,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [250, 393, 147, 35], "title": "1. Create new webhook", "text": "Only for manual setup" }
+  ]
+}

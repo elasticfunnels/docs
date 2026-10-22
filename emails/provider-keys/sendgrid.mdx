@@ -1,0 +1,72 @@
+---
+title: "Where to find your SendGrid API key and verification key"
+sidebarTitle: "SendGrid"
+description: "Create a SendGrid API key with the right permissions, and find the Event Webhook verification key that lets ElasticFunnels trust delivery events."
+---
+
+A SendGrid sending account in ElasticFunnels asks for an **API key**. To see opens, clicks and bounces in
+campaign reports it also needs the **Verification key (public key)** of a signed Event Webhook. Keys you save
+are stored encrypted and never shown again.
+
+<Tip>
+With the right API key you can skip the verification key. In **Emails** → **Campaign settings**, open the
+account's **Delivery stats** and click **Connect** under **Connect automatically**. ElasticFunnels uses the
+saved API key to create a signed event webhook in SendGrid and saves its verification key. It is safe to run
+again. If SendGrid has no free webhook slot left, it asks before replacing the one in use. If the key may
+not manage webhooks, follow **Set it up by hand** on the same screen.
+</Tip>
+
+## API key
+
+<Steps>
+  <Step title="Open API Keys">
+    Log in to [SendGrid](https://app.sendgrid.com) and go to **Settings** → **API Keys**.
+  </Step>
+  <Step title="Create the key">
+    Click **Create API Key**, name it (for example "ElasticFunnels") and choose **Custom Access**. Give
+    **Mail Send** full access. For one-click webhook setup, also give **Mail Settings** full access: that
+    is where the Event Webhook lives. **Full Access** works too.
+  </Step>
+  <Step title="Copy it once">
+    Click **Create & View** and copy the key. SendGrid shows it only once. It starts with `SG.`
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    Paste it into **API key** on the account. It is checked with SendGrid when you save.
+  </Step>
+</Steps>
+
+<img src="/images/emails/provider-keys/sendgrid-api-keys.png" alt="SendGrid's API Keys page under Settings, with the Create API Key button" />
+
+A key with only **Mail Send** still sends every email. ElasticFunnels just cannot set the webhook for you,
+so you create it by hand and paste the verification key (next section).
+
+SendGrid's own guide: [API keys](https://www.twilio.com/docs/sendgrid/ui/account-and-settings/api-keys).
+
+## Verification key
+
+SendGrid signs Event Webhook requests when **Signed Event Webhook** is on. The public key that checks those
+signatures is the verification key.
+
+<Steps>
+  <Step title="Open Event Webhooks">
+    Go to **Settings** → **Mail Settings** and click **Event Webhooks** under **Webhook Settings**.
+
+    <img src="/images/emails/provider-keys/sendgrid-mail-settings.png" alt="SendGrid's Mail Settings page with the Event Webhooks entry under Webhook Settings" />
+  </Step>
+  <Step title="Create or edit the webhook">
+    Click **Create new webhook**, or edit the one ElasticFunnels should use. Paste the webhook URL shown in
+    the account's **Delivery stats** under **Set it up by hand**, and choose the events delivered, open,
+    click, bounce, dropped, spam report and unsubscribe.
+
+    <img src="/images/emails/provider-keys/sendgrid-event-webhooks.png" alt="SendGrid's Event Webhook page with no webhooks yet and the Create new webhook button" />
+  </Step>
+  <Step title="Turn on signing">
+    Turn on **Signed Event Webhook** and save. The **Signature verification** section of the webhook then
+    shows the public key.
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    Copy that key and paste it into **Verification key (public key)** in **Delivery stats**, then save.
+  </Step>
+</Steps>
+
+SendGrid's own guide: [Event Webhook security features](https://www.twilio.com/docs/sendgrid/for-developers/tracking-events/getting-started-event-webhook-security-features).
