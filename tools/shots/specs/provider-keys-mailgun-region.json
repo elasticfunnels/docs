@@ -1,0 +1,36 @@
+{
+  "out": "images/emails/provider-keys/mailgun-region.png",
+  "alt": "Mailgun's region switch at the top of the dashboard, open, with US and EU",
+  "_source": "tools/shots/third-party/mailgun.mjs (owner's Mailgun account, app-access profile mailgun), domain list hidden, account name blurred",
+  "image": "tools/shots/source/mailgun-region.png",
+  "imageSize": {
+    "w": 416,
+    "h": 170
+  },
+  "maxWidth": 620,
+  "calloutWidth": 200,
+  "annotations": [
+    {
+      "box": [
+        16,
+        9,
+        94,
+        38
+      ],
+      "title": "1. Region",
+      "text": "The region you are viewing",
+      "side": "left"
+    },
+    {
+      "box": [
+        20,
+        124,
+        140,
+        38
+      ],
+      "title": "2. EU",
+      "text": "Domains added in the EU region",
+      "side": "left"
+    }
+  ]
+}

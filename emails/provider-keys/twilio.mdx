@@ -1,0 +1,32 @@
+---
+title: "Where to find your Twilio Account SID and API key"
+sidebarTitle: "Twilio"
+description: "Find your Twilio Account SID and create the API key and secret ElasticFunnels uses to send texts."
+---
+
+The Twilio integration asks for an **Account SID**, an **API Key** and an **API Secret**. The secret is
+stored encrypted and never shown again.
+
+## Account SID
+
+Log in to the [Twilio Console](https://console.twilio.com). The **Account SID** is in the **Account Info**
+box on the home page. It starts with `AC`. Copy it into **Account SID**.
+
+## API key and secret
+
+<Steps>
+  <Step title="Open API keys">
+    In the Console, open your account settings and go to **API keys & tokens**.
+  </Step>
+  <Step title="Create a Standard key">
+    Click **Create API key**, name it (for example "ElasticFunnels") and keep the type **Standard**.
+  </Step>
+  <Step title="Copy both values">
+    Copy the key's **SID** (it starts with `SK`) into **API Key** and the **Secret** into **API Secret**.
+    Twilio shows the secret only once.
+  </Step>
+</Steps>
+
+Twilio's own guide: [API keys in the Console](https://www.twilio.com/docs/iam/api-keys/keys-in-console).
+
+Setting up numbers, senders and registration: [Twilio integration](/integrations/twilio).

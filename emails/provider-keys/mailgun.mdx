@@ -1,0 +1,76 @@
+---
+title: "Where to find your Mailgun API key and webhook signing key"
+sidebarTitle: "Mailgun"
+description: "Create a Mailgun private API key, find the HTTP webhook signing key, and pick the right region (US or EU) for your sending domain."
+---
+
+A Mailgun sending account in ElasticFunnels asks for a **Private API key** and a **Sending domain**. To see
+opens, clicks and bounces in campaign reports it also needs the **HTTP webhook signing key**, and the
+**Mailgun region** has to match your domain. Keys you save are stored encrypted and never shown again.
+
+<Tip>
+You usually do not need to copy the signing key yourself. In **Emails** → **Campaign settings**, open the
+account's **Delivery stats** and click **Connect** under **Connect automatically**. ElasticFunnels uses the
+saved API key to add its webhook to your sending domain and saves the signing key for you. It is safe to run
+again: it adds what is missing, updates an old ElasticFunnels URL and keeps webhooks you added yourself. If
+your domain already uses all three URL slots Mailgun allows per event, it asks before replacing one. If the
+API key may not manage webhooks, follow the steps under **Set it up by hand** on the same screen.
+</Tip>
+
+## API key
+
+<Steps>
+  <Step title="Open API Security">
+    Log in to [Mailgun](https://app.mailgun.com). Click your account name at the top right and choose
+    **API Security**.
+
+    <img src="/images/emails/provider-keys/mailgun-account-menu.png" alt="Mailgun's account menu opened from the top right, with API Security near the bottom" />
+  </Step>
+  <Step title="Create a key">
+    On the **API keys** page, click **Create key**, give it a description such as "ElasticFunnels" and
+    create it. Copy the key straight away: Mailgun shows it in full only once.
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    Paste it into **Private API key**, and enter the **Sending domain** exactly as it appears under
+    **Sending** → **Domains** in Mailgun. The key is checked with Mailgun when you save.
+  </Step>
+</Steps>
+
+<img src="/images/emails/provider-keys/mailgun-api-keys.png" alt="Mailgun's API keys page: the Create key button and the HTTP webhook signing key box with its copy icon" />
+
+Mailgun's own guide: [API key management](https://documentation.mailgun.com/docs/mailgun/user-manual/api-key-mgmt/rbac-mgmt).
+
+## Webhook signing key
+
+Mailgun signs every webhook it sends with one key per account. ElasticFunnels uses it to check that delivery
+events really come from Mailgun, and refuses events it cannot verify.
+
+<Steps>
+  <Step title="Find the key">
+    Open **API Security** again from the account menu. The **HTTP webhook signing key** sits below your API
+    keys.
+  </Step>
+  <Step title="Copy it">
+    Click the copy icon next to the key. Do not click rotate: a new key stops events until you paste it into
+    ElasticFunnels too.
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    In the account's **Delivery stats**, paste it into **HTTP webhook signing key** and save.
+  </Step>
+</Steps>
+
+Mailgun's own guide: [Securing webhooks](https://documentation.mailgun.com/docs/mailgun/user-manual/webhooks/securing-webhooks).
+
+## Domain and region
+
+Mailgun keeps US and EU domains apart. A domain created in the EU region lives on `api.eu.mailgun.net`,
+and the US API does not know it. So when your domain is an EU one, set **Mailgun region** on the account in
+ElasticFunnels to **EU (api.eu.mailgun.net)**; for a US domain pick **US (api.mailgun.net)**. One-click
+setup uses the same setting.
+
+To check which region a domain is in, use the region switch in the top bar of Mailgun and look under
+**Sending** → **Domains**: the domain is listed in the region it belongs to.
+
+<img src="/images/emails/provider-keys/mailgun-region.png" alt="Mailgun's region switch in the top bar opened, showing US and EU" />
+
+If saving or sending says the sending domain was not found, the region is the usual cause.

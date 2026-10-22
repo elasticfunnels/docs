@@ -1,0 +1,30 @@
+---
+title: "Where to find your Plivo Auth ID and Auth Token"
+sidebarTitle: "Plivo"
+description: "Find the Plivo Auth ID and Auth Token ElasticFunnels uses to send texts and check Plivo's webhooks."
+---
+
+The Plivo integration asks for an **Auth ID** and an **Auth Token**. The token is stored encrypted and never
+shown again.
+
+## Auth ID and Auth Token
+
+<Steps>
+  <Step title="Open the console overview">
+    Log in to the [Plivo console](https://console.plivo.com/dashboard/). Both values are on the overview page,
+    in the account box.
+  </Step>
+  <Step title="Copy the Auth ID">
+    Copy it into **Auth ID**. It is 20 characters and starts with `MA` (main account) or `SA` (subaccount).
+  </Step>
+  <Step title="Copy the Auth Token">
+    Click the eye icon to reveal the **Auth Token**, copy it into **Auth Token** and save.
+  </Step>
+</Steps>
+
+Plivo also signs its webhooks with the Auth Token. If you regenerate the token in Plivo, paste the new one in
+ElasticFunnels as well, or replies and delivery reports are refused.
+
+Plivo's own guide: [Account API overview](https://plivo.com/docs/account/api/overview).
+
+Setting up numbers and senders: [Plivo integration](/integrations/plivo).

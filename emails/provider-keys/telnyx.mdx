@@ -1,0 +1,33 @@
+---
+title: "Where to find your Telnyx API key and public key"
+sidebarTitle: "Telnyx"
+description: "Create a Telnyx V2 API key and find the public key ElasticFunnels uses to check Telnyx webhooks."
+---
+
+The Telnyx integration asks for an **API key** and a **Webhook public key**. Saved keys are stored encrypted
+and never shown again.
+
+## API key
+
+<Steps>
+  <Step title="Open Keys & Credentials">
+    Log in to the [Telnyx portal](https://portal.telnyx.com/#/api-keys) and open **Keys & Credentials** →
+    **API Keys**.
+  </Step>
+  <Step title="Create a key">
+    Click **Create API Key** and copy it. It is a V2 key and starts with `KEY`. Telnyx shows it only once.
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    Paste it into **API key**.
+  </Step>
+</Steps>
+
+## Webhook public key
+
+On the same **Keys & Credentials** page, open the **Public Key** tab and copy the key (44 characters, ending
+in `=`) into **Webhook public key**. Telnyx signs every webhook it sends, and ElasticFunnels checks replies
+and delivery reports with this key.
+
+Telnyx's own guide: [Create API keys](https://developers.telnyx.com/docs/development/api-fundamentals/create-api-keys).
+
+Setting up numbers, messaging profiles and registration: [Telnyx integration](/integrations/telnyx).

@@ -1,0 +1,13 @@
+{
+  "out": "images/emails/provider-keys/mailgun-account-menu.png",
+  "alt": "Mailgun's account menu at the top right, open, with API Security under Account settings",
+  "_source": "tools/shots/third-party/mailgun.mjs (owner's Mailgun account, app-access profile mailgun), account name and plan blurred",
+  "image": "tools/shots/source/mailgun-account-menu.png",
+  "imageSize": { "w": 304, "h": 770 },
+  "maxWidth": 560,
+  "calloutWidth": 200,
+  "annotations": [
+    { "box": [51, 2, 239, 54], "title": "1. Account menu", "text": "Your name, top right", "side": "left" },
+    { "box": [9, 402, 280, 33], "title": "2. API Security", "text": "Opens the API keys page", "side": "left" }
+  ]
+}

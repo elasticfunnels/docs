@@ -1,0 +1,14 @@
+{
+  "out": "images/emails/provider-keys/mailgun-api-keys.png",
+  "alt": "Mailgun's API keys page: the Create key button and the HTTP webhook signing key box with its copy icon",
+  "_source": "tools/shots/third-party/mailgun.mjs (owner's Mailgun account, app-access profile mailgun), key IDs, descriptions and the signing key blurred",
+  "image": "tools/shots/source/mailgun-api-keys.png",
+  "imageSize": { "w": 1176, "h": 660 },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [1034, 86, 101, 38], "title": "1. Create key", "text": "A new private API key" },
+    { "box": [36, 460, 1104, 180], "title": "2. Signing key", "text": "HTTP webhook signing key" },
+    { "box": [1016, 549, 36, 36], "title": "3. Copy", "text": "Copies the signing key" }
+  ]
+}

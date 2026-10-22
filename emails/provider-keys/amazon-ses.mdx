@@ -1,0 +1,48 @@
+---
+title: "Where to find your Amazon SES access key"
+sidebarTitle: "Amazon SES"
+description: "Create an IAM user and access key for Amazon SES, or SMTP credentials, and find the region and configuration set ElasticFunnels asks for."
+---
+
+An Amazon SES sending account asks for an **Access key ID**, a **Secret access key**, the **Region** and a
+**Configuration set**. Keys you save are stored encrypted and never shown again.
+
+## Access key ID and secret access key
+
+<Steps>
+  <Step title="Create an IAM user">
+    In the AWS console, open **IAM** → **Users** → **Create user**. Give it a name such as
+    "elasticfunnels-ses". It does not need console access.
+  </Step>
+  <Step title="Give it SES permissions">
+    Attach a policy that allows `ses:SendEmail` and `ses:GetAccount`. ElasticFunnels checks the key with
+    `GetAccount` when you save and sends with `SendEmail`.
+  </Step>
+  <Step title="Create the access key">
+    Open the user, go to the **Security credentials** tab and click **Create access key**. Copy the
+    **Access key ID** and the **Secret access key**. AWS shows the secret only once.
+  </Step>
+  <Step title="Paste both in ElasticFunnels">
+    Paste them into **Access key ID** and **Secret access key**.
+  </Step>
+</Steps>
+
+If you already use SES over SMTP, the SMTP password from **SES** → **SMTP settings** → **Create SMTP
+credentials** also works as the **Secret access key**, with the SMTP user name as the **Access key ID**.
+
+AWS guides: [Create an IAM user](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html),
+[Manage access keys](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html),
+[SES SMTP credentials](https://docs.aws.amazon.com/ses/latest/dg/smtp-credentials.html).
+
+## Region
+
+Pick the region your SES identities (verified domains and addresses) are in. It shows in the top right of
+the SES console. Identities are per region, so a domain verified in `us-east-1` cannot send from
+`eu-west-1`.
+
+## Configuration set
+
+Opens, clicks and bounces need a configuration set that sends events to Amazon SNS. Create it under
+**SES** → **Configuration sets**, then follow [Amazon SES: three steps in AWS](/emails/delivery-events#amazon-ses-three-steps-in-aws).
+
+See also [Connect Amazon SES](/emails/sending-accounts#connect-amazon-ses).

@@ -1,0 +1,33 @@
+---
+title: "Where to find your Resend API key and webhook signing secret"
+sidebarTitle: "Resend"
+description: "Create a Resend API key with the right permission, and find the webhook signing secret when you add the webhook yourself."
+---
+
+A Resend sending account asks for an **API key**, and in some cases a **Webhook signing secret**. Keys you save are stored encrypted and never shown again.
+
+## API key
+
+<Steps>
+  <Step title="Open API Keys">
+    Log in to [Resend](https://resend.com) and open **API Keys**.
+  </Step>
+  <Step title="Create the key">
+    Click **Create API Key** and name it. Pick the permission:
+    - **Full access** lets ElasticFunnels add the delivery webhook itself.
+    - **Sending access** is enough to send, but you add the webhook by hand (next section).
+  </Step>
+  <Step title="Paste it in ElasticFunnels">
+    Copy the key (it starts with `re_`; Resend shows it only once) and paste it into **API key**.
+  </Step>
+</Steps>
+
+Resend's own guide: [Create an API key](https://resend.com/docs/create-an-api-key).
+
+## Webhook signing secret
+
+Only needed with a sending-access key. Add a webhook in Resend under **Webhooks** with the URL ElasticFunnels
+shows, then open it: the signing secret is on the webhook's details page and starts with `whsec_`. Paste
+it into **Webhook signing secret**. Details in [Resend with a sending-only key](/emails/delivery-events#resend-with-a-sending-only-key).
+
+Resend's own guide: [Verify webhook requests](https://resend.com/docs/webhooks/verify-webhooks-requests).

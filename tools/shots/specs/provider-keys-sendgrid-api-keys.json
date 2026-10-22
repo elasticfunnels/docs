@@ -1,0 +1,14 @@
+{
+  "out": "images/emails/provider-keys/sendgrid-api-keys.png",
+  "alt": "SendGrid's API Keys page under Settings, with the Create API Key button",
+  "_source": "Claude in Chrome on the owner's SendGrid account, read-only, API key name and ID blurred, trial banners hidden",
+  "image": "tools/shots/source/sendgrid-api-keys.png",
+  "imageSize": { "w": 1456, "h": 756 },
+  "maxWidth": 900,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [10, 421, 140, 40], "title": "1. Settings", "text": "Open Settings in the left menu", "side": "left" },
+    { "box": [6, 514, 60, 22], "title": "2. API Keys", "text": "Your existing keys", "side": "left" },
+    { "box": [1299, 55, 127, 34], "title": "3. Create API Key", "text": "Name it, pick Custom Access" }
+  ]
+}
