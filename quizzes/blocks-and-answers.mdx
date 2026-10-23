@@ -33,6 +33,16 @@ The visitor can answer the **Height** block in feet and inches or in centimetres
 
 So a visitor who enters 5'10" is stored as 177.8, and 180 lb as 81.6.
 
+Weights can be typed with one decimal (95.5 kg). Switching units keeps the value exact, so 200 lb shows as 90.7 kg and switches back to 200 lb.
+
+Settings on both blocks:
+
+| Setting | What it does |
+|---------|--------------|
+| **Share units with other measure blocks** | One unit switch for the screen: when the visitor switches a block to kg, every other block with this setting moves too, for example current weight and goal weight. |
+| **Show unit switch** | Shows the unit switch on the block. Turn it off on the second block of a pair so the screen has one switch. |
+| **Boxed inputs on mobile (input type)** | With **Type** set to **Input**, phones get the same typed boxes as desktop instead of the ruler. Off by default. |
+
 The unit details are available as variables, where `<id>` is the block's ID:
 
 | Variable | Value |
@@ -71,6 +81,8 @@ The visitor cannot go on until the screen's answers pass these checks. The messa
 | **Multiple Choice** (or a choice block with **Allow multiple choice**) | **Minimum selections**, **Maximum selections** | The visitor picked at least the minimum and at most the maximum. 0 or blank means no limit. |
 
 Fields marked required must be filled in, and an email field needs a valid address.
+
+To keep the button greyed out until those checks pass, select the screen's **Button** block and tick **Disabled until the screen is answered**. The button then waits for a valid answer without showing an error message. Off by default.
 
 ## Videos, links and HTML
 
@@ -149,6 +161,10 @@ Text on a coloured fill is picked to stay readable on that colour: white on dark
 - On each new screen, focus moves to its heading and screen readers hear "Step 2 of 8" (with the real numbers). The progress bar is announced too, and the Back button is read as "Go back".
 - Lead fields are a real form with labels, so browsers can fill in name, email and phone, and Enter submits the screen. When a field has an error, the error is announced and focus moves to the first field to fix.
 - Age, height and weight show their error message under the picker when Continue fails (for example "Age must be at least 16.").
+
+## Answers in your CRM
+
+With **Sync to CRM** on in the quiz builder's **CRM** tab, each quiz session creates or updates one CRM entry. A multiple choice answer arrives with every pick the visitor made, and long text answers arrive in full. When the quiz ends in a redirect, the quiz is marked complete before the visitor leaves.
 
 ## What visitors do not see
 
