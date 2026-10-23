@@ -42,9 +42,9 @@ The body text also escalates, becoming more urgent with each retry. The template
 
 - Subscription details (product, amount, card on file, next retry date)
 - Support contact box with phone and email
-- "Update Payment Method" CTA
+- An "Update Payment Method" button that opens your `/members` page. There is no card form there yet, so edit the button to point to your support email or phone.
 
-Use the `subscription.retry_count` variable with `@if` directives to customize urgency levels further.
+It is sent after every failed attempt until the subscription is canceled; from the 5th failed attempt it carries the red Final Notice banner. Use the `subscription.retry_count` variable with `@if` directives to customize urgency levels further.
 
 ## Pre-Renewal Reminder
 {/* SCREENSHOT: Pre-Renewal Reminder · email editor or template settings · desktop */}

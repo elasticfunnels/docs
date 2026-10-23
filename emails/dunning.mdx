@@ -37,6 +37,10 @@ On the default schedule, ElasticFunnels adjusts the waits to the reason the card
 
 American Express and Discover cards get one extra day on every wait. The number of attempts never changes, only the timing. If you set your own schedule on the merchant, ElasticFunnels uses it as entered (plus the card-brand day).
 
+### Other stored cards first
+
+When an NMI renewal is declined, ElasticFunnels immediately tries the customer's other cards stored in the brand; for Stripe, the other cards on the Stripe customer. A card that succeeds becomes the subscription's card, and the retry schedule never starts.
+
 ## Configuring the retry schedule
 {/* SCREENSHOT: Settings → Merchants → merchant → Email tab → Dunning Configuration · desktop */}
 
@@ -48,6 +52,8 @@ The schedule is set per merchant. Go to **Settings** → **Merchants**, open the
 - **Send to Callcenter on Cancel**: also send dunning cancellations to your call center
 
 Dunning Configuration shows on NMI and Stripe merchants. PayPal and Authorize.net subscriptions renew and retry too, on the default schedule.
+
+An active organization or brand schedule under **Call Center** → **Billing** → **Dunning** overrides the merchant's schedule. Its offsets are in hours and are rounded up to whole days.
 
 ## Escalating email urgency
 {/* SCREENSHOT: Escalating email urgency · email editor or template settings · desktop */}
@@ -69,6 +75,12 @@ The `renewal-failed` template uses the `subscription.retry_count` variable to es
 @endif
 ```
 
+`retry_count` counts the failed renewal as 1. From the 5th failed attempt the email shows a red **Final Notice** banner, so with the default Max Retries of 6 the email after attempt 5 is the final notice. If attempt 6 fails, the Subscription Canceled email goes out instead.
+
+<Warning>
+There is no page yet where a customer can enter a new card. The default template's **Update Payment Method** button opens your `/members` page, which has no card form, so edit the button to point to your support email or phone.
+</Warning>
+
 ## Dunning final notice
 {/* SCREENSHOT: Dunning final notice · email editor or template settings · desktop */}
 
@@ -83,7 +95,7 @@ yet, and new brands do not get it. Brands that already have it can edit it. It f
 ## Callcenter escalation
 {/* SCREENSHOT: Callcenter escalation · email editor or template settings · desktop */}
 
-If you have the Callcenter module enabled, failed payments can be escalated to your support team automatically. When a renewal has failed the number of times set in **Callcenter Escalation After Retry #**, the event is sent to your call center integrations so an agent can call the customer.
+If you have the Callcenter module enabled, failed payments can be escalated to your support team automatically. When a renewal has failed the number of times set in **Callcenter Escalation After Retry #**, the event is sent to your call center integrations so an agent can call the customer. The count includes the failed renewal, so the default of 3 escalates when retry 2 fails. With the in-house call center connected (the Organization Callcenter integration), agents get the lead one at a time in the Agent Workstation.
 
 Set it on the merchant's **Email** tab, in **Dunning Configuration** (see above). Each [call center integration](/integrations/callcenters) decides which events it receives.
 

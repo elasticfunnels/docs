@@ -5,45 +5,61 @@ icon: "envelope"
 description: 'Configure lifecycle emails for renewals, failed payments, pre-renewal reminders, pauses, and cancellations'
 ---
 
-ElasticFunnels sends automated emails at key points in the subscription lifecycle. The dunning system automatically retries failed charges on a configurable schedule and escalates to your call center if needed.
+ElasticFunnels sends automated emails at key points in the subscription lifecycle. When a renewal charge fails, the dunning system retries it on a schedule, emails the subscriber after each failed attempt, and can pass the subscriber to your call center.
 
 ## Subscription Email Templates
 
-Five subscription-specific email templates are available:
+Five subscription-specific email templates are sent:
 
 <CardGroup cols={2}>
   <Card title="Renewal Success" icon="circle-check">
     Sent after a successful subscription charge. Confirms the renewal and shows the next billing date.
   </Card>
   <Card title="Renewal Failed" icon="circle-exclamation">
-    Sent when a charge fails. Supports retry-aware messaging so the tone escalates with each attempt.
+    Sent after every failed charge attempt until the subscription is canceled. The tone escalates with each attempt and ends in a final notice.
   </Card>
   <Card title="Pre-Renewal Reminder" icon="bell">
-    Sent 3 days before the next charge. Gives customers time to update their card or make changes.
+    Sent 3 days before the next charge, so the customer knows the charge is coming and can contact you first.
   </Card>
   <Card title="Subscription Paused" icon="circle-pause">
     Confirms that billing has been paused. Shows the resume date if one is set.
   </Card>
   <Card title="Subscription Canceled" icon="circle-xmark">
-    Confirms cancellation. Includes a soft win-back CTA.
+    Confirms cancellation, including a cancel after the last retry fails. Includes a soft win-back CTA.
   </Card>
 </CardGroup>
 
-### Retry-Aware Dunning Emails
+<Note>
+Older brands also have **Dunning Final Notice** (`dunning-final`) and **Payment Method Expiring** (`payment-method-expiring`) templates, and **Settings** → **Subscriptions** has pickers for them. Nothing sends either one today, so a choice saved there has no effect. The final notice is part of the Renewal Failed email instead (see below).
+</Note>
 
-The renewal failed template can show different messaging based on how many retry attempts have occurred, using `@if` directives in the template editor:
+### How Renewal Failed escalates
+
+The default `renewal-failed` template changes with `subscription.retry_count`, the number of failed attempts so far. The failed renewal itself is attempt 1.
+
+| Failed attempts | What the email says |
+|-----------------|---------------------|
+| 1 and 2 | A gentle note that the payment didn't go through and will be tried again |
+| 3 and 4 | The payment could not be processed, with a request for a new card |
+| 5 and more | A red **Final Notice** banner: the subscription will be canceled |
+
+With the default Max Retries of 6, the email after attempt 5 is the final notice and the last Renewal Failed email. If attempt 6 fails, the subscription is canceled and the Subscription Canceled email goes out instead.
+
+You can edit the wording in the email editor. The conditions in the default template look like this:
 
 ```
-@if(subscription.retry_count eq 1)
-  We had trouble processing your payment. Don't worry — we'll try again soon.
-@elseif(subscription.retry_count eq 3)
-  Your payment could not be processed. Please update your payment method.
-@elseif(subscription.retry_count gte 5)
-  Final notice: Your subscription will be canceled unless you update your payment method.
+@if(subscription.retry_count gte 5)
+  Final notice: your subscription will be canceled.
+@elseif(subscription.retry_count gte 3)
+  Your payment could not be processed.
+@else
+  We had trouble processing your payment. We'll try again soon.
 @endif
 ```
 
-This lets you start gentle and escalate the urgency as retries continue.
+<Warning>
+There is no page yet where a customer can enter a new card. The default template's **Update Payment Method** button opens your `/members` page, which has no card form. Edit that button to point to your support email or phone number, so a customer who wants to keep the subscription can reach you. The template also prints `brand.support_phone` and `brand.support_email` when they are set in Brand Settings.
+</Warning>
 
 ### Template Variables
 
@@ -95,7 +111,7 @@ Dunning is the process of retrying failed subscription charges. When a renewal f
 |---------|-------------|---------|
 | **Max Retries** | Failed attempts (the renewal included) before auto-canceling | 6 |
 | **Retry Schedule** | Days to wait after each failed attempt | 1, 3, 5, 7, 10, 14 |
-| **Callcenter Escalation After Retry #** | Escalate to callcenter after this many retries | 3 (set to 0 to disable) |
+| **Callcenter Escalation After Retry #** | Send the subscriber to the call center once this many attempts have failed, the renewal included | 3 (set to 0 to disable) |
 | **Send to Callcenter on Cancel** | Route cancellation events to callcenter | Off |
 
 <Info>
@@ -113,10 +129,26 @@ Each number in the schedule is how many days to wait after a failed attempt befo
 5. **Retry 4 fails**. Retry in 10 days.
 6. **Retry 5 fails**: that is the sixth failed attempt, so the subscription is canceled, about 26 days after the first failure.
 
-On the default schedule the waits also adapt to the decline reason (longer for insufficient funds and for cards that cannot be used again), and American Express and Discover cards get one extra day. A schedule you set yourself is used as entered. See [Dunning](/emails/dunning#retry-timing-follows-the-decline) for the table.
+So the five retries fall on days 1, 4, 9, 16 and 26 after the failed renewal.
+
+On the default schedule the waits also adapt to the decline reason (longer for insufficient funds and for cards that cannot be used again), and American Express and Discover cards get one extra day. A schedule you set yourself is used as entered. See [Dunning](/emails/dunning#retry-timing-follows-the-decline) for the table. In days after the first failure, insufficient funds retries on days 2, 7, 17, 32 and 53, and unusable cards on days 3, 10, 24, 45 and 73.
+
+**Other stored cards are tried at once.** When an NMI renewal is declined, ElasticFunnels immediately tries the customer's other cards stored in the brand; for Stripe, the other cards on the Stripe customer. A card that succeeds becomes the subscription's card, and no retry is needed.
+
+### Where the schedule is set
+
+The first one that applies wins:
+
+1. **Organization or brand schedule**: **Call Center** → **Billing** → **Dunning**. An active schedule there overrides the merchant's. Its offsets are in hours and are rounded up to whole days.
+2. **Merchant schedule**: the merchant's **Email** tab → **Dunning Configuration**. You can edit it on NMI and Stripe merchants only.
+3. **Default**: the decline-aware schedule above, used by every other merchant, PayPal and Authorize.net included.
+
+<Info>
+The hint under Retry Schedule in the app says the days count from the initial failure. The billing job counts each wait from the previous attempt, as described above.
+</Info>
 
 <Tip>
-A healthy dunning recovery rate is 60–80%. If yours is below 50%, try adjusting your retry timing, ensure your renewal-failed emails have a clear "Update Payment Method" button, and consider enabling callcenter escalation.
+Start from the default: retries a few days apart catch a payday or a new monthly limit, while retries hours apart on the same card usually collect the same decline. If the [Dunning Recovery](/subscriptions/analytics) card shows few recoveries, set your support phone and email in Brand Settings so every Renewal Failed email tells customers how to reach you, and turn on call center escalation if you have a team that can call.
 </Tip>
 
 ## Pre-Renewal Reminders
@@ -131,15 +163,15 @@ Pre-renewal emails are recommended for legal compliance in some jurisdictions (e
 
 When a dunning event fires (renewal failed, cancel, winback), it's routed through three layers:
 
-1. **Subscription emails** — the templates described above, sent to the customer directly.
-2. **Merchant-level callcenter gate** — the **Callcenter Escalation After Retry #** / **Send to Callcenter on Cancel** settings decide if a call-center send is attempted.
-3. **Per-integration event config** — each [external call-center integration](/integrations/callcenters) decides which events it actually receives, how long to wait before sending, and which decline codes to filter.
+1. **Subscription emails**: the templates described above, sent to the customer directly.
+2. **Merchant-level callcenter gate**: the **Callcenter Escalation After Retry #** and **Send to Callcenter on Cancel** settings decide if a call-center send is attempted.
+3. **Per-integration event config**: with the in-house call center connected (the Organization Callcenter integration), the lead goes to your agents, who get leads one at a time in the Agent Workstation. Each [external call-center integration](/integrations/callcenters) decides which events it receives, how long to wait before sending, and which decline codes to filter.
 
 ## Further reading
 
 For detailed documentation on email template design, available variables, and editing, see the dedicated [Emails](/emails/overview) section:
 
-- [Email Templates Overview](/emails/overview) — How to create and edit emails
-- [Template Variables](/emails/template-variables) — Complete variable reference
-- [Subscription Emails](/emails/subscription-emails) — Detailed guide for all subscription templates
-- [Dunning](/emails/dunning) — Deep dive on dunning configuration and escalation
+- [Email Templates Overview](/emails/overview): how to create and edit emails
+- [Template Variables](/emails/template-variables): complete variable reference
+- [Subscription Emails](/emails/subscription-emails): detailed guide for all subscription templates
+- [Dunning](/emails/dunning): retry timing by decline type and call center escalation
