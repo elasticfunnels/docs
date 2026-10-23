@@ -10,8 +10,9 @@ The `ef` CLI can build audiences from a SegQL query and run [email](/campaigns/e
 ## Before you start
 
 - Connect the CLI to your project: [Connect the ef CLI](/account/cli-and-api-keys).
+- These commands need `ef` 0.24.0 or later. Check with `ef --version`. If `ef audiences` is not listed in `ef --help`, update with `npm i -g @elasticfunnels/cli@latest`; if it is still missing after that, the release is not out yet.
 - Audiences need the analytics permission and the segment permissions. Campaigns need the email permissions, and SMS needs the SMS integration permissions.
-- Contact details in samples and recipient lists come back masked (`j***@g***.com`, `***0123`) unless your user has the **View contact PII** permission.
+- Contact details in samples and recipient lists come back masked (`j***@g***.com`, `***0123`) unless your role has **See unmasked** on the **Contact details** row (see [who sees emails and phone numbers](/contacts/overview#who-sees-emails-and-phone-numbers)).
 - `ef claude` installs two skills for Claude Code: `ef-segql` (how to write audiences) and `ef-campaigns` (how to send safely).
 
 ## Audiences
