@@ -13,7 +13,7 @@ Follow the steps in order. Each one links to the section that explains it.
 1. [In Explodely: a funnel and one product per offer](#step-0-set-up-your-funnel-and-products-in-explodely), with each **Pro. ID** written down
 2. [In ElasticFunnels: the Explodely merchant](#step-1-create-the-explodely-merchant) with your username
 3. [Your products in ElasticFunnels](#step-2-create-your-products-and-enter-their-explodely-ids), each with its Explodely product ID (and each variant with its own, if it has one)
-4. [Postbacks in Explodely](#step-3-set-up-postbacks-in-explodely): the Global IPN plus three webhooks
+4. [Postbacks in Explodely](#step-3-set-up-postbacks-in-explodely): the Global IPN and Refund IPN URLs, plus three webhooks
 5. [A test sale](#step-4-test-the-connection) with `?testmode=yes`, until the merchant shows **Verified**
 6. [Buy links on your funnel pages](#step-5-put-the-buy-links-on-your-pages)
 
@@ -89,10 +89,10 @@ Later, in **Settings** → **Merchants**, click **Postback Setup** on the Explod
 Postback Setup lists its steps on the left: **Postback URL**, **Seller IPN**, **Webhooks** and **Test**. Use **Next** to move through them. Every URL has its own **Copy** button and is complete, your merchant's secret included:
 
 ```
-https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/<your merchant's secret>
+https://app.elasticfunnels.io/postback/vendor/<postback code>/explodely/<your merchant's secret>?event=sale&type=[type]&orderid=[orderid]&...
 ```
 
-Copy each URL and paste it into Explodely as it is. Nothing in it needs editing. On screen the secret is masked; **Show** reveals it, and **Copy** always copies the whole URL.
+The IPN URL ends in a list of every field Explodely can send, each as a `[placeholder]` such as `[orderid]` or `[customeremail]`. Explodely fills each one in when it sends the IPN, so the order details reach ElasticFunnels whatever else Explodely sends. Copy each URL and paste it into Explodely as it is. Nothing in it needs editing, and nothing needs adding with **Try IPN Builder**. On screen the secret is masked; **Show** reveals it, and **Copy** always copies the whole URL.
 
 <img src="/images/merchants/explodely-ef-setup-url.png" alt="The Postback Setup dialog for Explodely on its first step: the steps list, the complete postback URL with Copy, and the note that it already carries its secret" />
 
@@ -100,16 +100,19 @@ Copy each URL and paste it into Explodely as it is. Nothing in it needs editing.
 
 ### Seller IPN
 
-The IPN sends sales, rebills, refunds and rebill cancels. The **Seller IPN** step in Postback Setup has the URL and these steps.
+The IPN sends sales, rebills, refunds and rebill cancels. The **Seller IPN** step in Postback Setup has two URLs and these steps: the **IPN URL** for sales and rebills, and the **Refund IPN URL** for refunds and rebill cancels.
 
 <img src="/images/merchants/explodely-ef-setup-ipn.png" alt="The Seller IPN step of Postback Setup for Explodely: the complete IPN URL with Copy and the steps in Explodely" />
 
 1. Log in to your Explodely seller account
 2. Open **Seller Hub** → **Settings** and expand **Global IPN** under **Developers**
-3. Paste the IPN URL you copied into **IPN URL**, set **Send IPN** to Yes and **IPN Type** to POST. Leave **Refund IPN** empty.
-4. Click **Update**
+3. Paste the IPN URL you copied into **IPN URL**, set **Send IPN** to Yes and **IPN Type** to POST
+4. Paste the Refund IPN URL into **Refund IPN**
+5. Click **Update**
 
-<img src="/images/merchants/explodely-global-ipn.png" alt="Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Try IPN Builder and Update" />
+Keep **IPN Type** on POST: Explodely then sends its own fields in the request body, next to the placeholders it fills in the URL, and ElasticFunnels reads both.
+
+<img src="/images/merchants/explodely-global-ipn.png" alt="Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Refund IPN, Try IPN Builder and Update" />
 
 ### Webhooks
 
@@ -146,7 +149,7 @@ Explodely webhooks carry no event name, which is why each one needs its own `?ev
 4. Check the sale under **Reports** → **Conversions**.
 
 <Note>
-  **Try IPN Builder** in Explodely's Global IPN section does not send anything to your URL, so it cannot verify the merchant. Its field buttons also append placeholders such as `[orderid]` straight onto the URL, which breaks the secret at the end. Leave the IPN URL exactly as copied from **Postback Setup**.
+  **Try IPN Builder** in Explodely's Global IPN section does not send a test. It builds an IPN URL from placeholders and copies it into **IPN URL** when you click **Submit**, replacing the one you pasted. The URL from **Postback Setup** already has every placeholder, so you don't need the builder. If you used it, paste the URL from **Postback Setup** again and click **Update**.
 </Note>
 
 ## Step 5: Put the buy links on your pages
@@ -195,10 +198,10 @@ A payment link you paste by hand (`https://explodely.com/p/...`) gets `custom1` 
     The URL in Explodely is cut short or out of date (for example after **Make a new URL**). Copy each URL again from **Postback Setup** and paste it over the old one in Explodely, the IPN and all three webhooks.
   </Accordion>
   <Accordion title="The merchant still says Needs Setup">
-    No postback with the right secret has reached ElasticFunnels yet. Check that **Send IPN** is Yes and the IPN URL is the one copied from **Postback Setup**, then place a test sale with `?testmode=yes`. **Try IPN Builder** does not send a postback.
+    No postback with the right secret has reached ElasticFunnels yet. Check that **Send IPN** is Yes and the IPN URL is the one copied from **Postback Setup**, then place a test sale with `?testmode=yes`. **Try IPN Builder** does not send a postback, and a hit on the URL with no order in it (a link preview in a chat app, for example) does not count.
   </Accordion>
   <Accordion title="Every refund appears twice">
-    A refund webhook was added in Seller Hub as well as the IPN. Remove the webhook: refunds come through the IPN.
+    A refund webhook was added in Seller Hub as well as the IPN. Remove the webhook: refunds come through the Refund IPN URL.
   </Accordion>
   <Accordion title="Sales recorded with no click attribution">
     The payment link reached Explodely without `custom1` or `tid`, for example a link built in a script that runs after the page renders. Use a `[BUY=...]` tag, or a plain `explodely.com/p/` link in the page HTML. Inbound payloads are recorded under **Logs** → **Inbound Postbacks**.

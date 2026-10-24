@@ -1,6 +1,6 @@
 {
   "out": "images/merchants/explodely-global-ipn.png",
-  "alt": "Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Try IPN Builder and Update",
+  "alt": "Explodely Settings, Developers, Global IPN with IPN URL, Send IPN, IPN Type, Refund IPN, Try IPN Builder and Update",
   "_source": "Real Explodely seller UI and the ElasticFunnels app (prod, app 6c31ecf30), captured 2026-10-20; account details replaced in the page with generic values (Alex Morgan, acmehealth, alex@example.com, Acme Health) before capture, then cropped. The local app could not render an Explodely merchant.",
   "image": "tools/shots/source/merchants-explodely-global-ipn.png",
   "imageSize": {
@@ -29,7 +29,7 @@
         57
       ],
       "title": "IPN URL",
-      "text": "Paste the ElasticFunnels URL",
+      "text": "Paste the IPN URL from Postback Setup",
       "side": "left"
     },
     {
@@ -62,7 +62,18 @@
         32
       ],
       "title": "Try IPN Builder",
-      "text": "Sends nothing: test with a real sale",
+      "text": "Not needed: the URL has every field",
+      "side": "right"
+    },
+    {
+      "box": [
+        526,
+        425,
+        278,
+        57
+      ],
+      "title": "Refund IPN",
+      "text": "Paste the Refund IPN URL",
       "side": "right"
     },
     {
