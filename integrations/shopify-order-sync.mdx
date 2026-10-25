@@ -74,7 +74,7 @@ These are on the **Shopify** card under **Integrations** → **Operations**. Eve
 | Setting | What it does |
 |---|---|
 | **Sync orders to Shopify** | Sends ElasticFunnels purchases to this store. Merchant and affiliate filters apply while it is on. |
-| **Send test orders** | Sends test orders to Shopify too. Off by default, so test orders stay out of your live store. |
+| **Send test orders** | Sends test orders to Shopify too. Off by default, so test orders stay out of your live store. Test orders arrive tagged `test-order`, with a note that no payment was taken, so you and your fulfillment app can skip them. |
 | **Merge the funnel into one order**: **Max wait (minutes)** | 0 sends each purchase on its own (no merging). Above 0 turns merging on and is the longest an order waits after the first purchase of the session. Maximum 1440 (24 hours). New integrations start at 15. |
 | **Merge the funnel into one order**: **Send early after quiet (minutes)** | Sends the merged order once no new purchase has come in for this long. Default 5. Must be lower than the max wait, otherwise every order waits the full max wait. |
 | **Merchants** | All merchants, a whitelist, or a blacklist of merchants whose orders are sent. |
@@ -269,7 +269,7 @@ If you uninstall the app from Shopify, the integration is disabled and syncing s
   </Accordion>
 
   <Accordion title="Will test orders end up in my store?">
-    Only if you turn on **Send test orders**. It is off by default.
+    Only if you turn on **Send test orders**. It is off by default. When it is on, each test order is tagged `test-order` and its note says no payment was taken.
   </Accordion>
 
   <Accordion title="What if Shopify is down?">
