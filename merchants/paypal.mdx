@@ -67,10 +67,12 @@ In the **page builder**, select the **Credit Card Form** block and pick the merc
 ## What the buyer sees
 
 1. The buyer fills in their email and name, picks the **PayPal** tab and clicks the button.
-2. They are sent to PayPal, log in and approve the payment. The amount PayPal shows includes bumps, tax and shipping.
+2. They are sent to PayPal, log in and approve the payment. The amount PayPal shows includes bumps, tax, shipping and the coupon discount, if a coupon is applied on the checkout. PayPal lists each product with its quantity.
 3. PayPal sends them back to your funnel, the payment is captured, and they continue to the next step (an upsell or the thank-you page), exactly as after a card payment.
 
-If the buyer cancels on PayPal, they return to the checkout and can pay with a card instead. If PayPal cannot start the payment, the buyer stays on the checkout with a message to pay by card or try again; the cause is recorded for your support team.
+PayPal works on cart checkouts too (a page where the buyer picks several products, such as "pick your 6"): every product in the cart is charged at the same price as by card. A coupon that makes the whole order free cannot go through PayPal; the buyer completes it with the card form.
+
+If the buyer cancels on PayPal, they return to the checkout, with their cart as they left it, and can pay with a card instead. If PayPal cannot start the payment, the buyer stays on the checkout with a message to pay by card or try again; the cause is recorded for your support team.
 
 ---
 
@@ -125,7 +127,7 @@ There is nothing to set up. Each tracking number is sent once per payment. A car
 
 1. Create a **Sandbox** app in the Developer Dashboard and copy its Client ID and Secret into the sandbox fields of the PayPal merchant.
 2. Set **Mode** to **Sandbox**, or keep Live and use the merchant's test key: see [Test mode](/merchants/test-mode).
-3. Open your checkout, choose PayPal, and log in with a **sandbox personal account** from **Testing Tools → Sandbox Accounts** in the Developer Dashboard.
+3. Open your checkout (add `?test=<test key>` to its URL if you kept Live), choose PayPal, and log in with a **sandbox personal account** from **Testing Tools → Sandbox Accounts** in the Developer Dashboard.
 
 Sandbox payments are recorded as **test** orders.
 
@@ -133,7 +135,7 @@ Sandbox payments are recorded as **test** orders.
 
 ## Klarna
 
-Klarna works the same way: add `data-klarna="<merchant id>"` to the card panel to show a Klarna tab, and like PayPal it cannot be a domain's or funnel's main merchant.
+Klarna works the same way: add `data-klarna="<merchant id>"` to the card panel to show a Klarna tab, and like PayPal it cannot be a domain's or funnel's main merchant. The Klarna tab is shown only on checkouts that sell one product; on a cart checkout the buyer sees Card and PayPal.
 
 ---
 
