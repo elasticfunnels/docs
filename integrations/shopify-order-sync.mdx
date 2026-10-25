@@ -32,7 +32,7 @@ Shopify Order Sync creates an order in your Shopify store for every purchase mad
 
 <Warning>
 - **One Shopify store per brand.** The Shopify integration can be added once per brand. To sync to a second store, use a second brand.
-- **Installed through the ElasticFunnels team.** ElasticFunnels is not listed in the Shopify App Store. Each brand connects through its own custom Shopify app, which our team sets up for you (see [Set up](#set-up)).
+- **Connected from ElasticFunnels.** You connect your store yourself from **Integrations** (see [Set up](#set-up)). ElasticFunnels is not listed in the Shopify App Store yet. Brands that already have a custom Shopify app from our team keep using it.
 - **Shopify stock is not reduced.** Order lines are custom line items matched by SKU. They are not linked to your Shopify products or variants, so Shopify does not lower its inventory count for these orders. Track stock in ElasticFunnels (the product's **Inventory** settings) or in your 3PL.
 - **No product import from Shopify.** ElasticFunnels does not read your Shopify catalog. Products are created in ElasticFunnels; they can be pushed to Shopify (see [Products in Shopify](#products-in-shopify)).
 - **Cancellations and refunds made in Shopify do not come back.** Cancelling or refunding an order in the Shopify admin does not refund it in ElasticFunnels. Refund in ElasticFunnels and the refund reaches Shopify. Only shipment tracking comes back from Shopify (see [Tracking back from Shopify](#tracking-back-from-shopify)).
@@ -42,14 +42,11 @@ Shopify Order Sync creates an order in your Shopify store for every purchase mad
 {/* SCREENSHOT: Set up · Shopify integration card, not connected state with store domain and Integration Options · desktop */}
 
 <Steps>
-  <Step title="Ask the ElasticFunnels team for an install link">
-    Send us your store's `.myshopify.com` address. We create the custom Shopify app for your brand and send you an install link. Once your store is connected, the same link is shown on the integration as **Shopify install link**.
+  <Step title="Add Shopify in ElasticFunnels">
+    Go to **Apps > Integrations**, click **New Integration** and choose **Shopify**.
   </Step>
-  <Step title="Install the app in Shopify">
-    Open the link while you are logged in to your Shopify admin and click **Install**. Your store then connects to ElasticFunnels on its own. Shopify asks you to approve access to orders, customers, products, draft orders, inventory, price rules and shipping.
-  </Step>
-  <Step title="Turn on order sync">
-    In ElasticFunnels go to **Integrations**, open the **Operations** tab and open **Shopify**. Turn on **Sync orders to Shopify** and save.
+  <Step title="Connect your store">
+    Enter **Your Shopify Store Domain** (your `.myshopify.com` address), turn on **Sync orders to Shopify** under **Integration Options** and click **Connect your Shopify Store**. Shopify opens and asks you to approve access to orders, customers, products, draft orders, inventory, price rules and shipping. After you approve, you return to ElasticFunnels with the store connected.
   </Step>
   <Step title="Choose which orders go to the store (optional)">
     Under **Merchants**, pick **All merchants**, **Specific merchants (whitelist)** or **Exclude merchants (blacklist)**. Under **Affiliate Filtering**, you can do the same by affiliate ID.
@@ -63,7 +60,7 @@ Shopify Order Sync creates an order in your Shopify store for every purchase mad
 </Steps>
 
 <Info>
-Once our team has set up the app for your brand, you can also connect from ElasticFunnels: open **Shopify**, enter **Your Shopify Store Domain**, turn on at least one option under **Integration Options** (for example **Sync orders to Shopify**), and click **Connect your Shopify Store**. If the app has not been set up yet you will see "Shopify app not set up". Contact us in that case.
+Started from Shopify instead? If the ElasticFunnels app is already installed in your Shopify admin, open it and click **Connect in ElasticFunnels**. ElasticFunnels opens in a new tab with the Shopify form for your brand and your store already filled in. Log in first if asked. If your store is already connected to a brand in another ElasticFunnels account, the link stops there; disconnect it in that account first.
 </Info>
 
 ## Settings
@@ -212,7 +209,7 @@ If Shopify rejects the order or does not answer, the order is tried again up to 
   </Accordion>
 
   <Accordion title='"Shopify app not set up" when connecting'>
-    The custom Shopify app for your brand has not been created yet. Contact the ElasticFunnels team for an install link.
+    ElasticFunnels could not find a Shopify app to connect with. Contact support.
   </Accordion>
 
   <Accordion title="Shopify stock did not go down">
