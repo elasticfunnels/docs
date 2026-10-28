@@ -24,6 +24,10 @@ Retrieve all conversions (orders) for a project.
   Search by order code, customer email, or name
 </ParamField>
 
+<ParamField query="filter[product]" type="string">
+  Product codes, comma-separated (`nmn-6-bottles,nmn-1-bottle-free`). Returns orders that contain any of them, bonus lines included. Start the value with `-` to exclude those products instead (`-nmn-6-bottles`).
+</ParamField>
+
 ```bash Request
 GET /api/brands/{brand}/conversions
 ```
