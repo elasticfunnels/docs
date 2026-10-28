@@ -1,0 +1,89 @@
+{
+  "out": "images/affiliate-portal/brand-add-to-affiliates.png",
+  "alt": "The Add Northwind Sleep to your affiliates? modal with how many active affiliates lack the brand, Not now and Add to affiliates",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal?tab=brands",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='org.affiliate-portal.brands.list']",
+    "actions": [
+      {
+        "wait": 1200
+      },
+      {
+        "click": "[data-testid='list.row'][data-row-id='935'] [data-testid='row-actions-trigger']"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.brands.settings'] >> visible=true"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.brands.default-applicant-status']"
+      },
+      {
+        "wait": 400
+      },
+      {
+        "click": "[data-testid='select.option'][data-value='active'] >> visible=true"
+      },
+      {
+        "wait": 400
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.brands.save-settings']"
+      },
+      {
+        "waitFor": "[data-testid='org.affiliate-portal.brands.link-all.body']"
+      },
+      {
+        "wait": 5000
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')",
+      ".notifications",
+      ".vue-notification-group"
+    ],
+    "crop": ".ant-modal-content >> visible=true",
+    "allowPost": [
+      "/api/organizations/798/affiliate-portal/brands/935$"
+    ]
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.link-all.body'] p >> nth=0",
+      "title": "Who lacks it",
+      "text": "Active affiliates not on the brand",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.link-all.body'] p >> nth=1",
+      "title": "Their status",
+      "text": "The brand's status after sign-up",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.link-all.add']",
+      "title": "Add to affiliates",
+      "text": "Links the brand to all of them",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.brands.link-all.not-now']",
+      "title": "Not now",
+      "text": "Closes it, nothing changes",
+      "side": "left"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230,
+  "note": "Brand 935 (Northwind Sleep) must be on Pending approval before the shoot (PUT /api/organizations/798/affiliate-portal/brands/935 {default_applicant_status: pending_approve}); the allowed save sets it back to Active, which is what opens the modal. Add is never clicked."
+}

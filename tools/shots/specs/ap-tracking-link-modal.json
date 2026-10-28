@@ -1,6 +1,6 @@
 {
   "out": "images/affiliate-portal/tracking-link-modal.png",
-  "alt": "The Copy tracking link modal with a page URL entered and the final link for the matching brand",
+  "alt": "The Copy tracking link modal on Enter URL, with a page URL entered and the final link for the brand that owns it",
   "capture": {
     "path": "/org/northwind-demo/affiliate-portal/affiliates/2",
     "viewport": {
@@ -16,13 +16,13 @@
     ],
     "actions": [
       {
-        "click": "button:has-text('Tracking link')"
+        "click": "[data-testid='org.affiliate-portal.affiliate.tracking-link']"
       },
       {
         "wait": 800
       },
       {
-        "fill": "input[type=url]",
+        "fill": "[data-testid='org.affiliate-portal.affiliate.tracking-link.base-url']",
         "value": "https://northwindsupplements.makeoffers.io/sleep-gummies"
       },
       {
@@ -37,13 +37,19 @@
   },
   "annotations": [
     {
-      "selector": "input[type=url]",
+      "selector": "[data-testid='org.affiliate-portal.affiliate.tracking-link.mode-url']",
+      "title": "Enter URL",
+      "text": "Paste any page on a brand's domain",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliate.tracking-link.base-url']",
       "title": "Base URL",
       "text": "A page on the brand's domain",
       "side": "right"
     },
     {
-      "selector": "text=matched >> nth=0",
+      "selector": "[data-testid='org.affiliate-portal.affiliate.tracking-link.row'] >> nth=0",
       "title": "matched",
       "text": "The brand that owns the domain",
       "side": "left"

@@ -1,0 +1,66 @@
+{
+  "out": "images/affiliate-portal/tracking-link-select-page.png",
+  "alt": "The Copy tracking link modal on Select offer page, with an offer page picked, its brand and the final link with Copy link",
+  "capture": {
+    "path": "/org/northwind-demo/affiliate-portal/affiliates/2",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "text=Edit profile",
+    "fixtures": [
+      {
+        "url": "/affiliate-portal/affiliates/\\d+/metrics",
+        "file": "tools/shots/fixtures/affiliate-portal/affiliate-metrics.json"
+      }
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='org.affiliate-portal.affiliate.tracking-link']"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "click": "[data-testid='org.affiliate-portal.affiliate.tracking-link.mode-page']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "select": "[data-testid='org.affiliate-portal.affiliate.tracking-link.page']",
+        "value": "899:1"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "hide": [
+      "[data-testid='list.row']:has-text('onerror')",
+      "[data-testid='list.row']:has-text('<b>')"
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliate.tracking-link.mode-page']",
+      "title": "Select offer page",
+      "text": "Pick from the brand's pages",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliate.tracking-link.page']",
+      "title": "Page",
+      "text": "Homepages, then resources, then all pages",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='org.affiliate-portal.affiliate.tracking-link.copy-page']",
+      "title": "Copy link",
+      "text": "The page with their affid",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

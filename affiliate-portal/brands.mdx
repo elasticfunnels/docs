@@ -35,6 +35,23 @@ portal set to Active never auto-approves sign-ups on a brand whose owner wants t
 The status only applies to new sign-ups. Affiliates you invite are Active on every brand you tick in the invite. You
 change an existing affiliate's status on their **Brands** tab. See [Affiliates](/affiliate-portal/affiliates).
 
+## Add a brand to every affiliate
+
+Affiliates who signed up before a brand joined the portal are not on that brand. When you add brands to the
+portal, or set a brand's **Status after sign-up** to **Active**, a window asks **Add {brand} to your
+affiliates?** and says how many of your active affiliates don't have the brand yet.
+
+<img src="/images/affiliate-portal/brand-add-to-affiliates.png" alt="The Add Northwind Sleep to your affiliates? modal with how many active affiliates lack the brand, Not now and Add to affiliates" />
+
+- **Add to affiliates** puts the brand on each of them, with the brand's status after sign-up (Pending approval
+  means you still approve each one). Affiliates you removed from the brand are skipped. More than 300 are added
+  in the background, and a message tells you so.
+- **Not now** closes the window and changes nothing. You can still add the brand to one affiliate on their
+  **Brands** tab.
+
+The window only shows when at least one active affiliate lacks the brand, and only to users who can edit
+affiliates. Adding several brands at once asks about each brand in turn.
+
 ## Remove a brand
 
 Pick **Remove from portal** in the row's menu. Affiliates stop seeing the brand on the portal, and new sign-ups no
