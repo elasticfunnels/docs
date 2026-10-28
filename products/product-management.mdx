@@ -82,14 +82,14 @@ Warehousing, inventory, cost breakdown, SKU categorisation, product specificatio
 
 | Section | Fields |
 |---------|--------|
-| **Identity & Structure** | SKU, Barcode, Units per Package, Weight (oz), Dimensions (L/W/H cm) |
+| **Identity and size** | SKU, Barcode, Units per Package, Weight (oz), Dimensions (L/W/H cm) |
 | **Integration** | Fulfillment Integration override, Multiply SKU toggle |
 | **Inventory** | Stock Quantity (leave it blank to sell without tracking stock), Out-of-Stock Policy (Continue selling / Stop selling), **Restock on refund** (off by default). Products created by a [template kit](/template-kits/after-applying#4-check-the-stock) start with Stock Quantity blank (not tracked, always in stock); the policy applies only once you type a quantity. See [How stock moves](#how-stock-moves) |
 | **Bundle components** | For a bundle or kit: the products (and variants) inside it and how many of each. A sale of the bundle takes each component's stock times the quantity sold. Leave it empty and the bundle uses its own Stock Quantity |
-| **Cost Breakdown** | Product Cost, Fulfillment Cost, Packaging Cost, Avg. Shipping, Fuel Surcharge, Auto-calculated COGS |
-| **SKU Categorisation** | SKU Category, SKU Subcategory (for internal reporting) |
-| **Product Specifications** | Repeater: Name / Value / Unit pairs (e.g. Dimensions: 10×5×3 cm) |
-| **Shipping Profile** | Assign a brand-level shipping profile |
+| **Costs per package** | Product Cost, Fulfillment Cost, Packaging Cost, Avg. Shipping, Fuel Surcharge, Auto-calculated COGS |
+| **SKU categories** | SKU Category, SKU Subcategory (for internal reporting) |
+| **Specifications** | Repeater: Name / Value / Unit pairs (e.g. Dimensions: 10×5×3 cm) |
+| **Shipping profile** | Assign a brand-level shipping profile |
 
 #### How stock moves
 
@@ -153,15 +153,11 @@ Assign bonus products that customers receive when purchasing this product. Selec
 
 Visible when product type is **Digital** or classification is **Bonus**.
 
-Add one or more downloadable files:
-- **Purpose**: Digital or Bonus
-- **Title**: the name buyers see
-- **Description**: optional
-- **Image**: optional cover. The thumbnail shows as soon as you pick it.
-- **File**: the download. After you pick it, a card shows its name and size; once saved, **Open** downloads the stored copy.
-- **Primary**: the main file for this purpose
+Each file is one row: its cover (or file type), the title buyers see, the file name and size, the purpose (Digital or Bonus), a star for the primary file of that purpose, and buttons to open, replace or remove the file. Remove asks once before the row goes.
 
-**Replace** and **Remove** work on both the image and the file. Picked files upload when you click **Save**, and the row stays on screen with its stored copy afterwards. A row without a file is not saved.
+- **Add file** adds a row. Choose the file on the row; it uploads when you click **Save**, and the row shows "Uploads on Save" until then. A row without a file is not saved.
+- The arrow on the row opens the optional **description** and **cover image** for that file. The thumbnail shows as soon as you pick an image.
+- **Primary**: click the star to mark the main file for its purpose. Once saved, **Open** downloads the stored copy.
 
 ---
 
