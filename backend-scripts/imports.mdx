@@ -53,7 +53,13 @@ import { test } from "./app";      // relative path
 The resolution rules:
 1. The `.js` extension is stripped
 2. Leading `./` or `../` prefixes are stripped
-3. The remaining string is used as the page slug to look up
+3. The remaining string is looked up as a backend script code first (scripts in **Backend Scripts**, `ef scripts` in the CLI), then as a page slug
+
+So a shared script with the code `elevenlabs` is imported the same way:
+
+```javascript
+import { speak } from "elevenlabs";
+```
 
 For nested pages, the slug path is preserved:
 

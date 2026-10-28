@@ -5,11 +5,9 @@ icon: "cloud-arrow-up"
 description: 'Make HTTP GET and POST requests to external APIs from backend scripts.'
 ---
 
-Backend scripts can make HTTP requests to external APIs using `http.get()` and `http.post()`. All requests are routed through a secure proxy to prevent direct access to internal infrastructure.
+Backend scripts can call external APIs with `http.get()`, `http.post()` and `http.patch()`. They are on for every brand. Requests to private or internal addresses are blocked.
 
-<Warning>
-HTTP functions are only available when the HTTP proxy is configured. If the proxy is not set up, `http` will be `undefined`. Contact your administrator to enable this feature.
-</Warning>
+To send an API key, save it as a [secret](/backend-scripts/secrets) and put `env.secret.NAME` in a header. Never paste keys into the script itself.
 
 ## `http.get(url, headers?)`
 {/* SCREENSHOT: `http.get(url, headers?)` · code editor or rendered example · desktop */}
@@ -53,10 +51,14 @@ if (result.status !== 200) {
 | `body` | string | Request body (typically JSON stringified) |
 | `headers` | object | Optional request headers |
 
+## `http.patch(url, body, headers?)`
+
+Same as `http.post`, with the PATCH method.
+
 ## Response object
 {/* SCREENSHOT: Response object · code editor or rendered example · desktop */}
 
-Both `http.get` and `http.post` return an object:
+Every `http.*` call returns an object:
 
 ```javascript
 {
@@ -65,6 +67,8 @@ Both `http.get` and `http.post` return an object:
   body: '...'           // Response body as a string
 }
 ```
+
+The body is always a string, so binary answers (a raw mp3 or image) do not come through intact. Use an endpoint that returns JSON, for example one with base64 audio inside.
 
 To work with JSON APIs, parse the body:
 
@@ -85,9 +89,9 @@ var data = JSON.parse(result.body);
 ## Security
 {/* SCREENSHOT: Security · code editor or rendered example · desktop */}
 
-- All requests are routed through an authenticated proxy — they never originate from the application server directly
-- Private/internal IPs are blocked (localhost, 10.x.x.x, 172.16-31.x.x, 192.168.x.x, 169.254.x.x, AWS metadata endpoint)
-- Only `http://` and `https://` protocols are allowed
+- Private and internal addresses are blocked: localhost, 10.x.x.x, 172.16-31.x.x, 192.168.x.x, 169.254.x.x and cloud metadata endpoints, including hostnames that resolve to them.
+- Only `http://` and `https://` URLs are allowed. Redirects are not followed.
+- [Secrets](/backend-scripts/secrets) are sent only over https, in headers, to their allowed hosts.
 
 ## Example: external auth check
 {/* SCREENSHOT: Example: external auth check · code editor or rendered example · desktop */}

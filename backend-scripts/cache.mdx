@@ -113,6 +113,8 @@ setVariable('view_count', views);
 - **512 bytes** maximum value size
 - **1-hour** maximum TTL
 - **20 cache operations** per script execution
+
+For anything bigger than 512 bytes or longer than an hour (generated audio, API answers you want to keep), use [storage](/backend-scripts/storage): 64 KB per value, up to a year.
 </Note>
 
 <Warning>

@@ -565,6 +565,7 @@
                       "backend-scripts/data-functions",
                       "backend-scripts/validation",
                       "backend-scripts/http",
+                      "backend-scripts/secrets",
                       "backend-scripts/cache",
                       "backend-scripts/queue",
                       "backend-scripts/storage"

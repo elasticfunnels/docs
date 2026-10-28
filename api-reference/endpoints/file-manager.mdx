@@ -39,7 +39,7 @@ POST /api/brands/{brand}/file-manager/upload-file
   Override the stored filename. Defaults to the original filename from the `file` field.
 </ParamField>
 
-**Accepted MIME types:** images (`image/*`), video (`video/mp4`, `video/webm`, `video/quicktime`), fonts (`font/ttf`, `font/woff`, `font/woff2`, `font/otf`), code/text (`text/css`, `text/javascript`, `application/json`, `application/javascript`).
+**Accepted MIME types:** images (`image/*`), video (`video/mp4`, `video/webm`, `video/quicktime`), audio (`audio/*`: mp3, m4a, wav, ogg, aac, opus, flac), fonts (`font/ttf`, `font/woff`, `font/woff2`, `font/otf`), code/text (`text/css`, `text/javascript`, `application/json`, `application/javascript`).
 
 ```bash cURL
 curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/file-manager/upload-file \
