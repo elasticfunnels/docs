@@ -402,11 +402,11 @@ Update an existing page. Only include the fields you want to change.
 </ParamField>
 
 <ParamField body="custom_header_code" type="string">
-  Custom header code
+  Custom header code. Up to 65,535 bytes; a longer value returns 422. Put page styles in the page CSS instead.
 </ParamField>
 
 <ParamField body="custom_javascript" type="string">
-  Custom JavaScript code (must be valid script tags only)
+  Custom JavaScript code (must be valid script tags only). Up to 65,535 bytes; a longer value returns 422.
 </ParamField>
 
 <ParamField body="is_upsell_page" type="boolean">
