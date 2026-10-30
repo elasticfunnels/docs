@@ -1,0 +1,181 @@
+---
+title: 'Partner API (v1)'
+sidebarTitle: "Partner API (v1)"
+icon: "plug"
+description: 'A versioned API for your own server: scoped keys, contact lookup and funnel, page and quiz stats'
+---
+
+## Overview
+
+The partner API is for a server you run that talks to ElasticFunnels on its own: a reporting job, your app's backend, a CRM sync. It lives under `/api/v1/brands/{brand_id}/...`, its response shapes are documented and kept stable, and every route asks for one **scope** on the key.
+
+The rest of the API (`/api/brands/{brand_id}/...`) is the one the dashboard and the `ef` CLI use. It keeps working as before.
+
+<Note>
+  Call the partner API from a server only. A key in a web page or a mobile app can be read by anyone who has the page or the app.
+</Note>
+
+## Keys and scopes
+
+The partner API accepts **scoped API keys** (they start with `efk_`) in the `EF-Access-Key` header. Other credentials (the older full-access key, CLI tokens) answer `401 scoped_key_required`.
+
+Create a key in **Settings → API → Create API key**. Pick its projects and its access, then tick the scopes it needs under **Partner API scopes**:
+
+| Scope | Lets the key |
+|-------|--------------|
+| `stats:read` | Read funnel, page and quiz stats |
+| `contacts:read` | Look up contacts: ids, lifecycle and consent state |
+| `contacts:pii` | Also see email, phone and names in contact answers |
+| `identity:write` | Link your system's user ids to contacts |
+| `webhooks:manage` | Create and manage event webhooks |
+| `members:session` | Start a member sign-in for a contact |
+| `privacy:erase` | Erase a contact's data |
+
+- A **read-only** key can hold only the first three. It can't send `POST`, `PUT`, `PATCH` or `DELETE`, with one exception: the contact lookup, which is a read sent as `POST` so an email stays out of URLs.
+- A key created before scopes existed keeps its meaning: a read-only key has `stats:read`, `contacts:read` and `contacts:pii`; a read and write key also has `identity:write` and `webhooks:manage`. `privacy:erase` and `members:session` are never given unless you tick them.
+- Give each server its own key with only the scopes it uses.
+
+## Errors
+
+Every error has the same shape: a stable `error` code to branch on and a `message` for people.
+
+```json
+{ "error": "missing_scope", "message": "This API key does not have the stats:read scope. Add it to the key in the project's API settings.", "scope": "stats:read" }
+```
+
+| Status | `error` | When |
+|--------|---------|------|
+| 401 | `unauthenticated` | No key, an unknown key or a revoked key |
+| 401 | `scoped_key_required` | A key that is not an `efk_` scoped key |
+| 403 | `missing_scope` | The key lacks the route's scope (`scope` names it) |
+| 403 | `key_read_only` | A read-only key sent a write |
+| 404 | `not_found` | See below |
+| 409 | `contacts_not_enabled` | The project does not keep contacts yet |
+| 422 | `invalid_request` | A bad parameter; `errors` lists them by field |
+| 429 | `rate_limited` | Too many requests; wait the seconds in `Retry-After` |
+| 503 | `stats_unavailable` | Stats can't be read right now; retry after `Retry-After` |
+
+`404 not_found` is always `{"error": "not_found", "message": "Not found."}`. A project your key doesn't reach, a project of another organization, an id that doesn't exist and a contact that isn't there all answer exactly this, so the API never tells anyone what exists in a project they can't see.
+
+## Rate limits
+
+Limits count per key, per minute:
+
+| Routes | Limit |
+|--------|-------|
+| Contact lookup | 60 |
+| Stats | 30 |
+| Everything else | 120 |
+
+Every answer carries `X-RateLimit-Limit` and `X-RateLimit-Remaining`. A `429` adds `Retry-After` (seconds). Stats answers are cached for 60 seconds, so polling faster than once a minute returns the same numbers.
+
+Stats and lookup requests count as metered API reads, like the analytics and conversions reads of the main API.
+
+## Check your key
+
+```bash
+curl https://app.elasticfunnels.io/api/v1/brands/{brand_id} \
+  -H "EF-Access-Key: efk_..."
+```
+
+```json
+{
+  "data": {
+    "brand_id": 572,
+    "name": "My project",
+    "currency": "USD",
+    "timezone": "America/New_York",
+    "key": { "label": "efk_AbCdEf••••w9Xz", "permission": "read", "scopes": ["stats:read"] }
+  }
+}
+```
+
+## Contact lookup
+
+Scope `contacts:read`.
+
+```bash
+# By hash (GET is fine: the hash is not the email)
+curl "https://app.elasticfunnels.io/api/v1/brands/{brand_id}/contacts/lookup?email_sha256=5d41402abc4b2a76b9719d911017c592..." \
+  -H "EF-Access-Key: efk_..."
+
+# By email: use POST so the address never sits in a URL or a log
+curl -X POST https://app.elasticfunnels.io/api/v1/brands/{brand_id}/contacts/lookup \
+  -H "EF-Access-Key: efk_..." -H "Content-Type: application/json" \
+  -d '{"email": "ana@example.com"}'
+```
+
+Send exactly one of `email` or `email_sha256`. `email_sha256` is the lower-case hex SHA-256 of the email after you normalize it: trim it, remove every whitespace character, and lower-case it. The lookup finds a contact by any email it has used, not only its main one. A merged contact answers as the contact it was merged into.
+
+```json
+{
+  "data": {
+    "contact_id": "01JBX6Z5Q8N3K4M2P1R7T9V0WC",
+    "profile_id": "01JBX6Z5Q8N3K4M2P1R7T9V0WD",
+    "lifecycle": "lead",
+    "first_seen_at": "2026-10-28T14:02:11+00:00",
+    "first_source": "form",
+    "email_status": "subscribed",
+    "sms_status": "unknown",
+    "external_ids": []
+  }
+}
+```
+
+With `contacts:pii` the answer also has `email`, `phone`, `first_name` and `last_name`. No contact: the `404 not_found` above.
+
+## Stats
+
+Scope `stats:read`. Aggregates only: no answer ever names a person.
+
+```
+GET /api/v1/brands/{brand_id}/stats/funnels/{funnel_id}
+GET /api/v1/brands/{brand_id}/stats/pages/{page_id}
+GET /api/v1/brands/{brand_id}/stats/quizzes/{quiz_id}
+```
+
+| Parameter | Required | Value |
+|-----------|----------|-------|
+| `from`, `to` | yes | `YYYY-MM-DD`; both days are included, counted in `tz`. At most 400 days |
+| `tz` | yes | An IANA time zone such as `Europe/Bucharest` or `UTC`. There is no default |
+| `group_by` | no | `day`, `page`, `utm_source`, `utm_campaign`, `device` or `country` |
+| `metrics` | no | Funnels and pages: a comma list of `visits`, `unique_visitors`, `page_views`, `conversions`, `revenue` and up to 10 `event:<name>` (default: the five named ones) |
+
+What each number counts:
+
+- `visits`: sessions with a page view. Bots, data-center traffic, test sessions and suspected bots are left out, as on the Analytics dashboard.
+- `unique_visitors`: people with a page view. Someone ElasticFunnels has recognised on two devices counts once.
+- `page_views`: page views.
+- `event:<name>`: page events with that name, for example `event:quiz_start` for an event you added with the page events builder.
+- `conversions` and `revenue`: sales (first sales and subscription renewals) and their total in the project's currency. Test orders are left out.
+- Quizzes (built with the ElasticFunnels quiz builder): `starts` (quiz sessions with at least one answer), `completions` (quiz sessions that answered the last question), `email_captures` (quiz sessions that gave an email) and `steps`, the quiz sessions that answered each question.
+
+```bash
+curl "https://app.elasticfunnels.io/api/v1/brands/{brand_id}/stats/funnels/608?from=2026-10-01&to=2026-10-03&tz=Europe/Bucharest&group_by=day&metrics=visits,event:quiz_start,conversions,revenue" \
+  -H "EF-Access-Key: efk_..."
+```
+
+```json
+{
+  "data": {
+    "scope": { "type": "funnel", "id": 608 },
+    "from": "2026-10-01",
+    "to": "2026-10-03",
+    "tz": "Europe/Bucharest",
+    "group_by": "day",
+    "metrics": ["visits", "event:quiz_start", "conversions", "revenue"],
+    "currency": "USD",
+    "totals": { "visits": null, "event:quiz_start": 5, "conversions": 2, "revenue": 98.5 },
+    "groups": [
+      { "key": "2026-10-01", "visits": 10, "event:quiz_start": 4, "conversions": 0, "revenue": 0 },
+      { "key": "2026-10-02", "visits": 0, "event:quiz_start": 0, "conversions": 0, "revenue": 0 },
+      { "key": "2026-10-03", "visits": 5, "event:quiz_start": 1, "conversions": 2, "revenue": 98.5 }
+    ]
+  }
+}
+```
+
+- Without `group_by`, `groups` is `null` and `totals` holds every metric.
+- With `group_by`, `visits` and `unique_visitors` in `totals` are `null`: the same person on two days is one visitor for the range, so the days don't add up. Ask again without `group_by` for the range figure.
+- `group_by=day` lists every day of the range, with zeros on days with nothing. Other groupings list the groups that have data, at most 500.
+- Quiz answers have `totals` (`starts`, `completions`, `email_captures`), `steps` (`[{ "step": 1, "sessions": 40 }, ...]`) and `groups` when grouped.
