@@ -88,6 +88,10 @@ Warehousing, inventory, cost breakdown, SKU categorisation, product specificatio
 | **Product Specifications** | Repeater: Name / Value / Unit pairs (e.g. Dimensions: 10×5×3 cm) |
 | **Shipping Profile** | Assign a brand-level shipping profile |
 
+<Warning>
+A physical product needs a **SKU** that matches the SKU in your warehouse (Jetpack, ShipOffers) exactly. If a paid order has a physical product with no SKU, ElasticFunnels does not send it: the order shows a fulfillment error naming the product, and a [Brand Action](/essentials/brand-actions) tells you which orders are waiting. Set the SKU, then open the order under **Reports → Fulfillment** and click **Cancel and Resend**. If the warehouse reports a SKU it does not recognise, you get the same kind of action.
+</Warning>
+
 #### How a shipping rate is chosen
 
 A shipping profile (**Products → Shipping Profiles**) holds two separate rates - **Mainland US Cost** and **International Cost (outside Mainland US)** - plus an optional list of per-country overrides. At checkout the buyer's country selects exactly one of them:
