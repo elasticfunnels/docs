@@ -1,6 +1,6 @@
 {
   "out": "images/integrations/campaigns-columns-table.png",
-  "alt": "Ad campaigns with a date range and a custom column choice: spend, average time on page, pages per visitor, clicks to checkout, and the Get started click goal with its count and cost per goal for each campaign",
+  "alt": "Ad campaigns with a date range and a saved column choice: spend, average time on page, pages per visitor, clicks to checkout, and the Get started click goal with its count and cost per goal for each campaign, with the Columns button in the table toolbar",
   "capture": {
     "path": "/{brand}/analytics/campaigns?integration_id=45&start=2026-10-01&end=2026-10-30",
     "viewport": {
@@ -9,73 +9,76 @@
     },
     "actions": [
       {
-        "waitFor": "[data-testid='integrations.campaigns.columns.button']"
+        "waitFor": "[data-testid='list.columns']"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.button']"
+        "click": "[data-testid='list.columns']"
       },
       {
-        "waitFor": "[data-testid='integrations.campaigns.columns.menu']"
+        "waitFor": "text=Manage Columns"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.clicks']"
+        "wait": 400
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.profit']"
+        "click": "button:text-is('Impressions')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.impressions']"
+        "click": "button:text-is('Clicks')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.cpm']"
+        "click": "button:text-is('CPM')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.cpc']"
+        "click": "button:text-is('CPC')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.ctr']"
+        "click": "button:text-is('CTR')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.reach']"
+        "click": "button:text-is('Reach')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.frequency']"
+        "click": "button:text-is('Frequency')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.revenue']"
+        "click": "button:text-is('Funnel Revenue')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.sales']"
+        "click": "button:text-is('Funnel Sales')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.rpc']"
+        "click": "button:text-is('Funnel Profit')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.ppc']"
+        "click": "button:text-is('RPC')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.cpa']"
+        "click": "button:text-is('PPC')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.conversion_rate']"
+        "click": "button:text-is('CPA')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.aov']"
+        "click": "button:text-is('CVR')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.goal__quiz_completed__count']"
+        "click": "button:text-is('AOV')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.goal__thank_you_view__count']"
+        "click": "button:text-is('Quiz completed')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.toggle.goal__get_started__cost']"
+        "click": "button:text-is('Thank-you page visit')"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.button']"
+        "click": "button:text-is('Cost per Get started click')"
       },
       {
-        "wait": 700
+        "click": "button:has-text('Save Changes')"
+      },
+      {
+        "wait": 900
       }
     ],
     "crop": {
@@ -103,6 +106,11 @@
   "maxWidth": 900,
   "calloutWidth": 220,
   "annotations": [
+    {
+      "selector": "[data-testid='list.columns']",
+      "title": "Columns",
+      "text": "Opens Manage Columns"
+    },
     {
       "box": [
         714,

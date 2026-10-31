@@ -178,30 +178,34 @@ Campaigns (Top Level)
 
 ## Metrics Explained
 
-Metric columns appear once you pick a date range. Which of them the table shows is up to you: use the **Columns** button next to the date range.
+Metric columns appear once you pick a date range. Which of them the table shows, and in what order, is up to you: use the **Columns** button in the table toolbar, next to **Sort**.
 
 ### Choosing columns
 
-<img src="/images/integrations/campaigns-columns-picker.png" alt="The Columns menu on Ad campaigns, open over the campaign table: the From the ad platform, Engagement, Funnel and Goals groups with a checkbox per column" />
+<img src="/images/integrations/campaigns-columns-picker.png" alt="The Manage Columns drawer on Ad campaigns: every column as a button, dark when it is shown, from the ad platform columns through engagement, funnel and one count, rate and cost column per goal" />
 
 1. Open **Reports → Ad campaigns** and pick a date range.
-2. Click **Columns**.
-3. Tick the columns you want and untick the ones you don't. The table changes as you click.
+2. Click **Columns** in the table toolbar. The **Manage Columns** drawer opens.
+3. Under **Available Columns**, click a light button to add that column and a dark one to remove it.
+4. Under **Column Organization**, drag columns into the order you want. Drag a column into **Sticky Columns** to pin it to the left while you scroll sideways.
+5. Click **Save Changes**.
 
-The menu has four groups:
+The columns you can pick:
 
-| Group | Columns |
+| Kind | Columns |
 |---|---|
 | From the ad platform | Spend, Impressions, Clicks, CPM, CPC, CTR, Reach, Frequency |
 | Engagement | Visitors, Landing rate, Avg time on page, Pages per visitor |
 | Funnel | Clicks to checkout, Checkout click rate, Cost per checkout click, Abandoned checkouts, Funnel Revenue, Funnel Sales, Funnel Profit, ROAS, RPC, PPC, CPA, CVR, AOV |
 | Goals | For each goal: its count, its rate per visitor and the cost per goal |
 
-Your choice is saved for this project in this browser, so another browser or a teammate starts from the defaults. **Reset to default** at the bottom of the menu puts the starting set back: every ad platform column, Avg time on page, Pages per visitor, Clicks to checkout, the revenue, sales and profit columns with RPC, PPC, CPA, CVR and AOV, and the count of each active goal.
+Your choice is saved in this browser for this project, separately for the campaign, ad set and ad levels. Another browser or a teammate starts from the defaults: every ad platform column, Avg time on page, Pages per visitor, Clicks to checkout, the revenue, sales and profit columns with RPC, PPC, CPA, CVR and AOV, and the count of each active goal. You can also move a column from its header menu with **Move Left** and **Move Right**.
 
-A goal you add later shows its count column without a trip to the menu. An archived goal's columns stay in the menu and start unticked.
+A goal you add after saving a column choice is offered in the drawer; add its columns there. An archived goal's columns stay in the drawer and are left out of the defaults.
 
-<img src="/images/integrations/campaigns-columns-table.png" alt="Ad campaigns with a date range and a custom column choice: spend, average time on page, pages per visitor, clicks to checkout, and the Get started click goal with its count and cost per goal for each campaign" />
+When no tracked visit matches a row, its engagement, funnel and goal columns show a dash instead of 0, so a missing UTM never reads as a real zero.
+
+<img src="/images/integrations/campaigns-columns-table.png" alt="Ad campaigns with a date range and a saved column choice: spend, average time on page, pages per visitor, clicks to checkout, and the Get started click goal with its count and cost per goal for each campaign, with the Columns button in the table toolbar" />
 
 ### Ad Platform Metrics
 
@@ -296,7 +300,7 @@ A goal is an action you count besides sales, such as a "Get started" click, a fi
 | **Get started click rate** | Goal count ÷ visitors |
 | **Cost per Get started click** | Spend ÷ goal count |
 
-If the project has no goals yet, the Goals group in the menu says so and links to **Settings → Goals**.
+If the project has no goals yet, the drawer has no goal columns. Add goals under **Settings → Goals**.
 
 <Info>
 Engagement, funnel and goal columns all come from your own tracking, matched to each ad row by UTM: `utm_campaign` to the campaign name, `utm_content` to the ad set name and `utm_term` to the ad name. They need proper UTM parameters in your tracking URLs. See the "Setting Up UTM Tracking" section below.

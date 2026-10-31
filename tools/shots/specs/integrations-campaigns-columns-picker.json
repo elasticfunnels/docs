@@ -1,31 +1,31 @@
 {
   "out": "images/integrations/campaigns-columns-picker.png",
-  "alt": "The Columns menu on Ad campaigns, open over the campaign table: the From the ad platform, Engagement, Funnel and Goals groups with a checkbox per column",
+  "alt": "The Manage Columns drawer on Ad campaigns: every column as a button, dark when it is shown, from the ad platform columns through engagement, funnel and one count, rate and cost column per goal",
   "capture": {
     "path": "/{brand}/analytics/campaigns?integration_id=45&start=2026-10-01&end=2026-10-30",
     "viewport": {
       "width": 1440,
-      "height": 1800
+      "height": 1000
     },
     "actions": [
       {
-        "waitFor": "[data-testid='integrations.campaigns.columns.button']"
+        "waitFor": "[data-testid='list.columns']"
       },
       {
-        "click": "[data-testid='integrations.campaigns.columns.button']"
+        "click": "[data-testid='list.columns']"
       },
       {
-        "waitFor": "[data-testid='integrations.campaigns.columns.menu']"
+        "waitFor": "text=Manage Columns"
       },
       {
-        "wait": 600
+        "wait": 800
       }
     ],
     "crop": {
-      "x": 780,
+      "x": 1056,
       "y": 0,
-      "width": 660,
-      "height": 1120
+      "width": 384,
+      "height": 1000
     },
     "cropPad": 0,
     "fixtures": [
@@ -43,29 +43,50 @@
       }
     ]
   },
-  "maxWidth": 560,
+  "maxWidth": 420,
   "calloutWidth": 220,
   "annotations": [
     {
-      "selector": "[data-testid='integrations.campaigns.columns.button']",
-      "title": "Columns",
-      "text": "Opens the column picker",
-      "side": "right"
-    },
-    {
-      "selector": "[data-testid='integrations.campaigns.columns.toggle.avg_time_on_page']",
+      "box": [
+        17,
+        402,
+        171,
+        33
+      ],
       "title": "Engagement",
-      "text": "What visitors did on your pages"
+      "text": "Avg time on page, pages per visitor",
+      "side": "left"
     },
     {
-      "selector": "[data-testid='integrations.campaigns.columns.toggle.checkouts']",
+      "box": [
+        17,
+        444,
+        171,
+        33
+      ],
       "title": "Funnel",
-      "text": "Buy-button clicks, sales, profit"
+      "text": "Clicks to checkout, abandons, ROAS",
+      "side": "left"
     },
     {
-      "selector": "[data-testid='integrations.campaigns.columns.toggle.goal__get_started__count']",
-      "title": "Goals",
+      "box": [
+        197,
+        693,
+        170,
+        33
+      ],
+      "title": "Goal columns",
       "text": "Count, rate and cost per goal"
+    },
+    {
+      "box": [
+        197,
+        568,
+        170,
+        33
+      ],
+      "title": "Hidden column",
+      "text": "Light buttons are off; click to add"
     }
   ]
 }
