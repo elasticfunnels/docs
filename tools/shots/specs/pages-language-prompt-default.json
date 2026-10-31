@@ -1,0 +1,14 @@
+{
+  "out": "images/pages/language-prompt-default.png",
+  "alt": "The built-in language prompt at the bottom of an English page for a visitor whose browser is in Romanian: Această pagină există și în Română, with Rămân aici and Treci la Română buttons",
+  "_source": "website runtime, demo brand 899 page lp-a with a Romanian translation, Language suggestion = Built-in prompt and the three i18n_sites.prompt texts in the ro dictionary; browser locale ro-RO, 1280x720 at 2x, cropped to CSS x 340, y 560, 600 x 160. Script: elasticfunnels repo task T1031-3 (prompt-src.cjs in the session scratchpad).",
+  "image": "tools/shots/source/pages-language-prompt-default.png",
+  "imageSize": { "w": 600, "h": 160 },
+  "maxWidth": 640,
+  "calloutWidth": 210,
+  "annotations": [
+    { "box": [120, 56, 360, 21], "title": "Suggestion", "text": "Names the language, in that language", "side": "left" },
+    { "box": [239.5, 89, 100.1, 39], "title": "Stay here", "text": "Dismisses it for good", "side": "left" },
+    { "box": [347.6, 89, 132.4, 39], "title": "Switch", "text": "Opens the Romanian version" }
+  ]
+}

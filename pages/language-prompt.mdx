@@ -36,6 +36,8 @@ Other pages stay exactly as they are.
     In **Pages → Advanced → Translations**, under **Language URLs**, set
     **Language suggestion**, or use the CLI:
 
+    <img src="/images/pages/i18n-language-urls.png" alt="The Language URLs settings under Translations: the Serve pages under language folders switch, Language suggestion set to Built-in prompt, and Fallback language for search engines" />
+
     | Option | What happens | CLI |
     | --- | --- | --- |
     | **Off** | The default. No prompt shows. The switcher and the API still work. | `ef i18n settings --prompt off` |
@@ -73,14 +75,17 @@ already reading. Then:
 ---
 
 ## The built-in prompt
-{/* SCREENSHOT: Default language prompt · bottom of a translated page, Romanian suggestion with accept and dismiss · desktop and mobile */}
 
 With **Built-in prompt**, a small card at the bottom of the page names the language
-and offers two buttons: go to that version, or stay. The card is written in
-the suggested language: a plain white card in the visitor's system font.
+and offers two buttons: go to that version, or stay. It is a plain white card in
+the visitor's system font.
 
-Change its texts in the brand dictionary, per language, with these keys
-(see [Add texts](/pages/internationalization#add-texts)):
+<img src="/images/pages/language-prompt-default.png" alt="The built-in language prompt at the bottom of an English page for a visitor whose browser is in Romanian: Această pagină există și în Română, with Rămân aici and Treci la Română buttons" />
+
+Its built-in texts are in English ("This page is also available in Română").
+To write the card in the suggested language, as above, add these keys to the
+brand dictionary in that language (see [Add texts](/pages/internationalization#add-texts)).
+A language without them shows the English texts:
 
 | Key | Text |
 | --- | --- |

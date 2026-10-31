@@ -1,0 +1,62 @@
+{
+  "out": "images/pages/i18n-page-language-tab.png",
+  "alt": "Page settings, Language tab of the original page: Page language set to English, the Translations panel listing the English original and the Romanian translation, and the Add translation in, URL and Add translation controls for Español",
+  "capture": {
+    "path": "/{brand}/pages?id=5983",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='row-actions-trigger']"
+      },
+      {
+        "click": "[data-testid='row-actions-trigger']"
+      },
+      {
+        "click": "[data-testid='list.row.action.edit']"
+      },
+      {
+        "waitFor": "[data-testid='page-settings']"
+      },
+      {
+        "click": "[data-testid='page-settings-tab'][data-tab='language']"
+      },
+      {
+        "waitFor": "[data-testid='pages.settings.translations.add-slug']"
+      },
+      {
+        "wait": 800
+      }
+    ],
+    "crop": "[data-testid='page-settings']",
+    "cropPad": 0
+  },
+  "maxWidth": 780,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='page-settings-field-language']",
+      "title": "Page language",
+      "text": "The language this page is in"
+    },
+    {
+      "selector": "[data-testid='pages.settings.translations.rows']",
+      "title": "Translations",
+      "text": "Every language version, with its URL",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='pages.settings.translations.add-language']",
+      "title": "Add translation in",
+      "text": "Languages without a version yet",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='pages.settings.translations.add']",
+      "title": "Add translation",
+      "text": "Copies the page to the URL beside it"
+    }
+  ]
+}

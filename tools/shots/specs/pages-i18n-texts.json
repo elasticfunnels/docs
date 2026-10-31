@@ -1,0 +1,47 @@
+{
+  "out": "images/pages/i18n-texts.png",
+  "alt": "The Texts list under Translations on All languages: each key with its language code and text, the Language filter, search, Bulk edit and Add text",
+  "capture": {
+    "path": "/{brand}/pages/advanced?tab=translations",
+    "viewport": {
+      "width": 1440,
+      "height": 1300
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='translations.entries.row-language']"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": "[data-testid='translations.entries.add'] >> xpath=ancestor::section[1]",
+    "cropPad": 8
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='translations.entries.language']",
+      "title": "Language",
+      "text": "All languages, or one",
+      "side": "left"
+    },
+    {
+      "box": [
+        10,
+        186,
+        393,
+        49
+      ],
+      "title": "Key and language",
+      "text": "One row per text and language",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='translations.entries.add'] >> xpath=..",
+      "title": "Add text",
+      "text": "One text, or Bulk edit for many"
+    }
+  ]
+}

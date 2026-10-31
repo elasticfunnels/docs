@@ -28,10 +28,11 @@ renders exactly as before.
 ---
 
 ## Set up your languages
-{/* SCREENSHOT: Translations screen · Languages list with code, label, default and URL prefix · desktop */}
 
 Both models start with the brand's languages. Open **Pages → Advanced →
 Translations**.
+
+<img src="/images/pages/i18n-languages.png" alt="The Languages list in Pages, Advanced, Translations: English marked Default with the / prefix, Español under /es/ and Română under /ro/, with the Add language button and the edit icon on each row" />
 
 <Steps>
   <Step title="Add a language">
@@ -68,11 +69,12 @@ others are its **translations**. Together they are a translation group. The CLI
 calls the original the source.
 
 ### Give the original its language
-{/* SCREENSHOT: Page settings · Language tab with Page language, Translations panel with Add translation in, URL and Add translation · desktop */}
 
 Open the original page's settings and the **Language** tab. Set **Page
 language** to the language it is written in. **Not set** keeps the page as it
 was before languages existed.
+
+<img src="/images/pages/i18n-page-language-tab.png" alt="Page settings, Language tab of the original page: Page language set to English, the Translations panel listing the English original and the Romanian translation, and the Add translation in, URL and Add translation controls for Español" />
 
 ### Make a translation
 
@@ -195,11 +197,12 @@ A dictionary page is one page for every language. Its texts are keys, and the
 brand dictionary holds one value per language.
 
 ### Add texts
-{/* SCREENSHOT: Translations screen · Texts list on All languages, with the Language column and Add text · desktop */}
 
 The **Texts** section of **Pages → Advanced → Translations** lists every text
 in every language, with a **Language** column. Pick a language in the filter to
 see one.
+
+<img src="/images/pages/i18n-texts.png" alt="The Texts list under Translations on All languages: each key with its language code and text, the Language filter, search, Bulk edit and Add text" />
 
 1. Click **Add text**.
 2. Pick the **Language**. It starts on the brand's default language.
@@ -270,6 +273,8 @@ In **Pages → Advanced → Translations**, under **Language URLs**, switch on
 **Serve pages under language folders** (prefix routing), or run
 `ef i18n settings --prefix-routing on`. Then a request for
 `/<prefix>/<slug>` serves the dictionary page `<slug>` in that language:
+
+<img src="/images/pages/i18n-language-urls.png" alt="The Language URLs settings under Translations: the Serve pages under language folders switch, Language suggestion set to Built-in prompt, and Fallback language for search engines" />
 
 | URL | Serves | Language |
 | --- | --- | --- |

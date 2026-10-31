@@ -1,0 +1,21 @@
+{
+  "out": "images/pages/i18n-language-urls.png",
+  "alt": "The Language URLs settings under Translations: the Serve pages under language folders switch, Language suggestion set to Built-in prompt, and Fallback language for search engines",
+  "capture": {
+    "path": "/{brand}/pages/advanced?tab=translations",
+    "viewport": { "width": 1440, "height": 1000 },
+    "actions": [
+      { "waitFor": "[data-testid='translations.url-settings.prompt']" },
+      { "wait": 600 }
+    ],
+    "crop": "[data-testid='translations.url-settings']",
+    "cropPad": 8
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "[data-testid='translations.url-settings.prefix-routing']", "title": "Language folders", "text": "Serves dictionary pages under /ro/ and the like" },
+    { "selector": "[data-testid='translations.url-settings.prompt']", "title": "Language suggestion", "text": "Off, built-in prompt or your own markup" },
+    { "selector": "[data-testid='translations.url-settings.x-default']", "title": "Fallback language", "text": "The hreflang x-default version" }
+  ]
+}

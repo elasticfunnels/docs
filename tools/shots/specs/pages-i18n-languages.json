@@ -1,0 +1,52 @@
+{
+  "out": "images/pages/i18n-languages.png",
+  "alt": "The Languages list in Pages, Advanced, Translations: English marked Default with the / prefix, Español under /es/ and Română under /ro/, with the Add language button and the edit icon on each row",
+  "capture": {
+    "path": "/{brand}/pages/advanced?tab=translations",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='translations.languages.row-prefix']"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": "[data-testid='translations.languages.add'] >> xpath=ancestor::section[1]",
+    "cropPad": 8
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='translations.languages.add']",
+      "title": "Add language",
+      "text": "Code, name, default and URL prefix"
+    },
+    {
+      "selector": "[data-testid='translations.languages.row']:has-text('Default') >> td >> nth=0",
+      "title": "Default",
+      "text": "Main version and text fallback",
+      "side": "left"
+    },
+    {
+      "box": [
+        10,
+        217,
+        478,
+        49
+      ],
+      "title": "URL prefix",
+      "text": "Română pages live under /ro/",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='translations.languages.row']:has-text('Română') [data-testid='translations.languages.edit']",
+      "title": "Edit",
+      "text": "Change the name, prefix or order"
+    }
+  ]
+}
