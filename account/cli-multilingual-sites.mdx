@@ -12,7 +12,7 @@ brand dictionary. It calls the same API as the app, with the same permissions.
 ## Before you start
 
 - Connect the CLI to your project: [Connect the ef CLI](/account/cli-and-api-keys).
-- These commands need `ef` 0.26.0 or later. Check with `ef --version`; update
+- These commands need `ef` 0.26.1 or later. Check with `ef --version`; update
   with `npm i -g @elasticfunnels/cli@latest`.
 - Add the brand's languages first, in **Pages → Advanced → Translations** or
   with `ef translations push` (below). Every command takes the language code you
@@ -85,8 +85,13 @@ and visible text) changed since the translation was made or marked up to date.
 It also reads the source's local file, so an edit you have not pushed yet
 shows as "stale after push".
 
+It also lists every page with a language whose file still has its own hreflang,
+canonical or `og:locale` tag. EF writes those tags for pages with a language and leaves
+its own out when the page declares one, so a hand-written tag left over from an older
+setup quietly wins. `ef push` and `ef lint` print the same warning for that file.
+
 It exits **1** when a translation is stale, and with `--strict` also when one is
-missing, so it can stop a publish:
+missing or a page keeps its own language tags, so it can stop a publish:
 
 ```bash
 ef i18n check --lang ro,es && ef push --all
@@ -143,6 +148,6 @@ does.
 | Code | Meaning |
 | --- | --- |
 | `0` | Done. For `ef i18n check`: nothing stale. |
-| `1` | `ef i18n check` found a stale translation (or a missing one, with `--strict`). |
+| `1` | `ef i18n check` found a stale translation (with `--strict`, also a missing one or a page with its own language tags). |
 | `2` | The request was refused: an unknown language, a duplicate language in a group, a slug already taken, a bad flag value. |
 | `7` | The page, component or source slug does not exist. |
