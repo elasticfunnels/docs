@@ -1,0 +1,293 @@
+---
+title: 'Language prompt and switcher'
+sidebarTitle: "Language prompt and switcher"
+icon: "globe"
+description: 'Suggest a page in the visitor''s language without redirecting, add a language switcher, or build your own prompt on the window.ef.i18n API.'
+---
+
+When a page exists in more than one language, ElasticFunnels can suggest the
+visitor's language ("This page is also in Română") and fill in a language
+switcher. It never redirects anyone on its own: the visitor decides, and the
+choice is remembered.
+
+You can use EF's small built-in prompt, or write your own markup and styles and
+let ElasticFunnels handle when to show it, what it links to and what the
+visitor chose. The API is shaped like the cookie consent one on
+[Privacy & consent](/pages/privacy-consent),
+so if you built a consent banner, this works the same way.
+
+<Warning>
+**The prompt is off by default.** Until you turn it on, nothing shows. It only
+applies to pages that exist in another language: [linked translations](/pages/internationalization#linked-pages-one-page-per-language),
+or a dictionary page under [prefix routing](/pages/internationalization#prefix-routing).
+Other pages stay exactly as they are.
+</Warning>
+
+---
+
+## Turning it on
+
+<Steps>
+  <Step title="Have a page in two languages">
+    Set up your languages and at least one translated page. See
+    [Multilingual sites](/pages/internationalization).
+  </Step>
+  <Step title="Pick the prompt">
+    In **Pages → Advanced → Translations**, under **Language URLs**, set
+    **Language suggestion**, or use the CLI:
+
+    | Option | What happens | CLI |
+    | --- | --- | --- |
+    | **Off** | The default. No prompt shows. The switcher and the API still work. | `ef i18n settings --prompt off` |
+    | **Built-in prompt** | EF's small prompt, unless the page has its own (`data-ef-lang-modal`). | `ef i18n settings --prompt default` |
+    | **My own markup** | Only your own markup. With none on the page, nothing shows and your code can use the API. | `ef i18n settings --prompt custom` |
+  </Step>
+  <Step title="Check it">
+    Open a translated page in a browser set to the other language, in a private
+    window (a stored choice hides the prompt).
+  </Step>
+</Steps>
+
+---
+
+## When the prompt shows
+
+ElasticFunnels picks at most one language to suggest:
+
+1. The visitor's browser languages (`navigator.languages`), in their order.
+2. If none of those match, the language of the visitor's country.
+
+Only languages the page exists in are suggested, never the one the visitor is
+already reading. Then:
+
+- **It never redirects.** The visitor moves only by clicking.
+- **No prompt for bots.** Search engine crawlers and automated browsers
+  (`navigator.webdriver`) get no suggestion, so every version is crawled as it is.
+- **Once per visitor.** Accepting or dismissing stores the choice in the
+  `ef_lang_choice` cookie (`ro`, or `dismissed:ro`; 180 days, whole site) and in
+  local storage. A dismissed suggestion does not come back.
+- **An accepted language follows the visitor.** After choosing Romanian, a
+  page that has a Romanian version suggests it, even when the browser says
+  otherwise.
+
+---
+
+## The built-in prompt
+{/* SCREENSHOT: Default language prompt · bottom of a translated page, Romanian suggestion with accept and dismiss · desktop and mobile */}
+
+With **Built-in prompt**, a small card at the bottom of the page names the language
+and offers two buttons: go to that version, or stay. The card is written in
+the suggested language: a plain white card in the visitor's system font.
+
+Change its texts in the brand dictionary, per language, with these keys
+(see [Add texts](/pages/internationalization#add-texts)):
+
+| Key | Text |
+| --- | --- |
+| `i18n_sites.prompt.title` | The sentence on the card. `{name}` is replaced by the language's name. |
+| `i18n_sites.prompt.accept` | The button that goes to the suggested version. |
+| `i18n_sites.prompt.dismiss` | The button that keeps the visitor where they are. |
+
+---
+
+## Your own prompt
+
+With **My own markup** (or **Built-in prompt**, when the page has its own), your markup and
+styles are the prompt. ElasticFunnels shows it, fills it in and handles the
+clicks. Put the element on the page, or in a component every page includes,
+with the `hidden` attribute so it stays out of sight until there is something
+to suggest.
+
+| Attribute | On | What ElasticFunnels does |
+| --- | --- | --- |
+| `data-ef-lang-modal` | The prompt's outer element | Removes `hidden` when there is a suggestion, and hides it again after a choice. |
+| `data-ef-lang-accept` | A button or link | Stores the choice and goes to the suggested page. |
+| `data-ef-lang-dismiss` | A button | Stores "dismissed" and hides the prompt. |
+| `data-ef-lang-name` | Any element | Its text becomes the language's name (`Română`). |
+| `data-ef-lang-code` | Any element | Its text becomes the language code (`ro`). |
+| `data-ef-lang-url` | A link | Its `href` becomes the suggested page's URL. |
+| `data-ef-lang-open` | Any element | Shows the prompt again, for a "Language" link in your footer. |
+
+A complete example, a card in the corner with its own styles and a short
+script that writes the sentence in the suggested language:
+
+```html
+<style>
+.lp{position:fixed;left:20px;bottom:20px;z-index:2147483000;width:360px;max-width:calc(100vw - 40px);
+  background:#fff;color:#1C1566;border:1px solid #E4E2F0;border-radius:24px;padding:18px 20px;
+  box-shadow:0 16px 40px -12px rgba(28,21,102,.25);opacity:0;transform:translateY(8px);
+  transition:opacity .2s,transform .2s;font:14px/1.5 system-ui,sans-serif}
+.lp[hidden]{display:none!important}
+.lp.lp--in{opacity:1;transform:none}
+.lp__title{margin:0 0 12px;font-size:16px;font-weight:600}
+.lp__btns{display:flex;gap:8px}
+.lp__btn{flex:1 1 0;height:44px;border-radius:999px;border:0;cursor:pointer;font:500 14px/44px system-ui,sans-serif;
+  text-align:center;text-decoration:none}
+.lp__btn--dark{background:#1F1488;color:#fff}
+.lp__btn--light{background:#F4F2FA;color:#1C1566}
+.lp__btn:focus-visible{outline:2px solid #1F1488;outline-offset:2px}
+@media (max-width:600px){.lp{left:0;right:0;bottom:0;width:auto;max-width:none;border-radius:24px 24px 0 0}}
+@media (prefers-reduced-motion:reduce){.lp{transition:none}}
+</style>
+
+<div class="lp" id="lp" data-ef-lang-modal role="dialog" aria-modal="false"
+     aria-labelledby="lp-title" hidden>
+  <p class="lp__title" id="lp-title">This page is also in <span data-ef-lang-name></span>.</p>
+  <div class="lp__btns">
+    <button type="button" class="lp__btn lp__btn--light" data-ef-lang-dismiss>Stay here</button>
+    <a class="lp__btn lp__btn--dark" data-ef-lang-accept data-ef-lang-url href="#">Switch</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  // The sentence and buttons in the language being suggested.
+  var TEXT = {
+    ro: ['Pagina există și în română.', 'Rămân aici', 'Treci la română'],
+    es: ['Esta página también está en español.', 'Seguir aquí', 'Ver en español'],
+    de: ['Diese Seite gibt es auch auf Deutsch.', 'Hier bleiben', 'Auf Deutsch lesen']
+  };
+  window.addEventListener('ef-i18n-suggest', function (e) {
+    var box = document.getElementById('lp');
+    var t = TEXT[e.detail.lang];
+    if (t) {
+      box.setAttribute('lang', e.detail.lang);
+      document.getElementById('lp-title').textContent = t[0];
+      box.querySelector('[data-ef-lang-dismiss]').textContent = t[1];
+      box.querySelector('[data-ef-lang-accept]').textContent = t[2];
+    }
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { box.classList.add('lp--in'); });
+    });
+  });
+})();
+</script>
+```
+
+A footer link that brings it back:
+
+```html
+<a href="#" data-ef-lang-open>Language</a>
+```
+
+The `lp-` class names, the colours and the texts are all yours. Only the
+`data-ef-lang-*` attributes matter to ElasticFunnels. With dictionary pages,
+write the texts as `t()` keys instead of the script's list.
+
+---
+
+## A language switcher
+
+Add an element with `data-ef-lang-switcher`. Leave it empty and ElasticFunnels
+fills it with one link per language the page exists in, the current one marked
+with `aria-current`:
+
+```html
+<nav aria-label="Language" data-ef-lang-switcher></nav>
+```
+
+To control the markup, put your own links inside, one per language, with
+`data-ef-lang-option="<code>"`. ElasticFunnels sets their `href`, `hreflang`,
+`lang` and `aria-current`, and leaves everything else alone:
+
+```html
+<nav aria-label="Language" data-ef-lang-switcher class="lang">
+  <a data-ef-lang-option="en">EN</a>
+  <a data-ef-lang-option="ro">RO</a>
+  <a data-ef-lang-option="es">ES</a>
+</nav>
+```
+
+A click on a switcher link counts as the visitor's choice, the same as
+accepting the prompt.
+
+You can also write the switcher in the template from the `translations`
+variable; see [Template variables](/pages/internationalization#template-variables).
+
+---
+
+## For developers: the `window.ef.i18n` API
+
+On pages that exist in another language, `window.ef.i18n` is available from the
+page's `<head>` onwards. On other pages it is not defined, so check for it:
+`window.ef && window.ef.i18n`.
+
+| Method | What it does |
+| --- | --- |
+| `get()` | Returns `{ current, languages, suggestion, choice }`. |
+| `suggestion()` | The language to suggest, `{ lang, url, name }`, or `null`. |
+| `accept()` | Stores the suggested language and goes to its page. |
+| `dismiss()` | Stores "dismissed" and hides the prompt. |
+| `choose(lang)` | Stores `lang` and goes to that version (`'ro'`). |
+| `open()` | Shows the prompt again, even after a stored choice. |
+| `onChange(fn)` | Calls `fn(state)` with the same object as `get()` after every choice. Returns a function that removes it. |
+
+`current` is the page's language code. `languages` lists every version:
+`{ code, hreflang, name, url, current }`. `choice` is the stored choice (`'ro'`
+or `'dismissed:ro'`), or `null`.
+
+```js
+const i18n = window.ef.i18n;
+
+const s = i18n.suggestion();
+if (s) {
+  console.log('Suggest', s.name, 'at', s.url);
+}
+
+i18n.onChange((state) => {
+  console.log('now', state.choice);
+});
+```
+
+### Events
+
+The page fires these events on `window`:
+
+| Event | When |
+| --- | --- |
+| `ef-i18n-suggest` | Once on load, when there is a language to suggest. Fires with every prompt option, **Off** included. |
+| `ef-i18n` | Every choice. |
+| `ef-i18n-accepted` | A language was chosen: the prompt accepted, `choose()`, or a switcher link. |
+| `ef-i18n-dismissed` | The prompt was dismissed. |
+
+Each carries the same `detail`:
+
+```js
+{
+  current: 'en',               // the page's language
+  lang: 'ro',                  // the language suggested or chosen
+  url: 'https://example.com/ro/despre',
+  name: 'Română',
+  source: 'prompt'             // prompt | api | switcher | stored
+}
+```
+
+`source` is `prompt` for a click in the prompt, `api` for a call to
+`window.ef.i18n`, `switcher` for a switcher link, and `stored` for a suggestion
+that comes from a language the visitor accepted earlier.
+
+```js
+window.addEventListener('ef-i18n-accepted', (event) => {
+  console.log('switched to', event.detail.lang);
+});
+```
+
+### Google Tag Manager
+
+Every choice is also pushed to `dataLayer`:
+
+```js
+{ event: 'ef_language_choice', ef_language: { action: 'accepted', current: 'en', lang: 'ro', source: 'prompt' } }
+```
+
+`action` is `accepted` or `dismissed`. In Google Tag Manager, a **Custom
+Event** trigger on `ef_language_choice` and a **Data Layer Variable**
+`ef_language.lang` tell you which languages visitors pick.
+
+---
+
+## Related
+
+- [Multilingual sites](/pages/internationalization): linked pages, dictionary pages, prefix routing.
+- [SEO](/pages/seo#multilingual-sites-hreflang): the `hreflang` tags written for each version.
+- [Privacy & consent](/pages/privacy-consent): the cookie banner, built on the same pattern.

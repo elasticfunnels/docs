@@ -1,0 +1,148 @@
+---
+title: "Multilingual sites from the ef CLI"
+sidebarTitle: "CLI: multilingual sites"
+icon: "terminal"
+description: "Translate pages and components, link language versions, edit the brand dictionary as JSON files, and stop a publish when a translation is stale, from the ef command-line tool or an AI agent."
+---
+
+The `ef` CLI covers both ways of building a [multilingual site](/pages/internationalization):
+a page per language linked as translations, and one page with its texts in the
+brand dictionary. It calls the same API as the app, with the same permissions.
+
+## Before you start
+
+- Connect the CLI to your project: [Connect the ef CLI](/account/cli-and-api-keys).
+- These commands need `ef` 0.26.0 or later. Check with `ef --version`; update
+  with `npm i -g @elasticfunnels/cli@latest`.
+- Add the brand's languages first, in **Pages → Advanced → Translations** or
+  with `ef translations push` (below). Every command takes the language code you
+  gave there (`ro`, `pt-br`).
+- `ef claude` writes a section on multilingual sites into the project's
+  `CLAUDE.md`, so an AI agent working in the folder uses these commands.
+
+## Translate a page
+
+```bash
+ef pages translate about --lang ro                  # new page ro/about, a copy of about, pulled to pages/ro/about.ef
+ef pages translate about --lang es --slug es/acerca --title "Acerca de"
+ef pages translate about --lang de --no-copy        # start empty
+ef pages translations about                         # the group: language, slug, status, URL, stale
+```
+
+`translate` copies the group's source page, so `ef pages translate ro/about
+--lang es` also copies `about`. It refuses (exit 2) when the group already has
+that language or the slug is taken. Translate `pages/ro/about.ef`, then
+`ef push pages/ro/about.ef`.
+
+Link pages that already exist, or undo a link:
+
+```bash
+ef pages create ro/despre --lang ro --translation-of about   # an empty page, linked
+ef pages settings ro/despre --lang ro --translation-of about
+ef pages settings ro/despre --translation-of none
+ef pages settings about --lang none
+```
+
+## Translate a component
+
+```bash
+ef components translate header --lang ro
+ef components translations header
+```
+
+A page in Romanian then includes the Romanian `header`; pages in other
+languages keep the base one. `--code` and `--name` set the new component's
+code and name.
+
+## The language in your local files
+
+`ef pull` writes each page's language and source into the first line of its
+file:
+
+```
+{{-- efmeta:{"v":1,"type":"page","brandId":7,"id":42,"slug":"ro/about","path":"pages/ro/about.ef","language":"ro","translation_of":"about"} --}}
+```
+
+`translation_of` is the source page's slug (for a component, its code). Change
+a page's language with `ef pages settings`, which updates the server and this
+line together. `ef push` sends `language` and `translation_of` only when you
+changed them in the file since the last pull, so pushing an older file never
+undoes a change someone made in the app.
+
+## Stale and missing translations
+
+```bash
+ef i18n check                   # every brand language, pages and components
+ef i18n check --lang ro,es      # only these languages
+ef i18n check --pages --json    # for a script
+ef i18n synced ro/about         # after you updated the translation
+ef i18n synced header-ro --component
+```
+
+`check` lists, per source page or component, which languages exist, which are
+missing and which are **stale**: the source's text (SEO title, SEO description
+and visible text) changed since the translation was made or marked up to date.
+It also reads the source's local file, so an edit you have not pushed yet
+shows as "stale after push".
+
+It exits **1** when a translation is stale, and with `--strict` also when one is
+missing, so it can stop a publish:
+
+```bash
+ef i18n check --lang ro,es && ef push --all
+```
+
+## The brand dictionary as files
+
+```bash
+ef translations pull                         # translations/<code>.json, one per language
+ef translations push                         # every file in translations/
+ef translations push translations/ro.json
+ef translations push --dry-run               # what would change
+ef translations push --prune                 # also delete keys the files no longer have
+```
+
+```json
+{
+  "language": { "code": "ro", "label": "Română", "is_default": false, "sort_order": 1, "url_prefix": null },
+  "entries": {
+    "hero.title": "Somn mai bun din prima săptămână",
+    "nav.home": "Acasă"
+  }
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `code` | The language code. A file for a code the brand does not have creates that language. |
+| `label` | The name shown in the switcher and the prompt. Write it in its own language. |
+| `is_default` | The default language. Only one file may say `true`. |
+| `sort_order` | Order in the switcher. |
+| `url_prefix` | The prefix for prefix routing; `null` uses the code (none for the default language). |
+| `entries` | `key: text`. `push` sends only the texts that changed. |
+
+Without `--prune`, `push` never deletes: a key that is only on the server stays,
+and the output says how many there are. `ef push` skips the `translations/`
+folder; send it with `ef translations push`.
+
+## Brand settings
+
+```bash
+ef i18n settings                                   # show
+ef i18n settings --prefix-routing on               # /ro/about serves the dictionary page about in Romanian
+ef i18n settings --prompt default                  # off | default | custom
+ef i18n settings --x-default en                    # hreflang x-default; none = the default language
+```
+
+See [Language prompt and switcher](/pages/language-prompt) for the prompt
+options and [SEO](/pages/seo#multilingual-sites-hreflang) for what `x-default`
+does.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Done. For `ef i18n check`: nothing stale. |
+| `1` | `ef i18n check` found a stale translation (or a missing one, with `--strict`). |
+| `2` | The request was refused: an unknown language, a duplicate language in a group, a slug already taken, a bad flag value. |
+| `7` | The page, component or source slug does not exist. |

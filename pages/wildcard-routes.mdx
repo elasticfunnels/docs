@@ -273,8 +273,8 @@ Use **`{name}`** in the slug for each dynamic part, then read
 
 - [Products and shipping](/backend-template-engine/products-and-shipping) —
   `productUrl`, `getProduct`, and the product fields to render.
-- [Internationalization (i18n)](/pages/internationalization) — `route_params.hl`
-  and `route_params.locale` are the highest-priority locale hints, ahead of
-  `?hl=`.
+- [Multilingual sites](/pages/internationalization): for `/ro/about` URLs,
+  use a page per language or prefix routing. A `{hl}` placeholder inside a slug
+  (such as `docs/{hl}`) still sets the language of a page without one.
 - [Rendering pipeline](/pages/rendering-pipeline) — where route resolution sits
   relative to the template engines.

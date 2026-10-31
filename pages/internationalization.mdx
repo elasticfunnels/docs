@@ -1,219 +1,382 @@
 ---
-title: 'Internationalization (i18n)'
-sidebarTitle: "Translations (i18n)"
+title: 'Multilingual sites (i18n)'
+sidebarTitle: "Multilingual sites"
 icon: "language"
-description: 'Translate page copy with a brand-wide dictionary, switch the active language via URL, and render localized strings from templates and backend scripts.'
+description: 'Serve a site in several languages: one page per language linked as translations, or one page with dictionary texts under /<prefix>/ URLs. hreflang, sitemap alternates and the language switcher come with it.'
 ---
 
-ElasticFunnels gives you a single, brand-wide system for translating page
-copy without forking pages or maintaining duplicate variants. You write
-your page once, **reference translation keys in templates** (or backend
-scripts), **store translations per language** in the admin, and the page
-shows the right copy based on the visitor's language.
+ElasticFunnels can serve your site in several languages. There are two ways to
+build it, and one brand can use both:
 
-The system is intentionally narrow: it only translates copy. Layout,
-images, links, and behavior stay identical across languages. Use
-[Page Variants](./page-variants) when you need a fully different
-experience per audience.
+| | Linked pages | Dictionary page |
+| --- | --- | --- |
+| What you make | One page per language (`about`, `ro/despre`, `es/acerca`) | One page for every language (`about`) |
+| Where the words live | In each page's own HTML | In the brand dictionary, as keys: `{{ t('hero.title') }}` |
+| URLs | Each page's own slug, so slugs can be translated | `/about`, `/ro/about`, `/es/about` with prefix routing on |
+| SEO fields, layout, images | Their own per language | Shared; only the texts change |
+| Best for | Sales pages, articles, anything where the copy, offer or layout differs by market | Checkouts, members pages, shared navigation, pages whose layout never changes |
 
-## How it works
-{/* SCREENSHOT: Translations admin · Pages → Advanced → Translations · desktop */}
+Either way, a page in a language renders in that language, gets
+`<html lang>`, reciprocal `hreflang` links, a self canonical and sitemap
+alternates, and can show a language switcher and a "this page is also in
+Romanian" prompt. See [SEO for multilingual sites](/pages/seo#multilingual-sites-hreflang)
+and [Language prompt and switcher](/pages/language-prompt).
 
-There are two things to manage:
+Nothing changes for a brand that does not use it: a page without a language
+renders exactly as before.
 
-1. **Languages** — the list of locales your brand supports (e.g. `en`,
-   `pt-br`, `de`). One language is your **default**.
-2. **Entries** — for each language, a list of `key → translation` rows.
-   The same key (e.g. `hero.title`) lives in every language.
+---
 
-Once a language has entries, any template or script that uses that key
-under the **resolved** locale for the request will receive the matching
-value.
+## Set up your languages
+{/* SCREENSHOT: Translations screen · Languages list with code, label, default and URL prefix · desktop */}
 
-### Translation keys
+Both models start with the brand's languages. Open **Pages → Advanced →
+Translations**.
 
-Keys use **dot notation** so you can group related copy together —
-`hero.title`, `checkout.cta`, `faq.refund_policy`.
+<Steps>
+  <Step title="Add a language">
+    Click **Add language** and enter:
 
-Use **letters, numbers, underscores, and dots** in keys (e.g. `hero.title`,
-`form.email_placeholder`). The admin may allow a wider pattern for stored
-keys; sticking to this subset keeps lookups predictable.
+    | Field | What to put |
+    | --- | --- |
+    | **Code** | A short language code: `en`, `de`, `ro`, `pt-br`. Stored in lowercase. |
+    | **Language** | The name visitors see in the language switcher and the prompt. Write it in its own language: `Română`, `Deutsch`, `Português (Brasil)`. |
+    | **Default language** | The language a page without one is in, and the one shown when a visitor's language has no version. One per brand. |
+    | **Sort order** | Order in the switcher and in language lists. |
+    | **URL prefix** | The path prefix for prefix routing. Leave it empty to use the code (`/pt-br/`); the default language has no prefix. Lowercase letters, digits and dashes. |
+  </Step>
+  <Step title="Add the default language too">
+    Add your main language (usually `en`) and switch on **Default language**.
+    Without it, ElasticFunnels cannot tell which version is the main one for
+    `hreflang="x-default"` or for text fallbacks.
+  </Step>
+</Steps>
 
-Each `key` is unique within a language but is meant to repeat across
-languages — that's how the system knows the English `hero.title` and
-the German `hero.title` are the same slot.
+<Note>
+Codes are matched exactly. `pt` and `pt-br` are two languages: add both if you
+need both. A language that pages or components use can't be deleted or have
+its code changed; the error says how many use it.
+</Note>
 
-## Managing languages and translations
-{/* SCREENSHOT: Languages list · admin · desktop */}
+---
 
-Open **Pages → Advanced → Translations** to manage everything in one
-place.
+## Linked pages: one page per language
 
-### Add a language
+Each language version is its own page with its own slug, HTML, SEO title and
+description, revisions and split tests. One page is the **original**; the
+others are its **translations**. Together they are a translation group. The CLI
+calls the original the source.
 
-1. Click **Add language**.
-2. Enter a **Code**, a short language code such as `en`, `de` or `pt-br`.
-3. Optionally add a **Language** name (shown only in the admin, for example German).
-4. Toggle **Default language** for the language that should be served
-   when no other language is selected.
-5. Use **Sort order** to control the order in language pickers.
+### Give the original its language
+{/* SCREENSHOT: Page settings · Language tab with Page language, Translations panel with Add translation in, URL and Add translation · desktop */}
 
-### Add texts
+Open the original page's settings and the **Language** tab. Set **Page
+language** to the language it is written in. **Not set** keeps the page as it
+was before languages existed.
 
-The **Texts** section appears once the brand has a language.
+### Make a translation
 
-1. Pick the language in the **Language** field under the Texts heading.
-2. Click **Add text**.
-3. Enter a **Key** (for example `hero.title`) and the **Text**.
-4. Save.
+In the **Translations** panel on the same tab, pick a language in **Add
+translation in**, check the **URL**, and click **Add translation**.
+ElasticFunnels makes a draft copy of the original in that language, links the
+two, and proposes the URL `<prefix>/<original slug>`:
 
-Use the search box to filter by key or value when your dictionary grows.
+| Original slug | New Romanian page | Answers at |
+| --- | --- | --- |
+| `about` | `ro/about` | `/ro/about` |
+| `index` (the homepage) | `ro/index` | `/ro` |
+| `blog/sleep-tips` | `ro/blog/sleep-tips` | `/ro/blog/sleep-tips` |
 
-### Bulk edit
-{/* SCREENSHOT: Bulk editor · admin · desktop */}
+Change the URL to a translated one if you want (`ro/despre`). Then translate
+the copy, the SEO title and description, and publish the page. If the brand
+has no languages yet, the panel says **Add your languages first.** with a link
+to **Go to Translations**.
 
-Click **Bulk edit** next to **Add text** to switch to a
-spreadsheet-style editor. Add or change many keys at once, then click
-**Save all changes**. The whole batch saves together — if any row
-fails validation, nothing is saved.
+The panel lists every version: **Original**, **(this one)** for the page you
+are on, the language of each, and links to **Open the page** and **Open its
+settings**.
 
-### Permissions
+With the CLI:
 
-Access to translations is controlled by the **Translations** module
-permissions in your role: `view`, `create`, `update`, `delete`.
-
-## Choosing the active language
-
-ElasticFunnels derives a **locale hint** from the request, then **snaps**
-it to a language row configured for the brand (when any exist).
-
-**Locale hint priority** (first match wins):
-
-1. **Wildcard / route params** — `hl` or `locale` captured by a
-   [wildcard route](/pages/wildcard-routes) (e.g. the slug `docs/{hl}`), also
-   merged Express `params` when present. Note that a slug cannot *start* with a
-   placeholder, so `/en/about` cannot be matched this way — use `?hl=en`.
-2. **Query string** — `hl`, then `locale`, then `lang`.
-3. **Session** — `session.locale`.
-4. **Domain** — `locale` / `language` from domain config.
-5. **Brand** — `locale` / `language` from brand variables.
-6. **`Accept-Language`** — primary two-letter subtag of the first range
-   (e.g. `en-US` → `en`).
-7. **`en`** — final fallback for the hint.
-
-**Snapping to brand languages** (when the brand has at least one language
-in Advanced → Translations):
-
-- If the hint matches a configured **code** exactly (after normalization),
-  that language is used.
-- Otherwise the brand **default** language is used, or the first language
-  by sort order if no default is set.
-
-There is **no** automatic `pt-br` → `pt` alias today: add both codes in
-the admin if you need regional variants.
-
-If the brand has **no** languages configured, the hint is still set on
-the request for built-in helpers, but **`getTranslations()`** and
-dictionary-backed **`t()`** / **`| t`** paths will not load entries from
-the database.
-
-### Clean URLs per language
-
-If you want URLs like `/en/about` and `/pt-br/about` to switch the
-active language, capture the locale segment in your page slug:
-
-- **Page slug:** `{hl}/about`
-- **URLs that match:** `/en/about`, `/pt-br/about`
-
-The `{hl}` placeholder feeds into the route params used in step (1)
-above.
-
-## Using translations in templates
-
-There are two sources of copy:
-
-1. **Brand dictionary** (Advanced → Translations) — **`t()`**, **`| t`**,
-   and **`getTranslations()`** use the **resolved** language for the request.
-2. **Built-in product strings** (`src/locales` on the server) — used when
-   **`t()`** or **`| t`** does not find a brand entry for the key; today the shipped
-   catalog is **English**; extra locale files extend this over time.
-
-```twig
-<h1>{{ t('title.greeting') }}</h1>
-<h2>{{ 'hero.subtitle' | t }}</h2>
-<img src="/hero.png" alt="{{ t('hero.alt') }}" />
-<p>{{ dump(locales()) }}</p>
-<p>Default: {{ defaultLocale() }}</p>
-<p>{{ t('product.savings_percent', { percent: 20 }) }}</p>
-<p>{{ 'product.savings_percent' | t:savingsOpts }}</p>
-<p>Language: {{ getResolvedLanguage() }}</p>
-<p>Active code (same as resolved): {{ locale }}</p>
+```bash
+ef pages translate about --lang ro                 # creates ro/about and pulls pages/ro/about.ef
+ef pages translate about --lang es --slug es/acerca --title "Acerca de"
+ef pages translations about                        # every version, with its status
 ```
 
-| Function / filter | What it does |
+### Link pages you already have
+
+If the Romanian page already exists, link it instead of copying. This is done
+with the CLI:
+
+```bash
+ef pages settings ro/despre --lang ro --translation-of about
+ef pages settings ro/despre --translation-of none     # unlink it
+ef pages settings about --lang en                     # give the original its language
+```
+
+A linked page's **Language** tab names its original, for example **This page
+is a translation of About.** Click **Unlink** and save to take it out of the group; it keeps
+its content and language.
+
+Rules:
+
+- A group has at most one page per language.
+- One level only: a translation's original is never itself a translation. Link
+  every translation to the same original.
+- An original with no language counts as the default language.
+- Unlinking or deleting a translation leaves the other pages as they are.
+  Deleting the original makes its first translation the new original.
+
+### When the original changes
+
+A translation remembers the text of its original at the moment it was made or
+last marked up to date (the SEO title, the SEO description and the page's
+visible text; markup, scripts and styles do not count). When the original's
+text changes, the translation shows **Out of date** in the **Translations**
+panel.
+
+Update the translation, then click **Mark up to date**. In the CLI, `ef i18n check`
+lists every stale and missing translation and exits with an error when one is
+stale, so you can use it before you publish:
+
+```bash
+ef i18n check --lang ro,es
+ef i18n synced ro/about
+```
+
+### Components in a language
+
+A page in Romanian that includes the `header` component uses the Romanian
+translation of `header` when there is one, and the base `header` otherwise.
+Make a component translation the same way as a page translation, from the
+component's **Translations** panel (it asks for a **Code** instead of a URL), or
+with the CLI:
+
+```bash
+ef components translate header --lang ro
+```
+
+You can also keep one component for every language and write its texts as
+`{{ t('nav.home') }}`. Those follow the page's language too (see below). Pick
+by what differs:
+
+| Use | When |
 | --- | --- |
-| `getTranslations()` | Shallow copy of the full `key → value` map for the active resolved language. Async. |
-| `getResolvedLanguage()` | Snapped language **code** from the brand configuration (e.g. `pt-br`). Async. |
-| `t(key, params?)` | **Brand entry first** when the key exists for the resolved language; otherwise built-in JSON from `src/locales`. Optional `params` is an **object** for `{{ name }}`-style placeholders **only** for built-in strings. Async. |
-| `expr \| t` and `expr \| t:params` | Same resolution as `t()`; `expr` yields the **key string** (often a quoted literal). Optional **`t:params`** passes an object for built-in **`{{ name }}`** interpolation — `params` must be a variable or safe expression on the page context, same rules as `t(key, params)`. Async. |
-| `locales()` | Array of configured language codes for the brand (admin sort order). Async. |
-| `defaultLocale()` | Default language code, or first by sort order, or `''`. Async. |
+| One component with `t()` keys | Only the words change. One place to edit the markup. |
+| A translation of the component | The layout, the links or the images differ by language. |
 
-**`getTranslation(key)`** is still exposed for **brand-only** lookups (no built-in fallback, returns `''` if missing). For strings in pages and scripts, prefer **`t()`** or **`| t`** so product copy can fall through to the shipped catalog when useful.
+For links in shared navigation, use `page_url('<slug>')` instead of writing
+the path. It returns the URL of that page's translation in the current page's
+language, and the page itself when there is no translation:
 
-Use **`{{ locale }}`** for the active resolved code on the page context, or **`getResolvedLanguage()`** inside expressions when you need the snapped code explicitly.
+```html
+<nav>
+  <a href="{{ page_url('index') }}">{{ t('nav.home') }}</a>
+  <a href="{{ page_url('features') }}">{{ t('nav.features') }}</a>
+  <a href="{{ page_url('pricing') }}">{{ t('nav.pricing') }}</a>
+</nav>
+```
 
-## Using translations in backend scripts
+On `/ro/despre` this links to `/ro`, `/ro/features` and `/ro/pricing` when
+those translations exist.
 
-Backend scripts (`<script scope="backend">`) expose the same **brand**
-helpers as templates (all async in the sandbox):
+### Funnels keep the visitor's language
+
+When a funnel step or a `/page?id=` link sends a visitor to a page that has a
+translation in the language of the page they are on, they land on that
+translation. Build the funnel once, with the original pages.
+
+---
+
+## Dictionary pages: one page, texts per language
+
+A dictionary page is one page for every language. Its texts are keys, and the
+brand dictionary holds one value per language.
+
+### Add texts
+{/* SCREENSHOT: Translations screen · Texts list on All languages, with the Language column and Add text · desktop */}
+
+The **Texts** section of **Pages → Advanced → Translations** lists every text
+in every language, with a **Language** column. Pick a language in the filter to
+see one.
+
+1. Click **Add text**.
+2. Pick the **Language**. It starts on the brand's default language.
+3. Enter a **Key** (for example `hero.title`) and the **Text**, then save.
+
+If you save a text in a language the list is not showing, the list switches to
+**All languages** so you can see it.
+
+Keys use dot notation to group related texts: `hero.title`, `checkout.cta`,
+`faq.refund_policy`. Use letters, numbers, underscores and dots. The same key
+repeats in every language: that is how ElasticFunnels knows the English
+`hero.title` and the Romanian `hero.title` are the same text.
+
+**Bulk edit** opens a spreadsheet-style editor for one language at a time. If
+the list is on **All languages**, it switches to the default language first.
+Add or change many keys, then click **Save all changes**. The batch saves
+together: if a row fails, nothing is saved.
+
+With the CLI, the dictionary is one JSON file per language:
+
+```bash
+ef translations pull       # writes translations/en.json, translations/ro.json, ...
+ef translations push       # sends your edits back
+```
+
+```json
+{
+  "language": { "code": "ro", "label": "Română", "is_default": false, "sort_order": 1, "url_prefix": null },
+  "entries": {
+    "hero.title": "Somn mai bun din prima săptămână",
+    "nav.home": "Acasă"
+  }
+}
+```
+
+### Use texts in a page
+
+```html
+<h1>{{ t('hero.title') }}</h1>
+<h2>{{ 'hero.subtitle' | t }}</h2>
+<img src="/hero.png" alt="{{ t('hero.alt') }}" />
+<span data-ef-hl="cta.buy">Buy now</span>
+```
+
+| Function or filter | What it does |
+| --- | --- |
+| `t(key, params?)` | The text for the page's language. Async. |
+| `expr \| t` and `expr \| t:params` | Same as `t()`, with the key as the expression. |
+| `data-ef-hl="key"` | Replaces the element's text with the key's text in the page's language. |
+| `getTranslations()` | The whole `key → text` map for the page's language. Async. |
+| `getTranslation(key)` | The text from the brand dictionary only, `''` when missing. |
+| `getResolvedLanguage()` | The language code the page renders in (`pt-br`). Async. |
+| `locales()` | The brand's language codes, in sort order. Async. |
+| `defaultLocale()` | The default language code. Async. |
+| `{{ locale }}` | The language code the page renders in. |
+
+**A missing text falls back.** `t()` and `| t` look in the page's language,
+then the default language, then ElasticFunnels' built-in texts, and finally
+show the last part of the key (`hero.title` shows `title`). `data-ef-hl` uses
+the default language's text, then keeps the element's own markup.
+`getTranslation()` returns `''` when no language has the key. So a key only
+needs a value in the languages where it differs, and visitors never see a raw
+key such as `hero.title`.
+
+### Prefix routing
+
+In **Pages → Advanced → Translations**, under **Language URLs**, switch on
+**Serve pages under language folders** (prefix routing), or run
+`ef i18n settings --prefix-routing on`. Then a request for
+`/<prefix>/<slug>` serves the dictionary page `<slug>` in that language:
+
+| URL | Serves | Language |
+| --- | --- | --- |
+| `/about` | `about` | the default language (`?hl=` still switches it, without language tags) |
+| `/ro/about` | `about` | Romanian |
+| `/es` | the homepage | Spanish |
+
+A real page always wins: if a page with the slug `ro/about` exists, `/ro/about`
+serves it. Prefix routing only applies to pages without a language; a linked
+page in a language is served at its own slug. Each prefixed URL has its own
+canonical, and gets `hreflang` and sitemap alternates like a linked page.
+
+### Using translations in backend scripts
+
+Backend scripts (`<script scope="backend">`) have the same helpers, all async:
 
 ```javascript
 var code = await getResolvedLanguage();
 var langs = await getLocales();
 var def = await getDefaultLocale();
-var hint = await getLocale();
 var dict = await getTranslations();
 var cta = await t('checkout.cta');
-var title = await t('title.greeting');
 ```
 
-**`t(key, params?)`** tries the **brand** dictionary first, then built-in
-locale JSON (same as templates). Use `await`. **`getLocale()`** returns
-the same resolved code as `{{ locale }}` (async in the sandbox).
+There is no pipe filter in backend scripts: use `await t('key')`. See
+[Backend scripts → Data functions](../backend-scripts/data-functions).
 
-There is **no** pipe-filter syntax in backend scripts — use **`await t('key')`**.
+---
 
-For the full host surface, see
-[Backend Scripts → Data Functions](../backend-scripts/data-functions).
+## Which language a page renders in
 
-## Caching
+1. **The page's language.** A page with a language always renders in it,
+   whatever the visitor's browser or a `?hl=` parameter says.
+2. **The URL prefix**, for a dictionary page served under prefix routing.
+3. For a page with neither, the old order still applies, first match wins:
+   a `hl` or `locale` placeholder in a [wildcard route](/pages/wildcard-routes)
+   (such as the slug `docs/{hl}`), then `?hl=`, `?locale=` or `?lang=`, then the
+   visitor's session, the domain's and the brand's language setting, the
+   browser's `Accept-Language`, and finally the default language.
 
-Translations are served from a fast **in-memory cache** (per app
-process). Saving languages or entries from the admin should **bust**
-that cache via the worker (`brand_translation` or full `brand` clear) so
-the next request reloads from the database.
+The result is matched to a brand language exactly. When nothing matches, the
+default language is used.
+
+<Warning>
+A slug cannot start with a placeholder, so `{hl}/about` never matches a URL.
+For `/ro/about`, make a linked page with the slug `ro/about`, or turn on
+prefix routing for a dictionary page.
+</Warning>
+
+`?hl=` keeps working on pages without a language, which suits checkouts that
+need the visitor's language from the page before. It gives one URL for every
+language, so search engines can index only one version: use linked pages or
+prefix routing for pages you want found in search.
+
+---
+
+## Template variables
+
+Every page in a translation group, and every page served under a prefix, has
+these in its template:
+
+| Variable | What it holds |
+| --- | --- |
+| `page_language` | The page's language code (`ro`). |
+| `default_language` | The brand's default language code. |
+| `translations` | One entry per language the page exists in: `code`, `hreflang`, `name` (the language's label), `url`, and `current` (true for this page). |
+
+A switcher written in the template:
+
+```html
+<nav aria-label="Language">
+  @foreach(tr in translations)
+    <a href="{{ tr.url }}" hreflang="{{ tr.hreflang }}" lang="{{ tr.code }}"
+       @if(tr.current) aria-current="page" @endif>{{ tr.name }}</a>
+  @endforeach
+</nav>
+```
+
+The [Language prompt and switcher](/pages/language-prompt) page has a switcher
+that fills itself in, and the prompt that suggests a visitor's language.
+
+---
+
+## Permissions
+
+Languages and texts follow the **Translations** permissions in your role:
+`view`, `create`, `update`, `delete`. Page translations follow the **Pages**
+permissions.
 
 ## Patterns and pitfalls
 
-- **Always set a default language** in Advanced → Translations so
-  snapping has a predictable target when the URL hint does not match any
-  row.
-- **Use stable keys.** Renaming a key in the admin does not update your
-  templates. Once `hero.title` exists, keep using it; rename only when
-  the meaning of the slot truly changes.
-- **Missing entries.** When the brand has no value for a key in the active
-  language, **`t()` / `| t`** fall back to built-in strings when a catalog
-  entry exists; otherwise prefer a sensible default in markup or a **`default:`**
-  filter. **`getTranslation`** (brand-only) returns `''` when missing.
-- **Exact language codes.** Add `pt` and `pt-br` separately if you need
-  both; the runtime does not auto-collapse regions.
+- **Set a default language** before you link pages, so `x-default` and the
+  text fallback have a target.
+- **Keep keys stable.** Renaming a key in the dictionary does not change your
+  templates. Rename only when the meaning of the text changes.
+- **Do not redirect by language in a script.** Search engines crawl mostly
+  from the US with no `Accept-Language`, so a redirect hides your other
+  versions. The [language prompt](/pages/language-prompt) suggests instead.
+- **Keep a translation offline until it is ready.** A page with the status
+  draft still answers on its live URL, and a new translation starts as a draft
+  copy of the original's text. `ef pages settings ro/about --status offline` hides it;
+  set it to published when the copy is translated.
 
 ## Related
 
-- [Wildcard routes](/pages/wildcard-routes) — capture an `hl` path segment
-  (e.g. the slug `docs/{hl}`); the placeholder cannot be the first segment.
-- [Page variables](./page-variables) — non-translation per-locale
-  switches (currency formatting, date masks, etc.).
-- [Backend scripts → data functions](../backend-scripts/data-functions)
-  — backend reference for translation helpers.
+- [Language prompt and switcher](/pages/language-prompt): suggest the visitor's language and let them switch.
+- [SEO](/pages/seo#multilingual-sites-hreflang): `hreflang`, canonical links and sitemap alternates.
+- [Multilingual sites from the ef CLI](/account/cli-multilingual-sites): every command, and a publish check for stale translations.
+- [Wildcard routes](/pages/wildcard-routes): placeholders in slugs.
+- [Privacy & consent](/pages/privacy-consent): the cookie banner picks the page's language.

@@ -255,7 +255,9 @@ page:
   one search engines read. Make sure it points at your own domain.
 - Otherwise ElasticFunnels adds it, using the same address the sitemap lists.
 
-Pages that aren't listed in the sitemap get no canonical from ElasticFunnels.
+Pages that aren't listed in the sitemap get no canonical from ElasticFunnels,
+except pages in a language (see [Multilingual sites](#multilingual-sites-hreflang)),
+which always get a self canonical.
 
 ### Your platform subdomain
 
@@ -287,6 +289,75 @@ These are left alone:
   stays self-canonical and indexable.
 - A page attached to the subdomain only. It exists nowhere else, so it keeps its
   own address.
+
+---
+
+## Multilingual sites: hreflang
+
+When your site is in more than one language ([Multilingual sites](/pages/internationalization)),
+ElasticFunnels writes the tags search engines use to match the versions. You
+do not add them yourself. They are written for a page that has a language, and
+for a dictionary page served under a language prefix (`/ro/about`). Pages
+without a language get none of this.
+
+In the page's `<head>`:
+
+```html
+<html lang="ro">
+<link rel="canonical" href="https://example.com/ro/despre">
+<link rel="alternate" hreflang="en" href="https://example.com/about">
+<link rel="alternate" hreflang="ro" href="https://example.com/ro/despre">
+<link rel="alternate" hreflang="es" href="https://example.com/es/acerca">
+<link rel="alternate" hreflang="x-default" href="https://example.com/about">
+<meta property="og:locale" content="ro_RO">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="es_ES">
+```
+
+| Tag | What ElasticFunnels writes |
+| --- | --- |
+| `<html lang>` | The page's language. |
+| `hreflang` alternates | One per version of the page that can be indexed, on the same domain, the page itself included. Full `https://` URLs. Every version lists the same set, so the links are reciprocal. Written only when at least two versions can be indexed. |
+| `x-default` | The version for visitors whose language has none: the default language's page, or the language you pick in **Fallback language for search engines** under **Language URLs** on the Translations screen (`ef i18n settings --x-default en`). |
+| Canonical | The page's own URL. A translation is never canonical to the source page. |
+| `og:locale` | The language as a locale (`pt-br` becomes `pt_BR`), with `og:locale:alternate` for the other versions. |
+| `inLanguage` | Added to your JSON-LD blocks that do not have one. |
+
+A version can be indexed when it is published, **Prevent Search Engine
+Indexing** is off, and it is not funnel-only, members-only or behind a
+password. A language with no such version is never linked: a Romanian
+`hreflang` appears only once a Romanian version is published.
+
+Your own tags win. If your page's HTML already has a canonical, `hreflang`
+links or `og:locale`, ElasticFunnels leaves that tag out and keeps yours.
+
+**In sitemap.xml**, every listed page in a translation group carries its
+alternates, the same set as in the head:
+
+```xml
+<url>
+  <loc>https://example.com/about</loc>
+  <xhtml:link rel="alternate" hreflang="en" href="https://example.com/about"/>
+  <xhtml:link rel="alternate" hreflang="ro" href="https://example.com/ro/despre"/>
+  <xhtml:link rel="alternate" hreflang="x-default" href="https://example.com/about"/>
+</url>
+```
+
+Each version is listed as its own `<url>`, and only versions that are in the
+sitemap appear as alternates there. Tick **List this page in sitemap.xml and
+llms.txt** on every translation you want found. Under prefix routing, a listed
+dictionary page gets one alternate per language prefix.
+
+Under prefix routing, a dictionary page's plain URL (`/about`) is the default
+language version. `?hl=ro` still switches its texts, but that URL gets no
+language tags: link to `/ro/about` instead.
+
+**In llms.txt**, when the brand has more than one language, pages are grouped
+under a heading per language.
+
+Google reads `hreflang` from the page and from the sitemap alike, so there is
+nothing more to set up. After you publish a new language, resubmit
+`sitemap.xml` in Google Search Console.
 
 ---
 

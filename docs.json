@@ -47,6 +47,8 @@
                   "pages/wildcard-routes",
                   "pages/seo",
                   "pages/privacy-consent",
+                  "pages/internationalization",
+                  "pages/language-prompt",
                   "pages/rendering-pipeline",
                   {
                     "group": "Variants and revisions",
@@ -63,8 +65,7 @@
                     "pages": [
                       "pages/interactions-panel",
                       "pages/containers",
-                      "pages/page-variables",
-                      "pages/internationalization"
+                      "pages/page-variables"
                     ]
                   },
                   {
@@ -469,6 +470,7 @@
                   "account/passkeys",
                   "account/cli-and-api-keys",
                   "account/cli-audiences-and-campaigns",
+                  "account/cli-multilingual-sites",
                   "account/refer-and-earn",
                   "account/ai-credits"
                 ]
