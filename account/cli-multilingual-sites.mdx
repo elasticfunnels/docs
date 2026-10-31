@@ -12,7 +12,7 @@ brand dictionary. It calls the same API as the app, with the same permissions.
 ## Before you start
 
 - Connect the CLI to your project: [Connect the ef CLI](/account/cli-and-api-keys).
-- These commands need `ef` 0.26.1 or later. Check with `ef --version`; update
+- These commands need `ef` 0.26.2 or later. Check with `ef --version`; update
   with `npm i -g @elasticfunnels/cli@latest`.
 - Add the brand's languages first, in **Pages → Advanced → Translations** or
   with `ef translations push` (below). Every command takes the language code you
@@ -84,6 +84,10 @@ missing and which are **stale**: the source's text (SEO title, SEO description
 and visible text) changed since the translation was made or marked up to date.
 It also reads the source's local file, so an edit you have not pushed yet
 shows as "stale after push".
+
+Only pages that already have at least one translation count. A page with a language
+and no translation yet is one you chose not to translate (most sites translate some
+pages, not all), so it is not reported as missing; add `--untranslated` to list those too.
 
 It also lists every page with a language whose file still has its own hreflang,
 canonical or `og:locale` tag. EF writes those tags for pages with a language and leaves
