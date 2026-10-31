@@ -1,0 +1,55 @@
+{
+  "out": "images/analytics/goals-how-to-fire.png",
+  "alt": "How to fire Get started click: a link with data-ef-goal=\"get_started\" for clicks, and ef.goal('get_started') for your own script",
+  "capture": {
+    "path": "/{brand}/settings/goals",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "fixtures": [
+      {
+        "url": "^/api/brands/\\d+/goals",
+        "file": "tools/shots/fixtures/ad-columns/goals.json"
+      }
+    ],
+    "actions": [
+      {
+        "waitFor": "[data-testid='settings.goals.new-button']"
+      },
+      {
+        "click": "[data-testid='row-actions-trigger'] >> nth=0"
+      },
+      {
+        "waitFor": "[data-testid='settings.goals.row.how']:visible"
+      },
+      {
+        "click": "[data-testid='settings.goals.row.how']:visible"
+      },
+      {
+        "waitFor": "[data-testid='settings.goals.how.close']"
+      },
+      {
+        "wait": 500
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": ".ant-modal-content pre >> nth=0",
+      "title": "On a button or link",
+      "text": "data-ef-goal with the goal key",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-modal-content pre >> nth=1",
+      "title": "From your own script",
+      "text": "Call ef.goal with the key",
+      "side": "left"
+    }
+  ]
+}

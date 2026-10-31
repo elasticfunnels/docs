@@ -1,0 +1,64 @@
+{
+  "out": "images/analytics/goals-list.png",
+  "alt": "Settings, Goals: four goals with their name and key, what counts them, once per visit or every time, Active or Archived status and a row menu, with the Add goal button",
+  "capture": {
+    "path": "/{brand}/settings/goals",
+    "viewport": {
+      "width": 1700,
+      "height": 640
+    },
+    "fixtures": [
+      {
+        "url": "^/api/brands/\\d+/goals",
+        "file": "tools/shots/fixtures/ad-columns/goals.json"
+      }
+    ],
+    "actions": [
+      {
+        "waitFor": "[data-testid='settings.goals.new-button']"
+      },
+      {
+        "wait": 800
+      }
+    ],
+    "crop": "main main",
+    "cropPad": 0
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='settings.goals.new-button']",
+      "title": "Add goal",
+      "text": "Name, key and what counts it"
+    },
+    {
+      "selector": "tr:has-text('get_started') td >> nth=0",
+      "title": "Name and key",
+      "text": "The key is what your pages fire",
+      "side": "left"
+    },
+    {
+      "box": [
+        315,
+        386,
+        410,
+        145
+      ],
+      "title": "Counts when",
+      "text": "Click, script call or page visit",
+      "side": "left",
+      "pad": 0
+    },
+    {
+      "box": [
+        1088,
+        262,
+        34,
+        26
+      ],
+      "title": "Row menu",
+      "text": "How to fire it, archive, delete"
+    }
+  ]
+}

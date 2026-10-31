@@ -177,11 +177,35 @@ Campaigns (Top Level)
 </AccordionGroup>
 
 ## Metrics Explained
-{/* SCREENSHOT: Metrics Explained · integration settings or log state · desktop */}
 
-### Meta Ad Metrics
+Metric columns appear once you pick a date range. Which of them the table shows is up to you: use the **Columns** button next to the date range.
 
-These come directly from Meta's API and show your advertising performance:
+### Choosing columns
+
+<img src="/images/integrations/campaigns-columns-picker.png" alt="The Columns menu on Ad campaigns, open over the campaign table: the From the ad platform, Engagement, Funnel and Goals groups with a checkbox per column" />
+
+1. Open **Reports → Ad campaigns** and pick a date range.
+2. Click **Columns**.
+3. Tick the columns you want and untick the ones you don't. The table changes as you click.
+
+The menu has four groups:
+
+| Group | Columns |
+|---|---|
+| From the ad platform | Spend, Impressions, Clicks, CPM, CPC, CTR, Reach, Frequency |
+| Engagement | Visitors, Landing rate, Avg time on page, Pages per visitor |
+| Funnel | Clicks to checkout, Checkout click rate, Cost per checkout click, Abandoned checkouts, Funnel Revenue, Funnel Sales, Funnel Profit, ROAS, RPC, PPC, CPA, CVR, AOV |
+| Goals | For each goal: its count, its rate per visitor and the cost per goal |
+
+Your choice is saved for this project in this browser, so another browser or a teammate starts from the defaults. **Reset to default** at the bottom of the menu puts the starting set back: every ad platform column, Avg time on page, Pages per visitor, Clicks to checkout, the revenue, sales and profit columns with RPC, PPC, CPA, CVR and AOV, and the count of each active goal.
+
+A goal you add later shows its count column without a trip to the menu. An archived goal's columns stay in the menu and start unticked.
+
+<img src="/images/integrations/campaigns-columns-table.png" alt="Ad campaigns with a date range and a custom column choice: spend, average time on page, pages per visitor, clicks to checkout, and the Get started click goal with its count and cost per goal for each campaign" />
+
+### Ad Platform Metrics
+
+These come directly from the ad platform's API and show your advertising performance:
 
 <CardGroup cols={2}>
   <Card title="Spend" icon="dollar-sign">
@@ -202,7 +226,24 @@ These come directly from Meta's API and show your advertising performance:
   <Card title="CTR" icon="percent">
     Click-through rate (clicks ÷ impressions)
   </Card>
+  <Card title="Reach" icon="users">
+    People who saw your ads at least once
+  </Card>
+  <Card title="Frequency" icon="repeat">
+    Average times each person saw your ads (impressions ÷ reach)
+  </Card>
 </CardGroup>
+
+### Engagement Metrics
+
+These come from your ElasticFunnels tracking and show what visitors from each campaign, ad set or ad did on your pages:
+
+| Column | What it shows |
+|---|---|
+| Visitors | Visits we tracked from the row's ads |
+| Landing rate | Visitors ÷ ad clicks. Under 100% means some clicks never loaded the page: bots, a slow page or a wrong link. |
+| Avg time on page | Total time on page ÷ pages viewed, so it is the time spent per page across the visit |
+| Pages per visitor | Pages viewed ÷ visitors |
 
 ### Funnel Analytics Metrics
 
@@ -235,8 +276,30 @@ These come from your ElasticFunnels tracking and show conversion performance:
   </Card>
 </CardGroup>
 
+The Funnel group also has these columns:
+
+| Column | What it shows |
+|---|---|
+| Clicks to checkout | Clicks on a buy button (add to cart) from the row's visitors |
+| Checkout click rate | Clicks to checkout ÷ visitors |
+| Cost per checkout click | Spend ÷ clicks to checkout |
+| Abandoned checkouts | Checkouts started and not paid |
+| ROAS | Funnel revenue ÷ spend |
+
+### Goal Columns
+
+A goal is an action you count besides sales, such as a "Get started" click, a finished quiz or a visit to a thank-you page. You set goals up under **Settings → Goals** (see [Goals](/analytics/goals)). Each goal offers three columns:
+
+| Column | What it shows |
+|---|---|
+| The goal's name, for example **Get started click** | How many times the goal counted for the row's visitors |
+| **Get started click rate** | Goal count ÷ visitors |
+| **Cost per Get started click** | Spend ÷ goal count |
+
+If the project has no goals yet, the Goals group in the menu says so and links to **Settings → Goals**.
+
 <Info>
-Funnel analytics require proper UTM parameters in your tracking URLs. See the "Setting Up UTM Tracking" section below.
+Engagement, funnel and goal columns all come from your own tracking, matched to each ad row by UTM: `utm_campaign` to the campaign name, `utm_content` to the ad set name and `utm_term` to the ad name. They need proper UTM parameters in your tracking URLs. See the "Setting Up UTM Tracking" section below.
 </Info>
 
 ## Setting Up UTM Tracking
@@ -367,8 +430,7 @@ Date ranges control which metrics are displayed:
 - No funnel analytics
 
 ### With Date Range
-- Shows all Meta ad metrics (spend, clicks, impressions, etc.)
-- Shows all funnel analytics (revenue, sales, profit, etc.)
+- Shows the metric columns you picked under **Columns** (ad platform, engagement, funnel and goal columns)
 - Metrics are calculated for the selected time period
 
 ### How to Select a Date Range

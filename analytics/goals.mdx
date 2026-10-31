@@ -1,0 +1,102 @@
+---
+title: "Goals"
+sidebarTitle: "Goals"
+icon: "bullseye"
+description: "Count actions besides sales, such as a button click, a finished quiz or a thank-you page visit, and see them per ad on Ad campaigns"
+---
+
+A goal is an action you want to count that isn't a sale: a click on a "Get started" button, a quiz someone finished, a visit to a thank-you page. You list your goals under **Settings → Goals**, your pages fire them, and each goal gets its own columns on [Ad campaigns](/integrations/campaigns-management#goal-columns), so you can see which campaign, ad set or ad brings people who take that step.
+
+Only goals on this list are counted. A key that isn't listed, belongs to an archived goal, or comes from a way the goal doesn't allow is ignored, so a typo or an old snippet on a page never adds numbers to your reports.
+
+<img src="/images/analytics/goals-list.png" alt="Settings, Goals: four goals with their name and key, what counts them, once per visit or every time, Active or Archived status and a row menu, with the Add goal button" />
+
+## Add a goal
+
+1. Open **Settings → Goals** and click **Add goal**.
+2. Fill in the fields below and click **Create goal**.
+
+<img src="/images/analytics/goals-editor.png" alt="The Add goal window: Name, Key, the three Counts when options with A visitor opens a page ticked and /thank-you as the URL text, Count set to Once per visit, and Value set to a fixed amount of 5" />
+
+| Field | What to enter |
+|---|---|
+| **Name** | What reports show, for example `Get started click`. You can rename it any time. |
+| **Key** | What your pages use to fire the goal, for example `get_started`. Lowercase letters, numbers and underscores, up to 64 characters. It is filled in from the name until you edit it, and it can't change once the goal is created, because reports group by it. |
+| **Counts when** | One or more of the three ways to fire a goal (below). A new goal starts with the click and script options ticked. |
+| **Page URL contains** | Shown when you tick **A visitor opens a page**: the text the page URL must contain, for example `/thank-you`. |
+| **Count** | **Once per visit** counts the goal at most once per visit, however many times it fires. **Every time** counts each one. |
+| **Value** | **No value**, or **Fixed amount**: the amount each goal is worth, stored with every goal it counts. |
+
+A project can have up to 50 goals.
+
+## Fire a goal
+
+Every ElasticFunnels page already loads the tracking script goals need, so there is nothing to install. Pick the way that fits the action.
+
+### A visitor clicks a marked element
+
+Tick **A visitor clicks a marked element**, then add `data-ef-goal` with the goal's key to the button or link:
+
+```html
+<a href="/checkout" class="btn" data-ef-goal="get_started">Get started</a>
+```
+
+A click on the element, or on anything inside it (an icon, a `<span>`), counts. It works on any element, not only links and buttons:
+
+```html
+<div class="plan-card" data-ef-goal="plan_selected">
+  <h3>3 bottles</h3>
+  <button>Choose this plan</button>
+</div>
+```
+
+### Your page script calls it
+
+Tick **Your page script calls it**, then call `ef.goal()` with the key from your own code. Use this for actions a single click can't capture, such as a form that was sent or the last question of a quiz:
+
+```html
+<script>
+  document.querySelector('#quiz-form').addEventListener('submit', function () {
+    ef.goal('quiz_completed');
+  });
+</script>
+```
+
+`ef.goal()` is safe to call as soon as the page starts loading. Calls made before the tracking script is ready wait and are sent once it is.
+
+### A visitor opens a page
+
+Tick **A visitor opens a page** and enter the text the URL must contain in **Page URL contains**. There is no code to add: every page view in the project is checked, and a view whose URL contains the text counts the goal.
+
+| Page URL contains | Counts on |
+|---|---|
+| `/thank-you` | `/thank-you`, `/thank-you?order=123`, `/en/thank-you` |
+| `step=3` | `/quiz?step=3` |
+
+The text is matched against the page path and query string. Keep it specific: `/thank` also matches `/thanks-for-reading`.
+
+## See the snippet for a goal
+
+Open a goal's row menu and choose **How to fire it**. The window shows the code for each way the goal allows, with its key already filled in.
+
+<img src="/images/analytics/goals-how-to-fire.png" alt="How to fire Get started click: a link with data-ef-goal=&quot;get_started&quot; for clicks, and ef.goal('get_started') for your own script" />
+
+## Edit, archive or delete a goal
+
+From the row menu:
+
+- **Edit** changes the name, the ways it counts, the URL text, the count mode and the value. The key stays the same.
+- **Archive** stops counting the goal and keeps its history. Its columns stay available on Ad campaigns and start unticked. **Restore** makes it count again.
+- **Delete** removes the goal. Pages that still fire it stop counting, and its columns leave Ad campaigns. Archive instead when you want to keep the numbers.
+
+## Where goals show up
+
+On **Reports → Ad campaigns**, open **Columns** and look under **Goals**. Each goal offers its count, its rate per visitor and the cost per goal, for every campaign, ad set and ad. A new goal's count column appears on its own. See [Goal columns](/integrations/campaigns-management#goal-columns).
+
+Goals are matched to ads the same way as sales: by the UTM parameters on your ad links. Set those up as described in [Setting up UTM tracking](/integrations/campaigns-management#setting-up-utm-tracking).
+
+## Good to know
+
+- A visitor who hasn't given analytics consent, where your project asks for it, is not counted.
+- Goals are counted in ElasticFunnels reports. They are not sent to Meta or other ad platforms.
+- Goals you set in the page builder for a split test are separate from this list. They count on the [split test report](/analytics/split-test).

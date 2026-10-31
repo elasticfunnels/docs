@@ -1,0 +1,267 @@
+{
+ "data": [
+  {
+   "id": "120200000000000",
+   "name": "Sleep Gummies | Prospecting | US",
+   "status": "ACTIVE",
+   "effective_status": "ACTIVE",
+   "objective": "OUTCOME_SALES",
+   "daily_budget": 15000,
+   "lifetime_budget": null,
+   "currency": "USD",
+   "budget_offset": 100,
+   "spend": 1240.5,
+   "impressions": 98400,
+   "clicks": 2310,
+   "cpm": 12.61,
+   "cpc": 0.54,
+   "ctr": 2.35,
+   "reach": 61200,
+   "frequency": 1.61,
+   "revenue": 3870.0,
+   "sales": 86,
+   "customers": 86,
+   "conversion_rate": 4.23,
+   "aov": 45.0,
+   "profit": 1791.5,
+   "cpa": 14.42,
+   "rpc": 1.68,
+   "ppc": 0.78,
+   "roas": 3.12,
+   "visitors": 2032,
+   "page_views": 5080,
+   "avg_time_on_page": 41.0,
+   "pages_per_visitor": 2.5,
+   "landing_rate": 88.0,
+   "checkouts": 312,
+   "checkout_rate": 15.35,
+   "cost_per_checkout": 3.98,
+   "abandons": 141,
+   "goals": {
+    "get_started": {
+     "count": 498,
+     "rate": 24.51,
+     "cost": 2.49
+    },
+    "quiz_completed": {
+     "count": 205,
+     "rate": 10.09,
+     "cost": 6.05
+    },
+    "thank_you_view": {
+     "count": 86,
+     "rate": 4.23,
+     "cost": 14.42
+    },
+    "newsletter_signup": {
+     "count": 31,
+     "rate": 1.53,
+     "cost": 40.02
+    }
+   }
+  },
+  {
+   "id": "120200000000001",
+   "name": "Sleep Gummies | Retargeting",
+   "status": "ACTIVE",
+   "effective_status": "ACTIVE",
+   "objective": "OUTCOME_SALES",
+   "daily_budget": 5000,
+   "lifetime_budget": null,
+   "currency": "USD",
+   "budget_offset": 100,
+   "spend": 412.8,
+   "impressions": 21300,
+   "clicks": 890,
+   "cpm": 19.38,
+   "cpc": 0.46,
+   "ctr": 4.18,
+   "reach": 9800,
+   "frequency": 2.17,
+   "revenue": 2392.0,
+   "sales": 52,
+   "customers": 52,
+   "conversion_rate": 6.4,
+   "aov": 46.0,
+   "profit": 1481.2,
+   "cpa": 7.94,
+   "rpc": 2.69,
+   "ppc": 1.66,
+   "roas": 5.79,
+   "visitors": 812,
+   "page_views": 2436,
+   "avg_time_on_page": 50.0,
+   "pages_per_visitor": 3.0,
+   "landing_rate": 91.2,
+   "checkouts": 168,
+   "checkout_rate": 20.69,
+   "cost_per_checkout": 2.46,
+   "abandons": 62,
+   "goals": {
+    "get_started": {
+     "count": 241,
+     "rate": 29.68,
+     "cost": 1.71
+    },
+    "quiz_completed": {
+     "count": 97,
+     "rate": 11.95,
+     "cost": 4.26
+    },
+    "thank_you_view": {
+     "count": 52,
+     "rate": 6.4,
+     "cost": 7.94
+    },
+    "newsletter_signup": {
+     "count": 12,
+     "rate": 1.48,
+     "cost": 34.4
+    }
+   }
+  },
+  {
+   "id": "120200000000002",
+   "name": "Greens Powder | Broad | US",
+   "status": "ACTIVE",
+   "effective_status": "ACTIVE",
+   "objective": "OUTCOME_SALES",
+   "daily_budget": 10000,
+   "lifetime_budget": null,
+   "currency": "USD",
+   "budget_offset": 100,
+   "spend": 860.2,
+   "impressions": 74100,
+   "clicks": 1420,
+   "cpm": 11.61,
+   "cpc": 0.61,
+   "ctr": 1.92,
+   "reach": 48800,
+   "frequency": 1.52,
+   "revenue": 931.0,
+   "sales": 19,
+   "customers": 19,
+   "conversion_rate": 1.65,
+   "aov": 49.0,
+   "profit": -141.2,
+   "cpa": 45.27,
+   "rpc": 0.66,
+   "ppc": -0.1,
+   "roas": 1.08,
+   "visitors": 1150,
+   "page_views": 2185,
+   "avg_time_on_page": 28.0,
+   "pages_per_visitor": 1.9,
+   "landing_rate": 81.0,
+   "checkouts": 121,
+   "checkout_rate": 10.52,
+   "cost_per_checkout": 7.11,
+   "abandons": 70,
+   "goals": {
+    "get_started": {
+     "count": 176,
+     "rate": 15.3,
+     "cost": 4.89
+    },
+    "quiz_completed": {
+     "count": 44,
+     "rate": 3.83,
+     "cost": 19.55
+    },
+    "thank_you_view": {
+     "count": 19,
+     "rate": 1.65,
+     "cost": 45.27
+    },
+    "newsletter_signup": {
+     "count": 9,
+     "rate": 0.78,
+     "cost": 95.58
+    }
+   }
+  },
+  {
+   "id": "120200000000003",
+   "name": "Collagen | Advantage+ test",
+   "status": "PAUSED",
+   "effective_status": "PAUSED",
+   "objective": "OUTCOME_SALES",
+   "daily_budget": 7500,
+   "lifetime_budget": null,
+   "currency": "USD",
+   "budget_offset": 100,
+   "spend": 318.4,
+   "impressions": 30200,
+   "clicks": 505,
+   "cpm": 10.54,
+   "cpc": 0.63,
+   "ctr": 1.67,
+   "reach": 22100,
+   "frequency": 1.37,
+   "revenue": 294.0,
+   "sales": 6,
+   "customers": 6,
+   "conversion_rate": 1.49,
+   "aov": 49.0,
+   "profit": -91.4,
+   "cpa": 53.07,
+   "rpc": 0.58,
+   "ppc": -0.18,
+   "roas": 0.92,
+   "visitors": 402,
+   "page_views": 884,
+   "avg_time_on_page": 35.0,
+   "pages_per_visitor": 2.2,
+   "landing_rate": 79.6,
+   "checkouts": 38,
+   "checkout_rate": 9.45,
+   "cost_per_checkout": 8.38,
+   "abandons": 21,
+   "goals": {
+    "get_started": {
+     "count": 51,
+     "rate": 12.69,
+     "cost": 6.24
+    },
+    "quiz_completed": {
+     "count": 12,
+     "rate": 2.99,
+     "cost": 26.53
+    },
+    "thank_you_view": {
+     "count": 6,
+     "rate": 1.49,
+     "cost": 53.07
+    },
+    "newsletter_signup": {
+     "count": 2,
+     "rate": 0.5,
+     "cost": 159.2
+    }
+   }
+  }
+ ],
+ "total": 4,
+ "goals": [
+  {
+   "key": "get_started",
+   "label": "Get started click",
+   "status": "active"
+  },
+  {
+   "key": "newsletter_signup",
+   "label": "Newsletter signup",
+   "status": "archived"
+  },
+  {
+   "key": "quiz_completed",
+   "label": "Quiz completed",
+   "status": "active"
+  },
+  {
+   "key": "thank_you_view",
+   "label": "Thank-you page visit",
+   "status": "active"
+  }
+ ]
+}

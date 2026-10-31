@@ -260,6 +260,7 @@
                   "analytics/conversions",
                   "analytics/ad-spend-metrics",
                   "analytics/tracking-metrics",
+                  "analytics/goals",
                   "analytics/video-metrics"
                 ]
               },

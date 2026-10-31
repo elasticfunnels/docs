@@ -1,0 +1,71 @@
+{
+  "out": "images/integrations/campaigns-columns-picker.png",
+  "alt": "The Columns menu on Ad campaigns, open over the campaign table: the From the ad platform, Engagement, Funnel and Goals groups with a checkbox per column",
+  "capture": {
+    "path": "/{brand}/analytics/campaigns?integration_id=45&start=2026-10-01&end=2026-10-30",
+    "viewport": {
+      "width": 1440,
+      "height": 1800
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='integrations.campaigns.columns.button']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.button']"
+      },
+      {
+        "waitFor": "[data-testid='integrations.campaigns.columns.menu']"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": {
+      "x": 780,
+      "y": 0,
+      "width": 660,
+      "height": 1120
+    },
+    "cropPad": 0,
+    "fixtures": [
+      {
+        "url": "^/api/brands/\\d+/integrations/by-type/advertising",
+        "file": "tools/shots/fixtures/ad-columns/integrations.json"
+      },
+      {
+        "url": "^/api/brands/\\d+/campaigns\\?",
+        "file": "tools/shots/fixtures/ad-columns/campaigns.json"
+      },
+      {
+        "url": "^/api/brands/\\d+/campaigns$",
+        "file": "tools/shots/fixtures/ad-columns/campaigns.json"
+      }
+    ]
+  },
+  "maxWidth": 560,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='integrations.campaigns.columns.button']",
+      "title": "Columns",
+      "text": "Opens the column picker",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='integrations.campaigns.columns.toggle.avg_time_on_page']",
+      "title": "Engagement",
+      "text": "What visitors did on your pages"
+    },
+    {
+      "selector": "[data-testid='integrations.campaigns.columns.toggle.checkouts']",
+      "title": "Funnel",
+      "text": "Buy-button clicks, sales, profit"
+    },
+    {
+      "selector": "[data-testid='integrations.campaigns.columns.toggle.goal__get_started__count']",
+      "title": "Goals",
+      "text": "Count, rate and cost per goal"
+    }
+  ]
+}

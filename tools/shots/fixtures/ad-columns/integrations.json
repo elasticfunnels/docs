@@ -1,0 +1,43 @@
+[
+ {
+  "id": 45,
+  "integration": "meta_ads",
+  "name": "Northwind Meta Ads",
+  "status": "active",
+  "config": {
+   "meta_ad_account_id": "act_100000000000001",
+   "meta_ad_account_name": "Northwind Main"
+  },
+  "last_sync_at": null,
+  "sync_status": "ok",
+  "sync_error": null,
+  "sync_stats": null,
+  "last_event_at": null,
+  "last_success_at": null,
+  "last_error_at": null,
+  "last_error": null,
+  "behaviour": {
+   "acts": [
+    "conversions"
+   ],
+   "used_by": [],
+   "sync": true,
+   "inbound": false,
+   "log": "external-postbacks",
+   "classes": [
+    "A",
+    "C"
+   ]
+  },
+  "health": {
+   "last_event_at": null,
+   "last_success_at": null,
+   "last_error_at": null,
+   "last_error": null,
+   "events_24h": 0,
+   "errors_24h": 0
+  },
+  "pausable": true,
+  "pausable_group": "conversion_postback"
+ }
+]

@@ -1,0 +1,142 @@
+{
+  "out": "images/integrations/campaigns-columns-table.png",
+  "alt": "Ad campaigns with a date range and a custom column choice: spend, average time on page, pages per visitor, clicks to checkout, and the Get started click goal with its count and cost per goal for each campaign",
+  "capture": {
+    "path": "/{brand}/analytics/campaigns?integration_id=45&start=2026-10-01&end=2026-10-30",
+    "viewport": {
+      "width": 1900,
+      "height": 900
+    },
+    "actions": [
+      {
+        "waitFor": "[data-testid='integrations.campaigns.columns.button']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.button']"
+      },
+      {
+        "waitFor": "[data-testid='integrations.campaigns.columns.menu']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.clicks']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.profit']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.impressions']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.cpm']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.cpc']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.ctr']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.reach']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.frequency']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.revenue']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.sales']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.rpc']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.ppc']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.cpa']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.conversion_rate']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.aov']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.goal__quiz_completed__count']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.goal__thank_you_view__count']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.toggle.goal__get_started__cost']"
+      },
+      {
+        "click": "[data-testid='integrations.campaigns.columns.button']"
+      },
+      {
+        "wait": 700
+      }
+    ],
+    "crop": {
+      "x": 266,
+      "y": 140,
+      "width": 1634,
+      "height": 320
+    },
+    "cropPad": 0,
+    "fixtures": [
+      {
+        "url": "^/api/brands/\\d+/integrations/by-type/advertising",
+        "file": "tools/shots/fixtures/ad-columns/integrations.json"
+      },
+      {
+        "url": "^/api/brands/\\d+/campaigns\\?",
+        "file": "tools/shots/fixtures/ad-columns/campaigns.json"
+      },
+      {
+        "url": "^/api/brands/\\d+/campaigns$",
+        "file": "tools/shots/fixtures/ad-columns/campaigns.json"
+      }
+    ]
+  },
+  "maxWidth": 900,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "box": [
+        714,
+        40,
+        332,
+        212
+      ],
+      "title": "Engagement",
+      "text": "Time on page and pages per visitor",
+      "side": "left",
+      "pad": 0
+    },
+    {
+      "box": [
+        1046,
+        203,
+        180,
+        114
+      ],
+      "title": "Clicks to checkout",
+      "text": "Buy-button clicks from each campaign",
+      "side": "left",
+      "pad": 0
+    },
+    {
+      "box": [
+        1228,
+        89,
+        306,
+        228
+      ],
+      "title": "Goal columns",
+      "text": "Count and cost per goal",
+      "pad": 0
+    }
+  ]
+}

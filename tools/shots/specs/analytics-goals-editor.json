@@ -1,0 +1,104 @@
+{
+  "out": "images/analytics/goals-editor.png",
+  "alt": "The Add goal window: Name, Key, the three Counts when options with A visitor opens a page ticked and /thank-you as the URL text, Count set to Once per visit, and Value set to a fixed amount of 5",
+  "capture": {
+    "path": "/{brand}/settings/goals",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "fixtures": [
+      {
+        "url": "^/api/brands/\\d+/goals",
+        "file": "tools/shots/fixtures/ad-columns/goals.json"
+      }
+    ],
+    "actions": [
+      {
+        "waitFor": "[data-testid='settings.goals.new-button']"
+      },
+      {
+        "click": "[data-testid='settings.goals.new-button']"
+      },
+      {
+        "waitFor": "[data-testid='settings.goals.editor.label']"
+      },
+      {
+        "fill": "[data-testid='settings.goals.editor.label']",
+        "value": "Thank-you page visit"
+      },
+      {
+        "click": "[data-testid='settings.goals.editor.source.click']"
+      },
+      {
+        "click": "[data-testid='settings.goals.editor.source.script']"
+      },
+      {
+        "click": "[data-testid='settings.goals.editor.source.url']"
+      },
+      {
+        "waitFor": "[data-testid='settings.goals.editor.url-contains']"
+      },
+      {
+        "fill": "[data-testid='settings.goals.editor.url-contains']",
+        "value": "/thank-you"
+      },
+      {
+        "select": "[data-testid='settings.goals.editor.value-mode']",
+        "value": "fixed"
+      },
+      {
+        "waitFor": "[data-testid='settings.goals.editor.fixed-value']"
+      },
+      {
+        "fill": "[data-testid='settings.goals.editor.fixed-value']",
+        "value": "5"
+      },
+      {
+        "click": "#goal-label"
+      },
+      {
+        "wait": 500
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0
+  },
+  "maxWidth": 700,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "[data-testid='settings.goals.editor.label']",
+      "title": "Name",
+      "text": "What reports show",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='settings.goals.editor.key']",
+      "title": "Key",
+      "text": "Fixed once the goal is created"
+    },
+    {
+      "selector": "[data-testid='settings.goals.editor.source.click']",
+      "title": "Counts when",
+      "text": "Pick one or more ways",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='settings.goals.editor.url-contains']",
+      "title": "Page URL contains",
+      "text": "Text the visited URL must include"
+    },
+    {
+      "selector": "[data-testid='settings.goals.editor.count-mode']",
+      "title": "Count",
+      "text": "Once per visit or every time",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='settings.goals.editor.fixed-value']",
+      "title": "Value",
+      "text": "Optional fixed amount per goal"
+    }
+  ]
+}
