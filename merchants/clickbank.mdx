@@ -130,6 +130,7 @@ Start at **Settings** → **Logs** → **Merchant Postbacks**, filtered to Click
 
 - **Nothing from ClickBank since a certain date**: the INS URL was removed or replaced in ClickBank. Check **Account Settings** → **My Site** → **Advanced Tools**. The merchant still says **Verified**, because that badge only records the first postback. When the daily check sees buy clicks but no sales, it adds an amber **No sales reported since** warning next to the merchant in **Merchants**; hover it to see the clicks and sales it counted. The warning clears with the next postback that arrives.
 - **Notifications arrive but no orders**: open one with **Show Details**. If it could not be decrypted, the secret key in ClickBank and the one on the merchant differ, usually because one of them was changed. Make them the same; ClickBank does not resend notifications that already went out.
+- **Buyers on your thank-you page are not recognised** (no name or email filled in): ClickBank sends the order details to the thank-you page encrypted with the same secret key. If the merchant has no key, or a different one, you get one **Brand Action** on your dashboard: **Add your ClickBank secret key** or **Check your ClickBank secret key**. Fix the key on the merchant, then mark the action done.
 - **Orders arrive without a page or ad**: the pay link had no click ID. Use `[BUY]` tags; pasted pay links get `__click_id` added unless **Add click tracking to pasted buy links** is off (see [Custom Purchase Links](#custom-purchase-links)).
 
 ## Advanced Configuration
