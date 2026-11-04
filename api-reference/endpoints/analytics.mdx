@@ -213,6 +213,8 @@ curl "https://app.elasticfunnels.io/api/brands/{brand_id}/analytics/metrics/card
 
 Retrieve metrics grouped by a specific field (e.g., by product, page, affiliate).
 
+When you group by product, each product counts its own part of an order. In a cart of two products, revenue is split by each line's share of the order, so the column adds up to the order total. Orders without line data count in full under each product.
+
 <ParamField path="brand" type="string" required>
   The brand/project ID
 </ParamField>

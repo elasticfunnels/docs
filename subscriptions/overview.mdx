@@ -206,6 +206,14 @@ Coupons can be configured to apply to recurring subscription charges, not just t
 
 The recurring coupon logic is enforced during billing. The subscription detail drawer shows the applied coupon info, including the recurring mode.
 
+## Subscriptions in a cart
+
+A cart can mix subscription products and one-time products. The order opens one subscription, on the schedule of the first subscription product in the cart.
+
+Each renewal charges the subscription products at their recurring price times their quantity, plus the shipping paid on the first order. One-time products are charged once and do not renew. Tax is worked out again at each renewal.
+
+A one-time product added as an order bump works the same way. If a subscriber cancels, one-time courses bought in the same order stay available.
+
 ## Brand Subscription Settings
 
 **Settings** → **Subscriptions** holds the brand-wide subscription settings and the default email templates.
