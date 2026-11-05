@@ -215,3 +215,63 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel
 ```
 </ResponseExample>
 
+---
+
+## List Entry Pages
+
+The pages that can start this funnel, with the affiliate each is tied to.
+
+```bash Request
+GET /api/brands/{brand}/funnels/{funnel}/entry-pages
+```
+
+<ResponseExample>
+```json Response
+{
+  "entry_pages": [
+    { "id": 101, "slug": "offer-agency-a", "title": "Offer, Agency A", "status": "published", "affiliate_id": 55 }
+  ]
+}
+```
+</ResponseExample>
+
+## Add an Entry Page
+
+Adds one page to the funnel without sending the whole funnel graph. The funnel's page group, entry pages, compiled flow and any **Starting page** rule that names its entry pages are updated together. Adding a page that is already there changes nothing.
+
+<ParamField body="page_id" type="integer" required>
+  The page to add. It must belong to this brand, and can't be a checkout page or a page version.
+</ParamField>
+
+<ParamField body="affiliate_id" type="integer">
+  Ties the page to this affiliate, so its visitors are credited with no link parameter. Send `null` to remove it; leave it out to keep the page as it is. See [Partner entry pages](/funnels/partner-entry-pages).
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/funnels/{funnel_id}/entry-pages \
+  -H "EF-Access-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{ "page_id": 102, "affiliate_id": 55 }'
+```
+
+<ResponseExample>
+```json Response
+{
+  "changed": true,
+  "entry_pages": [
+    { "id": 101, "slug": "offer-agency-a", "title": "Offer, Agency A", "status": "published", "affiliate_id": 55 },
+    { "id": 102, "slug": "offer-agency-a-v2", "title": "Offer, Agency A v2", "status": "published", "affiliate_id": 55 }
+  ]
+}
+```
+</ResponseExample>
+
+A funnel has to start with one page group. Anything else returns `422` and nothing changes; connect the entry to a single page group in the builder first.
+
+## Remove an Entry Page
+
+Returns `422` if it is the funnel's last entry page.
+
+```bash Request
+DELETE /api/brands/{brand}/funnels/{funnel}/entry-pages/{page}
+```

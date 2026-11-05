@@ -1,0 +1,43 @@
+{
+  "out": "images/funnels/page-affiliate.png",
+  "alt": "Page settings, Tracking tab, with the Page affiliate select",
+  "capture": {
+    "path": "/899/pages",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "waitFor": "[data-testid='row-actions-trigger']",
+    "actions": [
+      {
+        "click": "[data-testid='row-actions-trigger'] >> nth=0"
+      },
+      {
+        "wait": 400
+      },
+      {
+        "click": "[data-testid='list.row.action.edit'] >> nth=0"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "[data-testid='page-settings-tab'][data-tab='tracking']"
+      },
+      {
+        "wait": 1000
+      }
+    ],
+    "crop": ".ant-modal-content >> visible=true"
+  },
+  "annotations": [
+    {
+      "selector": "[data-testid='page-settings-field-affiliate-id']",
+      "title": "Page affiliate",
+      "text": "Every visitor to this page is credited to this affiliate",
+      "side": "right"
+    }
+  ],
+  "maxWidth": 760,
+  "calloutWidth": 230
+}

@@ -87,6 +87,7 @@
                   "funnels/create-funnel",
                   "funnels/trigger-pages",
                   "funnels/trigger-rules",
+                  "funnels/partner-entry-pages",
                   "funnels/checkout-redirect-behavior"
                 ]
               },
