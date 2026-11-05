@@ -211,9 +211,15 @@ Name each integration clearly (e.g., "Client A - Supplements", "Client B - Softw
 
 ### Meta Conversions API: One Connection per Pixel
 
-If two teams sell the same brand on separate funnels, each with its own pixel, add one **Meta Conversions API** connection per pixel under **Integrations → Ad Platforms**.
+If two teams sell the same brand, each with its own pixel, add one **Meta Conversions API** connection per pixel under **Integrations → Ad Platforms**.
 
-Each sale goes to the connection whose pixel is set on the page where the sale happened, so each team only sees its own sales. A sale from a page with no matching pixel goes to your oldest connection.
+Each sale goes to the connection whose pixel fired on that visit, so each team only sees its own sales. A pixel counts if it comes from the page settings or from a tracking script. Teams can share one page: limit each team's tracking script to its affiliate.
+
+If the pixel loads inside Google Tag Manager, we can't read it. Limit that connection to the team's affiliate in its filters instead.
+
+With several connections:
+- A sale with no pixel and no affiliate goes to your oldest connection.
+- A sale from a pixel or affiliate that has no connection isn't sent, so it never lands on another team's pixel.
 
 ## Connection Status & Health
 {/* SCREENSHOT: Connection Status & Health · integration settings or log state · desktop */}
