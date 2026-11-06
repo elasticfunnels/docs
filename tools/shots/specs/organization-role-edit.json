@@ -1,0 +1,60 @@
+{
+  "out": "images/organization/role-edit.png",
+  "alt": "The Create Role window: a Name field and Save. Permissions and metrics are set afterwards from the role's menu",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The capture opens Create Role and types a fictional name; Save is never clicked (writes are blocked anyway). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-role-edit",
+  "capture": {
+    "path": "/settings/organization/roles",
+    "viewport": {
+      "width": 1180,
+      "height": 700
+    },
+    "waitFor": "[data-testid='list.reload']",
+    "actions": [
+      {
+        "click": "main button:has-text('Create Role')"
+      },
+      {
+        "waitFor": ".ant-modal-content input"
+      },
+      {
+        "fill": ".ant-modal-content input",
+        "value": "Media buyer"
+      },
+      {
+        "eval": "document.activeElement && document.activeElement.blur()"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        24,
+        14,
+        72,
+        24
+      ],
+      "title": "New Role",
+      "text": "Edit opens this window too",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-modal-content input",
+      "title": "Name",
+      "text": "What the team sees in role pickers"
+    },
+    {
+      "selector": ".ant-modal-content button:has-text('Save')",
+      "title": "Save",
+      "text": "Then set Manage Permissions",
+      "side": "right"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "out": "images/organization/role-permissions.png",
+  "alt": "Manage Permissions for the Admin role: modules grouped by area, each with a name and a short description, View, Create, Update, Delete and Full access columns, Allow All and Save Permissions",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798, its real Admin role. The capture reloads the list, opens Admin's menu, Manage Permissions, and scrolls the grid to the Funnels group. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-role-permissions",
+  "capture": {
+    "path": "/settings/organization/roles",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "waitFor": "[data-testid='list.reload']",
+    "actions": [
+      {
+        "click": "[data-testid='list.reload']"
+      },
+      {
+        "waitFor": "[data-testid='list.row']"
+      },
+      {
+        "click": "[data-testid='list.row']:nth-child(2) [data-testid='row-actions-trigger']"
+      },
+      {
+        "click": ".ant-dropdown:not(.ant-dropdown-hidden) >> text=Manage Permissions"
+      },
+      {
+        "waitFor": ".ant-modal-content .simplebar-content-wrapper"
+      },
+      {
+        "eval": "(() => { const sc = document.querySelector('.ant-modal-content .simplebar-content-wrapper'); const h = [...sc.querySelectorAll('h3.col-label')].find(t => t.textContent.trim() === 'Funnels'); sc.scrollTop += h.getBoundingClientRect().top - sc.getBoundingClientRect().top - 56; })()"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "title": "Group",
+      "text": "Modules sorted by area",
+      "side": "left",
+      "box": [
+        16,
+        179,
+        72,
+        17
+      ]
+    },
+    {
+      "selector": ".ant-modal-content h3.col-label:text-is('Funnels') + div > ul:first-child > li:first-child",
+      "title": "Module",
+      "text": "Name, and what it covers",
+      "side": "left"
+    },
+    {
+      "title": "View to Full access",
+      "text": "Full access ticks all four",
+      "box": [
+        266,
+        118,
+        608,
+        28
+      ]
+    },
+    {
+      "selector": ".ant-modal-content button:has-text('Allow All')",
+      "title": "Allow All",
+      "text": "Ticks every box at once"
+    },
+    {
+      "selector": ".ant-modal-content button:has-text('Save Permissions')",
+      "title": "Save Permissions",
+      "text": "Applies to everyone with this role"
+    }
+  ]
+}

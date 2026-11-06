@@ -1,0 +1,71 @@
+{
+  "out": "images/organization/role-permissions-billing.png",
+  "alt": "Manage Permissions for a Finance role scrolled to the Organization group: Settings with View and Update ticked, which is what opens Billing. The Billing group's Invoices and Payment Cards rows are left unticked",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The Finance role is a fictional fixture row (fixtures/organization/roles.json: the org's real roles plus Finance with organization.settings.view/update). The capture reloads the list, opens Finance's menu, Manage Permissions, and scrolls to the Billing and Organization groups. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-role-permissions-billing",
+  "capture": {
+    "path": "/settings/organization/roles",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/roles$",
+        "file": "tools/shots/fixtures/organization/roles.json"
+      }
+    ],
+    "waitFor": "[data-testid='list.reload']",
+    "actions": [
+      {
+        "click": "[data-testid='list.reload']"
+      },
+      {
+        "waitFor": "[data-testid='list.row']:has-text('Finance')"
+      },
+      {
+        "click": "[data-testid='list.row']:nth-child(7) [data-testid='row-actions-trigger']"
+      },
+      {
+        "click": ".ant-dropdown:not(.ant-dropdown-hidden) >> text=Manage Permissions"
+      },
+      {
+        "waitFor": ".ant-modal-content .simplebar-content-wrapper"
+      },
+      {
+        "eval": "(() => { const sc = document.querySelector('.ant-modal-content .simplebar-content-wrapper'); const h = [...sc.querySelectorAll('h3.col-label')].find(t => t.textContent.trim() === 'Billing'); sc.scrollTop += h.getBoundingClientRect().top - sc.getBoundingClientRect().top - 56; })()"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": ".ant-modal-content h3.col-label:text-is('Billing') + div",
+      "title": "Invoices, Payment Cards",
+      "text": "Not what opens Billing",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-modal-content h3.col-label:text-is('Organization') + div > ul:first-child > li:first-child",
+      "title": "Organization Settings",
+      "text": "View opens Billing, org Settings, Affiliate Portal",
+      "side": "left"
+    },
+    {
+      "box": [
+        306,
+        395,
+        284,
+        32
+      ],
+      "title": "View and Update",
+      "text": "Update also changes the card and plan"
+    }
+  ]
+}

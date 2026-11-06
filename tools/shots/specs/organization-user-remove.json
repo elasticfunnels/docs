@@ -1,0 +1,58 @@
+{
+  "out": "images/organization/user-remove.png",
+  "alt": "The Account tab on an organization member's page, with Remove from organization",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798; Dana Lee is a fictional fixture member (fixtures/organization/users.json). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-user-remove The capture opens the Account tab; Remove is never clicked.",
+  "capture": {
+    "path": "/settings/organization/users/9101",
+    "viewport": {
+      "width": 1360,
+      "height": 760
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/users$",
+        "file": "tools/shots/fixtures/organization/users.json"
+      }
+    ],
+    "waitFor": "[data-testid='detail.tab.account']",
+    "crop": {
+      "x": 257,
+      "y": 200,
+      "width": 740,
+      "height": 330
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ],
+    "actions": [
+      {
+        "click": "[data-testid='detail.tab.account']"
+      },
+      {
+        "waitFor": "main button:has-text('Remove from organization')"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "title": "Account tab",
+      "text": "Last but one tab on the member's page",
+      "side": "left",
+      "box": [
+        24,
+        92,
+        64,
+        23
+      ]
+    },
+    {
+      "selector": "main button:has-text('Remove from organization')",
+      "title": "Remove from organization",
+      "text": "Takes away every brand at once"
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "out": "images/organization/users-invite.png",
+  "alt": "The Invite User to Organization window: email address, role, the brands the person gets, and Send Invite",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The capture fills a fictional address; Send Invite is never clicked (writes are blocked anyway). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-users-invite",
+  "capture": {
+    "path": "/settings/organization/users",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/users$",
+        "file": "tools/shots/fixtures/organization/users.json"
+      }
+    ],
+    "waitFor": "[data-testid='list.row']",
+    "actions": [
+      {
+        "click": "[data-testid='list.new-button']"
+      },
+      {
+        "waitFor": ".ant-modal-content"
+      },
+      {
+        "fill": ".ant-modal-content input[type=email]",
+        "value": "taylor@example.com"
+      },
+      {
+        "click": ".ant-modal-content .ant-select"
+      },
+      {
+        "click": ".ant-select-item-option:has-text('Editor')"
+      },
+      {
+        "click": ".ant-modal-content .ant-checkbox-wrapper:has-text('Northwind Supplements')"
+      },
+      {
+        "eval": "document.activeElement && document.activeElement.blur()"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "cropPad": 0,
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": ".ant-modal-content input[type=email]",
+      "title": "Email Address",
+      "text": "Where the invite goes"
+    },
+    {
+      "selector": ".ant-modal-content .ant-select",
+      "title": "Role",
+      "text": "What they can see and change"
+    },
+    {
+      "selector": ".ant-modal-content .ant-checkbox-wrapper:has-text('Northwind Supplements')",
+      "title": "Assign to Brands",
+      "text": "Pick at least one brand",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-modal-content button:has-text('Send Invite')",
+      "title": "Send Invite",
+      "text": "Emails the invite link",
+      "side": "left"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "out": "images/organization/settings-sidebar-billing.png",
+  "alt": "The Settings sidebar as a member (not the owner) whose role has Organization Settings View sees it: Settings, Brands, Users, Billing and Affiliate Portal, with no Roles item",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The capture signs in as the demo owner, then the eval action swaps window.user for a fictional member (Priya Shah, role finance, permissions organization.settings.view + organization.members.view) and calls the sidebar's own buildSidebar(), so the real menu logic in SettingsApp.vue decides what shows. The crop is the menu only (the footer still holds the owner's name). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-settings-sidebar-billing",
+  "capture": {
+    "path": "/settings/organization/settings",
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "waitFor": "text=Affiliate Portal",
+    "actions": [
+      {
+        "eval": "(() => { Object.assign(window.user, { id: 9103, name: 'Priya Shah', email: 'priya@example.com', organization_role: 'finance', role: 'finance', permissions: ['organization.settings.view', 'organization.members.view'], metrics: ['revenue', 'sales', 'aov'] }); const link = [...document.querySelectorAll('a')].find(a => a.textContent.trim() === 'Affiliate Portal'); let c = link && link.__vueParentComponent; while (c && !(c.proxy && typeof c.proxy.buildSidebar === 'function')) c = c.parent; if (!c) throw new Error('SettingsApp not found'); c.proxy.buildSidebar(); })()"
+      },
+      {
+        "wait": 800
+      }
+    ],
+    "crop": {
+      "x": 9,
+      "y": 9,
+      "width": 248,
+      "height": 330
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 640,
+  "calloutWidth": 220,
+  "annotations": [
+    {
+      "selector": "a:has-text('Settings') >> nth=0",
+      "title": "Settings",
+      "text": "Opens with the same permission",
+      "side": "left",
+      "pad": 1
+    },
+    {
+      "selector": "a:has-text('Users') >> nth=0",
+      "title": "No Roles",
+      "text": "Roles shows under Users for the owner only",
+      "pad": 1
+    },
+    {
+      "selector": "a:has-text('Billing') >> nth=0",
+      "title": "Billing",
+      "text": "Shown by Organization Settings View",
+      "pad": 1
+    },
+    {
+      "selector": "a:has-text('Affiliate Portal') >> nth=0",
+      "title": "Affiliate Portal",
+      "text": "Opens with it too",
+      "side": "left",
+      "pad": 1
+    }
+  ]
+}

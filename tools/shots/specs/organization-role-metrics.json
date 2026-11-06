@@ -1,0 +1,67 @@
+{
+  "out": "images/organization/role-metrics.png",
+  "alt": "Manage Metrics for the Analyst role: analytics metrics in groups such as Revenue & Sales, the ticked ones the role can see, Allow All and Save Metrics",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798, its real Analyst role. The capture reloads the list, opens Analyst's menu and Manage Metrics. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-role-metrics",
+  "capture": {
+    "path": "/settings/organization/roles",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "waitFor": "[data-testid='list.reload']",
+    "actions": [
+      {
+        "click": "[data-testid='list.reload']"
+      },
+      {
+        "waitFor": "[data-testid='list.row']"
+      },
+      {
+        "click": "[data-testid='list.row']:nth-child(4) [data-testid='row-actions-trigger']"
+      },
+      {
+        "click": ".ant-dropdown:not(.ant-dropdown-hidden) >> text=Manage Metrics"
+      },
+      {
+        "waitFor": ".ant-modal-content h4.col-label"
+      }
+    ],
+    "crop": ".ant-modal-content",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "title": "Metric group",
+      "text": "Metrics sorted by area",
+      "side": "left",
+      "box": [
+        16,
+        127,
+        112,
+        17
+      ]
+    },
+    {
+      "selector": ".ant-modal-content label:has(input:checked) >> nth=0",
+      "title": "Ticked metric",
+      "text": "Shows on this role's dashboards",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-modal-content button:has-text('Allow All')",
+      "title": "Allow All",
+      "text": "Ticks every metric"
+    },
+    {
+      "selector": ".ant-modal-content button:has-text('Save Metrics')",
+      "title": "Save Metrics",
+      "text": "None ticked means no dashboard numbers"
+    }
+  ]
+}

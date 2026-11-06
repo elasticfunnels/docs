@@ -1,0 +1,56 @@
+{
+  "out": "images/organization/users-list.png",
+  "alt": "Settings, Users: the organization's members with their role, status and 2FA, the Invite User button and the row menu",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798 (Northwind Supplements, owner Alex Morgan). Members are fictional fixture rows (fixtures/organization/users.json). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-users-list",
+  "capture": {
+    "path": "/settings/organization/users",
+    "viewport": {
+      "width": 1180,
+      "height": 700
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/users$",
+        "file": "tools/shots/fixtures/organization/users.json"
+      }
+    ],
+    "waitFor": "[data-testid='list.row']",
+    "crop": "[data-testid='org.users.list']",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "[data-testid='list.new-button']",
+      "title": "Invite User",
+      "text": "Emails an invite with a role and brands"
+    },
+    {
+      "title": "Organization Role",
+      "text": "Click a role to change it",
+      "side": "left",
+      "box": [
+        402,
+        238,
+        112,
+        110
+      ]
+    },
+    {
+      "selector": "[data-testid='list.row']:nth-child(6) td:nth-child(4) span",
+      "title": "Invited",
+      "text": "Invite sent, not accepted yet",
+      "side": "right"
+    },
+    {
+      "selector": "[data-testid='list.row']:nth-child(2) [data-testid='row-actions-trigger']",
+      "title": "Row menu",
+      "text": "View the member, or resend an invite"
+    }
+  ]
+}

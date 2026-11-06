@@ -1,0 +1,65 @@
+{
+  "out": "images/organization/roles-list.png",
+  "alt": "Settings, Roles: the organization's roles with their type (System Role (Locked), System Role, Default Role, Custom), the Create Role button and a role's menu open with Edit, Manage Permissions, Manage Metrics and Delete",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798, its real seeded roles. The capture clicks the list's reload button first: on a direct load the list shows 'No data found' until reloaded (the org is not loaded yet when ListTemplate asks for rows). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-roles-list",
+  "capture": {
+    "path": "/settings/organization/roles",
+    "viewport": {
+      "width": 1180,
+      "height": 760
+    },
+    "waitFor": "[data-testid='list.reload']",
+    "actions": [
+      {
+        "click": "[data-testid='list.reload']"
+      },
+      {
+        "waitFor": "[data-testid='list.row']"
+      },
+      {
+        "click": "[data-testid='list.row']:nth-child(6) [data-testid='row-actions-trigger']"
+      },
+      {
+        "waitFor": ".ant-dropdown:not(.ant-dropdown-hidden)"
+      }
+    ],
+    "crop": "[data-testid='org.roles.list']",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "main button:has-text('Create Role')",
+      "title": "Create Role",
+      "text": "A new role, then pick its permissions"
+    },
+    {
+      "selector": "[data-testid='list.row']:has-text('System Role (Locked)')",
+      "title": "System Role (Locked)",
+      "text": "Owner: full access, cannot be edited",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='list.row']:has-text('Default Role')",
+      "title": "Default Role",
+      "text": "Given to people who join by domain",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='list.row']:nth-child(5):has-text('Custom')",
+      "title": "Custom",
+      "text": "A role your team added",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-dropdown:not(.ant-dropdown-hidden)",
+      "title": "Role menu",
+      "text": "Edit, permissions, metrics, delete"
+    }
+  ]
+}

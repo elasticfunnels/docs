@@ -1,0 +1,58 @@
+{
+  "out": "images/organization/user-detail.png",
+  "alt": "One organization member's page: their organization role, the brands they can open with a role per brand, and Save brands and roles",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798; Dana Lee is a fictional fixture member (fixtures/organization/users.json). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-user-detail",
+  "capture": {
+    "path": "/settings/organization/users/9101",
+    "viewport": {
+      "width": 1360,
+      "height": 760
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/users$",
+        "file": "tools/shots/fixtures/organization/users.json"
+      }
+    ],
+    "waitFor": "[data-testid='detail.tab.account']",
+    "crop": {
+      "x": 257,
+      "y": 62,
+      "width": 740,
+      "height": 520
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "text=Organization role: Admin",
+      "title": "Organization role",
+      "text": "Change it from the Users list",
+      "side": "left"
+    },
+    {
+      "selector": "main table tbody tr:first-child td:first-child",
+      "title": "Brand access",
+      "text": "Tick each brand they can open",
+      "side": "left"
+    },
+    {
+      "selector": "main table tbody tr:first-child .ant-select",
+      "title": "Role per brand",
+      "text": "Can differ from brand to brand",
+      "side": "right"
+    },
+    {
+      "selector": "main button:has-text('Save brands and roles')",
+      "title": "Save brands and roles",
+      "text": "Applies the ticks and roles",
+      "side": "left"
+    }
+  ]
+}
