@@ -1,0 +1,84 @@
+{
+  "out": "images/organization/org-settings.png",
+  "alt": "Organization settings, Domain & access and Security: the verified domain, Enforce domain restriction, Automatically join organization by email domain, Default role and Enforce two-factor authentication",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The organization's domain and switches are a fictional fixture (fixtures/organization/org-verified.json: domain example.com, verified, restriction and auto-join on). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-org-settings",
+  "capture": {
+    "path": "/settings/organization/settings",
+    "viewport": {
+      "width": 1360,
+      "height": 1750
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations$",
+        "file": "tools/shots/fixtures/organization/org-verified.json"
+      }
+    ],
+    "waitFor": "[data-testid='field.default-role']",
+    "crop": {
+      "x": 410,
+      "y": 540,
+      "width": 790,
+      "height": 635
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        688,
+        90,
+        90,
+        24
+      ],
+      "title": "Domain",
+      "text": "Set when the organization is created"
+    },
+    {
+      "box": [
+        734,
+        196,
+        44,
+        24
+      ],
+      "title": "Enforce domain restriction",
+      "text": "Invites only to your email domain"
+    },
+    {
+      "box": [
+        734,
+        302,
+        44,
+        24
+      ],
+      "title": "Automatically join",
+      "text": "Same-domain sign-ups join by themselves"
+    },
+    {
+      "box": [
+        490,
+        391,
+        288,
+        38
+      ],
+      "title": "Default role",
+      "text": "The role those people get"
+    },
+    {
+      "box": [
+        734,
+        574,
+        44,
+        24
+      ],
+      "title": "Enforce two-factor",
+      "text": "Every member needs 2FA to sign in"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "out": "images/organization/brands-list.png",
+  "alt": "Settings, Brands: the organization's brands with code, plan and price, Associate Brand and Add Brand, and a brand's menu open with View, Edit and Manage users",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. Brand rows and the brands you own outside the organization are fictional fixtures (fixtures/organization/brands.json, brands-unassigned.json). The capture clicks the list's reload button first: on a direct load the list shows 'No data found' until reloaded. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-brands-list",
+  "capture": {
+    "path": "/settings/organization/brands",
+    "viewport": {
+      "width": 1280,
+      "height": 600
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/brands$",
+        "file": "tools/shots/fixtures/organization/brands.json"
+      },
+      {
+        "url": "^/api/organizations/798/brands/unassigned$",
+        "file": "tools/shots/fixtures/organization/brands-unassigned.json"
+      }
+    ],
+    "waitFor": "[data-testid='list.reload']",
+    "actions": [
+      {
+        "click": "[data-testid='list.reload']"
+      },
+      {
+        "waitFor": "[data-testid='list.row']"
+      },
+      {
+        "click": "[data-testid='list.row']:nth-child(2) [data-testid='row-actions-trigger']"
+      },
+      {
+        "waitFor": ".ant-dropdown:not(.ant-dropdown-hidden)"
+      }
+    ],
+    "crop": "[data-testid='org.brands.list']",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "box": [
+        728,
+        11,
+        254,
+        40
+      ],
+      "title": "Associate Brand, Add Brand",
+      "text": "Move in a brand you own, or start one"
+    },
+    {
+      "selector": "[data-testid='list.row']:has-text('Northwind Supplements')",
+      "title": "Brand",
+      "text": "Click the name for its team",
+      "side": "left"
+    },
+    {
+      "selector": ".ant-dropdown:not(.ant-dropdown-hidden)",
+      "title": "Brand menu",
+      "text": "View, Edit, Manage users"
+    }
+  ]
+}

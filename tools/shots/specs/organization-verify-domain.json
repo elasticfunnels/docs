@@ -1,0 +1,51 @@
+{
+  "out": "images/organization/verify-domain.png",
+  "alt": "Verify your organization: the organization's domain, the TXT record to add to its DNS, and Re-check verification",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The organization's domain and TXT value are a fictional fixture (fixtures/organization/org-unverified.json: domain example.com, not verified). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-verify-domain",
+  "capture": {
+    "path": "/settings/organization/verify",
+    "viewport": {
+      "width": 1360,
+      "height": 800
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations$",
+        "file": "tools/shots/fixtures/organization/org-unverified.json"
+      }
+    ],
+    "waitFor": "main button:has-text('Re-check verification')",
+    "crop": {
+      "x": 275,
+      "y": 185,
+      "width": 640,
+      "height": 425
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "main dd:text-is('example.com')",
+      "title": "Domain",
+      "text": "The email domain you are proving"
+    },
+    {
+      "selector": "main input",
+      "title": "TXT record",
+      "text": "Click to copy, add it to your DNS",
+      "side": "left"
+    },
+    {
+      "selector": "main button:has-text('Re-check verification')",
+      "title": "Re-check verification",
+      "text": "Run it once DNS has updated",
+      "side": "left"
+    }
+  ]
+}

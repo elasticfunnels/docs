@@ -1,0 +1,12 @@
+{"organization":{"id":798,"name":"Northwind Supplements"},
+"plan":{"name":"Pro","plan_code":"pro","status":"active","payment_cycle":"monthly","price_per_month":149,"price_per_year":1490,"free_trial_end":null,"next_payment_date":"2026-11-24T12:00:00.000000Z","period_start_date":"2026-10-24T00:00:00.000000Z","period_end_date":"2026-11-24T12:00:00.000000Z","scheduled_downgrade_plan_code":null,"scheduled_downgrade_at":null,"can_reactivate":false},
+"ai_credits":{"available":500,"used":42},
+"brands_count":2,
+"usage_snapshot":{
+ "views":{"used":61240,"included":100000,"limit":100000,"percent":61,"gross":63980,"excluded":2740},
+ "domains":{"used":3,"included":10,"limit":10,"percent":30,"allows_overage":false,"overage_rate":0},
+ "brands":{"used":2,"limit":10,"percent":20},
+ "automation_runs":{"used":412,"included":1000,"limit":1000,"percent":41,"overage_rate":0},
+ "api_requests":{"used":8300,"included":50000,"limit":50000,"percent":17,"overage_rate":0.15,"usage_billed":false,"overage_cost":0}
+},
+"alerts":[],"next_reset_at":"2026-11-24T12:00:00.000000Z"}

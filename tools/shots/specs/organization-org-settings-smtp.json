@@ -1,0 +1,85 @@
+{
+  "out": "images/organization/org-settings-smtp.png",
+  "alt": "The Emailing section of Organization settings: SMTP server, port and encryption, login, sender identity, Save SMTP and Send test",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. Organization fixture as org-settings; the capture types fictional SMTP values (smtp.example.com, @example.com addresses) and never saves (writes are blocked). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-org-settings-smtp",
+  "capture": {
+    "path": "/settings/organization/settings",
+    "viewport": {
+      "width": 1360,
+      "height": 2300
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations$",
+        "file": "tools/shots/fixtures/organization/org-verified.json"
+      }
+    ],
+    "waitFor": "[data-testid='field.smtp-host']",
+    "actions": [
+      {
+        "fill": "[data-testid='field.smtp-host']",
+        "value": "smtp.example.com"
+      },
+      {
+        "fill": "[data-testid='field.smtp-username']",
+        "value": "mailer@example.com"
+      },
+      {
+        "fill": "[data-testid='field.smtp-password']",
+        "value": "demo-password"
+      },
+      {
+        "fill": "[data-testid='field.from-name']",
+        "value": "Northwind Supplements"
+      },
+      {
+        "fill": "[data-testid='field.from-email']",
+        "value": "team@example.com"
+      },
+      {
+        "fill": "[data-testid='field.reply-to-email']",
+        "value": "support@example.com"
+      },
+      {
+        "eval": "document.activeElement && document.activeElement.blur()"
+      }
+    ],
+    "crop": "main div.border-line:has(> div :text-is('Emailing'))",
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "main :text-is('Not verified')",
+      "title": "Not verified",
+      "text": "Until a test email goes through"
+    },
+    {
+      "selector": "[data-testid='field.smtp-host']",
+      "title": "SMTP server",
+      "text": "Host, port, encryption and login from your provider",
+      "side": "left"
+    },
+    {
+      "selector": "[data-testid='field.from-name']",
+      "title": "Sender identity",
+      "text": "Name and addresses people see",
+      "side": "left"
+    },
+    {
+      "title": "Save SMTP, Send test",
+      "text": "Save, then send yourself a test",
+      "box": [
+        21,
+        469,
+        580,
+        40
+      ]
+    }
+  ]
+}

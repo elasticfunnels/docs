@@ -1,0 +1,76 @@
+{
+  "out": "images/organization/billing-invoices.png",
+  "alt": "Organization Billing on the Invoices tab: invoices by type with status, an open invoice with Pay now, and download",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. Billing data is fictional fixture JSON (fixtures/organization/billing-summary.json, payment-cards.json, invoices.json, billing-details.json): the local app has no Stripe customer and its usage summary needs ClickHouse. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-billing-invoices",
+  "capture": {
+    "path": "/settings/organization/billing",
+    "viewport": {
+      "width": 1800,
+      "height": 900
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/billing/summary$",
+        "file": "tools/shots/fixtures/organization/billing-summary.json"
+      },
+      {
+        "url": "^/api/organizations/798/payment-cards$",
+        "file": "tools/shots/fixtures/organization/payment-cards.json"
+      },
+      {
+        "url": "^/api/organizations/798/invoices$",
+        "file": "tools/shots/fixtures/organization/invoices.json"
+      },
+      {
+        "url": "^/api/organizations/798/billing-details$",
+        "file": "tools/shots/fixtures/organization/billing-details.json"
+      }
+    ],
+    "waitFor": "[data-testid='detail.tab.subscription']",
+    "actions": [
+      {
+        "click": "[data-testid='detail.tab.invoices']"
+      },
+      {
+        "wait": 1200
+      }
+    ],
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ],
+    "crop": {
+      "x": 270,
+      "y": 285,
+      "width": 1000,
+      "height": 400
+    }
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "main [data-testid='detail.tabs'] >> nth=1",
+      "title": "Invoice types",
+      "text": "Subscription, overages, AI credits, refunds",
+      "side": "left"
+    },
+    {
+      "selector": "main :text-is('ORG-2311')",
+      "title": "Invoice number",
+      "text": "Quote it when you contact support",
+      "side": "left"
+    },
+    {
+      "selector": "main button:has-text('Pay now')",
+      "title": "Pay now",
+      "text": "Charges an unpaid invoice again"
+    },
+    {
+      "selector": "main button[aria-label='Download invoice'] >> nth=1",
+      "title": "Download invoice",
+      "text": "Saves the PDF"
+    }
+  ]
+}

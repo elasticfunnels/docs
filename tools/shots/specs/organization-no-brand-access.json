@@ -1,0 +1,58 @@
+{
+  "out": "images/organization/no-brand-access.png",
+  "alt": "What a new member with no brand access sees: the welcome to the organization, a note that no project is shared with them yet, next steps, Check access again and their organization and role",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798, route /organization/no-brand-access, reached inside the app (a full page load of that URL is a 404 from Laravel; the BrandAccess middleware redirects there). The eval action swaps window.user for a fictional member (Jordan Kim, role editor) and pushes the route in the SPA so the page reads it. Neither button is clicked. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-no-brand-access",
+  "capture": {
+    "path": "/settings/organization/users",
+    "viewport": {
+      "width": 1100,
+      "height": 900
+    },
+    "waitFor": "[data-testid='list.row']",
+    "actions": [
+      {
+        "eval": "(async () => { Object.assign(window.user, { id: 9105, name: 'Jordan Kim', email: 'jordan@example.com', organization_role: 'editor', role: 'editor' }); const r = document.querySelector('#app').__vue_app__.config.globalProperties.$router; await r.push('/organization/no-brand-access'); })()"
+      },
+      {
+        "wait": 1500
+      }
+    ],
+    "crop": {
+      "x": 420,
+      "y": 195,
+      "width": 508,
+      "height": 630
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "h2",
+      "title": "Welcome",
+      "text": "They joined the organization",
+      "side": "left"
+    },
+    {
+      "selector": ":text('No Project Access Yet')",
+      "title": "No project yet",
+      "text": "No brand has been shared with them",
+      "side": "left"
+    },
+    {
+      "selector": "button:has-text('Check for Access')",
+      "title": "Check for Access",
+      "text": "Opens their first brand once added"
+    },
+    {
+      "selector": "div.sm\\:max-w-md >> nth=1 >> :text('Role:')",
+      "title": "Organization and role",
+      "text": "The organization and their role in it"
+    }
+  ]
+}

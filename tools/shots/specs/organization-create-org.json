@@ -1,0 +1,67 @@
+{
+  "out": "images/organization/create-org.png",
+  "alt": "Create organization: Organization name, Organization domain (optional), the switch that adds all brands you own after verification, and Create organization",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The capture types a fictional name and example.com and turns the switch on; Create organization is never clicked (writes are blocked). The TXT record to verify the domain is shown on the next screen (verify-domain.png). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-create-org",
+  "capture": {
+    "path": "/settings/organization/create",
+    "viewport": {
+      "width": 1360,
+      "height": 800
+    },
+    "waitFor": "main button:has-text('Create organization')",
+    "actions": [
+      {
+        "fill": "main input >> nth=0",
+        "value": "Northwind Supplements"
+      },
+      {
+        "fill": "main input >> nth=1",
+        "value": "example.com"
+      },
+      {
+        "click": "main [role=switch], main button.ant-switch"
+      },
+      {
+        "eval": "document.activeElement && document.activeElement.blur()"
+      }
+    ],
+    "crop": {
+      "x": 275,
+      "y": 80,
+      "width": 640,
+      "height": 440
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "main input >> nth=0",
+      "title": "Organization name",
+      "text": "Shown to everyone you invite",
+      "side": "left"
+    },
+    {
+      "selector": "main input >> nth=1",
+      "title": "Organization domain",
+      "text": "Optional: your team's email domain",
+      "side": "left"
+    },
+    {
+      "selector": "main [role=switch], main button.ant-switch",
+      "title": "Add my brands",
+      "text": "After verification, brands you own move in",
+      "side": "left"
+    },
+    {
+      "selector": "main button:has-text('Create organization')",
+      "title": "Create organization",
+      "text": "Then add the TXT record shown"
+    }
+  ]
+}

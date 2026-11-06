@@ -1,0 +1,8 @@
+{"brand":{"id":899,"name":"Northwind Supplements","code":"demo-northwind","status":"active","plan":{"name":"Pro","plan_code":"pro","payment_cycle":"monthly","status":"active"}},
+"users":[
+{"id":975,"name":"Alex Morgan","email":"alex@example.com","organization_role":"owner","status":"active","is_external_user":false,"is_organization_owner":true,"is_self":true,"is_invitation":false,"brand_role":"owner","in_brand":true,"organization_managed":false},
+{"id":9101,"name":"Dana Lee","email":"dana@example.com","organization_role":"admin","status":"active","is_external_user":false,"is_organization_owner":false,"is_self":false,"is_invitation":false,"brand_role":"admin","in_brand":true,"organization_managed":true},
+{"id":9102,"name":"Sam Rivera","email":"sam@example.com","organization_role":"editor","status":"active","is_external_user":false,"is_organization_owner":false,"is_self":false,"is_invitation":false,"brand_role":"analyst","in_brand":true,"organization_managed":true},
+{"id":9103,"name":"Priya Shah","email":"priya@example.com","organization_role":"analyst","status":"active","is_external_user":false,"is_organization_owner":false,"is_self":false,"is_invitation":false,"brand_role":null,"in_brand":false,"organization_managed":true},
+{"id":9105,"name":"Jordan Kim","email":"jordan@example.com","organization_role":"editor","status":"active","is_external_user":false,"is_organization_owner":false,"is_self":false,"is_invitation":false,"brand_role":null,"in_brand":false,"organization_managed":true}
+]}

@@ -1,0 +1,72 @@
+{
+  "out": "images/organization/brand-users.png",
+  "alt": "A brand's Users and roles tab: each member's organization role next to their role in this brand, the All / In brand / Not in brand filter, and three people ticked with a role picked for Add to brand or Remove from brand",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798, brand 899. Members are a fictional fixture (fixtures/organization/brand-users.json). The capture ticks three rows and picks a role; nothing is applied (writes are blocked). Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-brand-users",
+  "capture": {
+    "path": "/settings/organization/brands/899",
+    "viewport": {
+      "width": 1360,
+      "height": 980
+    },
+    "fixtures": [
+      {
+        "url": "^/api/organizations/798/brands/899/users$",
+        "file": "tools/shots/fixtures/organization/brand-users.json"
+      }
+    ],
+    "waitFor": "main tr:has-text('Jordan Kim')",
+    "actions": [
+      {
+        "click": "main tr:has-text('Sam Rivera') input[type=checkbox]"
+      },
+      {
+        "click": "main tr:has-text('Priya Shah') input[type=checkbox]"
+      },
+      {
+        "click": "main tr:has-text('Jordan Kim') input[type=checkbox]"
+      },
+      {
+        "click": "main .rounded-xl.bg-zinc-50 .ant-select"
+      },
+      {
+        "click": ".ant-select-item-option:has-text('Editor')"
+      }
+    ],
+    "crop": {
+      "x": 270,
+      "y": 300,
+      "width": 1070,
+      "height": 575
+    },
+    "hide": [
+      ".toast",
+      ".notifications",
+      ".vue-notification-group"
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 210,
+  "annotations": [
+    {
+      "selector": "main button:has-text('Not in brand') >> xpath=..",
+      "title": "All, In brand, Not in brand",
+      "text": "Narrow the list by membership"
+    },
+    {
+      "selector": "main .rounded-xl.bg-zinc-50",
+      "title": "Bulk actions",
+      "text": "Pick a role, then Add to brand or Remove",
+      "side": "left"
+    },
+    {
+      "box": [
+        364,
+        194,
+        508,
+        364
+      ],
+      "title": "Organization role, Brand role",
+      "text": "Org-wide role next to this brand's"
+    }
+  ]
+}

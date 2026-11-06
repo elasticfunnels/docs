@@ -1,0 +1,57 @@
+[
+ {
+  "id": 798,
+  "name": "Northwind Supplements",
+  "code": "northwind-demo",
+  "domain": "example.com",
+  "enforce_domain_restriction": true,
+  "auto_join_users_by_domain": true,
+  "allowed_custom_integrations": null,
+  "default_role": "editor",
+  "owner_id": 975,
+  "verified_at": "2026-10-30T10:00:00.000000Z",
+  "txt_validation_record": "elastic-verification=Dm7qR2xK9vLp4TzW8nYc3HsB6fJa1EuQ",
+  "txt_validated": true,
+  "txt_validated_at": "2026-10-30T10:00:00.000000Z",
+  "txt_failed_at": null,
+  "last_try_at": null,
+  "created_at": "2026-09-24T21:16:52.000000Z",
+  "updated_at": "2026-10-30T10:00:00.000000Z",
+  "is_verified": 1,
+  "auto_add_brands": true,
+  "enforce_2fa": false,
+  "deleted_at": null,
+  "stripe_customer_id": null,
+  "billing_details": null,
+  "billing_country": null,
+  "billing_zip": null,
+  "billing_name": null,
+  "billing_email": null,
+  "billing_tax_id": null,
+  "migration_pending": false,
+  "blocked_at": null,
+  "blocked_reason": null,
+  "blocked_user_ids": null,
+  "restricted_at": null,
+  "restricted_reason": null,
+  "restricted_network": null,
+  "restriction_lifted_at": null,
+  "restriction_lifted_by": null,
+  "restriction_lift_reason": null,
+  "identity_tracking_domain_id": null,
+  "brands": [
+   {
+    "id": 899,
+    "organization_id": 798,
+    "name": "Northwind Supplements",
+    "code": "demo-northwind"
+   },
+   {
+    "id": 935,
+    "organization_id": 798,
+    "name": "Northwind Sleep",
+    "code": "demo-northwind-sleep"
+   }
+  ]
+ }
+]

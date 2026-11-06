@@ -1,0 +1,2 @@
+[{"id":899,"name":"Northwind Supplements","code":"demo-northwind","plan":{"name":"Pro","plan_code":"pro","price_per_month":149,"price_per_year":null,"price_per_mille":null,"payment_cycle":"monthly","status":"active"}},
+{"id":935,"name":"Northwind Sleep","code":"demo-northwind-sleep","plan":{"name":"Pro","plan_code":"pro","price_per_month":149,"price_per_year":null,"price_per_mille":null,"payment_cycle":"monthly","status":"active"}}]

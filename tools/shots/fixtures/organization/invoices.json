@@ -1,0 +1,6 @@
+[
+{"id":2311,"source":"organization","type":"subscription","plan_name":"Pro","status":"open","total":149,"brand_id":null,"brand_name":"Northwind Supplements","created_at":"2026-10-24T09:00:00.000000Z","period_start_date":"2026-10-24","period_end_date":"2026-11-24","refund_amount":0,"overage_components":null,"parent_invoice_id":null},
+{"id":2287,"source":"organization","type":"overage_monthly","plan_name":"Pro","status":"paid","total":12.5,"brand_id":null,"brand_name":"Northwind Supplements","created_at":"2026-10-01T09:00:00.000000Z","period_start_date":"2026-09-01","period_end_date":"2026-09-30","refund_amount":0,"overage_components":null,"parent_invoice_id":null},
+{"id":2264,"source":"organization","type":"subscription","plan_name":"Pro","status":"paid","total":149,"brand_id":null,"brand_name":"Northwind Supplements","created_at":"2026-09-24T09:00:00.000000Z","period_start_date":"2026-09-24","period_end_date":"2026-10-24","refund_amount":0,"overage_components":null,"parent_invoice_id":null},
+{"id":2240,"source":"organization","type":"ai_credits","plan_name":null,"credits":1000,"status":"paid","total":20,"brand_id":null,"brand_name":"Northwind Supplements","created_at":"2026-09-12T14:30:00.000000Z","period_start_date":null,"period_end_date":null,"refund_amount":0,"overage_components":null,"parent_invoice_id":null}
+]
