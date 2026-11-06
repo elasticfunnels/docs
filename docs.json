@@ -481,6 +481,8 @@
                 "group": "Team and permissions",
                 "icon": "user-shield",
                 "pages": [
+                  "settings/organization-users",
+                  "settings/organization-roles",
                   "essentials/roles-permissions-metrics",
                   "essentials/permission-matrix",
                   "essentials/restricted-role-troubleshooting"

@@ -6,9 +6,8 @@ description: How organization roles control menus, features, actions, and dashbo
 ---
 
 ## Overview
-{/* SCREENSHOT: Overview · relevant screen or example output · desktop */}
 
-ElasticFunnels uses **organization roles** to decide what each teammate can access. A role has:
+ElasticFunnels uses **organization roles** to decide what each teammate can access. Owners manage roles under **Settings > Roles** ([Organization roles](/settings/organization-roles)) and give them to people under **Settings > Users** ([Organization users](/settings/organization-users)). A role has:
 
 - **Permissions**: dotted keys such as `conversions.view`, `pages.update`, `customers.export`.
 - **Metrics**: which analytics numbers they may see on the dashboard, cards, and metrics table.
@@ -16,7 +15,6 @@ ElasticFunnels uses **organization roles** to decide what each teammate can acce
 Owners always have full access. Users **not** in an organization (standalone brands) are not restricted by these lists.
 
 ## How access is decided
-{/* SCREENSHOT: How access is decided · relevant screen or example output · desktop */}
 
 Most areas of the app check more than one thing:
 
@@ -32,7 +30,8 @@ That means a user can sometimes:
 - have access to a feature, but still see no dashboard metrics
 
 ## What permissions affect
-{/* SCREENSHOT: What permissions affect · relevant screen or example output · desktop */}
+<img src="/images/organization/role-permissions.png" alt="The Manage Permissions grid: rows per area of the app with View, Create, Update, Delete and Full Access checkboxes" />
+
 
 - **Sidebar and navigation**: Menu entries check both permissions and related modules.
 - **Screens and actions**: Buttons, create flows, update actions, and exports can be restricted separately.
@@ -40,7 +39,8 @@ That means a user can sometimes:
 - **Dashboard analytics**: Metrics, cards, and the metrics table are controlled by metric access, not only by feature permissions.
 
 ## Metrics vs permissions
-{/* SCREENSHOT: Metrics vs permissions · relevant screen or example output · desktop */}
+<img src="/images/organization/role-metrics.png" alt="The Manage Metrics window: grouped analytics metrics, each with a checkbox, and the Allow All button" />
+
 
 Permissions control **features** (pages, conversions, settings, etc.). **Metrics** control **dashboard numbers** (sales, revenue, cards, breakdown tables).
 
@@ -53,7 +53,6 @@ If your role has **no metrics** assigned, the dashboard will **not** show:
 You may still be able to use reports, conversions, customers, pages, or settings if your feature permissions allow them.
 
 ## Common examples
-{/* SCREENSHOT: Common examples · relevant screen or example output · desktop */}
 
 ### Reports behavior
 
@@ -61,12 +60,16 @@ If a user only has access to one report child, such as **Customers** or **Conver
 
 ### Customers and conversions
 
-- **Customers** — Viewing the Customers report requires `customers.view`. Export uses `customers.export`. Creating a manual customer order (which creates a purchase conversion) requires **`conversions.create`** in addition to appropriate customer access where applicable.
-- **Fulfillment** — Viewing the fulfillment list is tied to **conversions** access. Seeing or configuring **integrations** is separate (`integrations.view`). You can have fulfillment orders listed even if you cannot open the Integrations screen.
+- **Customers**: Viewing the Customers report requires `customers.view`. Export uses `customers.export`. Creating a manual customer order (which creates a purchase conversion) requires **`conversions.create`** in addition to appropriate customer access where applicable.
+- **Fulfillment**: Viewing the fulfillment list is tied to **conversions** access. Seeing or configuring **integrations** is separate (`integrations.view`). You can have fulfillment orders listed even if you cannot open the Integrations screen.
+
+{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
 
 ### Billing
 
-Billing visibility uses permissions such as `billing.invoices.view` and `billing.cards.view` (not the shorter `billing.invoices` labels).
+The Admin role does not include Billing. To give someone Billing, tick the **Billing** rows in their role (Invoices, Payment Cards, Plan), or **Organization > Settings**, which also opens the organization Settings page and Affiliate Portal. The exact boxes are in [Give someone Billing](/settings/organization-roles#give-someone-billing).
+
+{/* BILLING SECTION END */}
 
 ### Affiliate portal
 
@@ -77,17 +80,17 @@ Organization settings permissions no longer open the portal on their own. When t
 To let someone add an internal affiliate on a brand, give their role **Use portal affiliates in brands** as well as **Affiliates** create or update.
 
 ## How to set up a restricted role
-{/* SCREENSHOT: How to set up a restricted role · relevant screen or example output · desktop */}
 
 For a practical setup flow:
 
-1. Start from an existing role that is close to the access level you want.
-2. Remove feature permissions the user should not have.
-3. Add only the metrics the user should be allowed to see.
+1. Create a role under **Settings > Roles**, or start from an existing role that is close to the access level you want.
+2. In **Manage Permissions**, tick only the rows and actions the user needs.
+3. In **Manage Metrics**, tick only the numbers the user should see.
 4. Test with a real restricted user account before assigning the role broadly.
 
+[Organization roles](/settings/organization-roles#worked-examples) has worked examples for finance, support, fulfillment and media buyers.
+
 ## Tips for admins
-{/* SCREENSHOT: Tips for admins · relevant screen or example output · desktop */}
 
 1. Start from a template role close to what you need, then remove permissions.
 2. If someone sees a menu item but gets errors loading data, check both **permissions** and **module** toggles for the brand.
@@ -95,9 +98,8 @@ For a practical setup flow:
 4. Treat view, export, create, and update as separate capabilities. In some areas, being able to see a list does not mean the user can export or create.
 
 ## Next steps
-{/* SCREENSHOT: Next steps · relevant screen or example output · desktop */}
 
+- [Organization roles](/settings/organization-roles): built-in roles, creating a role, the permissions grid and worked examples.
+- [Organization users](/settings/organization-users): inviting people and choosing their brands.
 - Use the [Permission Matrix](/essentials/permission-matrix) to map common capabilities to permission keys.
 - Use [Restricted Role Troubleshooting](/essentials/restricted-role-troubleshooting) for setup examples and debugging steps.
-
-For technical details of the enforcement stack, see the engineering note in the application repo: `docs/permission-inventory.md`.

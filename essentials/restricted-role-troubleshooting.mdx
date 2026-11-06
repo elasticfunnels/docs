@@ -5,7 +5,6 @@ description: How to configure restricted roles and diagnose why a user can or ca
 ---
 
 ## Before you troubleshoot
-{/* SCREENSHOT: Before you troubleshoot · relevant screen or example output · desktop */}
 
 When a restricted role does not behave as expected, check these in order:
 
@@ -15,7 +14,6 @@ When a restricted role does not behave as expected, check these in order:
 4. Does the role include the required metrics for analytics widgets?
 
 ## Common symptoms
-{/* SCREENSHOT: Common symptoms · relevant screen or example output · desktop */}
 
 ### “I cannot see a menu item”
 
@@ -29,7 +27,23 @@ Examples:
 
 - Missing `customers.view` means the Customers report item will not appear.
 - Missing `conversions.view` means conversions-related reports and lists stay hidden.
-- Missing both `billing.invoices.view` and `billing.cards.view` means Billing stays hidden.
+- Billing has its own rules; see the next section.
+
+{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
+
+### “I set Admin, but they cannot see Billing”
+
+That is expected. Admin covers every brand feature and managing members, but not Billing or organization settings.
+
+To give them Billing, an owner edits the role in **Settings > Roles > Manage Permissions** and ticks the **Billing** rows (Invoices View; Payment Cards View, Create, Update, Delete; Plan View, Update), or **Organization > Settings**. You can add these to Admin itself, or create a separate Finance role. The exact boxes are in [Give someone Billing](/settings/organization-roles#give-someone-billing).
+
+<img src="/images/organization/role-permissions-billing.png" alt="The Manage Permissions grid scrolled to the Billing and Organization groups, with the boxes that grant Billing highlighted" />
+
+After saving, the user sees **Billing** in their settings menu:
+
+<img src="/images/organization/settings-sidebar-billing.png" alt="The settings sidebar of a teammate with a Finance role, showing Billing under the organization items" />
+
+{/* BILLING SECTION END */}
 
 ### “I can see Reports, but it opens a different page than expected”
 
@@ -63,6 +77,14 @@ That can be correct.
 
 A role can be allowed to work with fulfillment orders while still being blocked from integration setup pages.
 
+### “They cannot see Roles”
+
+Only owners can open **Settings > Roles**, whatever permissions their role has. Ask an owner to change the role, or to make them an owner.
+
+### “I changed someone's role and their brand roles or metrics changed”
+
+Changing a person's organization role resets their role on every brand and their visible metrics to the new role. Saving a role's permissions or metrics does the same for everyone who holds it. Set per-brand roles and custom metrics again on the person's page under **Settings > Users**. See [Organization users](/settings/organization-users#change-a-users-role).
+
 ### “I can see the menu, but the data will not load”
 
 This usually means one of the following:
@@ -72,7 +94,8 @@ This usually means one of the following:
 - the role was configured with feature permissions but no metric grants
 
 ## Example role setups
-{/* SCREENSHOT: Example role setups · relevant screen or example output · desktop */}
+
+More examples, with the exact boxes to tick in the role editor, are in [Organization roles](/settings/organization-roles#worked-examples).
 
 ### Example 1: Conversions and customers viewer
 
@@ -134,7 +157,6 @@ Expected behavior:
 - dashboard metrics, cards, and metrics table stay hidden
 
 ## Admin checklist
-{/* SCREENSHOT: Admin checklist · relevant screen or example output · desktop */}
 
 Before assigning a restricted role widely:
 
@@ -145,6 +167,5 @@ Before assigning a restricted role widely:
 5. Test one read action and one operational action relevant to that role.
 
 ## Need the full mapping?
-{/* SCREENSHOT: Need the full mapping? · relevant screen or example output · desktop */}
 
-Use the [Permission Matrix](/essentials/permission-matrix) for a quick reference of common capabilities and their permission keys.
+Use the [Permission Matrix](/essentials/permission-matrix) for a quick reference of common capabilities and their permission keys, [Organization roles](/settings/organization-roles) to build a role, and [Organization users](/settings/organization-users) to assign it.

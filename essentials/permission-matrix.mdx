@@ -5,16 +5,14 @@ description: A user-facing map of common ElasticFunnels capabilities to the perm
 ---
 
 ## How to use this page
-{/* SCREENSHOT: How to use this page · relevant screen or example output · desktop */}
 
 This matrix is designed for brand owners and organization admins who need to build or troubleshoot roles.
 
 - Use the **capability** column to find the behavior you want.
-- Use the **permission** column to configure the role.
+- Use the **permission** column to configure the role in **Settings > Roles > Manage Permissions** ([Organization roles](/settings/organization-roles#manage-permissions)). The key `pages.update` is the **Update** box on the **Pages** row.
 - Also verify the related **module** is enabled for the brand.
 
 ## Core rules
-{/* SCREENSHOT: Core rules · relevant screen or example output · desktop */}
 
 - `*.view` usually controls whether a user can open a section or list.
 - `*.create` controls creation flows.
@@ -24,7 +22,8 @@ This matrix is designed for brand owners and organization admins who need to bui
 - Metrics are separate from feature permissions.
 
 ## Common capability matrix
-{/* SCREENSHOT: Common capability matrix · relevant screen or example output · desktop */}
+<img src="/images/organization/role-permissions.png" alt="The Manage Permissions grid where these permissions are ticked: one row per area with View, Create, Update, Delete and Full Access" />
+
 
 | Capability | Typical permission | Notes |
 |-----------|--------------------|-------|
@@ -40,8 +39,8 @@ This matrix is designed for brand owners and organization admins who need to bui
 | Open Pages | `pages.view` | Base pages access. |
 | Open Advanced pages tools | `pagecomponents.view`, `collections.view`, `trackingscripts.view`, `backendscripts.view`, `files.view`, and related page permissions | Advanced page tooling can depend on several permissions. |
 | Open Custom Reports | `reports.view` | In some UI contexts `analytics.view` may also appear; use the report-specific permission model when assigning roles. |
-| Open Tracking reports | `tracking.view` or `reporting.utm_performance.view` | Depends on the report page. |
-| Open Billing | `billing.invoices.view`, `billing.cards.view` | Billing checks use the `.view` form. |
+| Open Tracking reports | `tracking.view` or `reports.utm_performance.view` | Depends on the report page. |
+| Open Billing | See [Billing access](#billing-access) | Admin does not include Billing. |
 | See plans and pricing on the organization's Brands page | `organization.settings.view` | Other members see the brand list without plan and pricing columns. |
 | Open the Affiliate portal | any `organization.affiliate_portal*.view` | The portal shows only the tabs the role has. A role with none of these does not see Affiliate Portal in the organization menu. |
 | Change portal domain, branding, emails, payout schedule and brands (with each brand's status after sign-up) | `organization.affiliate_portal.update` | Removing the portal needs `organization.affiliate_portal.delete`. |
@@ -52,8 +51,24 @@ This matrix is designed for brand owners and organization admins who need to bui
 | Pick a portal affiliate when adding an internal affiliate on a brand | `affiliates.organization_affiliates.view` | Together with `affiliates.create` or `affiliates.update` on that brand. |
 | Invite a new portal affiliate from a brand's Add affiliate form | `affiliates.create` on the brand, `affiliates.organization_affiliates.view` and `organization.affiliate_portal_affiliates.create` | Without the portal permission the form still lets you pick existing portal affiliates. |
 
+{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
+
+## Billing access
+
+| Capability | Permission | Notes |
+|-----------|------------|-------|
+| See invoices and credit notes | `billing.invoices.view` | Billing > Invoices, View. |
+| See, add, change or remove payment cards | `billing.cards.view`, `.create`, `.update`, `.delete` | Billing > Payment Cards. |
+| See the plan; change it and buy AI credits | Billing > Plan: View, Update | {/* PLAN KEY: add the permission key from the final code. */} |
+| All of Billing, plus organization Settings and Affiliate Portal | `organization.settings.view` (see), `organization.settings.update` (change) | Organization > Settings. |
+
+Step by step, with a finance example: [Give someone Billing](/settings/organization-roles#give-someone-billing).
+
+{/* BILLING SECTION END */}
+
 ## Metrics access matrix
-{/* SCREENSHOT: Metrics access matrix · relevant screen or example output · desktop */}
+<img src="/images/organization/role-metrics.png" alt="The Manage Metrics window where metric keys are ticked by name, grouped by type" />
+
 
 Metrics are assigned separately from page permissions.
 
@@ -72,7 +87,6 @@ Examples of metric keys include:
 - `refund_total`
 
 ## Recommended restricted-role patterns
-{/* SCREENSHOT: Recommended restricted-role patterns · relevant screen or example output · desktop */}
 
 ### Conversions-only viewer
 
@@ -88,7 +102,7 @@ Examples of metric keys include:
 ### Reports reader
 
 - `reports.view`
-- report-specific permissions such as `conversions.view`, `customers.view`, `tracking.view`, or `reporting.utm_performance.view`
+- report-specific permissions such as `conversions.view`, `customers.view`, `tracking.view`, or `reports.utm_performance.view`
 - selected metrics if the dashboard should also be visible
 
 ### Operations user
@@ -99,7 +113,6 @@ Examples of metric keys include:
 - optionally `merchants.view` if they need merchant settings or merchant-based selectors
 
 ## Important differences to remember
-{/* SCREENSHOT: Important differences to remember · relevant screen or example output · desktop */}
 
 - **Feature permissions** decide what pages and actions a user can access.
 - **Metrics** decide whether analytics widgets and dashboard numbers appear.
@@ -107,6 +120,5 @@ Examples of metric keys include:
 - A user may see **Reports** but only be allowed into a subset of report pages.
 
 ## Next step
-{/* SCREENSHOT: Next step · relevant screen or example output · desktop */}
 
-If a role still behaves unexpectedly, use [Restricted Role Troubleshooting](/essentials/restricted-role-troubleshooting).
+If a role still behaves unexpectedly, use [Restricted Role Troubleshooting](/essentials/restricted-role-troubleshooting). For worked examples (finance, support, fulfillment, media buyer), see [Organization roles](/settings/organization-roles#worked-examples).
