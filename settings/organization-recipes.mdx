@@ -1,0 +1,66 @@
+---
+title: Team setup recipes
+sidebarTitle: "Team recipes"
+icon: "list-check"
+description: Step-by-step ElasticFunnels team setups for a finance person, an agency client who sees one brand, a page contractor who sees no revenue, offboarding, and adding a second owner.
+---
+
+Each recipe uses the screens described in [Organization users](/settings/organization-users), [Organization roles](/settings/organization-roles) and [Organization brands](/settings/organization-brands). Only owners can create or edit roles, so start there if you are not one.
+
+## A finance person
+
+Dana handles billing and wants revenue reports for every brand, without touching pages.
+
+1. In **Settings > Roles**, create a role named "Finance" and set it up as in the [Finance example](/settings/organization-roles#finance-billing-and-revenue-numbers-no-page-editing).
+2. In **Settings > Users**, click **Invite User**, enter Dana's email, pick **Finance** and tick every brand.
+3. When Dana has accepted, ask her to check that **Billing** shows in her settings menu.
+
+Admin is the wrong choice here: it can edit pages and does not include Billing.
+
+## An agency client who sees one brand
+
+Your agency runs several brands, and the client behind Acme Health should see that brand's numbers and nothing else.
+
+Invite them with **Analyst** and tick only **Acme Health** under **Assign to Brands**. Analyst can look at pages, funnels, tracking and conversions without changing anything, and sees traffic, revenue, sales and AOV on the dashboard.
+
+To show more or fewer numbers, open their user page after they accept and set the **Metrics** tab. If they should not see revenue at all, untick the revenue metrics there.
+
+Their email is on another domain, so check the [domain settings](/settings/organization-settings#domain-and-access) if they will create brands of their own.
+
+## A contractor who edits pages but sees no revenue
+
+Create a custom role, for example "Page editor", and tick only:
+
+| Row | Boxes |
+|-----|-------|
+| Pages | View, Create, Update |
+| Funnels | View |
+| Page Components | View, Create, Update |
+| Files | View, Create |
+| Collections | View |
+
+Leave **Manage Metrics** empty, so the dashboard shows them no numbers. Do not tick Conversions, Customers or any Reporting row.
+
+Invite the contractor with this role and only the brands they work on. When the project ends, follow the next recipe.
+
+## Offboarding someone
+
+<Steps>
+  <Step title="Pause first if you are unsure">
+    In **Settings > Users**, click their status and pick **Disabled**. They keep their role and brands but cannot open the organization or its brands, and they stop using a seat.
+  </Step>
+  <Step title="Remove them for good">
+    Open their user page, go to **Account** and click **Remove from organization**. Their access to every brand ends and their open sessions are signed out.
+  </Step>
+  <Step title="Tidy up what they owned">
+    Check the brands they worked on for anything only they knew, such as merchant or integration logins they set up. Removing a user does not change those.
+  </Step>
+</Steps>
+
+Owners cannot be removed this way. To remove a second owner, another owner first changes their role in the **Users** list to a non-owner role.
+
+## Adding a second owner
+
+An owner can make another member an owner: in **Settings > Users**, click the member's role and pick **Owner**. Invitations cannot make someone an owner, so invite them with another role first.
+
+An organization can have several owners. The person who created the organization is its primary owner: their role and status cannot be changed, and there is no setting that moves the primary ownership to someone else.
