@@ -37,6 +37,8 @@ What happens once it is set:
 - Sub IDs and UTM parameters in the link still count.
 - Page versions use the same affiliate as the main page.
 
+To check which page credits whom, open **Pages**. Once a page in the brand has an affiliate, the list shows an **Affiliate** column with its name.
+
 <Note>
 Page affiliate works on domains that use your own checkout, such as Stripe or NMI, and needs a merchant on the domain. On ClickBank, BuyGoods and other merchants that track their own affiliates, the setting is ignored.
 </Note>
@@ -45,7 +47,7 @@ Page affiliate works on domains that use your own checkout, such as Stripe or NM
 
 If you edit pages in your own tool, it can publish through the [API](/api-reference/authentication) so nobody has to open ElasticFunnels.
 
-1. **Copy a page for a new version:** `POST /api/brands/{brand}/pages/{page}/clone` with `title` and `slug`. The response holds the new page's `id`.
+1. **Copy a page for a new version:** `POST /api/brands/{brand}/pages/{page}/clone` with `title` and `slug`. The response holds the new page's `page_id` and `slug`.
 2. **Update the content:** `POST /api/brands/{brand}/pages/{page}/editor` with `html` and `draft: false`. This goes live immediately. Send `expected_revision_id` to avoid overwriting a change someone made in the meantime.
 3. **Add it to the funnel and credit the partner:** `POST /api/brands/{brand}/funnels/{funnel}/entry-pages` with `page_id` and `affiliate_id`. See [Funnels API](/api-reference/endpoints/funnels#add-an-entry-page).
 4. **Get the link to run:** `GET /api/brands/{brand}/pages/{page}/editor/live-url`.
