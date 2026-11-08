@@ -42,9 +42,10 @@ You can change any of them except Owner. Your changes apply to everyone who has 
 ## Create a role
 
 1. Open **Settings > Roles** and click **Create Role**.
-2. Enter a **Name**, for example "Finance", and click **Save**.
-3. Open the new role's menu and pick **Manage Permissions**. A new role starts with no permissions.
-4. Open the menu again and pick **Manage Metrics**. A new role starts with no metrics.
+2. Enter a **Name**, for example "Finance".
+3. Under **Start from a preset**, pick one of the presets below, or **Blank role** to start with nothing ticked. A preset fills in permissions and metrics. Use **Edit permissions** and **Edit metrics** under the list to change them before you save.
+4. Click **Save**.
+5. To change the role later, open its menu and pick **Manage Permissions** or **Manage Metrics**.
 
 <img src="/images/organization/role-edit.png" alt="The New Role window with the Name field and the Save button" />
 
@@ -52,18 +53,20 @@ You cannot name a role "Owner".
 
 ## Role presets
 
-{/* PRESETS: fill from the final code once Start from a preset ships. */}
-
-When you create a role you can start from a preset and adjust it, instead of ticking every box yourself.
+When you create a role you can start from a preset and adjust it, instead of ticking every box yourself. A preset only fills in the new role. Changing presets later does not touch roles you already made.
 
 | Preset | Starts with | Metrics |
 |--------|-------------|---------|
-| Finance | _To be added_ | _To be added_ |
-| Support | _To be added_ | _To be added_ |
-| Fulfillment | _To be added_ | _To be added_ |
-| Marketing analyst | _To be added_ | _To be added_ |
-| Page editor / contractor | _To be added_ | _To be added_ |
-| Read-only | _To be added_ | _To be added_ |
+| Finance | All of Billing (Invoices; Payment Cards; Plan View and Update), plus View on Conversions, Customers and Reports | Sales and revenue (total, main and upsell), net revenue, AOV, refund total and refund % |
+| Support | View on Customers and Conversions, Update on Conversions | Sales, refund total and refund % |
+| Fulfillment | View on Conversions and Products, Update on Conversions | None |
+| Marketing analyst | View on Analytics, Reports, UTM performance, Segments, Tracking, Conversions, Split tests, Funnels and Pages | All |
+| Page editor / contractor | Pages (View, Create, Update, Build), page components, files and funnels (View, Create, Update), and the funnel builder | None |
+| Read-only | View on every brand area. Nothing in Billing, Organization or Call Center | Page views, sessions and clicks |
+
+<Note>
+Update on Conversions also allows refunds, so the Support and Fulfillment presets can refund an order. Remove that box if the person should not. The Read-only preset gets no Export boxes, but the app does not yet check Export everywhere, so treat exported data as visible to anyone who can view the list.
+</Note>
 
 ## Manage Permissions
 
@@ -81,9 +84,7 @@ Click **Save Permissions** when you are done.
 
 Some rows point at the same permission. Under **Reporting**, the Conversions, Subscriptions and Fulfillment rows all use the Conversions View permission, and the Customers row uses Customers View, so ticking one ticks the other.
 
-<Note>
-A few permissions have no column in the grid: Export on Conversions, Customers and Custom Reports, and the individual call center actions. The built-in roles that need them already have them. A role you create only gets them through **Allow All**.
-</Note>
+Some rows have actions outside the four columns, such as **Export** on Conversions and Customers, **Build** on Pages, and the call center actions. They show as their own small checkboxes under the row name.
 
 ## Manage Metrics
 
@@ -99,10 +100,10 @@ Click **Save Metrics** when you are done. You can also override metrics for one 
 
 ## What happens when you change a role
 
-When you save a role's permissions or metrics, everyone whose organization role is that role gets the change on every brand of the organization right away.
+When you save a role's permissions or metrics, everyone who holds that role gets the change right away, on every brand where they have it. A person who has a different role on one brand keeps it there.
 
 <Warning>
-Saving a role also resets the brand roles and custom metrics of the people who hold it. If someone has a different role on one brand, or custom metrics, check their user page after you edit their organization role.
+Changing one person's **organization role** on their user page resets their brand roles and custom metrics to the new role. If they had a different role on one brand, or custom metrics, set those again afterwards.
 </Warning>
 
 ## Delete a role
@@ -110,8 +111,6 @@ Saving a role also resets the brand roles and custom metrics of the people who h
 Pick **Delete** in the role's menu and confirm. Owner, Admin, Editor and Analyst cannot be deleted.
 
 Move everyone off a role before you delete it: the people who still have it lose its permissions, and this cannot be undone.
-
-{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
 
 ## Give someone Billing
 
@@ -127,13 +126,13 @@ In **Manage Permissions**, under the **Billing** heading, tick:
 | **Payment Cards** | View, Create, Update, Delete | See the cards on file, add a card, change the default, remove a card. Tick only View for someone who should look but not change. |
 | **Plan** | View, Update | View sees the current plan. Update changes the plan and buys AI credits. |
 
-**Organization > Settings** also grants Billing: View to see it, Update to change cards and the plan. It opens the organization **Settings** page and the **Affiliate Portal** as well, so use the Billing rows when the person should only handle billing.
+Invoices View also lets the person pay a failed invoice with **Pay now**.
+
+**Organization > Settings** also grants Billing: View to see it, Update to change cards and the plan. It opens the organization **Settings** page as well, so use the Billing rows when the person should only handle billing. The quickest way is the **Finance** preset in **Create Role**.
 
 Once saved, the person sees **Billing** in their settings menu.
 
 <img src="/images/organization/settings-sidebar-billing.png" alt="The settings sidebar of a teammate with a Finance role, showing Billing under the organization items" />
-
-{/* BILLING SECTION END */}
 
 ## Worked examples
 

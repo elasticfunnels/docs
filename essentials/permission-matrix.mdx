@@ -51,20 +51,16 @@ This matrix is designed for brand owners and organization admins who need to bui
 | Pick a portal affiliate when adding an internal affiliate on a brand | `affiliates.organization_affiliates.view` | Together with `affiliates.create` or `affiliates.update` on that brand. |
 | Invite a new portal affiliate from a brand's Add affiliate form | `affiliates.create` on the brand, `affiliates.organization_affiliates.view` and `organization.affiliate_portal_affiliates.create` | Without the portal permission the form still lets you pick existing portal affiliates. |
 
-{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
-
 ## Billing access
 
 | Capability | Permission | Notes |
 |-----------|------------|-------|
-| See invoices and credit notes | `billing.invoices.view` | Billing > Invoices, View. |
+| See invoices and credit notes, pay a failed invoice | `billing.invoices.view` | Billing > Invoices, View. |
 | See, add, change or remove payment cards | `billing.cards.view`, `.create`, `.update`, `.delete` | Billing > Payment Cards. |
-| See the plan; change it and buy AI credits | Billing > Plan: View, Update | {/* PLAN KEY: add the permission key from the final code. */} |
-| All of Billing, plus organization Settings and Affiliate Portal | `organization.settings.view` (see), `organization.settings.update` (change) | Organization > Settings. |
+| See the plan; change it and buy AI credits | `billing.plan.view`, `billing.plan.update` | Billing > Plan. |
+| All of Billing, plus organization Settings | `organization.settings.view` (see), `organization.settings.update` (change) | Organization > Settings. |
 
 Step by step, with a finance example: [Give someone Billing](/settings/organization-roles#give-someone-billing).
-
-{/* BILLING SECTION END */}
 
 ## Metrics access matrix
 <img src="/images/organization/role-metrics.png" alt="The Manage Metrics window where metric keys are ticked by name, grouped by type" />

@@ -29,21 +29,17 @@ Examples:
 - Missing `conversions.view` means conversions-related reports and lists stay hidden.
 - Billing has its own rules; see the next section.
 
-{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
-
 ### “I set Admin, but they cannot see Billing”
 
 That is expected. Admin covers every brand feature and managing members, but not Billing or organization settings.
 
-To give them Billing, an owner edits the role in **Settings > Roles > Manage Permissions** and ticks the **Billing** rows (Invoices View; Payment Cards View, Create, Update, Delete; Plan View, Update), or **Organization > Settings**. You can add these to Admin itself, or create a separate Finance role. The exact boxes are in [Give someone Billing](/settings/organization-roles#give-someone-billing).
+To give them Billing, an owner edits the role in **Settings > Roles > Manage Permissions** and ticks the **Billing** rows (Invoices View; Payment Cards View, Create, Update, Delete; Plan View, Update), or **Organization > Settings**. You can add these to Admin itself, or create a role from the **Finance** preset. The exact boxes are in [Give someone Billing](/settings/organization-roles#give-someone-billing).
 
 <img src="/images/organization/role-permissions-billing.png" alt="The Manage Permissions grid scrolled to the Billing and Organization groups, with the boxes that grant Billing highlighted" />
 
 After saving, the user sees **Billing** in their settings menu:
 
 <img src="/images/organization/settings-sidebar-billing.png" alt="The settings sidebar of a teammate with a Finance role, showing Billing under the organization items" />
-
-{/* BILLING SECTION END */}
 
 ### “I can see Reports, but it opens a different page than expected”
 

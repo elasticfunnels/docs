@@ -63,13 +63,9 @@ If a user only has access to one report child, such as **Customers** or **Conver
 - **Customers**: Viewing the Customers report requires `customers.view`. Export uses `customers.export`. Creating a manual customer order (which creates a purchase conversion) requires **`conversions.create`** in addition to appropriate customer access where applicable.
 - **Fulfillment**: Viewing the fulfillment list is tied to **conversions** access. Seeing or configuring **integrations** is separate (`integrations.view`). You can have fulfillment orders listed even if you cannot open the Integrations screen.
 
-{/* BILLING SECTION START: adjust after the billing permissions fix (T1106-3) is deployed. */}
-
 ### Billing
 
-The Admin role does not include Billing. To give someone Billing, tick the **Billing** rows in their role (Invoices, Payment Cards, Plan), or **Organization > Settings**, which also opens the organization Settings page and Affiliate Portal. The exact boxes are in [Give someone Billing](/settings/organization-roles#give-someone-billing).
-
-{/* BILLING SECTION END */}
+The Admin role does not include Billing. To give someone Billing, tick the **Billing** rows in their role (Invoices, Payment Cards, Plan), or **Organization > Settings**, which also opens the organization Settings page. The **Finance** preset in **Create Role** starts with all of Billing. The exact boxes are in [Give someone Billing](/settings/organization-roles#give-someone-billing).
 
 ### Affiliate portal
 
