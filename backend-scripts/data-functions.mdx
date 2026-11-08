@@ -34,6 +34,67 @@ if (user.email) {
 }
 ```
 
+## Contacts
+
+On a brand that uses [Contacts](/contacts/overview), a backend script can create, tag and read the visitor's contact. These calls are **async**: use `await`. A script never gets the contact's email, phone or address back, only the fields below. On a brand not yet moved to Contacts they do nothing and return `null`.
+
+The contact object:
+
+```json
+{
+  "public_id": "c_8f2k3m9x",
+  "first_name": "Ana",
+  "lifecycle": "lead",
+  "tags": ["quiz-done", "ebook"],
+  "email_status": "subscribed",
+  "sms_status": "unknown",
+  "orders_count": 0,
+  "is_customer": false
+}
+```
+
+A tag is 1 to 64 characters: letters, numbers and `_ . : -` (no spaces), at most 20 per call. Each tag a contact gains or loses is recorded with its date, so an audience can ask for "tagged `quiz-done` in the last 3 days". Calls are rate limited per visitor.
+
+### `upsertContact(fields)`
+
+Creates or updates the contact for an email or phone (one of them is required) and links it to the current visit. Fields: `email`, `phone`, `first_name`, `last_name`, `country` (two letters), `tags` (added to the contact's tags) and `attributes` (up to 20 custom fields with plain values). It fills what the contact is missing and never overwrites a name or address that came from an order. Returns the contact.
+
+```javascript
+var contact = await upsertContact({
+  email: form.email,
+  first_name: form.first_name,
+  tags: ['quiz-done'],
+  attributes: { quiz_score: 42 }
+});
+```
+
+### `addContactTag(tags)`
+
+Adds one tag or a list of tags to the visitor's contact. Returns the contact, or `null` when the visitor has no contact yet (nothing is created).
+
+```javascript
+await addContactTag('watched-vsl');
+```
+
+### `removeContactTag(tags)`
+
+Removes one tag or a list of tags from the visitor's contact; other tags stay. Returns the contact, or `null`.
+
+```javascript
+await removeContactTag(['cart-open']);
+```
+
+### `getContact()`
+
+Returns the visitor's contact, or `null` when this visit isn't linked to one.
+
+```javascript
+var contact = await getContact();
+if (contact && contact.tags.indexOf('vip') !== -1) {
+  setVariable('show_vip_offer', true);
+}
+```
+
 ## Translations
 {/* SCREENSHOT: Translations · backend script editor with t() · desktop */}
 

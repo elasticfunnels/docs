@@ -149,7 +149,7 @@ The entry it stores:
 Phone numbers are kept as typed, so ask for the country code in the label or placeholder. If you'd rather accept numbers without the checkbox ticked, drop `:required` from `sms_opt_in` and the `required` attribute from the checkbox.
 
 <Note>
-An entry is stored data only. Saving it doesn't add the number to any text message list and doesn't send a text to anyone.
+Saving an entry doesn't send a text to anyone. On a brand that uses Contacts, the ticked box and the saved wording record an SMS opt-in on the contact (see [Email and SMS consent](#email-and-sms-consent)), so campaigns and automations may text that number.
 </Note>
 
 ## How the form behaves
@@ -173,4 +173,31 @@ ElasticFunnels' page script sends every form whose `action` starts with `/api/` 
 
 Each entry stores the visitor's session id and IP address with the fields. The submission also counts as a form-submit event for that visit in your analytics.
 
-An entry doesn't create or update a customer, and a phone number in it isn't matched to an existing customer. If the form has an email field, the form-submit event also carries a hashed copy of that email. The entry itself stays a collection record.
+On a brand that uses [Contacts](/contacts/overview), an entry with an email or phone field also creates or updates that person's contact and links the visit to it. A form never overwrites a name or address that came from an order; it only fills what the contact is missing. On a brand not yet moved to Contacts, the entry stays a collection record and no contact is made.
+
+## Tag the contact
+{/* SCREENSHOT: Edit collection modal, Contact tags section with Always add and Tags a form may request · desktop */}
+
+Tags on a contact let you start automations and build audiences ("downloaded the ebook in the last 3 days"). A form can tag the contact it creates in two ways.
+
+- **Always add.** Open the collection, find **Contact tags** and type the tags under **Always add**. Every entry adds them to the submitter's contact.
+- **Tags the page asks for.** Add `data-ef-tags` to the `<form>`, or a hidden field named `_tags`, with the tags separated by commas. A requested tag is added only when it is listed under **Tags a form may request** on the collection. Any other tag the page sends is ignored, so a visitor who edits the page can't give themselves a tag you didn't allow.
+
+```html
+<form action="/api/collection/0ws38w/store" method="post" data-ef-tags="ebook,lead-magnet">
+  <input name="email" type="email" required>
+  <!-- or: <input type="hidden" name="_tags" value="ebook,lead-magnet"> -->
+  <button type="submit">Send me the ebook</button>
+</form>
+```
+
+A tag is 1 to 64 characters: letters, numbers and `_ . : -` (no spaces). A collection holds at most 20 tags in each list. Each tag a contact gains or loses is recorded with its date, so an audience can ask for "tagged `ebook` in the last 3 days".
+
+## Email and SMS consent
+
+A ticked consent box records an opt-in on the contact only when the form also sends the exact wording the visitor agreed to, in a hidden `consent_text` field (see the phone example above).
+
+- **SMS.** A checkbox whose name mentions SMS, text or phone together with consent, opt-in, agree or subscribe (for example `sms_opt_in`) records an SMS opt-in for the phone number in the form.
+- **Email.** A checkbox whose name mentions email, newsletter or marketing together with consent, opt-in, agree or subscribe (for example `email_opt_in` or `subscribe_newsletter`) records an email opt-in for the email address in the form.
+
+An unticked box, a missing `consent_text` or a form without that address records nothing. Each opt-in keeps the wording, the page address, the IP address and the browser, and shows on the contact's record.
