@@ -1,7 +1,7 @@
 {
   "out": "images/organization/role-permissions-billing.png",
-  "alt": "Manage Permissions for a Finance role scrolled to the Organization group: Settings with View and Update ticked, which is what opens Billing. The Billing group's Invoices and Payment Cards rows are left unticked",
-  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The Finance role is a fictional fixture row (fixtures/organization/roles.json: the org's real roles plus Finance with organization.settings.view/update). The capture reloads the list, opens Finance's menu, Manage Permissions, and scrolls to the Billing and Organization groups. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-role-permissions-billing",
+  "alt": "Manage Permissions for a Finance role scrolled to the Billing group: Invoices View, every Payment Cards box and Plan View and Update are ticked",
+  "_source": "Local EF app (EF_APP=http://127.0.0.1:8010), demo organization 798. The Finance role is a fictional fixture row (fixtures/organization/roles.json: the org's real roles plus Finance with the Finance preset's permissions). The capture reloads the list, opens Finance's menu, Manage Permissions, and scrolls to the Billing and Organization groups. Re-shoot: EF_APP=<local app> node tools/shots/shoot.cjs organization-role-permissions-billing",
   "capture": {
     "path": "/settings/organization/roles",
     "viewport": {
@@ -46,26 +46,22 @@
   "calloutWidth": 210,
   "annotations": [
     {
-      "selector": ".ant-modal-content h3.col-label:text-is('Billing') + div",
-      "title": "Invoices, Payment Cards",
-      "text": "Not what opens Billing",
+      "selector": ".ant-modal-content h3.col-label:text-is('Billing') + div > ul:nth-child(1)",
+      "title": "Invoices",
+      "text": "See, download and pay a failed invoice",
       "side": "left"
     },
     {
-      "selector": ".ant-modal-content h3.col-label:text-is('Organization') + div > ul:first-child > li:first-child",
-      "title": "Organization Settings",
-      "text": "View opens Billing, org Settings, Affiliate Portal",
+      "selector": ".ant-modal-content h3.col-label:text-is('Billing') + div > ul:nth-child(2)",
+      "title": "Payment cards",
+      "text": "Tick only View to look, not change",
       "side": "left"
     },
     {
-      "box": [
-        306,
-        395,
-        284,
-        32
-      ],
-      "title": "View and Update",
-      "text": "Update also changes the card and plan"
+      "selector": ".ant-modal-content h3.col-label:text-is('Billing') + div > ul:nth-child(3)",
+      "title": "Plan",
+      "text": "Update changes the plan, buys AI credits",
+      "side": "left"
     }
   ]
 }
