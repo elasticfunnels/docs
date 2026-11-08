@@ -20,6 +20,14 @@ An exit popup appears when a user's mouse moves toward leaving the page, giving 
 2. Click "Add Node" and select the "Exit Intent" node
 3. Add a "Popup" node and connect it to the "Exit Intent" node
 
+## When exit intent fires
+
+- **Desktop:** the pointer leaves through the top of the window, toward the tabs or the address bar.
+- **Phones and tablets:** a fast scroll up after the visitor has scrolled past 30% of the page, or switching to another tab or app.
+- Not in the first 3 seconds after the page loads, and once per page view.
+
+To catch the back button or a visitor who stops doing anything, or to open the popup from the page's own code, see [Exit intent from code](/funnels/popups-from-code#exit-intent).
+
 ## Open it on click
 
 To open the same popup when a visitor clicks a link or button, add `data-ef-popup="Popup name"` to it. See [Popups and interactions from code](/funnels/popups-from-code).
@@ -31,4 +39,4 @@ To open the same popup when a visitor clicks a link or button, add `data-ef-popu
 - Offer genuine value (discount, bonus content, etc.)
 - Test different popup designs and messages
 - Don't show exit popups on every page - be strategic
-- Consider mobile user experience (exit intent works differently on mobile) 
+- Check the popup on a phone: it opens on a fast scroll up, so it should fit a small screen and close easily 

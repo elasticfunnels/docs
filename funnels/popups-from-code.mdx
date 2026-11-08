@@ -8,14 +8,14 @@ description: 'Open a platform popup or an inline modal from any element, and run
 Pages built in the code editor, with the `ef` CLI or from a kit can open the same popups you build in **Pages → Advanced → Popups**, and run the same actions the page builder's **Interactions** panel offers. The store edits the popup in the app; the page only says when to open it.
 
 <Note>
-  `ef.popup` and `ef.interactions` ship with the current runtime release. Until it is live on your pages, `ef.popup` is undefined.
+  `ef.popup`, `ef.interactions` and `ef.exitIntent` ship with the runtime. Check `typeof ef.exitIntent` on a live page before you rely on it: until the release that adds it is live, it is undefined.
 </Note>
 
 ## Which one to use
 
 | The popup appears... | Build it as | Open it with |
 |---|---|---|
-| on exit intent, after a delay, at a scroll depth, when an element comes into view, after a video moment, after a form or add to cart | a platform popup (Pages → Advanced → Popups) | the page's [page events](/funnels/page-events): trigger → **Has tag** → **Popup** (+ **Add tag** to show it once) |
+| on exit intent (or [from code](#exit-intent)), after a delay, at a scroll depth, when an element comes into view, after a video moment, after a form or add to cart | a platform popup (Pages → Advanced → Popups) | the page's [page events](/funnels/page-events): trigger → **Has tag** → **Popup** (+ **Add tag** to show it once) |
 | when the visitor clicks something, and its content is copy the store should be able to edit | the same platform popup | `data-ef-popup="Popup name"` on the element |
 | when the visitor clicks something, and its content depends on what they did on this page (the pack they picked, their cart, quiz answers) | a `<dialog id="...">` in the page | `data-ef-popup="#dialog-id"` |
 | after a URL change | its own page | a link |
@@ -42,7 +42,7 @@ Put `data-ef-popup` on any element. No script needed.
 <div data-ef-popup="Reviews" data-ef-popup-trigger="in-view"></div>
 ```
 
-Exit intent, timers and scroll depth belong in page events, where the store can see and change them.
+Timers and scroll depth belong in page events, where the store can see and change them. For exit intent, use the **On Exit Intent** page event, or the [`exit-intent` trigger](#exit-intent) when the page's own code decides what to show.
 
 ### Show it once
 
@@ -116,9 +116,68 @@ Or in markup, `trigger:action:value`, several separated by `;`:
 <section data-ef-interaction="in-view:custom-event:saw-reviews">...</section>
 ```
 
-Triggers: `click`, `hover`, `mouseenter`, `mouseleave`, `focus`, `blur`, `load`, `in-view`, `on-form-submit`, `on-form-success`, `on-form-error`.
+Triggers: `click`, `hover`, `mouseenter`, `mouseleave`, `focus`, `blur`, `load`, `in-view`, `on-form-submit`, `on-form-success`, `on-form-error`, `exit-intent`.
 
 Actions: `show_popup`, `hide_popup`, `show_modal`, `hide_modal`, `show_element`, `hide_element`, `visibility-toggle`, `focus-on-element`, `track-event`, `custom-event`, `split-test-goal`, and the `animate-*` set (`animate-fade-in`, `animate-pulse`, `animate-shake`, ...).
+
+## Exit intent
+
+The page has one exit-intent detector. The **On Exit Intent** page event, the `exit-intent` interaction trigger and `ef.exitIntent` all use it, so it fires once per page view and every listener gets the same reason.
+
+Open a popup on exit intent from markup, capped to once a day:
+
+```html
+<div data-ef-interaction="exit-intent:show_popup:Wait offer" data-ef-popup-cap="exit-offer:1440"></div>
+```
+
+The element can be anywhere on the page; exit intent is page-wide. `data-ef-popup-cap` works as it does on `data-ef-popup`: it shares the tag with the **Has tag** and **Add tag** nodes.
+
+From JavaScript:
+
+```js
+ef.interactions.add({ type: 'exit-intent', action: 'show_popup', data: 'Wait offer', cap: 'exit-offer:1440' });
+
+const off = ef.exitIntent.on(({ reason }) => {
+  // reason: 'mouse_top', 'scroll_up', 'tab_hidden', 'back', 'idle' or 'api'
+  ef.popup.open('#scratch-card', { cap: 'exit-offer:1440', trigger: 'exit-intent' });
+});
+off();                 // stop listening (or ef.exitIntent.off(callback))
+ef.exitIntent.fired;   // true once it fired on this page view
+ef.exitIntent.reason;  // why
+ef.exitIntent.fire();  // fire it now, for testing or your own signal (reason 'api')
+window.addEventListener('ef:exit-intent', (e) => console.log(e.detail.reason));
+```
+
+A callback added after exit intent already fired is not called.
+
+### When it fires
+
+| Reason | Device | What the visitor did |
+|---|---|---|
+| `mouse_top` | desktop | moved the pointer out through the top of the window (toward the tabs or the address bar). Brushing the top edge for under 50 ms does not count |
+| `scroll_up` | phone, tablet | scrolled up fast (a quarter of the screen in under 400 ms) after scrolling past 30% of the page |
+| `tab_hidden` | phone, tablet | switched tab or app, so the popup is waiting when they come back |
+| `back` | any, opt-in | pressed the back button. Their next back leaves the page |
+| `idle` | any, opt-in | did nothing for `idleSeconds` |
+
+Nothing fires in the first 3 seconds after the page loads, except `back`.
+
+### Options
+
+```js
+ef.exitIntent.configure({
+  mobile: true,        // scroll_up and tab_hidden on phones and tablets
+  scrollUp: true,
+  tabHidden: true,
+  backButton: false,   // opt-in: catch the back button
+  idleSeconds: 0,      // opt-in: fire after this many idle seconds
+  delayMs: 3000,       // ignore everything before this
+});
+```
+
+Other options, rarely needed: `scrollUpPercent` (25), `scrollUpWindowMs` (400), `armPercent` (30), `minLeaveMs` (50). `configure` returns the options in force, `ef.exitIntent.options()` reads them.
+
+The options apply to the whole page, page events included. The back button guard adds a history entry the first time the visitor taps, clicks or presses a key (browsers ignore entries added before that), so turn it on only where catching the back button is worth the extra step.
 
 ## Kits and templates
 
