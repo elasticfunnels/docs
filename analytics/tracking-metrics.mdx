@@ -135,9 +135,9 @@ description: "Detailed tracking metrics for user behavior, engagement, and funne
 
 **What it is**: Total time users spend viewing specific pages
 
-**How it's measured**: Time between page load and next page load or session end
+**How it's measured**: Every tracked event on a page (scroll, click, tab switch, exit) carries the seconds the visitor has had the page in front of them so far. Each page visit counts once, at its last tracked event, so a visit still counts when the browser never sends an exit event, which is common in the Facebook and Instagram in-app browsers.
 
-**Aggregation**: Sum of all time spent across all sessions
+**Aggregation**: Sum over page visits (one visit is one session on one page)
 
 **Use for**:
 - Identifying most engaging content
