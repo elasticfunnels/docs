@@ -147,6 +147,18 @@ See [Language prompt and switcher](/pages/language-prompt) for the prompt
 options and [SEO](/pages/seo#multilingual-sites-hreflang) for what `x-default`
 does.
 
+## A domain per language
+
+```bash
+ef domains language example.ro ro                  # example.ro serves the Romanian pages at the original slugs
+ef domains language example.ro                     # show
+ef domains language example.ro none                # clear
+ef domains list                                    # the language column shows every binding
+```
+
+What a bound domain serves, and what happens to a page with no translation in
+its language: [A domain per language](/pages/internationalization#a-domain-per-language).
+
 ## Exit codes
 
 | Code | Meaning |

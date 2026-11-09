@@ -195,6 +195,48 @@ When a funnel step or a `/page?id=` link sends a visitor to a page that has a
 translation in the language of the page they are on, they land on that
 translation. Build the funnel once, with the original pages.
 
+### A domain per language
+
+For a fully translated site you can give each language its own domain, for
+example `example.com` in English and `example.ro` in Romanian. Bind the domain
+to the language with the ef CLI:
+
+```bash
+ef domains language example.ro ro      # bind
+ef domains language example.ro         # show
+ef domains language example.ro none    # clear
+```
+
+On a domain bound to a language, every linked page answers at its
+**original's** slug, in that language. With `book` (English) and its
+translation `ro/book`:
+
+| Request | Result |
+| --- | --- |
+| `example.ro/book` | serves `ro/book` |
+| `example.ro/ro/book` | redirects (301) to `example.ro/book` |
+| `example.ro/about`, when `about` has no Romanian translation | redirects (302) to `about` on the main domain, so no second copy of it is indexed |
+| `example.ro/checkout`, a page with no translations at all | serves the page as is, with its texts and components in Romanian |
+| `example.com/ro/book` | still serves `ro/book`, with its canonical on `example.ro/book` |
+
+The canonical link, `hreflang` alternates, `sitemap.xml` and
+`{{ page_url('book') }}` all name each language's own domain. Each domain's
+sitemap lists its own language. A language without a domain keeps its
+`/<prefix>/<slug>` address on the main domain: the default language's domain
+if it has one, else the brand's other custom domain.
+
+Rules:
+
+- The domain must already be added and validated, and the code must be one of
+  the brand's languages. One domain per language (its `www.` twin counts as the
+  same domain).
+- It only changes anything when the brand uses linked pages. A brand that
+  translates a few pages, or uses dictionary pages only, sees no change.
+- Keep each translation linked to its original (`ef pages translate`, or
+  `ef pages settings ro/book --lang ro --translation-of book`): a page that is
+  not linked is served at its own slug like on any other domain.
+- A change reaches every server within 5 minutes.
+
 ---
 
 ## Dictionary pages: one page, texts per language
