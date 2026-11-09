@@ -126,6 +126,7 @@
               "guides/how-to-set-up-a-new-merchant",
               "merchants/high-risk-and-merchant-accounts",
               "merchants/postback-urls",
+              "merchants/test-mode",
               {
                 "group": "Payment Processors",
                 "pages": [
