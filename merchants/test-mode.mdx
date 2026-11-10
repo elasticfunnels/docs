@@ -1,0 +1,94 @@
+---
+title: 'Test mode and test cards'
+description: 'Place test orders on a live checkout with ?test=[key] and test cards - approvals, declines, insufficient funds and more - without charging anyone and without sandbox credentials.'
+---
+
+Test mode lets you run a real checkout end to end - checkout, upsells, one-click purchases and subscription renewals - on a live merchant, without moving any money. You add your merchant's test key to the checkout URL and pay with a test card. The card number decides the result: approved, declined, insufficient funds, and so on.
+
+It works the same on **Stripe**, **NMI** and **Authorize.Net**. You do not need sandbox credentials from the gateway: in test mode, ElasticFunnels simulates the gateway's response and never contacts the gateway.
+
+## Set up your test key
+{/* SCREENSHOT: Merchant edit form · Live Mode on, Test Key field filled in · desktop */}
+
+1. Go to **Settings** → **Merchants** → pick your Stripe, NMI or Authorize.Net merchant → **Edit**.
+2. Make sure **Live Mode** is on. The **Test Key** field appears.
+3. Enter a secret key: 8 to 64 letters and numbers, for example `qa7Hx29pLm`.
+4. Save.
+
+<Warning>
+Treat the test key like a password. Anyone who has it can place test orders on your checkout, and those orders are not charged. Don't put it in ads, emails or affiliate links. Change it if it leaks.
+</Warning>
+
+## Place a test order
+
+Open your checkout (or any funnel page that leads to it) with `?test=` and your key:
+
+```
+https://yourstore.com/checkout?test=qa7Hx29pLm
+```
+
+The card form switches to plain card fields, and only test cards are accepted. Enter any future expiry date (for example `12/30`), any 3-digit CVC (4 digits for Amex), and a card number from the tables below.
+
+The key stays active for the rest of the visitor's session, so the upsells and downsells that follow are simulated too. You don't need to add `?test=` to every page.
+
+### Cards that approve
+
+| Card number | Brand |
+|---|---|
+| `4242 4242 4242 4242` | Visa |
+| `4000 0566 5566 5556` | Visa (debit) |
+| `4111 1111 1111 1111` | Visa |
+| `5555 5555 5555 4444` | Mastercard |
+| `2223 0031 2200 3222` | Mastercard (2-series) |
+| `3782 822463 10005` | American Express |
+| `6011 1111 1111 1117` | Discover |
+
+### Cards that fail
+
+| Card number | Result | Message the customer sees |
+|---|---|---|
+| `4000 0000 0000 0002` | Generic decline | Your card was declined. |
+| `4000 0000 0000 0341` | Generic decline | Your card was declined. |
+| `4000 0000 0000 9995` | Insufficient funds | Your card has insufficient funds. |
+| `4000 0000 0000 9987` | Lost card | Your card was declined. |
+| `4000 0000 0000 9979` | Stolen card | Your card was declined. |
+| `4100 0000 0000 0019` | Suspected fraud | Your card was declined. |
+| `4000 0000 0000 6975` | Too many attempts (velocity limit) | Your card was declined. |
+| `4000 0000 0000 0069` | Expired card | Your card has expired. |
+| `4000 0000 0000 0127` | Incorrect CVC | Your card's security code is incorrect. |
+| `4000 0000 0000 0119` | Processing error | An error occurred while processing your card. Try again in a moment. |
+
+These are the same numbers as [Stripe's test cards](https://docs.stripe.com/testing), so a card behaves the same whichever gateway your merchant uses. On Stripe, a decline carries Stripe's `decline_code` (for example `insufficient_funds`). On NMI and Authorize.Net it carries the matching response text (for example `INSUFFICIENT FUNDS`).
+
+## What happens to a test order
+
+- **No money moves.** Nothing is sent to Stripe, NMI or Authorize.Net, not even to their sandbox.
+- **Real cards are refused.** A card number that isn't in the tables above is rejected with *"Test mode: use a test card"*. Apple Pay and Google Pay are not available in test mode.
+- **The order is marked as a test.** It is recorded like any other order, with the test flag set, so it stays out of your revenue reports. It also carries the test flag in [postback URLs](/merchants/postback-urls) (`is_test: true`).
+- **Upsells and one-click purchases are approved.** They use the simulated card saved by the test checkout.
+- **Subscriptions renew as tests.** A subscription started by a test order renews with a simulated charge, so you can test renewals (for example with a forced bill) without a real card on file.
+
+## Test mode vs. sandbox mode
+
+These are two different settings:
+
+| | Test key (`?test=[key]`) | Sandbox mode (**Live Mode** off) |
+|---|---|---|
+| Who it applies to | Only visitors who open the URL with your key | Every visitor |
+| Gateway credentials | Your live credentials stay in place, and they aren't used for test orders | The gateway's sandbox credentials |
+| Gateway contacted | No, responses are simulated | Yes, the gateway's sandbox |
+| Test cards | The tables above, on every gateway | The gateway's own sandbox test cards |
+
+Use the test key to check a live funnel without taking it down. Use sandbox mode only when you need the gateway's own sandbox, for example while building a new integration.
+
+<Note>
+**PayPal** works differently: its test key switches PayPal checkout to your PayPal sandbox account, because PayPal completes the payment on PayPal's own pages. Add your sandbox client ID and secret on the PayPal merchant to use it.
+</Note>
+
+## Troubleshooting
+
+**The card form still shows the Stripe, NMI or Authorize.Net secure fields.** The key didn't match. It is case-sensitive and must be exactly the value saved on the merchant that this checkout uses. If a funnel or domain routes to a different merchant, use that merchant's key.
+
+**"Test mode: use a test card".** You're in test mode and the number isn't one of the test cards. Copy one from the tables above.
+
+**The test key field isn't shown.** Turn **Live Mode** on. The field is only needed, and only shown, for live merchants.

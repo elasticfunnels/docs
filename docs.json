@@ -203,6 +203,7 @@
                   "merchants/high-risk-and-merchant-accounts",
                   "merchants/postback-urls",
                   "merchants/test-merchant",
+                  "merchants/test-mode",
                   {
                     "group": "Merchant platforms",
                     "icon": "store",
