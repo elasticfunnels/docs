@@ -139,6 +139,19 @@ A product with **no** shipping profile assigned also ships free. Assign a profil
 
 To charge shipping on a single unit and ship bundles free, give only the single-unit product a profile and leave the bundles without one.
 
+#### Shipping profiles from the `ef` CLI
+
+```bash
+ef shipping-profiles list                                   # rates and how many products use each
+ef shipping-profiles create "Single jar" --us 6.95 --intl 14.95 --override CA:9.95
+ef shipping-profiles assign JAR-1 --profile "Single jar"    # product codes or ids, several at once
+ef shipping-profiles assign JAR-1 --none                    # remove it: the product ships free
+ef shipping-profiles update "Single jar" --us 5.95          # rates you leave out are kept
+ef shipping-profiles get "Single jar"                       # rates and the products that use it
+```
+
+`none` as a rate (`--intl none`) leaves that region empty, which means free shipping there, exactly as in the dashboard.
+
 ---
 
 ### Merchants Tab
