@@ -224,6 +224,8 @@ The cart plugin exposes a `window.ef` object you can call from custom scripts or
 | **`window.ef.getCartForSubmit()`** | Same as `getCart()` but excludes zero-quantity lines. |
 | **`window.ef.onAddToCart(callback)`** | Run a callback when a product is added (client cart or `/b` buy links). Returns an unsubscribe function. See [EF API](/funnels/ef-api#cart). |
 
+On an upsell page (after the first order), the selection API is `window.ef.upsell`: it lets the buyer pick which products a one-click upsell buys. See [Multi-Product Upsells](/products/multi-product-upsells).
+
 Example — add to cart on button click:
 
 ```html

@@ -223,6 +223,10 @@ window.handleLovedOneGift = function (o) {
 </script>
 ```
 
+## Several products with one form
+
+A form works with a [multi-product upsell](/products/multi-product-upsells) too: `[UPSELL=prod1,prod3 form=gift-address]` asks for the address once and ships every selected product there. If your page uses `window.ef.upsell` to change the selection, the form charges what is selected when the buyer clicks. Each product's shipping profile must ship to the recipient's country, otherwise the form says so before anything is charged.
+
 ## Shipping and tax
 
 - Shipping is charged from the product's [shipping profile](/products/product-management) for the ship-to country (and state, where the profile has state rates), not the buyer's address.

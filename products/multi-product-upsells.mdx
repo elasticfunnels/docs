@@ -1,0 +1,128 @@
+---
+title: 'Multi-Product Upsells'
+description: 'Sell several products in one click on an upsell page, and let the buyer choose which ones (and how many) with window.ef.upsell'
+---
+
+A multi-product upsell charges the card from the first order once for several products. The buyer gets one order with one line per product, and the funnel continues to its next step exactly as it does after a single upsell.
+
+You can use it two ways:
+
+- **A fixed bundle.** One button buys every product you list.
+- **A chooser.** Your page shows options (1, 3 or 6 bottles, a cream, a gift box) and the buyer picks. You build the layout; `window.ef.upsell` keeps the selection and buys it.
+
+## The tag
+
+```
+[UPSELL=prod1,prod3,prod5]
+```
+
+Put it in a button's link like any [upsell tag](/products/upsells#upsell-link-tags). One click buys `prod1`, `prod3` and `prod5`.
+
+| Tag | What one click buys |
+|-----|---------------------|
+| `[UPSELL=prod1,prod3,prod5]` | One of each |
+| `[UPSELL=prod1:2,prod3]` | Two of `prod1` and one of `prod3` |
+| `[UPSELL=prod1,prod3,prod5 max_qty=6]` | One of each by default; your page may raise any of them up to 6 |
+| `[UPSELL=prod1 max_qty=6]` | One `prod1` by default, up to 6 from your page |
+| `[UPSELL=prod1,prod3 form=gift-address]` | Asks for the recipient's address first, then ships the whole selection there. See [Upsell Forms](/products/upsell-forms) |
+
+`[UPSELL_DECLINE]` on the same page works as usual: it skips the offer and continues the funnel.
+
+<Note>
+The tag also decides what the page is allowed to sell. A chooser can only pick products listed in the tag, at most at the quantity the tag allows (`max_qty`, or the quantity written next to the code). Anything else is refused and the card is not charged. Prices always come from your product catalog, never from the page.
+</Note>
+
+## Let the buyer choose: `window.ef.upsell`
+
+Keep the tag on your buy button. Your chooser tells `window.ef.upsell` what is selected, and the same button then buys the selection. The tag's link carries the funnel, page and click details, so the sale is attributed and the funnel continues exactly as with a plain `[UPSELL=X]` button.
+
+| Method | What it does |
+|--------|--------------|
+| `ef.upsell.set(selection)` | Replace the selection. `['prod3']`, `'prod1:2,prod3'` or `[{ code: 'prod1', quantity: 2 }]` |
+| `ef.upsell.add(code, quantity = 1)` | Add a product, or add to its quantity |
+| `ef.upsell.remove(code)` | Take a product out |
+| `ef.upsell.setQuantity(code, quantity)` | Set a quantity; `0` removes it |
+| `ef.upsell.clear()` / `ef.upsell.reset()` | Empty the selection / go back to the tag's own list |
+| `ef.upsell.items()` | The selection: `[{ code, quantity }]` |
+| `ef.upsell.offers()` | What the tag allows: `[{ code, max }]` |
+| `await ef.upsell.quote()` | Prices from the server, nothing charged: `{ success, items, price, shipping_amount, tax_amount, total, currency }` |
+| `await ef.upsell.total()` | Just the total (with shipping and tax), or `null` |
+| `await ef.upsell.buy(selection?)` | Charge the card for the selection (or the one you pass) and go to the next funnel step. Resolves `{ success, nextUrl }` or `{ success: false, code, error }` |
+| `ef.upsell.on('change' \| 'success' \| 'error', fn)` | Listen for changes and results. The same events are sent on `document` as `ef:upsell-change`, `ef:upsell-success` and `ef:upsell-error` |
+
+If the selection is empty, or holds something the tag does not offer, the button does nothing and an `error` event fires with the code, so you can show your own message.
+
+### Example: 1, 3 or 6 bottles
+
+```html
+<div class="choices">
+  <button data-pick="bottle1">1 bottle</button>
+  <button data-pick="bottle3">3 bottles</button>
+  <button data-pick="bottle6">6 bottles</button>
+</div>
+<p>Total today: <span id="upsell-total"></span></p>
+<p id="upsell-error"></p>
+
+<a id="buy" href="[UPSELL=bottle1,bottle3,bottle6]">Yes, add it to my order</a>
+<a href="[UPSELL_DECLINE]">No thanks</a>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const pick = async (code) => {
+    ef.upsell.set([code]);
+    const total = await ef.upsell.total();
+    document.getElementById('upsell-total').textContent = total != null ? '$' + total.toFixed(2) : '';
+  };
+  document.querySelectorAll('[data-pick]').forEach((b) =>
+    b.addEventListener('click', () => pick(b.dataset.pick)));
+  ef.upsell.on('error', (e) => {
+    document.getElementById('upsell-error').textContent = e.error || 'Please choose an option.';
+  });
+  pick('bottle3'); // preselect the middle option
+});
+</script>
+```
+
+Without the script, the button would buy all three packs. With it, the button buys only the pack the buyer picked.
+
+To sell several products together with a quantity, list them with `max_qty` and let the buyer add what they want:
+
+```html
+<a id="buy" href="[UPSELL=serum,cream,mask max_qty=3]">Add to my order</a>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ef.upsell.set([]);                 // start empty, the buyer adds
+  // ef.upsell.add('cream'); ef.upsell.setQuantity('serum', 2); ...
+});
+</script>
+```
+
+You can also skip the button and call `ef.upsell.buy()` from your own UI.
+
+## What gets recorded
+
+- **One charge** for the total of the selection, with shipping and tax worked out per product, on the card from the first order.
+- **One order** with one line per product and its quantity. Fulfillment, order sync, refunds and reports see each product as its own line.
+- The upsell-accept event, your conversion postbacks (Meta, RedTrack and others) and the thank-you page get the full total and every product.
+- A double click, a second tab or a reload charges once. The second request gets the first result.
+- A declined card charges nothing and records no order. The buyer goes to your decline step, as with a single upsell.
+
+## Limits
+
+| Situation | What happens |
+|-----------|--------------|
+| ClickBank, BuyGoods, JVZoo, Digistore24 and other networks, PayPal, Klarna, Shop Pay | Refused with the code `multi_upsell_unsupported_merchant`. These merchants run their own upsell flow and take one product per offer. Use one `[UPSELL=X]` per product |
+| A subscription product in the selection | Refused (`multi_upsell_subscription`). Sell a subscription with its own `[UPSELL=X]` link |
+| The first order was free with a coupon that covers upsells | Refused (`multi_upsell_free_order`) |
+| The buyer opens the page in another browser (no order there) | Refused (`multi_upsell_no_session`) |
+| A selection the tag does not offer | Refused (`multi_upsell_not_offered`) |
+
+Supported merchants: NMI (also Apple Pay saved on NMI), Stripe, Authorize.Net, the Test merchant and the card gateways added through plug-ins. The card is never charged when the upsell is refused, and `buy()` gives you the code and a message you can show.
+
+A selection of one product at quantity 1 is a normal upsell, identical to `[UPSELL=X]`.
+
+## Related Documentation
+
+- [Upsells](/products/upsells)
+- [Upsell Forms](/products/upsell-forms)
+- [Cart](/pages/cart)

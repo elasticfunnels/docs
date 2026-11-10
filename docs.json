@@ -193,7 +193,8 @@
                 "pages": [
                   "products/upsells",
                   "products/subscription-upsells",
-                  "products/upsell-forms"
+                  "products/upsell-forms",
+                  "products/multi-product-upsells"
                 ]
               },
               {

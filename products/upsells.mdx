@@ -125,6 +125,12 @@ Declines the current offer but tracks which product was declined for analytics.
 [UPSELL=product_code extra=campaign_data]
 ```
 
+### Several Products in One Click
+```
+[UPSELL=product1,product3,product5]
+```
+Charges the card once for all the listed products and records one order with one line per product. Add `:2` after a code for a quantity, and `max_qty=6` to let your page change quantities. With `window.ef.upsell` your page can let the buyer choose which of them to buy. See [Multi-Product Upsells](/products/multi-product-upsells).
+
 ### Ask for a Ship-To Address or Extra Details
 ```
 [UPSELL=product_code form=gift-address]
