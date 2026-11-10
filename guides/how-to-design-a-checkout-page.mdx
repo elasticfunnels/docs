@@ -225,7 +225,7 @@ Both branches must be marked `data-frontend-template="true"` (see Step 6 below).
       <div class="dt-co-prod-row">
         <div class="dt-co-prod-img-wrap">
           <template-if data-condition="item.image" data-frontend-template="true">
-            <img ef-src="item.image" alt="[[ item.name ]]" />
+            <img ef-src="item.image" :alt="item.name" />
           </template-if>
           <template-else data-frontend-template="true">
             <span class="dt-co-prod-img-ph"><!-- placeholder icon --></span>
@@ -235,12 +235,12 @@ Both branches must be marked `data-frontend-template="true"` (see Step 6 below).
         <div class="dt-co-prod-info">
           <p class="dt-co-prod-name"><span ef-text="item.name">Product</span></p>
           <div class="dt-co-qty-ctrl">
-            <button type="button" data-cart-qty-minus data-code="[[ item.code ]]" data-disable-when-one aria-label="Decrease">&minus;</button>
+            <button type="button" data-cart-qty-minus :data-code="item.code" data-disable-when-one aria-label="Decrease">&minus;</button>
             <span ef-text="item.quantity">1</span>
-            <button type="button" data-cart-qty-plus data-code="[[ item.code ]]" aria-label="Increase">+</button>
+            <button type="button" data-cart-qty-plus :data-code="item.code" aria-label="Increase">+</button>
           </div>
           <template-if data-condition="cartItems.length > 1" data-frontend-template="true">
-            <button type="button" data-cart-qty-remove data-code="[[ item.code ]]" class="dt-co-prod-remove">Remove</button>
+            <button type="button" data-cart-qty-remove :data-code="item.code" class="dt-co-prod-remove">Remove</button>
           </template-if>
         </div>
         <div class="dt-co-prod-price">
@@ -696,9 +696,10 @@ Two ways to print scope values, used throughout the examples above:
 | `ef-text="expr"` | Set an element's text | `<span ef-text="checkout.product_title">Product</span>` |
 | `ef-src="expr"` | Set an `<img>` `src` | `<img ef-src="checkout.product_image" />` |
 | `ef-alt="expr"` | Set an `<img>` `alt` | `<img ef-alt="checkout.product_title" />` |
-| `[[ expr ]]` | Interpolate inside text/attributes | `alt="[[ item.name ]]"`, `data-code="[[ item.code ]]"` |
+| `[[ expr ]]` | Interpolate inside text | `Qty: [[ item.quantity ]]` |
+| `:attr="expr"` | Bind any attribute | `:alt="item.name"`, `:data-code="item.code"`, `:class="open ? 'is-open' : ''"` |
 
-Use `[[ … ]]` where you need a value **inside** an attribute or mixed with other text (`data-code="[[ item.code ]]"`); use `ef-text` / `ef-src` / `ef-alt` for a whole element's text or image. `formatPrice(raw)` formats a raw number as currency.
+Use `[[ … ]]` for a value mixed into text and `:attr="…"` for an attribute (`:data-code="item.code"`, see [Attribute bindings](/frontend-template-engine/syntax#attribute-bindings-attr)). Use `ef-text` / `ef-src` / `ef-alt` for a whole element's text or image. `formatPrice(raw)` formats a raw number as currency.
 
 `<template-foreach>` also drives select dropdowns for country/state, each option `{ value, label }`:
 
@@ -706,7 +707,7 @@ Use `[[ … ]]` where you need a value **inside** an attribute or mixed with oth
 <select name="shipping_state" data-template-value="checkout.customer.shipping_state">
   <option value="">Select State</option>
   <template-foreach data-each="opt in checkout.usStates">
-    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+    <option :value="opt.value">[[ opt.label ]]</option>
   </template-foreach>
 </select>
 ```

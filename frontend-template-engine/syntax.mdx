@@ -193,10 +193,9 @@ Include a component with the backend directive **`@component("code", { key: valu
 ### Where it works
 
 - **Text nodes:** `Price: [[ item.price ]]`
-- **Attribute values:** `src="[[ item.image ]]"`, `data-code="[[ item.code ]]"`, `required="[[ f.required ? 'required' : '' ]]"`
 - **Anywhere** inside processed template content (e.g. inside `template-if` or `template-foreach`)
 
-For cart/checkout control attributes, use **`data-code="[[ item.code ]]"`** so the plugin receives the actual product code string. Unquoted **`data-code="item.code"`** may still be supported by the engine in some contexts.
+For an **attribute**, use a binding instead: `:src="item.image"`, `:data-code="item.code"`, `:class="item.open ? 'is-open' : ''"` (see [Attribute bindings](#attribute-bindings-attr)). The engine does evaluate `[[ ]]` inside an attribute value, but a binding gives the plugins the real value (for example the product code in `:data-code`) and keeps raw `[[ ]]` out of the HTML before the engine runs.
 
 ### What you can write inside `[[ ]]`
 
@@ -238,6 +237,23 @@ For many UI components, attribute bindings are easier to maintain than inline to
 Supported aliases include `ef-text`, `ef-html`, `ef-src`, `ef-href`, `ef-title`, `ef-alt`, `ef-placeholder`, and `ef-value` (plus `data-` forms).
 
 These can be added from the page builder **Data Attributes** panel (right sidebar) when an element is selected.
+
+## Attribute bindings (`:attr`)
+
+Any attribute can be bound to an expression with a leading colon. The engine sets it on first render and again whenever scope changes:
+
+```html
+<img src="placeholder.png" :src="item.image" :alt="item.name">
+<button type="button" data-cart-qty-plus :data-code="item.code">+</button>
+<div class="step" :class="quiz.step === 2 ? 'is-on' : ''">...</div>
+<input type="checkbox" :checked="bump.added" :disabled="!bump.available">
+```
+
+- **`:class`** keeps the element's static `class` and adds the result. It accepts a string, an object (`{ 'is-active': open }`) or an array.
+- **`:checked`**, **`:disabled`** and **`:value`** set the element's property (what a form submits), not only the attribute.
+- Any other name (`:style`, `:href`, `:aria-pressed`, `:data-plan`, `:data-code`) sets that attribute to the result.
+
+Prefer `:attr` (or the `ef-*` shortcuts above) over `[[ ]]` inside an attribute value.
 
 ---
 

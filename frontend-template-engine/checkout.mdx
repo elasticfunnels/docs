@@ -29,7 +29,7 @@ Do **not** use `cartItems[0]` in the single-product block. Use **`checkout.produ
 ```html
 <template-if data-condition="is_single_product">
   <div class="order-summary-single">
-    <img src="[[ checkout.product_image ]]" alt="[[ checkout.product_title ]]" />
+    <img :src="checkout.product_image" :alt="checkout.product_title" />
     <h2>[[ checkout.product_title ]]</h2>
     <span>[[ checkout.product_price ]]</span>
     <span>[[ checkout.retail_price ]]</span>
@@ -38,7 +38,7 @@ Do **not** use `cartItems[0]` in the single-product block. Use **`checkout.produ
 <template-else-if data-condition="is_cart">
   <template-foreach data-each="item in cartItems">
     <div class="order-summary-line">
-      <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+      <img :src="item.image" :alt="item.name" />
       <span>[[ item.name ]]</span>
       <span>[[ item.total ]]</span>
     </div>
@@ -208,7 +208,7 @@ Use code values in options:
 <select name="shipping_country" data-template-value="checkout.customer.shipping_country">
   <option value="">Select Country</option>
   <template-foreach data-each="opt in checkout.countries">
-    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+    <option :value="opt.value">[[ opt.label ]]</option>
   </template-foreach>
 </select>
 ```
@@ -255,7 +255,7 @@ The **entire billing info section** can be wrapped in **`<template-if data-condi
 | **`checkout.selectedBumpLines`** | Selected bumps (each: **`code`**, **`name`**, **`price`**, **`price_raw`**). |
 
 - Display **`[[ bump.price ]]`** and **`[[ line.price ]]`** as-is (already formatted).
-- **Checkbox pattern:** Use **`data-bump-code`**, **`data-bump-checkbox`**, **`data-bump-toggle`** and **`name="bump"`**, **`value="[[ bump.code ]]"`** so the bump plugin can toggle and style. See [Cart](/frontend-template-engine/cart#order-bumps) for the full offer vs added pattern.
+- **Checkbox pattern:** Use **`data-bump-code`**, **`data-bump-checkbox`**, **`data-bump-toggle`** and **`name="bump"`**, **`:value="bump.code"`** so the bump plugin can toggle and style. See [Cart](/frontend-template-engine/cart#order-bumps) for the full offer vs added pattern.
 - **Button + @click pattern:** Alternatively, use **`<button @click="bump.added = true">…</button>`** for “Add to order” and **`<button @click="bump.added = false">…</button>`** for “Remove”. Mutating **`bump.added`** triggers re-render. Both checkbox + **data-bump-*** and button + **@click** are valid.
 
 ---

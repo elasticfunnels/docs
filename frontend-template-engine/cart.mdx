@@ -87,12 +87,12 @@ Example:
 ```html
 <template-foreach data-each="item in cartItems">
   <div class="cart-line">
-    <img src="[[ item.image ]]" alt="[[ item.name ]]" />
+    <img :src="item.image" :alt="item.name" />
     <span>[[ item.name ]]</span>
     <span>[[ item.price ]]</span>
     <template-foreach data-each="bonus in item.bonuses">
       <div class="cart-bonus">
-        <img src="[[ bonus.image ]]" alt="[[ bonus.name ]]" />
+        <img :src="bonus.image" :alt="bonus.name" />
         <span>[[ bonus.name ]]</span>
         <span>FREE (valued at [[ bonus.retail_price ]])</span>
       </div>
@@ -129,7 +129,7 @@ Example — listing included courses beneath a cart line:
   <span>[[ item.name ]]</span>
   <template-foreach data-each="course in item.courses">
     <div class="cart-course">
-      <img src="[[ course.cover ]]" alt="[[ course.title ]]" />
+      <img :src="course.cover" :alt="course.title" />
       <span>[[ course.title ]]</span>
     </div>
   </template-foreach>
@@ -150,7 +150,7 @@ Use these so the **cart plugin** handles +/- and remove without custom script:
 | **`data-cart-qty-minus`** | Button | Decrease quantity |
 | **`data-cart-qty-plus`** | Button | Increase quantity |
 | **`data-cart-qty-remove`** | Button/link | Remove line (set qty to 0) |
-| **`data-code="[[ item.code ]]"`** | Same element or parent | So the plugin receives the actual product code |
+| **`:data-code="item.code"`** | Same element or parent | So the plugin receives the actual product code |
 | **`data-disable-when-one`** | Minus button (optional) | Disable when `item.quantity <= 1` |
 
 Example:
@@ -158,13 +158,13 @@ Example:
 ```html
 <template-foreach data-each="item in cartItems">
   <div class="cart-line">
-    <img alt="[[ item.name ]]" src="[[ item.image ]]" />
+    <img :alt="item.name" :src="item.image" />
     <span>[[ item.name ]]</span>
-    <button type="button" data-cart-qty-minus data-code="[[ item.code ]]" data-disable-when-one aria-label="Decrease">−</button>
+    <button type="button" data-cart-qty-minus :data-code="item.code" data-disable-when-one aria-label="Decrease">−</button>
     <span>[[ item.quantity ]]</span>
-    <button type="button" data-cart-qty-plus data-code="[[ item.code ]]" aria-label="Increase">+</button>
+    <button type="button" data-cart-qty-plus :data-code="item.code" aria-label="Increase">+</button>
     <span>[[ item.total ]]</span>
-    <button type="button" data-cart-qty-remove data-code="[[ item.code ]]" aria-label="Remove">Remove</button>
+    <button type="button" data-cart-qty-remove :data-code="item.code" aria-label="Remove">Remove</button>
   </div>
 </template-foreach>
 ```
@@ -182,10 +182,10 @@ On checkout pages, bump cards use these **data attributes** so the bump-products
 
 | Attribute | Where | Purpose |
 |-----------|--------|---------|
-| **`data-bump-code="[[ bump.code ]]"`** | Card/container | Plugin adds `.selected` / `.bump-selected` when selected |
-| **`data-bump-checkbox="[[ bump.code ]]"`** | Checkbox | Links checkbox to bump code |
-| **`data-bump-toggle="[[ bump.code ]]"`** | Label or clickable wrapper | Click toggles the checkbox |
-| **`name="bump"`** or **`name="bump[]"`**, **`value="[[ bump.code ]]"`** | Checkbox | Form submit and plugin read selected codes |
+| **`:data-bump-code="bump.code"`** | Card/container | Plugin adds `.selected` / `.bump-selected` when selected |
+| **`:data-bump-checkbox="bump.code"`** | Checkbox | Links checkbox to bump code |
+| **`:data-bump-toggle="bump.code"`** | Label or clickable wrapper | Click toggles the checkbox |
+| **`name="bump"`** or **`name="bump[]"`**, **`:value="bump.code"`** | Checkbox | Form submit and plugin read selected codes |
 
 For **scope** (**`checkout.bump_products`**, **`checkout.selectedBumpLines`**) and full **offer vs added** template pattern, see [Checkout — Order bumps](/frontend-template-engine/checkout#order-bumps).
 

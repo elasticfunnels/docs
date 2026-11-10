@@ -23,6 +23,12 @@ The internal `/api/subscription-*` routes are used by the call center and subscr
 | **`skipSubscription(transactionId)`** | `{ ok, next_charge_at?, error? }` | Skip next billing cycle (active only). Returns new next charge date. |
 | **`changeSubscriptionFrequency(transactionId, interval, intervalCount)`** | `{ ok, frequency_unit?, frequency?, next_charge_at?, error? }` | Change billing interval. `interval`: `day`, `week`, `month`, `year`. |
 
+### What pause and resume do to the next charge
+
+- **`pauseSubscription(tx)`** sets the status to `paused`. Nothing bills or ships while it is paused. `next_charge_at` is **not** moved.
+- **With `resumeAt`**, billing picks the plan up again on that date. A pause that ends before the next charge date changes nothing the customer would notice, because the next charge was already later. To skip a delivery, use `skipSubscription` (moves `next_charge_at` one cycle); to stop until the customer comes back, pause with no date.
+- **`resumeSubscription(tx)`** sets it back to `active`. If `next_charge_at` passed while it was paused, the next charge is recalculated from today; otherwise the original date stands.
+
 ### Built-in validation
 
 Write functions enforce these rules automatically — even if your script does not check:

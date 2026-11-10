@@ -143,7 +143,7 @@ The server-side processor auto-converts `<template-foreach>` inside `<select>` i
 
 **Mistake:** Bump checkboxes/labels without **data-bump-checkbox**, **data-bump-toggle**, or **data-bump-code**, so the bump-products plugin cannot toggle or style them.
 
-**Fix:** Use **`data-bump-code="[[ bump.code ]]"`** on the card, **`data-bump-checkbox="[[ bump.code ]]"`** and **`value="[[ bump.code ]]"`** on the checkbox, and **`data-bump-toggle="[[ bump.code ]]"`** on the label. Same code on both “add” and “remove” states.
+**Fix:** Use **`:data-bump-code="bump.code"`** on the card, **`:data-bump-checkbox="bump.code"`** and **`:value="bump.code"`** on the checkbox, and **`:data-bump-toggle="bump.code"`** on the label. Same code on both “add” and “remove” states.
 </Warning>
 
 ---

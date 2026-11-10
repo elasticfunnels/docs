@@ -90,7 +90,7 @@ These are great for page builder workflows: add them in **Data Attributes** (rig
         ef-value="checkout.customer.shipping_country" required>
   <option value="">Select Country</option>
   <template-foreach data-each="opt in checkout.countries">
-    <option value="[[ opt.value ]]">[[ opt.label ]]</option>
+    <option :value="opt.value">[[ opt.label ]]</option>
   </template-foreach>
 </select>
 
@@ -162,9 +162,9 @@ Returning **`false`** from the expression calls **`preventDefault()`** on the ev
 
 For **cart quantity** and **remove**, prefer the cart plugin’s **data attributes** so behavior is consistent without custom script:
 
-- **Decrease qty:** **`data-cart-qty-minus`** and **`data-code="[[ item.code ]]"`** (so the plugin gets the actual code); optional **`data-disable-when-one`** to disable when `item.quantity <= 1`.
-- **Increase qty:** **`data-cart-qty-plus`** and **`data-code="[[ item.code ]]"`**.
-- **Remove:** **`data-cart-qty-remove`** and **`data-code="[[ item.code ]]"`**.
+- **Decrease qty:** **`data-cart-qty-minus`** and **`:data-code="item.code"`** (so the plugin gets the actual code); optional **`data-disable-when-one`** to disable when `item.quantity <= 1`.
+- **Increase qty:** **`data-cart-qty-plus`** and **`:data-code="item.code"`**.
+- **Remove:** **`data-cart-qty-remove`** and **`:data-code="item.code"`**.
 
 When you need **custom @click** logic, you can use **`window.ef.addToCart(code, options?, quantity?)`**, **`ef.setCartQuantity(code, quantity)`**, **`ef.removeFromCart(code, allowClear?)`** if the app exposes **`window.ef`**.
 
