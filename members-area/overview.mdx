@@ -83,6 +83,10 @@ There are two ways to restrict a page to logged-in customers only.
 
 When a visitor without a valid session tries to access the page they are automatically redirected to that URL. If no redirect is configured, a 404 page is shown.
 
+From the `ef` CLI: `ef pages settings <slug> --requires-login on --redirect-url /members-login`.
+
+Prefer the setting to a script: it is visible in the editor, survives edits in the page builder, and needs no code.
+
 ### Option 2: Backend scope script
 
 Add a `<script scope="backend">` block at the top of the page. This gives you more control — for example, redirecting to different pages based on the customer's order history or preserving a `?next=` query parameter.

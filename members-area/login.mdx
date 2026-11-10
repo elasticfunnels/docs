@@ -136,6 +136,8 @@ Your members dashboard page (the page customers land on after login) should be c
 
 This ensures that if someone tries to access the dashboard directly without a valid session, they are sent to the login page first.
 
+From the `ef` CLI: `ef pages settings <dashboard-slug> --requires-login on --redirect-url /members-login` (`--requires-login off` to open the page again, `--redirect-url none` to clear the URL). Use this setting rather than a `redirect()` in a backend script.
+
 ## Logout
 {/* SCREENSHOT: Logout · members area screen · desktop */}
 
