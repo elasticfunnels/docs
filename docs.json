@@ -217,6 +217,20 @@
                     ]
                   },
                   {
+                    "group": "Card gateways (Beta)",
+                    "icon": "credit-card",
+                    "pages": [
+                      "merchants/adyen",
+                      "merchants/airwallex",
+                      "merchants/braintree",
+                      "merchants/checkout-com",
+                      "merchants/cybersource",
+                      "merchants/fiserv-payeezy",
+                      "merchants/paysafe",
+                      "merchants/worldpay"
+                    ]
+                  },
+                  {
                     "group": "Express checkout",
                     "icon": "bolt",
                     "pages": [

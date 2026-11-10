@@ -1,0 +1,149 @@
+---
+title: 'Adyen'
+description: 'Take card payments on your checkout through your Adyen account, with one-click upsells, subscription renewals, refunds and chargebacks recorded from Adyen webhooks.'
+---
+
+<Warning>
+**Beta.** Adyen is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Adyen can be the **card merchant** of a domain or funnel, the same way Stripe, NMI or Authorize.Net are. The buyer types the card into fields that Adyen serves inside your checkout page. Adyen encrypts the card in the browser, so the card number never passes through ElasticFunnels in readable form, and ElasticFunnels sends the encrypted card to Adyen to charge it.
+
+With an Adyen merchant you get:
+
+- card payments on the checkout, with order bumps,
+- **one-click upsells** charged to the saved card,
+- **subscription renewals** charged automatically, marked to Adyen as subscription payments the buyer agreed to,
+- full and partial **refunds** from the order page,
+- refunds, cancellations and **chargebacks** made in Adyen recorded on the order through an Adyen webhook.
+
+<Note>
+3D Secure is not part of the Adyen merchant yet. ElasticFunnels asks Adyen not to start 3D Secure, so a card whose bank insists on it is declined and the buyer is asked to use another card. If most of your buyers are in Europe or the UK, where banks often require it, check with Adyen before you switch your traffic. Apple Pay, Google Pay and Adyen's other payment methods are not included either.
+</Note>
+
+---
+
+## Before you start
+
+You need:
+
+1. An **Adyen** account. For testing, Adyen gives you a test Customer Area at `ca-test.adyen.com` once you sign up at [adyen.com/signup](https://www.adyen.com/signup). Adyen may ask for company details before it opens.
+2. Access to the Adyen **Customer Area** for that account, with a user that can manage API credentials.
+
+Test and live are separate Customer Areas with separate keys. Do the steps below once in each.
+
+---
+
+## Step 1: create the API credential in Adyen
+
+ElasticFunnels talks to Adyen as an API credential (a "web service user"). Most accounts already have one named `ws@Company.YourCompany`.
+
+1. In the Customer Area, go to **Developers** → **API credentials** and open your `ws@Company...` credential, or create one.
+2. Under **Server settings** → **Authentication**, click **Generate API key** and copy it at once. Adyen shows it only one time.
+3. Under **Client settings**, click **Generate client key** if there is none, and copy it.
+4. Still under **Client settings**, add every domain your checkout runs on to **Allowed origins** (for example `https://checkout.yourstore.com`). The card fields do not load on a domain that is missing here.
+5. Under **Permissions**, keep the **Checkout webservice** role. Also tick **Management API - Webhooks read and write** if you want ElasticFunnels to create the webhook for you in step 4.
+6. Click **Save changes**.
+
+Then, under **Developers** → **Additional data**, turn on **Card summary** so the order shows the last 4 digits of the card, and **Recurring details** so the saved card comes back with the payment.
+
+---
+
+## Step 2: find the other values
+
+| Field in ElasticFunnels | Where it is in Adyen |
+|---|---|
+| **Merchant account** | The account name at the top left of the Customer Area, or **Settings** → **Merchant accounts**. Use the merchant account (often ending in `ECOM`), not the company account |
+| **API key** | **Developers** → **API credentials** → your credential → **Server settings** (step 1) |
+| **Client key** | Same credential → **Client settings**. It starts with `test_` in the test Customer Area and `live_` in the live one |
+| **Webhook HMAC key** | **Developers** → **Webhooks** → your Standard webhook (step 4). Leave it empty if ElasticFunnels creates the webhook for you |
+| **Live URL prefix** (live only) | Live Customer Area → **Developers** → **API URLs**: the part before `-checkout-live.adyenpayments.com` |
+| **Live region** (live only) | The region your live account runs in: Europe, United States, Australia, Asia Pacific South East or India. Ask your Adyen account manager if you are not sure |
+
+---
+
+## Step 3: add the Adyen merchant
+
+1. Go to **Merchants** → **Add Merchant** and choose **Adyen**.
+2. Paste the values. Test and live keys have their own fields, and the **Mode** toggle decides which set is used. The live URL prefix and region are only needed in Live mode.
+3. Pick the **checkout page** this merchant charges on.
+4. Save.
+
+Each field has an info tooltip that tells you where to find the value in Adyen. Then attach the merchant to a domain or funnel, as for any card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+---
+
+## Step 4: the webhook
+
+Adyen tells ElasticFunnels about refunds, cancellations and chargebacks through a webhook. There are two ways to set it up.
+
+**Automatic.** If the API credential has the **Management API - Webhooks read and write** role and you left **Webhook HMAC key** empty, ElasticFunnels creates the webhook in Adyen when you save the merchant and fills in the HMAC key itself. Nothing else to do.
+
+**By hand.** Otherwise:
+
+1. Open the Adyen merchant in ElasticFunnels again. Below the keys, the form shows your **Webhook URL**. Copy it.
+2. In the Customer Area, go to **Developers** → **Webhooks** → **+ Webhook** → **Standard webhook**.
+3. Paste the URL, set the format to **JSON** and make sure the webhook is **active**.
+4. Under **Security**, click **Generate** next to **HMAC Key**, copy the key and save the webhook.
+5. Paste the HMAC key into the merchant in ElasticFunnels and save.
+
+ElasticFunnels checks the HMAC signature on every webhook and ignores any that does not match. Test and live webhooks have different HMAC keys.
+
+With the webhook in place:
+
+- a refund or cancellation made in the Customer Area shows on the order and in your reports,
+- a chargeback shows on the order as disputed,
+- a refund made from ElasticFunnels is not counted twice when Adyen confirms it.
+
+<Warning>
+Adyen confirms refunds a little later, through the webhook. In the rare case that Adyen then reports the refund as failed, ElasticFunnels keeps showing the order as refunded and logs an error. Check the payment in the Customer Area if a buyer says the money did not come back.
+</Warning>
+
+---
+
+## What the buyer sees
+
+The card panel on your checkout shows Adyen's fields for card number, expiry date and security code. They look like the rest of the form. When the buyer clicks the submit button, the card is encrypted in the browser and the order goes through as with any other card merchant.
+
+A declined card keeps the buyer on the checkout with a message to try another card.
+
+---
+
+## One-click upsells and renewals
+
+On the first payment, Adyen saves the card in your Adyen account under a reference for that buyer. Later charges use the saved card:
+
+- **Upsells** after the checkout are charged in one click, without the buyer typing the card again.
+- **Subscription renewals** are charged on schedule and flagged to Adyen as subscription payments the buyer set up.
+
+Saved cards stay in your own Adyen account. The buyer reference ElasticFunnels uses contains no email or name.
+
+---
+
+## Refunds and voids
+
+Refund from the order page in ElasticFunnels.
+
+- **Partial refunds** can be made as many times as you need, up to the amount paid.
+- A **void** asks Adyen to cancel the payment. If Adyen has already captured it, Adyen refunds it in full instead, so the buyer always gets the money back.
+
+---
+
+## Testing with the Adyen test account
+
+1. Put the test Customer Area's values in the **sandbox** fields and set **Mode** to **Sandbox**.
+2. Pay on your checkout with Adyen's test card `5555 5555 5555 4444` (or `4111 1111 1111 1111`), expiry `03/30` and security code `737`.
+3. Open **Transactions** → **Payments** in the test Customer Area to see the payment.
+
+Test payments are recorded as **test** orders.
+
+To try declines and other results without the Adyen test account, keep the merchant in Live mode and use its test key with the test cards in [Test merchant](/merchants/test-merchant). ElasticFunnels then simulates the result and never contacts Adyen.
+
+---
+
+## Going live
+
+1. In the **live** Customer Area, repeat step 1 (API key, client key with your live checkout domains, Additional data).
+2. Fill in the live fields, including **Live URL prefix** and **Live region**, and switch **Mode** to **Live**.
+3. Set up the live webhook (step 4). It needs its own HMAC key.
+4. Place one real order with your own card and refund it from the order page.

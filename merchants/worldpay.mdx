@@ -1,0 +1,120 @@
+---
+title: 'Worldpay'
+description: 'Take card payments on your own checkout with Access Worldpay: secure card fields, one-click upsells, subscription renewals, refunds and chargebacks in your reports.'
+---
+
+<Warning>
+**Beta.** Worldpay is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Worldpay is a **card merchant** for your checkout. It uses Access Worldpay, Worldpay's API for online card payments. The buyer types their card into secure fields that Worldpay hosts inside your checkout page, so the card number never reaches ElasticFunnels. Once the first payment goes through, the card is saved with Worldpay, which makes one-click upsells and subscription renewals possible.
+
+<Info>
+Worldpay accounts are not self-serve. Worldpay sales set up your account and assign you an **Implementation Manager**, who gives you your credentials and turns on webhooks for you. Plan for that step before you build the funnel.
+</Info>
+
+---
+
+## Before you start
+
+You need:
+
+1. An **Access Worldpay** merchant account with **Card Payments**, **Verified Tokens** and the **Checkout SDK** (web) enabled. Ask your Implementation Manager to confirm all three.
+2. Your **Try** credentials for testing and your **live** credentials for real payments. Try is Worldpay's name for its test environment, and its credentials are different from the live ones.
+3. Your **Checkout ID**, which loads the secure card fields.
+
+---
+
+## Step 1: add the Worldpay merchant
+
+1. Go to **Settings** → **Merchants** → **Add Merchant** and choose **Worldpay**.
+2. Fill in the fields. Each one has a hint under it that says where to find the value.
+3. Use the **Live Mode** toggle to pick which set of credentials is used. With Live Mode off, the **Sandbox (Try)** fields are used and nothing is charged.
+4. Save.
+
+| Field | Where to find it |
+|---|---|
+| **API username** | The Worldpay Dashboard (dashboard.worldpay.com) on the API credentials page, or sent by your Implementation Manager. |
+| **API password** | Shown next to the API username when the credentials are created. It is not your Dashboard login password. |
+| **Checkout ID** | The Worldpay Dashboard next to your API credentials, or ask your Implementation Manager. Required: without it the card fields cannot load. |
+| **Merchant entity** | Given to you during onboarding. Leave it blank to use `default`. |
+| **Statement descriptor** | Optional. Up to 24 characters on the buyer's card statement. Leave it blank to use the product name. |
+| **Webhook signature secret** | Sent by your Implementation Manager when they turn on signed webhooks (Step 2). |
+| **Webhook key ID** | Optional. The number Worldpay gives with the secret. When set, only signatures made with that key are accepted. |
+
+Every field has a **Sandbox (Try)** twin, so you can keep both sets of credentials on one merchant and switch with the toggle.
+
+---
+
+## Step 2: send Worldpay your webhook URL
+
+Refunds, reversals and chargebacks reach your reports through Worldpay webhooks. Worldpay does not let you add a webhook yourself: your Implementation Manager sets it up.
+
+Send them the **Webhook URL** shown on the merchant: save the merchant, open it again, and copy the URL shown under the credential fields.
+
+Ask them to:
+
+- send the **payment events** (refunds, reversals, cancellations, chargebacks) to that URL;
+- turn on **signed events** (the `Event-Signature` header) and send you the secret, then paste it in **Webhook signature secret**;
+- do the same for your Try account if you test there, pointing at the same URL of your test merchant.
+
+When the secret is set, any webhook with a missing or wrong signature is rejected.
+
+---
+
+## Step 3: use the merchant on your checkout
+
+Pick the Worldpay merchant as the domain's or the funnel's merchant, the same way as any card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+The card form on your checkout shows three secure fields: card number, expiry and CVV. They are hosted by Worldpay, which keeps your checkout out of scope for handling card data (PCI SAQ-A).
+
+---
+
+## What works with Worldpay
+
+| | Supported |
+|---|---|
+| **Card payments** on your checkout | Yes. The payment is captured right away. |
+| **One-click upsells** | Yes, charged to the card saved at checkout. |
+| **Subscriptions** | Yes. Renewals are charged automatically to the saved card. |
+| **Full and partial refunds** | Yes, from the order in ElasticFunnels. |
+| **Voids** | A same-day payment is reversed instead of refunded. |
+| **Chargebacks** in your reports | Yes, through the webhook from Step 2. |
+| **Apple Pay and Google Pay** | Not yet. |
+| **3-D Secure** | Not yet. A card that needs 3-D Secure is declined, and the buyer can try another card. |
+| **Test mode** (`?test=` with a test key) | Not available. Use your Try credentials with Live Mode off instead. See below. |
+
+---
+
+## Refunds take a moment to show
+
+Worldpay accepts a refund first and confirms it a little later. When you refund an order, ElasticFunnels sends the refund and marks it as sent. Worldpay then confirms it through the webhook. If the webhook is not set up (Step 2), the refund still happens at Worldpay, but a refund you start in the Worldpay Dashboard will not appear in your reports.
+
+A partial refund needs the order total, so it works on orders taken through ElasticFunnels. If Worldpay only allows a reversal for a payment (for example on the same day), a full refund becomes a reversal and a partial refund is refused until the payment settles.
+
+---
+
+## Testing with Try
+
+Test mode with a `?test=` key does not work with Worldpay, because the card is typed into Worldpay's own fields and ElasticFunnels never sees the number. Test with your Try credentials instead:
+
+1. Fill in the **Sandbox (Try)** fields and turn **Live Mode** off.
+2. Open your checkout and pay with a Worldpay test card, for example `4444 3333 2222 1111` with any future expiry date and any CVV.
+3. To test a decline, use the test cardholder names from Worldpay's test values page.
+
+{/* OWNER: confirm the Try decline names (REFUSED, REFUSED51, ...) on a real Try account before linking a list here. */}
+
+<Warning>
+Turn **Live Mode** on before you send real traffic. With Live Mode off, every payment goes to Try and nobody is charged.
+</Warning>
+
+---
+
+## Troubleshooting
+
+| What you see | What to check |
+|---|---|
+| The card fields do not appear on the checkout | The **Checkout ID** is missing or belongs to the other environment (Try vs live). |
+| Every payment fails with an authentication error | The API username or password is wrong, or Try credentials are used with Live Mode on. |
+| Refunds and chargebacks done in the Worldpay Dashboard never reach your reports | The webhook from Step 2 is not set up, or the signature secret does not match. |
+| A buyer's card is declined although it works elsewhere | The card issuer may require 3-D Secure, which is not supported yet. The buyer can use another card. |

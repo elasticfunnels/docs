@@ -1,0 +1,118 @@
+---
+title: 'Fiserv (Commerce Hub / Payeezy)'
+description: 'Take card payments on your own checkout with Fiserv Commerce Hub, the successor to Payeezy: secure card fields, one-click upsells, subscription renewals and refunds from ElasticFunnels.'
+---
+
+<Warning>
+**Beta.** Fiserv is a new gateway in ElasticFunnels. Test it with your sandbox credentials before you take live payments, and contact support if a payment fails.
+</Warning>
+
+Fiserv is a **card merchant** for your checkout. ElasticFunnels connects to **Commerce Hub**, the Fiserv gateway that replaced Payeezy (First Data). If your bank or ISO set you up with Payeezy, ask Fiserv for Commerce Hub credentials: new merchants are no longer boarded on Payeezy.
+
+The buyer types their card into secure fields that Fiserv hosts inside your checkout page, so the card never reaches ElasticFunnels. The first payment also saves the card with Fiserv as a token, which is what makes one-click upsells and subscription renewals possible.
+
+---
+
+## Before you start
+
+You need:
+
+1. A **Fiserv Commerce Hub merchant account**. To test first, create a free account at [developer.fiserv.com](https://developer.fiserv.com). The sandbox (Fiserv calls it CERT) is separate from production and has its own keys.
+2. For live payments, a production account that Fiserv has **boarded**. Production keys only appear after that.
+3. **Tokenization** (TransArmor) enabled on the account, so cards can be saved for upsells and renewals. Ask your Fiserv contact if you are not sure.
+
+---
+
+## Step 1: get your keys from Fiserv Developer Studio
+
+ElasticFunnels needs four values for each environment: the API Key, the API Secret, the Merchant ID and the Terminal ID.
+
+1. Sign in at [developer.fiserv.com](https://developer.fiserv.com) and open your workspace.
+2. Open the **Credentials** tab.
+3. Generate a key for the environment you want (sandbox or production).
+4. Copy the **API Key** and the **API Secret**, and note the **Merchant ID** and **Terminal ID** shown with them.
+
+<Warning>
+The API Secret is shown only once. If you lose it, generate a new key and paste the new pair into ElasticFunnels.
+</Warning>
+
+---
+
+## Step 2: add the Fiserv merchant
+
+1. Go to **Merchants** → **Add Merchant** and choose **Fiserv (Commerce Hub / Payeezy)**.
+2. Fill in the fields. Each one has a hint under it that says where to find the value.
+3. Use the **Live Mode** toggle to pick which set of keys is used. With Live Mode off, the **Sandbox** fields are used and no real card is charged.
+4. Pick the checkout page the merchant uses.
+5. Save.
+
+| Field | Where to find it |
+|---|---|
+| **API Key** | The Credentials tab of your Developer Studio workspace. |
+| **API Secret** | Shown once, next to the API Key, when you generate the key. |
+| **Merchant ID (MID)** | The Credentials tab, with your keys. For production, also in your Fiserv boarding email. |
+| **Terminal ID (TID)** | The Credentials tab, under the Merchant ID. For production, also in your Fiserv boarding email. |
+
+Every field has a **Sandbox** twin, so you can keep both sets of keys on one merchant and switch with the toggle. Saving does not test the keys. Place a test order with Live Mode off (see [Test before you go live](#test-before-you-go-live)) to confirm they work.
+
+---
+
+## Step 3: use it on your checkout
+
+Make Fiserv the merchant of the domain or the funnel, as with any card merchant. See [How to set up a new merchant](/guides/how-to-set-up-a-new-merchant).
+
+The card form on your checkout page then loads Fiserv's secure fields for the card number, expiry month, expiry year and security code. Nothing changes in your page's code.
+
+---
+
+## What the buyer sees
+
+1. The buyer fills in their details and types the card into the secure fields.
+2. They click the button. The payment is approved or declined on the same page.
+3. After an approval they continue to the next step (an upsell or the thank-you page).
+
+A declined card shows a message on the checkout, and the buyer can try another card.
+
+---
+
+## One-click upsells and subscriptions
+
+The first payment saves the buyer's card with Fiserv as a token. ElasticFunnels keeps only the token and the card's expiry date, never the card number. With the saved card:
+
+| | How it is charged |
+|---|---|
+| **One-click upsell** | The buyer clicks accept on the upsell page and the saved card is charged. The buyer does not type the card again. |
+| **Subscription renewal** | ElasticFunnels charges the saved card on each billing date, linked to the buyer's first payment, as card networks require for renewals. |
+
+A declined renewal follows your subscription's retry settings.
+
+---
+
+## Refunds and voids
+
+Refund an order from its page in ElasticFunnels, the same way as for any card merchant. You can refund the full amount or part of it.
+
+{/* OWNER: confirm on the sandbox whether Fiserv refuses a refund before the payment settles. The plug-in does not turn such a refund into a void automatically; if the sandbox refuses, add a line here telling the user to void instead (or wait a day). */}
+
+Fiserv does not send ElasticFunnels notifications about payments. A refund or void you make in the Fiserv portal is not recorded in ElasticFunnels, so refund from ElasticFunnels to keep your reports right. Chargebacks do not reach your reports automatically either.
+
+---
+
+## Test before you go live
+
+With **Live Mode** off, payments go to the Fiserv sandbox (CERT), which simulates approvals and declines. Use the test cards from the Fiserv Developer Studio documentation with any future expiry date.
+
+{/* OWNER: copy Fiserv's test card table here once the sandbox account exists (the list is behind the developer.fiserv.com login). Candidates to confirm: Visa 4005 5500 0000 0019, Mastercard 5204 7300 0000 2514. */}
+
+To place test orders on a live merchant without charging a real card, set a **Test Key** and add `?test=[key]` to the checkout URL. See [Test merchant](/merchants/test-merchant).
+
+---
+
+## Troubleshooting
+
+| What you see | What to check |
+|---|---|
+| Test orders fail with "ApiKey and/or Authentication supplied are invalid" | The API Key and API Secret belong together, and you are using the sandbox fields for sandbox keys (Live Mode off). Sandbox and production keys are different. |
+| "The secure card form could not be prepared" on the checkout | The Merchant ID and Terminal ID match the keys, and the checkout page is opened over https on your own domain. |
+| Upsells or renewals fail with a token error | Tokenization (TransArmor) is not enabled on the account. Ask Fiserv to enable it. |
+| Live payments fail but the sandbox works | Your production account is not boarded yet, or the Live fields still hold sandbox keys. |
