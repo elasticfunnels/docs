@@ -124,6 +124,7 @@
                 "pages": [
                   "quizzes/build-and-publish",
                   "quizzes/blocks-and-answers",
+                  "quizzes/design",
                   "quizzes/page-intro"
                 ]
               },

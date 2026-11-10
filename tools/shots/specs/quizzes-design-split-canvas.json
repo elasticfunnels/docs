@@ -1,0 +1,145 @@
+{
+  "out": "images/quizzes/design-split-canvas.png",
+  "alt": "The Split header in the quiz builder: Back on the left, the brand name as a spaced wordmark, the step count on the right, with the screen setting its own header colours",
+  "capture": {
+    "path": "/{brand}/quizzes/40/builder",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid='quizzes.builder.mode.design']",
+    "actions": [
+      {
+        "wait": 2500
+      },
+      {
+        "click": "[data-testid='quizzes.builder.mode.design']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "[data-testid='quizzes.builder.dock.close']"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "click": "[data-testid='quizzes.builder.design.header-variant-split']"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "select": "[data-testid='quizzes.builder.design.back-style']",
+        "value": "text"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "fill": "[data-testid='quizzes.builder.design.back-text']",
+        "value": "Back"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[data-testid='quizzes.builder.design.step-counter']"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "fill": "[data-testid='quizzes.builder.design.brand-name']",
+        "value": "Northwind"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "select": "[data-testid='quizzes.builder.design.brand-name-style']",
+        "value": "wordmark"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "click": "[data-testid='quizzes.builder.mode.builder']"
+      },
+      {
+        "wait": 2500
+      },
+      {
+        "click": "[data-testid='quizzes.builder.screen-strip.next']"
+      },
+      {
+        "wait": 2000
+      },
+      {
+        "fill": "[data-testid='quizzes.builder.display.header-background']",
+        "value": "#14532d"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "fill": "[data-testid='quizzes.builder.display.header-text']",
+        "value": "#ffffff"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "scroll": "[data-testid='quizzes.builder.display.text-color']"
+      },
+      {
+        "wait": 800
+      }
+    ],
+    "crop": {
+      "x": 60,
+      "y": 56,
+      "width": 1380,
+      "height": 564
+    },
+    "cropPad": 0
+  },
+  "maxWidth": 860,
+  "annotations": [
+    {
+      "box": [
+        32,
+        84,
+        931,
+        62
+      ],
+      "title": "Split header",
+      "text": "Back, brand name, step count",
+      "side": "left"
+    },
+    {
+      "box": [
+        1013,
+        320,
+        351,
+        58
+      ],
+      "title": "Text colour",
+      "text": "This screen only",
+      "side": "right"
+    },
+    {
+      "box": [
+        1013,
+        395,
+        351,
+        131
+      ],
+      "title": "Header colours",
+      "text": "Background and text on this screen",
+      "side": "right"
+    }
+  ],
+  "calloutWidth": 200
+}

@@ -1,0 +1,130 @@
+{
+  "out": "images/quizzes/design-header.png",
+  "alt": "Quiz builder Design tab: screen colours for the whole quiz, edge-to-edge screens, header layouts with Split selected, and the Back button style",
+  "capture": {
+    "path": "/{brand}/quizzes/40/builder",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "waitFor": "[data-testid='quizzes.builder.mode.design']",
+    "actions": [
+      {
+        "wait": 2500
+      },
+      {
+        "click": "[data-testid='quizzes.builder.mode.design']"
+      },
+      {
+        "wait": 1500
+      },
+      {
+        "click": "[data-testid='quizzes.builder.dock.close']"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "click": "[data-testid='quizzes.builder.design.header-variant-split']"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "select": "[data-testid='quizzes.builder.design.back-style']",
+        "value": "text"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "fill": "[data-testid='quizzes.builder.design.back-text']",
+        "value": "Back"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "click": "[data-testid='quizzes.builder.design.step-counter']"
+      },
+      {
+        "wait": 500
+      },
+      {
+        "fill": "[data-testid='quizzes.builder.design.brand-name']",
+        "value": "Northwind"
+      },
+      {
+        "wait": 300
+      },
+      {
+        "select": "[data-testid='quizzes.builder.design.brand-name-style']",
+        "value": "wordmark"
+      },
+      {
+        "wait": 800
+      },
+      {
+        "scroll": "[data-testid='quizzes.builder.design.header-variant-split']"
+      },
+      {
+        "wait": 1000
+      }
+    ],
+    "crop": {
+      "x": 1056,
+      "y": 56,
+      "width": 384,
+      "height": 944
+    },
+    "cropPad": 0
+  },
+  "maxWidth": 420,
+  "annotations": [
+    {
+      "box": [
+        17,
+        7,
+        351,
+        30
+      ],
+      "title": "Edge to edge",
+      "text": "No outer margin around the quiz",
+      "side": "left"
+    },
+    {
+      "box": [
+        17,
+        157,
+        351,
+        63
+      ],
+      "title": "Screen colours",
+      "text": "Background and text for every screen",
+      "side": "right"
+    },
+    {
+      "box": [
+        17,
+        381,
+        351,
+        119
+      ],
+      "title": "Header layout",
+      "text": "Split: Back, brand name, step count",
+      "side": "left"
+    },
+    {
+      "box": [
+        17,
+        583,
+        351,
+        57
+      ],
+      "title": "Back button",
+      "text": "Arrow, or arrow and your text",
+      "side": "right"
+    }
+  ],
+  "calloutWidth": 200
+}
