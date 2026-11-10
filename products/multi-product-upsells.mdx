@@ -112,12 +112,13 @@ You can also skip the button and call `ef.upsell.buy()` from your own UI.
 | Situation | What happens |
 |-----------|--------------|
 | ClickBank, BuyGoods, JVZoo, Digistore24 and other networks, PayPal, Klarna, Shop Pay | Refused with the code `multi_upsell_unsupported_merchant`. These merchants run their own upsell flow and take one product per offer. Use one `[UPSELL=X]` per product |
+| Authorize.Net | Refused with the code `multi_upsell_unsupported_merchant`. Use one `[UPSELL=X]` per product on Authorize.Net for now |
 | A subscription product in the selection | Refused (`multi_upsell_subscription`). Sell a subscription with its own `[UPSELL=X]` link |
 | The first order was free with a coupon that covers upsells | Refused (`multi_upsell_free_order`) |
 | The buyer opens the page in another browser (no order there) | Refused (`multi_upsell_no_session`) |
 | A selection the tag does not offer | Refused (`multi_upsell_not_offered`) |
 
-Supported merchants: NMI (also Apple Pay saved on NMI), Stripe, Authorize.Net, the Test merchant and the card gateways added through plug-ins. The card is never charged when the upsell is refused, and `buy()` gives you the code and a message you can show.
+Supported merchants: NMI (also Apple Pay saved on NMI), Stripe, the Test merchant and the card gateways added through plug-ins. Authorize.Net, PayPal, Klarna, Shop Pay and the networks refuse a multi selection. The card is never charged when the upsell is refused, and `buy()` gives you the code and a message you can show.
 
 A selection of one product at quantity 1 is a normal upsell, identical to `[UPSELL=X]`.
 
