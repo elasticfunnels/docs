@@ -88,6 +88,22 @@ Seeing a contact's email, phone, name and postal code in full needs the **See un
 
 Editing names or postal codes also needs this permission, so nobody overwrites a value they cannot see.
 
+## From the ef CLI
+
+The [`ef` CLI](/account/cli-and-api-keys) reads contacts too, so you or an AI agent can look someone up without opening the app:
+
+```bash
+ef contacts list --lifecycle lead --limit 20
+ef contacts search jane@example.com
+ef contacts list --phone 4155550101 --json
+ef contacts get 01J9Z6X3M1Q2R4S5T6V7W8X9Y0
+```
+
+- `list` takes the same filters as the screen: `--lifecycle`, `--tag`, `--email-status`, `--sms-status` and `--sort`. `--all` fetches every match.
+- The table never prints emails, phones, names or postal codes. `--json` leaves them out too unless you add `--include-pii`.
+- Even with `--include-pii`, they come back masked unless your user has the **See unmasked** permission described above.
+- The CLI only reads contacts. Edit and merge them in the app.
+
 ## Related
 
 - [Merging and duplicates](/contacts/merge-and-duplicates)
