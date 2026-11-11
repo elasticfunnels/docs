@@ -1,0 +1,299 @@
+{
+    "file_hash": "3ee215abfb15d701de657aac083dec283c817766c074acbc61a66b68187c9a78",
+    "file_name": "affiliates.csv",
+    "row_count": 6,
+    "columns": [
+        {
+            "index": 0,
+            "choices": [
+                "Dana Whitfield",
+                "Marco Ruiz",
+                "Priya Shah",
+                "Owen Brooks",
+                "Lena Fischer",
+                "Sam Okafor"
+            ],
+            "header": "Full Name",
+            "samples": [
+                "Dana Whitfield",
+                "Marco Ruiz",
+                "Priya Shah"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Full Name",
+                "key": "full_name",
+                "type": "text",
+                "options": null
+            }
+        },
+        {
+            "index": 1,
+            "choices": [
+                "dana@northwind-partners.test",
+                "marco@northwind-partners.test",
+                "priya@northwind-partners.test",
+                "owen@northwind-partners.test",
+                "lena@northwind-partners.test",
+                "sam@northwind-partners.test"
+            ],
+            "header": "Email",
+            "samples": [
+                "dana@northwind-partners.test",
+                "marco@northwind-partners.test",
+                "priya@northwind-partners.test"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Email",
+                "key": "email",
+                "type": "email",
+                "options": null
+            }
+        },
+        {
+            "index": 2,
+            "choices": [
+                "+1 555 010 1001",
+                "+1 555 010 1002",
+                "+1 555 010 1003",
+                "+1 555 010 1004",
+                "+1 555 010 1005",
+                "+1 555 010 1006"
+            ],
+            "header": "Phone",
+            "samples": [
+                "+1 555 010 1001",
+                "+1 555 010 1002",
+                "+1 555 010 1003"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Phone",
+                "key": "phone",
+                "type": "phone",
+                "options": null
+            }
+        },
+        {
+            "index": 3,
+            "choices": [
+                30,
+                25,
+                20
+            ],
+            "header": "Commission %",
+            "samples": [
+                "30",
+                "25",
+                "20"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Commission %",
+                "key": "commission",
+                "type": "number",
+                "options": null
+            }
+        },
+        {
+            "index": 4,
+            "choices": [
+                "Active",
+                "Paused"
+            ],
+            "header": "Status",
+            "samples": [
+                "Active",
+                "Paused"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Status",
+                "key": "status",
+                "type": "select",
+                "options": [
+                    {
+                        "label": "Active",
+                        "value": "Active"
+                    },
+                    {
+                        "label": "Paused",
+                        "value": "Paused"
+                    }
+                ]
+            }
+        },
+        {
+            "index": 5,
+            "choices": [
+                "2026-01-04",
+                "2026-01-09",
+                "2026-02-02",
+                "2026-02-15",
+                "2026-03-01",
+                "2026-03-12"
+            ],
+            "header": "Joined",
+            "samples": [
+                "2026-01-04",
+                "2026-01-09",
+                "2026-02-02"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Joined",
+                "key": "joined",
+                "type": "date",
+                "options": null
+            }
+        },
+        {
+            "index": 6,
+            "choices": [
+                "https://danareviews.test",
+                "https://marcofit.test",
+                "https://priyawell.test",
+                "https://owenlifts.test",
+                "https://lenaeats.test",
+                "https://samruns.test"
+            ],
+            "header": "Website",
+            "samples": [
+                "https://danareviews.test",
+                "https://marcofit.test",
+                "https://priyawell.test"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Website",
+                "key": "website",
+                "type": "url",
+                "options": null
+            }
+        },
+        {
+            "index": 7,
+            "choices": [
+                "PayPal",
+                "Wire"
+            ],
+            "header": "Payout method",
+            "samples": [
+                "PayPal",
+                "Wire"
+            ],
+            "filled": 6,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Payout method",
+                "key": "payout_method",
+                "type": "select",
+                "options": [
+                    {
+                        "label": "PayPal",
+                        "value": "PayPal"
+                    },
+                    {
+                        "label": "Wire",
+                        "value": "Wire"
+                    }
+                ]
+            }
+        },
+        {
+            "index": 8,
+            "choices": [
+                "Top seller in Q1",
+                "Needs new creatives"
+            ],
+            "header": "Notes",
+            "samples": [
+                "Top seller in Q1",
+                "Needs new creatives"
+            ],
+            "filled": 2,
+            "action": "create",
+            "existing_key": null,
+            "suggested": {
+                "label": "Notes",
+                "key": "notes",
+                "type": "text",
+                "options": null
+            }
+        }
+    ],
+    "title_column": 0,
+    "sample_rows": [
+        [
+            "Dana Whitfield",
+            "dana@northwind-partners.test",
+            "+1 555 010 1001",
+            "30",
+            "Active",
+            "2026-01-04",
+            "https://danareviews.test",
+            "PayPal",
+            "Top seller in Q1"
+        ],
+        [
+            "Marco Ruiz",
+            "marco@northwind-partners.test",
+            "+1 555 010 1002",
+            "25",
+            "Active",
+            "2026-01-09",
+            "https://marcofit.test",
+            "Wire",
+            ""
+        ],
+        [
+            "Priya Shah",
+            "priya@northwind-partners.test",
+            "+1 555 010 1003",
+            "30",
+            "Paused",
+            "2026-02-02",
+            "https://priyawell.test",
+            "PayPal",
+            ""
+        ],
+        [
+            "Owen Brooks",
+            "owen@northwind-partners.test",
+            "+1 555 010 1004",
+            "20",
+            "Active",
+            "2026-02-15",
+            "https://owenlifts.test",
+            "Wire",
+            "Needs new creatives"
+        ],
+        [
+            "Lena Fischer",
+            "lena@northwind-partners.test",
+            "+1 555 010 1005",
+            "25",
+            "Active",
+            "2026-03-01",
+            "https://lenaeats.test",
+            "PayPal",
+            ""
+        ]
+    ]
+}

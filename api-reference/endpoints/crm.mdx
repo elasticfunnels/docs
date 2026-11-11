@@ -723,6 +723,95 @@ DELETE /api/brands/{brand}/crm/entries/{entry}
 DELETE /api/brands/{brand}/crm/entities/{entity}/entries/{entry}
 ```
 
+### Import Entries from a File
+
+Two calls. The first reads a CSV or XLSX file and suggests a field per column; the second writes the rows, a batch at a time. Create any new fields with [Create Field](#create-field) between the two: every key in `mapping` must already be a field of the entity.
+
+```
+POST /api/brands/{brand}/crm/entities/{entity}/import/preview
+POST /api/brands/{brand}/crm/entities/{entity}/import/rows
+```
+
+**Preview** (multipart form):
+
+<ParamField body="file" type="file" required>
+  A `.csv`, `.tsv`, `.txt` or `.xlsx` file, at most 20 MB and 20,000 rows. The first row is the header row; for `.xlsx`, the first sheet is read.
+</ParamField>
+
+```bash cURL
+curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/7/import/preview \
+  -H "EF-Access-Key: your_api_key_here" \
+  -F "file=@affiliates.csv"
+```
+
+```json Response
+{
+  "file_hash": "3ee215ab...c9a78",
+  "file_name": "affiliates.csv",
+  "row_count": 6,
+  "title_column": 0,
+  "columns": [
+    {
+      "index": 1,
+      "header": "Email",
+      "samples": ["dana@example.com", "marco@example.com"],
+      "choices": ["dana@example.com", "marco@example.com"],
+      "filled": 6,
+      "action": "create",
+      "existing_key": null,
+      "suggested": { "label": "Email", "key": "email", "type": "email", "options": null }
+    }
+  ],
+  "sample_rows": [["Dana Whitfield", "dana@example.com", "..."]]
+}
+```
+
+`action` is `existing` when the header matches a field's key or label (`existing_key` names it), `skip` for a column that is empty in every row, otherwise `create`. `suggested.type` is one of `text`, `textarea`, `email`, `phone`, `url`, `number`, `date`, `datetime`, `boolean`, `select`; for `select`, `suggested.options` holds the choices. `choices` lists the column's distinct values (null above 50). The parsed file is kept for a day under its `file_hash`.
+
+**Rows** (JSON):
+
+<ParamField body="file_hash" type="string" required>
+  The `file_hash` from the preview.
+</ParamField>
+
+<ParamField body="mapping" type="array" required>
+  `[{ "index": 1, "key": "email" }, ...]`: column index to field key. Columns left out are not imported.
+</ParamField>
+
+<ParamField body="title_column" type="number">
+  Column index used as the entry title. Without it, an entry takes its first text value.
+</ParamField>
+
+<ParamField body="pipeline_id" type="number">
+  Required with `stage_id` when the entity is in CRM mode and has pipelines.
+</ParamField>
+
+<ParamField body="stage_id" type="number">
+  Stage every imported entry starts in.
+</ParamField>
+
+<ParamField body="offset" type="number" required>
+  First data row to import (0-based). Start at 0, then send the `next_offset` of the previous reply.
+</ParamField>
+
+<ParamField body="limit" type="number">
+  Rows per call, 1 to 250 (default 100).
+</ParamField>
+
+```json Response
+{
+  "imported": 100,
+  "skipped": 0,
+  "failed": 0,
+  "errors": [],
+  "next_offset": 100,
+  "total": 312,
+  "done": false
+}
+```
+
+Repeat until `done` is `true`. `errors` lists up to 20 failed rows per call as `{ "row": 14, "message": "..." }`, where `row` is the line in the file (the header is line 1). Values are converted to the field type (numbers, yes / no, dates). Each call adds new entries, so sending the same offset twice imports those rows twice. Imported entries resolve contacts like any new entry, but do not fire stage automations or `form.submitted` webhooks. Errors: `422` with `code` `file_missing` (preview again), `unknown_field`, or a pipeline / stage validation error.
+
 ---
 
 ## Automation: Create CRM Entry from Conversion

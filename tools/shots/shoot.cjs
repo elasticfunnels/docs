@@ -136,8 +136,9 @@ async function capture(browser, spec, ctx) {
     else if (a.waitFor) await page.waitForSelector(a.waitFor, { timeout: 30000 });
     else if (a.select) await page.selectOption(a.select, String(a.value));
     else if (a.fill) await page.fill(a.fill, String(a.value));
+    else if (a.upload) await page.setInputFiles(a.upload, path.resolve(ROOT, a.files));
     else if (a.eval) await page.evaluate(a.eval);
-    if (a.wait || a.click || a.hover || a.select || a.fill || a.eval) await page.waitForTimeout(a.wait || 600);
+    if (a.wait || a.click || a.hover || a.select || a.fill || a.upload || a.eval) await page.waitForTimeout(a.wait || 600);
   }
   for (const h of c.hide || []) await page.locator(h).evaluateAll((els) => els.forEach((e) => (e.style.visibility = "hidden")));
   await page.evaluate(() => document.fonts.ready);

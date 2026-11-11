@@ -1,0 +1,65 @@
+{
+  "out": "images/crm/import-fields.png",
+  "alt": "The CRM Import entries page after choosing a CSV: one row per column with New field, the suggested field name and type, the Entry title picker and the Import rows button",
+  "capture": {
+    "path": "/{brand}/crm/entities/104/entries/import",
+    "viewport": {
+      "width": 1440,
+      "height": 1300
+    },
+    "waitFor": "[data-testid='crm.import.dropzone']",
+    "actions": [
+      {
+        "upload": "[data-testid='crm.import.file-input']",
+        "files": "tools/shots/fixtures/crm/affiliates.csv"
+      },
+      {
+        "waitFor": "[data-testid='crm.import.start']"
+      },
+      {
+        "wait": 600
+      }
+    ],
+    "crop": {
+      "x": 257,
+      "y": 183,
+      "width": 1183,
+      "height": 1000
+    },
+    "fixtures": [
+      {
+        "url": "^/api/brands/{brand}/crm/entities/104/fields$",
+        "file": "tools/shots/fixtures/crm/fields-empty.json"
+      },
+      {
+        "url": "^/api/brands/{brand}/crm/entities/104/import/preview",
+        "method": "POST",
+        "file": "tools/shots/fixtures/crm/import-preview.json"
+      }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 230,
+  "annotations": [
+    {
+      "selector": "[data-testid='crm.import.title-column']",
+      "title": "Entry title",
+      "text": "The column each entry is named after"
+    },
+    {
+      "selector": "[data-testid='crm.import.column.1.type']",
+      "title": "Field type",
+      "text": "Guessed from the column's values"
+    },
+    {
+      "selector": "[data-testid='crm.import.column.4.type']",
+      "title": "Choice",
+      "text": "A short list of repeated values"
+    },
+    {
+      "selector": "[data-testid='crm.import.start']",
+      "title": "Import rows",
+      "text": "Creates the fields, then adds the rows"
+    }
+  ]
+}
