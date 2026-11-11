@@ -37,6 +37,10 @@ Under **Who gets this campaign**, pick one:
 | **A collection or CRM list** | Leads from a form collection or a CRM entity, using the entry's email field |
 | **A list of addresses** | Addresses you paste, one per line or separated by commas (up to 10,000) |
 
+**Sending to part of a CRM list.** Through the API or the `ef` CLI, a CRM-list audience can take filters in `audience_config.filters`, for example `[{"field_key": "brand", "field_value": "herpafend"}]`. Every filter must match, the same way the filter on the CRM entries list works, and a several-choices field (tags) matches when any of its items does. When several entries share an email, the oldest matching entry is the one used.
+
+**Using the entry in the email.** In a CRM-list campaign, the email can show the matching entry's fields with `{{ entry.<field key> }}`, plus `{{ entry.title }}` and `{{ entry.id }}`. For example, an affiliate's own link: `https://example.com/?aff_id={{ entry.affiliate_id }}`. The values are taken when the campaign starts sending. Test sends have no entry, so these show empty.
+
 The **Will receive this campaign** card counts who is left once ElasticFunnels removes:
 
 - **Left out: said no to emails**: people who saw the email opt-in box at checkout and left it unticked.
