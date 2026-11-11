@@ -74,10 +74,13 @@ A warning triangle beside a page title means we found a problem with the buy lin
 - **Red: sales at risk.**
   - A buy link to a merchant account this brand does not have, for example a ClickBank pay link for another vendor, or a BuyGoods checkout link with another `account_id`. Those sales land on that account and never reach ElasticFunnels. We only say this when the account can be read from the link (ClickBank vendor, BuyGoods `account_id`) or when the brand has no merchant at all on that platform. JVZoo, Digistore24 and Explodely links do not name the account, so they never raise it on their own.
   - A pasted buy link while **Add click tracking to pasted buy links** is off on that merchant, so the sale cannot be matched to its visit.
+  - A pasted BuyGoods link that sends the buyer somewhere other than your `/purchase` page after payment, while the BuyGoods merchant has recorded no sales in the last 30 days. The warning names the page buyers land on. With no postback reaching ElasticFunnels and no return through `/purchase`, nothing records those sales, so upsells and affiliate tracking are lost too. Use a `[BUY=CODE]` tag, or set the link's return to `/purchase` and check the merchant's [BuyGoods postback setup](/merchants/buygoods). Once the merchant records sales again, the warning goes back to amber. ClickBank, JVZoo, Digistore24 and Explodely links do not carry a return address, so they cannot raise this one.
   - A product code (`[BUY=CODE]`, `[UPSELL=CODE]` and the like) that matches no product in the brand, so its buy link shows nothing. Add the product or fix the code.
 - **Amber: a hint.** A BuyGoods, Digistore24, ClickBank, JVZoo or Explodely buy link pasted straight into the page. It is still tracked, but a `[BUY=CODE]` tag is better: the product, price and funnel next step then come from ElasticFunnels. See [Order Tags](#order-tags).
 
-Warnings are checked when you save the page, when a component it uses changes, and when you change the brand's merchants or products. Links inside HTML comments are ignored because visitors never see them. `ef push` prints the same warnings after it saves a page.
+Warnings are checked when you save the page, when a component it uses changes, when you change the brand's merchants or products, and once a day for merchant sales. Links inside components count for every page that includes them, however the component is added. Links inside HTML comments are ignored because visitors never see them.
+
+The code editor and the page builder show the same warnings when you save: a warning triangle appears next to **Publish** (hover it for the list), and a red warning also pops up as a message. `ef push` prints the same warnings after it saves a page.
 
 <CardGroup cols={2}>
   <Card title="Create Landing Page" icon="file-plus" href="/pages/create-landing-page">
