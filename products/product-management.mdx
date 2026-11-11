@@ -123,6 +123,8 @@ A shipping profile (**Products → Shipping Profiles**) holds two separate rates
 | `US` | **Mainland US Cost** |
 | Anything else | **International Cost** |
 
+A cost of `0` is a rate: a per-country override set to `0` ships that country free. Only a blank field means "not set".
+
 <Warning>
 **The two rates are independent - neither one falls back to the other.** Leaving a field empty does not mean "charge the other rate". It means **free shipping for that region**, applied silently with no warning.
 
