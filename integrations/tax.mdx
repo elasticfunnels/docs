@@ -91,6 +91,16 @@ A product with **Tax exempt** switched on (product **Pricing** tab) is never tax
 
 Card (NMI, Stripe, Authorize.Net) and PayPal one-click upsells are taxed with the same merchant tax settings and provider as the front sale. Card upsells send the upsell's real shipping amount, so tax on shipping is charged the same way as on the first order.
 
+QuickBuy buttons (card on file) are charged with the same merchant tax settings they show before the buyer confirms.
+
+### Plan upgrades
+
+A subscription plan upgrade is taxed with the subscription merchant's tax settings, the same way its renewals are.
+
+### Call center orders
+
+Orders entered in the call center (**Order entry**) do not read the merchant's Tax configuration tab yet. They are taxed with the built-in rates (EU VAT, UK VAT, Canadian tax, Australian GST), even when **Collect tax at checkout** is off. Check the tax line in the order form before you charge.
+
 ### Subscription renewals
 
 Every renewal is taxed again when it is charged, with the merchant's current tax settings:
