@@ -1,0 +1,75 @@
+{
+  "campaign": {
+    "id": 36,
+    "name": "Welcome to Acme Health",
+    "kind": "broadcast",
+    "subject": "Welcome to Acme Health",
+    "status": "sent",
+    "status_message": null,
+    "audience_type": "crm_collection",
+    "schedule_at": null,
+    "launched_at": "2026-11-11T10:00:00-05:00",
+    "completed_at": "2026-11-11T10:00:40-05:00",
+    "updated_at": "2026-11-11T10:00:40-05:00",
+    "recipients_total": 38,
+    "sent_count": 38,
+    "failed_count": 0,
+    "opened_count": 19,
+    "clicked_count": 6,
+    "open_rate": 50,
+    "click_rate": 15.8,
+    "email_id": null,
+    "content_source": null,
+    "source_email_id": null,
+    "source_campaign_id": null,
+    "has_content": true,
+    "preview_text": null,
+    "sender": "integration",
+    "integration_id": 41,
+    "from_name": null,
+    "from_email": null,
+    "reply_to_email": null,
+    "audience_config": null,
+    "test_sent_at": null,
+    "dispatched_at": null,
+    "delivered_count": 37,
+    "bounced_count": 1,
+    "complained_count": 0,
+    "unsubscribed_count": 1,
+    "excluded_suppressed_count": 1,
+    "excluded_consent_count": 1,
+    "problems": [],
+    "editable": false,
+    "cancelable": false,
+    "split_pct": 0,
+    "split_wait_min": 240,
+    "split_metric": "clicks",
+    "split_phase": null,
+    "split_winner_id": null,
+    "split_test_done_at": null,
+    "split_winner_at": null,
+    "variants": []
+  },
+  "by_status": [
+    {
+      "status": "sent",
+      "n": 38
+    }
+  ],
+  "rates": {
+    "delivered": 97.4,
+    "opened": 50,
+    "clicked": 15.8,
+    "bounced": 2.6,
+    "unsubscribed": 2.6,
+    "complained": 0
+  },
+  "top_links": [
+    {
+      "url": "https://example.com/quiz",
+      "clicks": 6
+    }
+  ],
+  "tracks_events": true,
+  "split": null
+}

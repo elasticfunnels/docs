@@ -1,0 +1,25 @@
+{
+  "out": "images/guides/crm-claude-code-campaign-audience.png",
+  "alt": "The draft campaign Claude Code created, open on its Audience step: the Leads CRM collection selected and 38 people who will receive it",
+  "_source": "demo brand 899 (Northwind Supplements), local app; draft made with ef campaigns email create for this shot and removed after; the count is a fixture matching the guide (40 leads, 1 suppressed, 1 without consent)",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/36/edit",
+    "viewport": { "width": 1440, "height": 1000 },
+    "waitFor": "[data-testid=\"campaign-composer\"]",
+    "actions": [ { "wait": 2000 } ],
+    "crop": { "x": 257, "y": 61, "width": 1183, "height": 512 },
+    "fixtures": [
+      { "url": "^/api/brands/{brand}/email-campaigns/options", "file": "tools/shots/fixtures/campaigns/email-options-enabled.json" },
+      { "url": "^/api/brands/{brand}/email-campaigns/preview-audience", "file": "tools/shots/fixtures/campaigns/email-preview-audience-leads.json", "method": "POST" },
+      { "url": "^/api/brands/{brand}/email-campaigns/36/preview-audience", "file": "tools/shots/fixtures/campaigns/email-preview-audience-leads.json", "method": "POST" }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [62, 14, 178, 28], "title": "Draft", "text": "The campaign Claude Code created", "side": "left" },
+    { "selector": "select", "title": "CRM list", "text": "The Leads entity, by its email field", "side": "left" },
+    { "box": [866, 128, 278, 62], "title": "Will receive", "text": "38 of 40 after the checks" },
+    { "box": [866, 238, 278, 52], "title": "Left out", "text": "No consent, or suppressed" }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "out": "images/guides/crm-claude-code-report.png",
+  "alt": "Report of the Welcome to Acme Health campaign sent to the Leads: recipients, delivered, opened, clicked, bounced and unsubscribed, the most clicked link and the recipient list",
+  "_source": "demo brand 899 (Northwind Supplements), local app; the campaign was never sent, so the report and recipients are fictional fixtures (38 example.com leads) on the real report screen",
+  "capture": {
+    "path": "/{brand}/emails/campaigns/36",
+    "viewport": { "width": 1440, "height": 1400 },
+    "waitFor": "text=Most clicked links",
+    "actions": [ { "wait": 1500 } ],
+    "crop": { "x": 256, "y": 60, "width": 1184, "height": 784 },
+    "fixtures": [
+      { "url": "^/api/brands/{brand}/email-campaigns/options", "file": "tools/shots/fixtures/campaigns/email-options-enabled.json" },
+      { "url": "^/api/brands/{brand}/email-campaigns/36/report", "file": "tools/shots/fixtures/campaigns/email-report-36.json" },
+      { "url": "^/api/brands/{brand}/email-campaigns/36/recipients", "file": "tools/shots/fixtures/campaigns/email-recipients-36.json" }
+    ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "box": [20, 178, 190, 72], "title": "Recipients", "text": "The 38 who got it", "side": "left" },
+    { "selector": "text=Left out at send time", "title": "Left out", "text": "Rechecked at send time", "side": "left" },
+    { "box": [20, 444, 443, 35], "title": "Filters", "text": "Opened, clicked, bounced and more", "side": "left" },
+    { "box": [962, 178, 190, 72], "title": "Unsubscribed", "text": "Left out of later campaigns" },
+    { "selector": "text=6 people", "title": "Clicked links", "text": "People per link in the email" }
+  ]
+}

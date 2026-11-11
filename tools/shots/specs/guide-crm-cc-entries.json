@@ -1,0 +1,20 @@
+{
+  "out": "images/guides/crm-claude-code-entries.png",
+  "alt": "The Entries tab of the Leads object after the import: leads titled by their example.com address, with first name, last name, phone and the New stage",
+  "_source": "demo brand 899 (Northwind Supplements), local app; 40 fake @example.com leads imported with ef crm import for this shot, removed after",
+  "capture": {
+    "path": "/{brand}/crm/entities/121?tab=settings",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid=\"detail.tab.entries\"]",
+    "actions": [ { "click": "[data-testid=\"detail.tab.entries\"]" }, { "waitFor": "td >> text=/@example\\.com/" }, { "wait": 1500 } ],
+    "crop": { "x": 256, "y": 60, "width": 830, "height": 744 },
+    "hide": [ "button:has-text(\"Newest first\")", "button:has-text(\"25 per page\")", "button:has-text(\"per page\")" ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "text=8 fields", "title": "Fields", "text": "Four new ones came from the file" },
+    { "selector": "td >> text=hugo.laurent@example.com", "title": "Title", "text": "Taken from the email column", "side": "left" },
+    { "selector": "td >> text=New >> nth=0", "title": "Stage", "text": "First stage of the Sales pipeline" }
+  ]
+}

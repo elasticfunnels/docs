@@ -1,0 +1,20 @@
+{
+  "out": "images/guides/crm-claude-code-fields.png",
+  "alt": "The Leads object in Apps, CRM, open on its Fields tab: First name, Last name, Phone and Source with their keys and types, and one pipeline",
+  "_source": "demo brand 899 (Northwind Supplements), local app; Leads object made with the ef CLI for this shot, fake @example.com contacts, removed after",
+  "capture": {
+    "path": "/{brand}/crm/entities/121?tab=settings",
+    "viewport": { "width": 1440, "height": 900 },
+    "waitFor": "[data-testid=\"tab.fields\"]",
+    "actions": [ { "click": "[data-testid=\"tab.fields\"]" }, { "waitFor": "td >> text=phone" }, { "wait": 1000 } ],
+    "crop": { "x": 256, "y": 60, "width": 1184, "height": 608 },
+    "hide": [ "text=8 fields" ]
+  },
+  "maxWidth": 760,
+  "calloutWidth": 220,
+  "annotations": [
+    { "selector": "text=1 pipeline", "title": "Pipeline", "text": "Sales, with its four stages", "side": "left" },
+    { "selector": "[data-testid=\"tab.fields\"]", "title": "Fields", "text": "Every column a lead can hold", "side": "left" },
+    { "box": [289, 499, 858, 50], "title": "Phone", "text": "A field of type phone" }
+  ]
+}

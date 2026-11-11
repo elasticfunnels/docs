@@ -297,6 +297,7 @@
                 "group": "Campaigns",
                 "icon": "bullhorn",
                 "pages": [
+                  "guides/crm-contacts-campaigns-claude-code",
                   "campaigns/email-campaigns",
                   "campaigns/sms-campaigns"
                 ]
