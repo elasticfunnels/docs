@@ -937,7 +937,7 @@ POST /api/brands/{brand}/coupons
 </ParamField>
 
 <ParamField body="product_ids" type="array">
-  Limit discount to specific product IDs. Empty/null means all products.
+  Limit the discount to these product IDs. Empty or null means all products. The code is accepted when at least one of them is in the cart, and only their cart lines are discounted: other products and order bumps in the same cart pay full price.
 </ParamField>
 
 <ParamField body="excluded_product_ids" type="array">
