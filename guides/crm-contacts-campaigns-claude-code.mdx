@@ -194,13 +194,16 @@ entity, like records added by hand.
 Ask Claude Code for the email itself as an HTML file, and say who it is from:
 
 ```text
-Write a short welcome email for the Leads in welcome.html: greet them with {{ customer.first_name }},
+Write a short welcome email for the Leads in welcome.html: greet each lead by their first name,
 two lines about Acme Health, a button to https://example.com/quiz.
 Send it from Acme Health, hello@example.com.
 ```
 
 Claude Code writes the HTML into the folder; the campaign reads it with `--html-file` in the next step.
-`{{ customer.first_name }}` is filled from each lead's First name field when the email is sent.
+You don't need to know the merge tag: the ef-campaigns skill that `ef init` installs lists it, so Claude Code
+writes `{{ customer.first_name }}` into the HTML itself. It is filled from each lead's First name field when the
+email is sent, so give your file a First name column. Without one it falls back to a name field and puts the whole
+name in the greeting.
 
 ElasticFunnels adds the footer with the unsubscribe link and your postal address to every campaign email when it
 is sent, so the HTML only needs the message. See [The footer and unsubscribe link](/campaigns/email-campaigns#the-footer-and-unsubscribe-link).
