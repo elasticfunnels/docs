@@ -957,7 +957,7 @@ POST /api/brands/{brand}/coupons
 </ParamField>
 
 <ParamField body="usage_limit" type="number">
-  Maximum number of redemptions (null = unlimited).
+  How many orders can use the coupon (null or 0 = unlimited). Each recorded main order uses one, including a free order. A declined payment, an upsell or a subscription renewal does not. Once the limit is reached the checkout refuses the code and charges nothing. `used_count` shows the uses so far; it only counts orders placed after this rule went live, so older orders are not included.
 </ParamField>
 
 ```bash cURL — 20% off all products
