@@ -28,6 +28,16 @@ The tag you use determines the customer experience:
 **Important:** One-click upsells require an active purchase session. If the customer doesn't have an active session (e.g., they navigated directly to an upsell page), clicking an `[UPSELL=]` link will redirect them to the checkout page instead.
 </Note>
 
+### When a one-click upsell charges
+
+The saved card is charged only when the buyer accepts on your own site:
+
+- **`[UPSELL=]` and `[DOWNSELL=]` buttons** charge in one click, as always.
+- **Accept links you wrote by hand** (`<a href="/b?p=CODE&ups=yes">`) still charge in one click when the buyer clicks them on one of your pages. A short "Adding this to your order" page shows for a moment and sends the order on its own.
+- **The same link opened any other way** (from another website, an email, a chat, or typed in the address bar) shows a confirm page with the product and price. Nothing is charged until the buyer clicks **Yes, add it to my order**. **No, thanks** goes back to the page they came from, or to your home page.
+
+This stops another site from charging your buyers by sending them to an accept link in the hours after they order.
+
 ## Setting Up Upsell Pages
 {/* SCREENSHOT: Setting Up Upsell Pages · product form, builder panel, or checkout example · desktop */}
 
