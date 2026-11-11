@@ -723,6 +723,20 @@ DELETE /api/brands/{brand}/crm/entries/{entry}
 DELETE /api/brands/{brand}/crm/entities/{entity}/entries/{entry}
 ```
 
+### Delete Entries in Bulk
+
+```
+POST /api/brands/{brand}/crm/entities/{entity}/entries/bulk-delete
+```
+
+<ParamField body="ids" type="array" required>
+  Up to 500 entry ids of this entity. Ids that belong to another entity or brand are ignored.
+</ParamField>
+
+```json Response
+{ "deleted": 500 }
+```
+
 ### Import Entries from a File
 
 Two calls. The first reads a CSV or XLSX file and suggests a field per column; the second writes the rows, a batch at a time. Create any new fields with [Create Field](#create-field) between the two: every key in `mapping` must already be a field of the entity.
@@ -798,9 +812,14 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/7/
   Rows per call, 1 to 250 (default 100).
 </ParamField>
 
+<ParamField body="upsert_by" type="string">
+  A mapped field key (for example `email`). A row whose value for it matches an existing entry of the entity (trimmed, not case sensitive) updates that entry instead of adding one: a filled cell replaces the stored value, an empty cell keeps it, and several-choices values are merged. Rows of the file that share a value end up as one entry, across calls too. Each call's reply counts these rows in `updated`.
+</ParamField>
+
 ```json Response
 {
   "imported": 100,
+  "updated": 0,
   "skipped": 0,
   "failed": 0,
   "errors": [],
@@ -810,7 +829,7 @@ curl -X POST https://app.elasticfunnels.io/api/brands/{brand_id}/crm/entities/7/
 }
 ```
 
-Repeat until `done` is `true`. `errors` lists up to 20 failed rows per call as `{ "row": 14, "message": "..." }`, where `row` is the line in the file (the header is line 1). Values are converted to the field type (numbers, yes / no, dates). Each call adds new entries, so sending the same offset twice imports those rows twice. Imported entries resolve contacts like any new entry, but do not fire stage automations or `form.submitted` webhooks. Errors: `422` with `code` `file_missing` (preview again), `unknown_field`, or a pipeline / stage validation error.
+Repeat until `done` is `true`. `errors` lists up to 20 failed rows per call as `{ "row": 14, "message": "..." }`, where `row` is the line in the file (the header is line 1). Values are converted to the field type (numbers, yes / no, dates). Each call adds new entries, so sending the same offset twice imports those rows twice. Imported entries resolve contacts like any new entry, but do not fire stage automations or `form.submitted` webhooks. Errors: `422` with `code` `file_missing` (preview again), `unknown_field` (also for an `upsert_by` key that is not a mapped field), or a pipeline / stage validation error.
 
 ---
 
