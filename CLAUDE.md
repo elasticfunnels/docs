@@ -73,3 +73,7 @@ hand-drawn copy of the UI, never a real customer's brand.
   (codes `sleep-gummies`, `sleep-gummies-1/3/6`), the example brand **Acme Health**, example
   domains `example.com`. Never a real customer product or brand (Menosoothe, Herpafend, Glucotil
   and the like), not in prose, code, JSON or alt text.
+
+## Tasks
+
+The single list of work is [TASKS.md](TASKS.md).
