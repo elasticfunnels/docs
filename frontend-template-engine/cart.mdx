@@ -173,6 +173,8 @@ You can wrap the Remove button in **`<template-if data-condition="cartItems.leng
 
 For custom behavior, use **`@click`** with **`window.ef.addToCart(code, options?, quantity?)`**, **`window.ef.setCartQuantity(code, quantity)`**, or **`window.ef.removeFromCart(code, allowClear?)`** if the app exposes **`window.ef`**.
 
+`addToCart` and a `setCartQuantity` call that raises a quantity are both recorded as an add to cart in Analytics (and reach `ef.onAddToCart` subscribers). Calls made in one go, such as clearing the cart and setting each product before going to checkout, are recorded as a single add to cart. Lowering a quantity or removing a product records nothing.
+
 ---
 
 ## Order bumps (on checkout)

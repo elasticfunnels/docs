@@ -295,6 +295,27 @@ description: "Detailed tracking metrics for user behavior, engagement, and funne
 
 **Different from add-to-cart rate**: Raw count vs percentage
 
+**What counts as an add to cart**:
+- A click on a buy link (`[BUY=...]` or any `/b?p=...` link)
+- A click on a pasted merchant buy link (JVZoo, ClickBank)
+- `window.ef.addToCart(...)` or an add-to-cart button on the page
+- `window.ef.setCartQuantity(...)` raising a product's quantity, for pages that build the cart in their own code. Several products set in one go (for example a "pick your bottles" page filling the cart before checkout) count as one add to cart.
+
+Lowering or removing a quantity is not an add to cart, and quantity changes on the checkout page itself are not counted.
+
+### Top funnels card
+
+The **Top funnels** card on the Analytics page ranks funnels by page views. Next to Revenue, EPC, AOV, MOV and UOV, each row shows:
+
+| Column | What it counts |
+|---|---|
+| Sales | Every order in the period: front-end purchases, upsells, downsells and subscription renewals |
+| Add to carts | Add to carts on the funnel's pages (see above) |
+| Upsells | Upsell and downsell orders |
+| Upsell take % | Upsell and downsell orders as a share of all orders on the funnel |
+
+Sales and Add to carts appear when at least one funnel has one in the period. Upsells and Upsell take % appear when the period has sales. A funnel with no orders shows a dash for Upsell take %.
+
 **Why track both**:
 - Volume understanding (total events)
 - Performance measurement (rate)
