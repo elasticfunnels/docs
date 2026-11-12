@@ -242,18 +242,18 @@ var unsubscribe = ef.onAddToCart(function(event) {
   event.products.forEach(function(product) {
     console.log('Added:', product.id, product.price, 'from', event.source);
 
-    // Example: fire a Meta Pixel AddToCart event
-    // fbq('track', 'AddToCart', {
-    //   content_ids: [product.id],
-    //   value: product.price,
-    //   currency: product.currency,
-    // });
+    // Example: send it to a tool you added to the page yourself
+    // myTool.track('add_to_cart', { id: product.id, value: product.price });
   });
 });
 
 // Stop listening later:
 // unsubscribe();
 ```
+
+<Note>
+Pixels you connect to the brand (Meta, Google Analytics, TikTok, Pinterest, Snapchat and X) already get their standard add to cart event for buy links and cart adds. Don't fire that event again from this callback, or the pixel counts each add twice. Use the callback for tools you added to the page yourself.
+</Note>
 
 The same payload is also dispatched as an `ef:add-to-cart` **CustomEvent** on `window`. This is handy for Google Tag Manager or pixels that listen for DOM events instead of calling `window.ef`:
 
