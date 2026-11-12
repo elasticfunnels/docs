@@ -36,6 +36,15 @@ Each domain has one or more uses. Open **Domains**, click the edit icon on the d
 
 Keep at least one use checked.
 
+## Redirect www to your root domain (or the reverse)
+
+You don't need a DNS redirect for this. ElasticFunnels does it for you:
+
+1. Add **both** versions to the brand as domains, for example `example.com` and `www.example.com`, and point both at us.
+2. Go to **Settings → SEO** and, under **Site address**, set **Preferred domain** to **Without www** (or **With www**). Click **Save**.
+
+Every visit to the other version now gets a permanent (301) redirect, with the path and query string kept, so affiliate parameters arrive unchanged. Checkout and tracking requests are never redirected. Details: [Site address: www, non-www and https](/pages/seo#site-address-www-non-www-and-https).
+
 ## DNS Configuration
 {/* SCREENSHOT: DNS Configuration · domain settings or DNS setup screen · desktop */}
 
