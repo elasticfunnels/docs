@@ -114,7 +114,7 @@ API keys are for your own scripts and integrations. Send the key in the `EF-Acce
     Give it a name that says where it will be used, such as `reporting server`.
   </Step>
   <Step title="Choose what it is for">
-    Under **Use**, pick **ef CLI or AI agent** for a key that runs the `ef` CLI unattended (see below), or **Custom** to choose the projects, access and partner API scopes yourself.
+    Under **Use**, pick **ef CLI or AI agent** for a key that runs the `ef` CLI unattended (see below), then **Only** this project or **All projects I can access, now and later**; or pick **Custom** to choose the projects, access and partner API scopes yourself.
   </Step>
   <Step title="Custom only: choose the projects and access">
     Under **Projects**, pick **Only** this project, **Projects I pick**, or **All projects I can access, now and later**. Under **Access**, pick **Read and write** or **Read-only**. **Partner API scopes** apply only to the partner API (`/api/v1`).
@@ -131,7 +131,7 @@ No API key or CLI connection reaches billing, payment cards, team members, organ
 
 ### A key for the ef CLI or an AI agent
 
-A key made with **ef CLI or AI agent** works for this project only, can read and write, and can do everything the `ef` CLI does there: pages, components, assets, scripts, folders, templates, funnels, products, domains, tags, popups, stats, split tests, orders, contacts, CRM import, audiences, campaigns and settings. It acts as you, so it can't do more than your role allows; for example, personal contact details still need the permission to see them.
+A key made with **ef CLI or AI agent** works for **Only** this project or **All projects I can access, now and later**, can read and write, and can do everything the `ef` CLI does there: pages, components, assets, scripts, folders, templates, funnels, products, domains, tags, popups, stats, split tests, orders, contacts, CRM import, audiences, campaigns and settings. It acts as you, so it can't do more than your role allows; for example, personal contact details still need the permission to see them.
 
 Use it where nobody can approve a browser sign-in, such as a server or an AI agent:
 
@@ -139,7 +139,7 @@ Use it where nobody can approve a browser sign-in, such as a server or an AI age
 ef init --api-key <your key>
 ```
 
-The CLI asks the server which project the key belongs to, so `--brand-id` is not needed. You can also set the key in `$EF_API_KEY`.
+For a one-project key the CLI asks the server which project the key belongs to, so `--brand-id` is not needed. An all-projects key reaches every project you are assigned to (an organization member who is not assigned to a project can't open it in the app, and their key can't either), so bind each folder to one with `ef init --api-key <your key> --brand-id <id>`. You can also set the key in `$EF_API_KEY`.
 
 **Revoke** stops a key at once and can't be undone.
 
