@@ -107,13 +107,36 @@ You can also skip the button and call `ef.upsell.buy()` from your own UI.
 - A double click, a second tab or a reload charges once. The second request gets the first result.
 - A declined card charges nothing and records no order. The buyer goes to your decline step, as with a single upsell.
 
+## Subscriptions
+
+A selection made only of subscription products opens **one subscription** that holds every product, at its quantity. The buyer is charged once today and once per cycle after that, the same way a cart checkout with several subscription products works.
+
+```
+[UPSELL=coffee-monthly,filters-monthly max_qty=3]
+```
+
+- **Today:** one charge for the products, with shipping and tax, on the card from the first order.
+- **Each cycle:** one charge for every product's recurring price times its quantity, plus the shipping from today's order (the products ship every cycle). Tax is worked out again on each renewal.
+- **Renewal orders** carry every product as its own line, so fulfillment ships them all and reports count each one.
+- It is one plan in [Subscriptions](/subscriptions/overview): pausing, skipping or canceling it acts on all of its products together.
+
+This lets you build "subscribe to what you just picked": list the subscription products in the tag, let the buyer choose with `window.ef.upsell`, and the selection becomes one plan.
+
+Every product in the selection must renew on the same schedule (for example, all monthly). These selections are refused, and the card is not charged:
+
+| Selection | Code |
+|-----------|------|
+| Subscription and one-time products together | `multi_upsell_subscription`. Sell the one-time products with their own upsell |
+| Subscriptions that renew on different schedules (monthly and weekly) | `multi_upsell_subscription_schedule` |
+| A subscription with a free trial, an intro price, a free first charge or prices that change by cycle | `multi_upsell_subscription_schedule`. Sell it with its own `[UPSELL=X]` link |
+
 ## Limits
 
 | Situation | What happens |
 |-----------|--------------|
 | ClickBank, BuyGoods, JVZoo, Digistore24 and other networks, PayPal, Klarna, Shop Pay | Refused with the code `multi_upsell_unsupported_merchant`. These merchants run their own upsell flow and take one product per offer. Use one `[UPSELL=X]` per product |
 | Authorize.Net | Refused with the code `multi_upsell_unsupported_merchant`. Use one `[UPSELL=X]` per product on Authorize.Net for now |
-| A subscription product in the selection | Refused (`multi_upsell_subscription`). Sell a subscription with its own `[UPSELL=X]` link |
+| Subscription and one-time products together, or subscriptions on different schedules | Refused. See [Subscriptions](#subscriptions) |
 | The first order was free with a coupon that covers upsells | Refused (`multi_upsell_free_order`) |
 | The buyer opens the page in another browser (no order there) | Refused (`multi_upsell_no_session`) |
 | A selection the tag does not offer | Refused (`multi_upsell_not_offered`) |
