@@ -59,6 +59,9 @@ Which favicon a page shows:
 From a terminal, `ef favicon` shows the brand favicon and whether it loads, `ef favicon set icon.png`
 uploads one (PNG, JPG or WebP, square, for example 192x192) and `ef favicon clear` removes it.
 
+The brand favicon also answers at `/favicon.ico` on every domain of the brand, which is where browsers,
+bookmarks and search results look first. Without a brand favicon, `/favicon.ico` returns not found.
+
 ## Security
 
 Funnel-only access (visitors who did not come through a funnel are sent to the index page),
