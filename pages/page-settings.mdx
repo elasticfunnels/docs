@@ -48,6 +48,17 @@ Title, favicon, a title shown while the tab is in the background, meta descripti
 the page is listed in `sitemap.xml` and `llms.txt` (see [SEO](/pages/seo)). Code editor pages write
 their own `<head>`, so they have no SEO tab.
 
+Which favicon a page shows:
+
+1. If the page's own HTML links an icon (`<link rel="icon">` in its layout, head code or custom header
+   code), that icon is used and ElasticFunnels adds none.
+2. Otherwise the favicon set on the page's SEO tab.
+3. Otherwise the brand favicon from **Settings > General**.
+4. Otherwise none.
+
+From a terminal, `ef favicon` shows the brand favicon and whether it loads, `ef favicon set icon.png`
+uploads one (PNG, JPG or WebP, square, for example 192x192) and `ef favicon clear` removes it.
+
 ## Security
 
 Funnel-only access (visitors who did not come through a funnel are sent to the index page),
