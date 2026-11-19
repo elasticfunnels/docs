@@ -131,6 +131,28 @@ Recipients go out in batches of 250, paced to your sending account's limit per m
 | Resend | 100 |
 | Mailrelay, your SMTP server | 60 |
 
+### Send it slowly
+
+To protect a new domain or sending account, slow the campaign down under **Sending speed** in the Settings step.
+Every rule is optional. When you set several, the strictest one wins, and the account limit above still applies.
+
+| Rule | What it does |
+|---|---|
+| **Speed: Up to a number per hour** | At most that many emails an hour, spread evenly through the hour |
+| **Speed: Spread over a number of hours** | Splits the whole list over that many sending hours. 10,000 people over 20 hours is 500 an hour. |
+| **Sending days** | Only sends on the days you leave on |
+| **Only send between** | Only sends between two times, for example 09:00 to 17:00. An end time before the start time runs overnight. |
+| **Timezone** | The timezone for the days and hours. Empty uses the brand's timezone. |
+| **Daily limit** | At most that many emails a day |
+| **Raise the daily limit each day (%)** | For warming up a new domain: 20 turns a limit of 500 into 600 on day two, 720 on day three, and so on |
+
+While a paced campaign sends, its report shows whether it is sending, waiting for its sending hours or done for
+the day, how many people are still waiting, and roughly when the last ones go out. Click **Change speed** there to
+slow it down, speed it up, or switch every rule off: switching them off sends everyone still waiting right away.
+
+To start every new campaign with the same rules, set them under **Default sending speed** in
+**Campaigns > Settings**. Each campaign can still change its own.
+
 ## The report
 
 <img src="/images/campaigns/email-report.png" alt="Email campaign report: stats, people left out, most clicked links and the recipients list" />

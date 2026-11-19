@@ -64,6 +64,23 @@ ef campaigns email stats 17
 - `ef campaigns email get 17` lists anything that still blocks sending, such as a missing sending account or marketing address.
 - `unschedule` puts a scheduled campaign back to draft. `cancel` stops one that is scheduled or sending.
 
+### Sending speed
+
+```bash
+ef campaigns email pace 17                                   # the rules and where the send stands
+ef campaigns email pace 17 --per-hour 500                    # at most 500 an hour
+ef campaigns email pace 17 --spread-hours 24                 # the whole list over 24 sending hours
+ef campaigns email pace 17 --send-days mon-fri --send-hours 09:00-17:00 --timezone America/New_York
+ef campaigns email pace 17 --daily-cap 500 --daily-growth 20 # 500, 600, 720... a day
+ef campaigns email pace 17 --no-pacing                       # every rule off: send at full speed
+ef campaigns email pace-default --per-hour 1000              # the speed new campaigns start with
+```
+
+- `pace` works on drafts, scheduled and sending campaigns. The same flags work on `create` and `set`.
+- Each flag takes `off` to clear just that rule; the others stay. When several rules are set, the strictest wins.
+- A new campaign starts with the brand default unless you pass pacing flags or `--no-pacing`.
+- Needs ef CLI 0.28.9 or later.
+
 ## SMS campaigns
 
 ```bash
