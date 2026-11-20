@@ -153,6 +153,46 @@ slow it down, speed it up, or switch every rule off: switching them off sends ev
 To start every new campaign with the same rules, set them under **Default sending speed** in
 **Campaigns > Settings**. Each campaign can still change its own.
 
+### Warm up a new sending account
+
+A sending account you connect now starts with a **warm-up**: a daily limit for the account itself, shared by every
+campaign that sends through it. It allows 200 emails on the first day the account sends, 30% more each day after
+(260, 338, 439...), and ends once the daily limit would reach 50,000. Inbox providers trust an account that grows
+slowly; a new domain that sends thousands on day one tends to land in spam.
+
+- Each campaign gets the lower of its own sending speed and what the account has left for the day.
+- The Review step shows how many sending days the campaign needs and when the last emails should go out, counting
+  the warm-up.
+- In **Campaigns > Settings**, each sending account shows its warm-up: the day it is on, how many it sent today out of
+  its limit, and the date the limit ends. **Change warm-up** sets the first day's limit, the growth per day and where it
+  ends. **Mark as warmed** removes the limit. **Start warm-up** puts an account back into warm-up from day one.
+- Accounts you connected before November 20, 2026 have no limit until you start a warm-up for them, so campaigns
+  already sending keep their speed.
+
+### Bounce and complaint limits
+
+While a campaign sends, ElasticFunnels checks every minute how many of its emails hard-bounced or were marked as
+spam over the last 72 hours, once at least 200 have gone out. It checks the same for all campaigns on the same sending
+account together.
+
+| Rate | Slow down at | Pause at |
+|---|---|---|
+| Hard bounces | 2% | 5% |
+| Spam complaints | 0.05% | 0.1% |
+
+- Over the slow-down line, the campaign's speed per hour is halved, at most once a day. The campaign page says when and why.
+- Over the pause line, the campaign is paused. It shows **Paused** with the reason, and nobody else gets it until you
+  click **Resume** on the campaign page. Fix the cause first (clean the list, check the sending account). After a
+  resume, the check counts only what is sent from then on.
+- **Pause** on a sending campaign stops it by hand in the same way.
+- Change the lines for the brand under **Bounce and complaint limits** in **Campaigns > Settings**.
+
+<Warning>
+The check needs bounce and complaint reports from your sending account. A plain SMTP server, or an account whose
+delivery stats are not set up, reports none, so the check cannot pause anything for it. Campaign settings, the Review
+step and the campaign page say so for those accounts.
+</Warning>
+
 ## The report
 
 <img src="/images/campaigns/email-report.png" alt="Email campaign report: stats, people left out, most clicked links and the recipients list" />
@@ -212,6 +252,7 @@ The list covers the whole brand, so it also keeps these people out of marketing 
 | **Draft** | Not launched. You can edit it. |
 | **Scheduled** | Waiting for its send time. **Unschedule** turns it back into a draft. |
 | **Sending** | Going out now. **Stop sending** cancels the rest. |
+| **Sending** + **Paused** | Stopped by you or by the bounce and complaint limits. **Resume** carries on. |
 | **Sent** | Finished |
 | **Failed** / **Canceled** | Stopped by a problem, or by you. Both show under **Failed or canceled**. |
 

@@ -81,6 +81,20 @@ ef campaigns email pace-default --per-hour 1000              # the speed new cam
 - A new campaign starts with the brand default unless you pass pacing flags or `--no-pacing`.
 - Needs ef CLI 0.28.9 or later.
 
+### Warm-up, pauses and the finish date
+
+```bash
+ef campaigns email count 17                                  # who gets it, and the finish date counting the warm-up
+ef campaigns email warmup                                    # each sending account, its warm-up and whether bounces are seen
+ef campaigns email warmup integration:41 --on --start 100 --growth 25   # start (or change) a warm-up
+ef campaigns email warmup brand_smtp:5 --off                 # mark as warmed: no daily limit
+ef campaigns email pause 17                                  # stop a sending campaign
+ef campaigns email resume 17                                 # carry on after a pause
+```
+
+- `pace`, `stats` and `get` show a paused campaign's reason, an automatic slow-down and the account warm-up.
+- A sending account's key comes from `warmup`: `integration:<id>` or `brand_smtp:<id>`.
+
 ## SMS campaigns
 
 ```bash
