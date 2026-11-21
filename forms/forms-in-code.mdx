@@ -159,7 +159,7 @@ ElasticFunnels' page script sends every form whose `action` starts with `/api/` 
 - **Errors.** Server errors ("phone is required", "Your session has expired") appear in the element with `data-form-error-message`. Without one, a red box appears above the submit button.
 - **Success.** The element with `data-form-success-message` shows "Thank you for submitting the form." and the form is cleared. Saving the page resets the `data-success-message` attribute, so for your own wording use the `on-form-success` event as in the example.
 - **Redirect.** Add `data-redirect-url="/thank-you"` to the `<form>` to send the visitor to another page after a successful entry.
-- **Checks.** Required fields, email fields and number fields are checked on the server. Text fields are also screened for random-looking spam text. If the collection has reCAPTCHA v3 turned on, put `<div data-recaptcha-v3="true" data-site-key="YOUR_SITE_KEY"></div>` inside the form.
+- **Checks.** Required fields, email fields and number fields are checked on the server. Text fields are also screened for random-looking spam text. Submissions that look like attack probes, or use an email at a reserved test domain such as `example.com` or `.invalid`, are not saved and send no notification. The form still shows its success message, so test your form with a real inbox. If the collection has reCAPTCHA v3 turned on, put `<div data-recaptcha-v3="true" data-site-key="YOUR_SITE_KEY"></div>` inside the form.
 - **Session.** The form only works on pages served by ElasticFunnels. It sends a security token from the page, so a copy of the form on another site is rejected.
 
 ## Where entries show up
