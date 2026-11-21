@@ -9,9 +9,11 @@ opens, clicks and bounces in campaign reports it also needs the **HTTP webhook s
 **Mailgun region** has to match your domain. Keys you save are stored encrypted and never shown again.
 
 <Tip>
-You usually do not need to copy the signing key yourself. In **Emails** → **Campaign settings**, open the
-account's **Delivery stats** and click **Connect** under **Connect automatically**. ElasticFunnels uses the
-saved API key to add its webhook to your sending domain and saves the signing key for you. It is safe to run
+You usually do not need to copy the signing key yourself. When you save the Mailgun account,
+ElasticFunnels uses its API key to add its webhook to your sending domain and saves the signing key for you.
+You can run the same step again from **Emails** → **Campaign settings**: open the account's **Delivery
+stats** and click **Connect** under **Connect automatically**. The account shows **Receiving events** only
+once Mailgun really sends its events to ElasticFunnels; until then campaigns show no opens or clicks. It is safe to run
 again: it adds what is missing, updates an old ElasticFunnels URL and keeps webhooks you added yourself. If
 your domain already uses all three URL slots Mailgun allows per event, it asks before replacing one. If the
 API key may not manage webhooks, follow the steps under **Set it up by hand** on the same screen.

@@ -9,10 +9,10 @@ campaign reports it also needs the **Verification key (public key)** of a signed
 are stored encrypted and never shown again.
 
 <Tip>
-With the right API key you can skip the verification key. In **Emails** → **Campaign settings**, open the
-account's **Delivery stats** and click **Connect** under **Connect automatically**. ElasticFunnels uses the
-saved API key to create a signed event webhook in SendGrid and saves its verification key. It is safe to run
-again. If SendGrid has no free webhook slot left, it asks before replacing the one in use. If the key may
+With the right API key you can skip the verification key. When you save the SendGrid account,
+ElasticFunnels uses its API key to create a signed event webhook in SendGrid and saves its verification key.
+You can run the same step again from **Emails** → **Campaign settings**: open the account's **Delivery
+stats** and click **Connect** under **Connect automatically**. It is safe to run again. If SendGrid has no free webhook slot left, it asks before replacing the one in use. If the key may
 not manage webhooks, follow **Set it up by hand** on the same screen.
 </Tip>
 
