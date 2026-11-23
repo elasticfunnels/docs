@@ -74,6 +74,8 @@ When an integration's sign-in fails 10 times in a row on automation steps, with 
 
 While it is switched off, the integration is marked as needing attention on the Integrations page with the reason, and automation steps that use it fail with that reason without contacting the service. To turn it back on, fix the API key or login and save the integration, or click **Reactivate** on the Integrations page. One failure from a bad email address or a missing field does not count toward the 10.
 
+The owner and admins get one **Automation failed** email when the integration is switched off, naming the integration. Steps skipped while it stays off send no further emails.
+
 ## Paused integrations
 
 A paused integration sends nothing, including email. Order and subscription emails that would go through a paused email integration are not sent (brands that send through their own SMTP settings are not affected), and course welcome emails fall back to the ElasticFunnels mailer. A paused tax integration is not used at checkout (see [Pausing a tax integration](/integrations/tax#pausing-a-tax-integration)). Resume the integration to send again.
