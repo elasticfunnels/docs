@@ -84,6 +84,16 @@ A brand with no sales in the last 14 days gets the alert when it has at least 50
 
 The message names the cause when it can (for example, the merchant that is still in Needs Setup) and links to that merchant's postback setup. The issue resolves itself as soon as a purchase arrives.
 
+Only real shoppers count. Sessions marked as bots, such as Meta's link preview crawler opening your checkout, are left out of the count and out of your 14-day sales rate.
+
+Open the alert to see what is behind it:
+
+- **Real shoppers**, **Bots** and **Last sale recorded** for the alert's 6-hour window;
+- each merchant on those checkouts, whether it is set up, how many real and bot sessions it had and when its last sale arrived;
+- the latest sessions, with the page, how far they got (add to cart, checkout), page views, country, device, source and the browser identifier. Switch between **Real shoppers**, **Bots** and **All**, and click **Open session** to see a session's full journey.
+
+If the real shoppers look normal and the last sale is recent, check your merchant's own dashboard: sales it shows that are missing here mean its postback stopped reaching ElasticFunnels.
+
 ## Severity
 
 Every issue starts as a **Warning**. It becomes:
