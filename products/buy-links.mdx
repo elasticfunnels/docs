@@ -52,6 +52,7 @@ On the checkout page itself, do not make the quantity choice (1x / 2x / 4x) a se
 - **extra**: Additional tracking data
 - **quantity**: Pre-set purchase quantity
 - **discount**: Apply discount codes
+- **coupon**: Coupon code for the merchant's checkout. On Buygoods, `[BUY=product_code discount=SAVE20]` and `[BUY=product_code coupon=SAVE20]` both open the Buygoods checkout with `&coupon=SAVE20`, so the code must exist as a coupon in your Buygoods account.
 
 ### Platform-Specific Affiliate Parameters
 Affiliate parameters are typically passed via URL query strings to the landing page, not in buy links. The system automatically captures and tracks them:
