@@ -65,8 +65,10 @@ Magic links are single-use. Once clicked, they cannot be used again. If the link
 
 ## When your brand has no sending account
 
-Login codes and links always go out, so a customer can sign in even before you set up SMTP or an
-email integration. If your brand cannot send them itself, ElasticFunnels sends a plain version:
+Login codes and links always go out, so a customer can sign in even before you set up a sending
+account. If your brand cannot send them itself, ElasticFunnels sends a plain version. That is also
+the case when the brand default under **Settings → Emailing → Send through** is Amazon SES,
+Postmark, Brevo or Resend, because pages cannot send through those yet:
 
 - The sender name is your brand's name. The address is an ElasticFunnels no-reply address, so it
   never looks like it came from a person.
@@ -74,8 +76,8 @@ email integration. If your brand cannot send them itself, ElasticFunnels sends a
 - **Emails** → **Logs** lists it as Sent, with its subject, and the channel reads
   "ElasticFunnels mailer".
 
-Your own template and From address are used as soon as your brand has SMTP or an email
-integration. See [Sending setup](/emails/sending-setup).
+Your own template and From address are used as soon as the brand default is your SMTP server,
+Mailgun, SendGrid or Mailrelay. See [Sending setup](/emails/sending-setup).
 
 Order and subscription emails work differently: they are never sent by ElasticFunnels. Without a
 sending account they are skipped, and you get a "Choose a sending account" action.

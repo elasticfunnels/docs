@@ -10,8 +10,10 @@ description: "Connect a sender, wire templates to a merchant, and send a test be
 
 An order confirmation only reaches a customer when all three of these are in place:
 
-1. **A sender.** SMTP credentials on the brand, or an email integration on the merchant that is
-   connected and not paused.
+1. **A sender.** A sending account picked under **Send through** in **Settings → Emailing**: your
+   SMTP server or an API account (Mailgun, SendGrid, Amazon SES, Postmark, Brevo, Resend,
+   Mailrelay). A merchant can use its own account instead. Either way it must be connected and
+   not paused.
 2. **A template.** The email itself, from the template list (**Settings → Apps → Emails**). Your brand has a **Default**
    template for each standard event.
 3. **A merchant whose payments run through ElasticFunnels.** NMI, Stripe, PayPal, Klarna and
@@ -33,8 +35,36 @@ for which merchants. Check it after any change here.
 ## Step 1: connect a sender
 {/* SCREENSHOT: Settings Emailing tab · empty SMTP form before credentials are entered · desktop */}
 
-Go to **Settings** → **Emailing**. This is the SMTP relay ElasticFunnels connects to for
-every transactional email this brand sends.
+Go to **Settings** → **Emailing**. The page has two parts: **Send through** at the top, and the
+SMTP server form under it.
+
+### Send through: pick the account that sends
+
+**Send through** lists every sending account your brand has: the SMTP server from the form below
+and any API account (Mailgun, SendGrid, Amazon SES, Postmark, Brevo, Resend, Mailrelay). Click
+one to make it the brand default. The default sends your order, subscription, course and login
+emails. A merchant can pick a different one on its **Email** tab (see
+[A different account for one merchant](#a-different-account-for-one-merchant)).
+
+- **Add an API account** connects a new account without leaving the page. How to get each
+  provider's key is on [Email Sending Accounts](/emails/sending-accounts).
+- **Delivery stats** on each row says whether that account reports bounces and spam complaints
+  back. An API account does this once its event webhook is set: click **Set up delivery stats**.
+  A plain SMTP server cannot, because it cannot say what happens after it accepts an email.
+- **Reload accounts** refreshes the list after you change an account somewhere else.
+
+With no account yet, the section says so. Fill in your SMTP server below or add an API account.
+
+<Note>
+When Amazon SES, Postmark, Brevo or Resend is the brand default, members area login codes and
+links still go out through the ElasticFunnels mailer, because pages cannot send through those
+services yet. Your order, subscription and course emails use the account you picked.
+</Note>
+
+### The SMTP server
+
+This is the SMTP relay ElasticFunnels connects to when **Send through** is set to your SMTP
+server, and the fallback when no other account is picked.
 
 <Steps>
 <Step title="Enter the server details">
@@ -86,24 +116,44 @@ Email templates have their own `from_name`, `from_email`, and `reply_to_email` f
 the brand sends over SMTP, those are not used. The three values on the **Emailing** tab win
 for every template. Change the sender in one place and every transactional email follows.
 
-### Alternative: a per-merchant email integration
+### Switch Mailgun SMTP to the Mailgun API
 
-Instead of brand SMTP, a merchant can carry its own sending service. Merchant → **Email**
-tab → **Email Integration** lists your Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid
-and Mailrelay integrations from **Integrations**. How to connect each one is on
-[Email Sending Accounts](/emails/sending-accounts).
+If your SMTP host is Mailgun, **Send through** shows a hint: connect the same Mailgun account by
+API and you see bounces and spam complaints for every email. ElasticFunnels reads your sending
+domain from the SMTP username and shows it in the hint.
 
-**Brand SMTP takes priority.** If the brand has SMTP configured, the merchant integration
-is ignored for order emails. Use the merchant integration when a single brand sells through
-merchants that need to mail from different providers.
+1. Click **Switch to the Mailgun API**.
+2. Paste your Mailgun private API key. Check that the sending domain and the Mailgun region
+   match your domain in Mailgun. Where to find the key is on [Mailgun keys](/emails/provider-keys/mailgun).
+3. Save. The Mailgun API account becomes the brand default, and its delivery stats setup opens
+   so you can set the event webhook.
 
-A paused or disabled integration sends nothing. If it is the only sender a merchant has, its
+Your SMTP settings stay saved. To go back, pick your SMTP server under **Send through**.
+
+The same hint shows **Switch to the SendGrid API** when your SMTP host is SendGrid.
+
+### A different account for one merchant
+
+A merchant can send through its own account. Open **Merchants**, the merchant, then the **Email**
+tab. **Send through** lists the same accounts as **Settings → Emailing**. The first option is
+**Brand default**, followed by the brand's account name in brackets. Leave it there to follow
+the brand default, or pick another account for this merchant. Use this when one brand sells through merchants that need to mail
+from different providers.
+
+The merchant's own choice wins over the brand default for its order and subscription emails.
+Merchants set up before this option keep sending the way they did until you save a choice on
+their **Email** tab.
+
+If no account can send, the tab says so. Add your SMTP server or an API account in
+**Settings → Emailing**.
+
+A paused or disabled account sends nothing. If it is the only sender a merchant has, its
 order and subscription emails are skipped and a Brand Action asks you to choose a sending
 account. ElasticFunnels never sends those emails from its own servers in its place.
 
 Members area login codes and links, and the course welcome email, are the exception: when
-the brand has no SMTP, ElasticFunnels sends them under your brand name so customers are not
-locked out.
+the brand has no account that can send them, ElasticFunnels sends them under your brand name
+so customers are not locked out.
 
 ---
 
@@ -153,8 +203,9 @@ Visible for NMI and Stripe merchants:
 | Subscription Canceled | A subscription is canceled |
 
 Each row has a **Create template** button that seeds a ready-made template for that type and
-selects it immediately. A row showing **Not set** uses the brand's template for that event (see
-below). The Pre-Renewal Reminder is the exception: with **Not set**, no reminder is sent.
+selects it immediately. An empty row shows the template it sends instead, for example
+**Brand default: New Purchase** (see below for where that comes from). The Pre-Renewal Reminder
+is the exception: it only goes out once a template is picked in its row.
 
 <Tip>
 The usual setup is all four order slots filled on the merchant, with a custom purchase

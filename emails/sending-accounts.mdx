@@ -6,7 +6,8 @@ description: "Send order emails, campaigns, ticket replies and automation emails
 ---
 
 A sending account is an email service you own that ElasticFunnels sends through. Besides your
-SMTP server, Mailgun, SendGrid and Mailrelay, you can connect four API services:
+SMTP server, Mailgun, SendGrid and Mailrelay, you can connect four API services. You can add any
+of them from **Settings** → **Emailing** → **Send through** → **Add an API account**:
 
 | Service | What you paste | Good to know |
 |---|---|---|
@@ -21,15 +22,15 @@ Each key is checked with the provider when you save. A key that the provider ref
 
 | Email | Where you pick the account |
 |---|---|
-| Order and subscription emails | **Merchants** → the merchant → **Email** tab → **Email Integration**. Brand SMTP still wins when the brand has it. See [Sending Setup](/emails/sending-setup#alternative-a-per-merchant-email-integration). |
-| Course emails | The course's email integration. |
-| Campaigns | The campaign's **Settings** step, or **Connect a sending account** there. |
+| Order, subscription, course and login emails | **Settings** → **Emailing** → **Send through** sets the brand default. A merchant can pick its own under **Merchants** → the merchant → **Email** tab → **Send through**. See [Sending Setup](/emails/sending-setup#send-through-pick-the-account-that-sends). |
+| Campaigns | The campaign's **Settings** step. **Emails** → **Campaign settings** has an **Add a sending account** button. |
 | Support ticket replies | Ticket settings → **Reply Using Integration**. |
 | Automations | The **Send email** step's **Sending account**. See [Send email step](/automations/send-email). |
 
 Members area login codes and links are the exception. They are sent by your pages, which send
-only through brand SMTP, Mailgun, SendGrid or Mailrelay. Without one of those, ElasticFunnels
-sends the login email under your brand name, as it does today.
+only through brand SMTP, Mailgun, SendGrid or Mailrelay. When the brand default is Amazon SES,
+Postmark, Brevo or Resend, or there is no account at all, ElasticFunnels sends the login email
+under your brand name through its own mailer.
 
 A paused account sends nothing. For a ticket reply, the ticket source's own SMTP server is used
 instead.

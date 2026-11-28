@@ -96,7 +96,7 @@ All subscription email templates receive the standard purchase data (products, a
 </Steps>
 
 <Warning>
-Subscription emails need a sender: brand SMTP, or an **Email Integration** on the merchant (Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid or Mailrelay). Without one, no emails will be sent. See [Email Sending Accounts](/emails/sending-accounts).
+Subscription emails need a sender: the brand default under **Settings → Emailing → Send through**, or the account picked under **Send through** on the merchant's **Email** tab. It can be your SMTP server or an API account (Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid or Mailrelay). Without one, no emails will be sent. See [Email Sending Accounts](/emails/sending-accounts).
 </Warning>
 
 <Note>
@@ -153,7 +153,7 @@ Start from the default: retries a few days apart catch a payday or a new monthly
 
 ## Pre-Renewal Reminders
 
-Pre-renewal emails are sent automatically **3 days** before the next scheduled charge to customers with an active subscription and a valid email address. They go out only for merchants that have a **Pre-Renewal Reminder** template picked on their **Email** tab and a working sender (brand SMTP, or the merchant's email integration).
+Pre-renewal emails are sent automatically **3 days** before the next scheduled charge to customers with an active subscription and a valid email address. They go out only for merchants that have a **Pre-Renewal Reminder** template picked on their **Email** tab and a working sender (the brand default, or the merchant's own sending account). An empty Pre-Renewal Reminder row sends nothing, and the tab says so.
 
 <Info>
 Pre-renewal emails are recommended for legal compliance in some jurisdictions (e.g., FTC negative-option guidelines in the US).

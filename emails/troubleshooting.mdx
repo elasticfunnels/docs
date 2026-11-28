@@ -49,9 +49,10 @@ Open **Settings → Apps → Emails** and find the template for that event. Its 
 reason. A merchant whose checkout sends its own receipt (BuyGoods, ClickBank, Digistore24, JVZoo,
 Shopify) never gets order emails from ElasticFunnels.
 
-Then check the merchant's **Email** tab. A filled slot wins; a slot showing **Not set** uses the
-brand's pick under **Settings** → **Subscriptions**, then the brand's **Default** template for
-that event. The Pre-Renewal Reminder sends only when its slot is filled.
+Then check the merchant's **Email** tab. A filled slot wins. An empty slot shows the template it
+sends instead, for example **Brand default: New Purchase**: the brand's pick under **Settings** →
+**Subscriptions**, else the brand's **Default** template for that event. The Pre-Renewal Reminder
+sends only when its slot is filled.
 </Step>
 
 <Step title="Does the order have a customer email?">
@@ -61,13 +62,14 @@ never resolve into a confirmation email.
 </Step>
 
 <Step title="Is a sender configured?">
-**Settings** → **Emailing** needs SMTP credentials, or the merchant needs an **Email
-Integration** that is connected and not paused. With neither, the email is skipped.
+**Settings** → **Emailing** → **Send through** needs an account (your SMTP server or an API
+account), or the merchant needs its own account picked under **Send through** on its **Email**
+tab. The account must be connected and not paused. With none, the email is skipped.
 ElasticFunnels does not send order or subscription emails from its own servers instead.
 
 Check **Brand Actions** on your dashboard. A missing sender raises one task per email type,
 for example **Choose a sending account for order confirmation emails**. It closes by itself
-once that email can be sent again. A paused or disabled integration counts as no sender.
+once that email can be sent again. A paused or disabled account counts as no sender.
 </Step>
 
 <Step title="For shipping emails, did fulfillment actually report shipped?">

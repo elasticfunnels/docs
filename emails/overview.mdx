@@ -107,7 +107,8 @@ The usual reasons a template is not sending:
 - **Renewal reminders** go out only for merchants that have a renewal reminder template picked on
   their **Email** tab.
 - **Login emails** follow the members area login mode, and use your template only when the brand
-  has its own SMTP server. Without one, ElasticFunnels sends its standard login email.
+  default is your SMTP server, Mailgun, SendGrid or Mailrelay. Otherwise ElasticFunnels sends its
+  standard login email.
 - **Campaign and automation templates** count as sending while the campaign is going out or the
   automation is on.
 
@@ -137,19 +138,20 @@ A new campaign starts on a ready-made layout instead of an empty page. How to ed
 
 ## Who sends your email
 
-ElasticFunnels sends your email through an account you own: your SMTP server
-(**Settings → Emailing**) or an email integration: Amazon SES, Postmark, Brevo, Resend, Mailgun,
-SendGrid or Mailrelay ([Email Sending Accounts](/emails/sending-accounts)). Each
-kind of email has one rule for which account sends it:
+ElasticFunnels sends your email through an account you own: your SMTP server or an API account
+(Amazon SES, Postmark, Brevo, Resend, Mailgun, SendGrid or Mailrelay, see
+[Email Sending Accounts](/emails/sending-accounts)). **Settings → Emailing → Send through** lists
+them all, and the one you pick there is the brand default. Each kind of email has one rule for
+which account sends it:
 
 | Email | Sent through | If no account can send it |
 |---|---|---|
-| Order and subscription emails | Your brand SMTP. Without SMTP, the email integration picked on the merchant (**Merchant → Email → Email Integration**). | Not sent. A **Choose a sending account for ... emails** task appears in your Brand Actions, one per email type, and closes by itself once that email can go out again. |
-| Members area login codes and links | Your brand SMTP. | ElasticFunnels sends its standard login email under your brand name, so customers are never locked out. |
-| Course welcome email | Your brand SMTP, or the course's email integration. | ElasticFunnels sends it under your brand name. |
+| Order and subscription emails | The account picked on the merchant (**Merchant → Email → Send through**). Left on **Brand default**, the brand default from **Settings → Emailing**. | Not sent. A **Choose a sending account for ... emails** task appears in your Brand Actions, one per email type, and closes by itself once that email can go out again. |
+| Members area login codes and links | The brand default. When that is Amazon SES, Postmark, Brevo or Resend, the ElasticFunnels mailer sends them under your brand name. | ElasticFunnels sends its standard login email under your brand name, so customers are never locked out. |
+| Course welcome email | The brand default. | ElasticFunnels sends it under your brand name. |
 | Campaigns | The account you choose in the campaign's **Settings** step. | The campaign cannot be sent until you pick one. |
 
-A paused or disabled integration never sends anything, so it counts as no account. The full setup
+A paused or disabled account never sends anything, so it counts as no account. The full setup
 is on [Sending Setup](/emails/sending-setup).
 
 ## Create a template
@@ -161,7 +163,7 @@ In the template list (**Settings → Apps → Emails**), click **Create email**.
 <Step title="Fill in the basics">
 Give it a **Name** (only you see it), a **Subject** and an optional **Preview text**, the line most
 inboxes show after the subject. **From name**, **From email** and **Reply-to** apply when the email
-goes through an email integration. When your brand sends over SMTP, the sender set in
+goes through an API account. When your brand sends over SMTP, the sender set in
 **Settings → Emailing** is used instead.
 </Step>
 <Step title="Pick the type">

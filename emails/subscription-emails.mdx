@@ -125,7 +125,9 @@ Subscription email templates are chosen in two places, checked in this order:
 2. **Settings** -> **Subscriptions**, which holds brand-wide defaults for the same events.
 3. The brand's built-in system template for that event.
 
-A merchant with an empty slot and no brand default still sends, using the system template.
+A merchant with an empty slot and no brand default still sends, using the system template. The
+empty slot shows the template it sends, after **Brand default:**. The
+Pre-Renewal Reminder is the exception: it only goes out once a template is picked in its slot.
 Subscription slots only appear for merchants that bill recurring charges through
 ElasticFunnels (NMI and Stripe).
 
