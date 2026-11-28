@@ -99,6 +99,18 @@ ordinary copy, and the system template still wins even after you select the copy
 merchant. Shipped and cancelled always use whatever the merchant has selected.
 </Warning>
 
+## Card charge name on Stripe
+
+On a Stripe merchant, the card charge name is added after your Stripe account's prefix, so a
+statement reads `PREFIX* NAME`. Stripe cuts the whole line at 22 characters. With the prefix
+`ASPERDIGI`, the name gets 11 characters and `GOLDENTHREAD` prints as `ASPERDIGI* GOLDENTHREA`.
+
+Below the Card Charge Name field, the merchant's Settings tab shows the line as it will print,
+and says when the name is cut. Order and subscription emails use that same line, so the
+customer is told what their statement really shows. To make room, shorten the name or the prefix (in Stripe:
+Settings > Business > Public details > shortened descriptor). Some bank apps, Revolut among
+them, show your business name in place of this line.
+
 ## Related docs
 
 - [Sending Setup](/emails/sending-setup) - Sender, templates, and merchant wiring
