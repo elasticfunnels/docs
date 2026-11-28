@@ -23,6 +23,13 @@ The field then reads as the field's name and its step, for example **Valid · Va
 value next to it. Click it to change it. Behind the label the step stores a variable such as
 `{nwdeb00005.valid}`: the step's code, then the field.
 
+## Fields that hold a list
+
+Some fields hold several values, such as **Product Codes** on a purchase (`{purchase.product_codes}`). The picker
+lists the field itself, with its values joined by commas as the example (`tide-reading,bonus-guide`), and each
+value on its own (`{purchase.product_codes.0}`). Used whole, the field reads as that comma-separated text, so a
+**Continue If** with **contains** `tide-reading` follows the yes path when that product was bought.
+
 ## Steps you have not tested yet
 
 You do not need to test a step before the next one can use its fields. Integration steps come with an example
